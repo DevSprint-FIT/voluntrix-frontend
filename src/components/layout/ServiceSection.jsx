@@ -18,7 +18,15 @@ export default function ServiceSection() {
             paragraph:
               "Track and manage your volunteers effectively. Gain insights into participation, performance, and contributions to foster stronger engagement.",
             end: "Learn more",
+          },
+          {
+            imageUrl: "/images/service-3.png",
+            header: "Sponsorships made seamless.",
+            paragraph:
+              "Connect with sponsors seamlessly to support your needs. Manage sponsorship requests and payments with ease while maintaining transparency and trust.",
+            end: "Learn more",
           }
+          
           
       ];
       
