@@ -25,9 +25,7 @@ export default function ServiceSection() {
             paragraph:
               "Connect with sponsors seamlessly to support your needs. Manage sponsorship requests and payments with ease while maintaining transparency and trust.",
             end: "Learn more",
-          }
-          
-          
+          },
       ];
       
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -35,20 +33,17 @@ export default function ServiceSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % services.length);
-    }, 3000); 
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, [services.length]);
 
   return (
     <div className="relative w-full bg-white flex justify-center py-10">
-      
       <div className="w-[1200px] text-center">
         <h2 className="text-3xl font-primary font-medium text-shark-900 mb-12">
           Streamline Your Volunteering <br /> Experience Today
         </h2>
-
-        
         <div className="relative">
           <ServiceCard
            {...services[currentIndex]}
@@ -60,8 +55,6 @@ export default function ServiceSection() {
           }
            />
         </div>
-
-        
         <div className="flex justify-center mt-12">
            {services.map((_, index) => (
               <button
@@ -73,7 +66,6 @@ export default function ServiceSection() {
              ></button>
             ))}
         </div>
-
       </div>
     </div>
   );
