@@ -98,7 +98,7 @@ export default function EventCard({ donation }: { donation: boolean }) {
               size="md"
               value={value}
             />
-            <div className="flex gap-1 justify-between w-full px-[4px] text-sm text-secondary ">
+            <div className="flex gap-1 justify-between w-full px-[4px] text-[12px] text-secondary ">
               <div className="text-verdant-600">
                 <span>{100 - value}%</span> to complete
               </div>
