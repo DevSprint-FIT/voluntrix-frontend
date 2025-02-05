@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ServiceSection from '@/components/layout/ServiceSection';
 
 export const metadata: Metadata = {
   title: "Voluntrix",
@@ -23,7 +24,9 @@ export default function DashboardLayout({
       <body suppressHydrationWarning>
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
-        <main>{children}</main>
+        <main>
+          <ServiceSection />
+          {children}</main>
       </body>
     </html>
   )

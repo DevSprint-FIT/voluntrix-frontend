@@ -7,7 +7,7 @@ export default function ServiceSection() {
     const services = [
         {
           imageUrl: "/images/service-1.png",
-          header: "Effortless event organization.",
+          header: "Effortless event  organization.",
           paragraph:
             "Effortlessly organize and manage events with our all-in-one platform. From event creation to volunteer assignment and task tracking, streamline every step to ensure success.",
           end: "Learn more",
@@ -44,7 +44,7 @@ export default function ServiceSection() {
     <div className="relative w-full bg-white flex justify-center py-10">
       
       <div className="w-[1200px] text-center">
-        <h2 className="text-3xl font-secondary-300 text-gray-800 mb-12">
+        <h2 className="text-3xl font-primary font-medium text-shark-900 mb-12">
           Streamline Your Volunteering <br /> Experience Today
         </h2>
 
