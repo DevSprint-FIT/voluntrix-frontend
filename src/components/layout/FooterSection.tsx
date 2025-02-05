@@ -30,7 +30,7 @@ const FooterSection = () => {
           </p>
           <div className="mt-3 flex flex-col md:flex-row gap-2">
             <input type="email" placeholder="Email"  className="w-full md:w-auto border border-black px-3 py-2 rounded-md" />
-            <button className="bg-black text-white rounded-md width={101} height={40}">Subscribe</button>
+            <button className="bg-black text-white rounded-md w-[120px] h-[40px]">Subscribe</button>
           </div>
         </div>
       </div>
