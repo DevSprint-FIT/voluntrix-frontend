@@ -8,8 +8,10 @@ export default function HomePage() {
     <div className="flex flex-col justify-center items-start flex-shrink-0 gap-[200px]">
       <ServiceSection />
       <EventSection />
-      <VolunteerSection />
-      <FooterSection />
+      <div className="w-full gap-[70px]">
+        <VolunteerSection />
+        <FooterSection />
+      </div>
     </div>
   );
 }
