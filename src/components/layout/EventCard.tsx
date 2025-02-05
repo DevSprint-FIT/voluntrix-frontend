@@ -1,8 +1,21 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 const EventCard = () => {
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSave = () => {
+    if (isSaved) {
+      setIsSaved(false);
+    } else {
+      setIsSaved(true);
+    }
+  };
+
   return (
-    <div className="w-[308px] h-[434px] bg-#FFFFFF shadow-[0px 4px 10px rgba(0, 0, 0, 0.1)] font-secondary">
+    <div className="w-[308px] h-[434px] rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary">
       <div className="h-[165px]">
         <Image
           src="/images/DummyEvent1.png"
@@ -20,13 +33,15 @@ const EventCard = () => {
                 <p className="text-shark-950 font-bold text-xl">
                   River Cleanup Drive
                 </p>
-                <Image
-                  src="/icons/save.svg"
-                  width={20}
-                  height={20}
-                  alt="save"
-                  className="mt-1"
-                />
+                <button onClick={handleSave}>
+                  <Image
+                    src={isSaved ? "/icons/tick-circle.svg" : "/icons/save.svg"}
+                    width={20}
+                    height={20}
+                    alt="save"
+                    className="mt-1"
+                  />
+                </button>
               </div>
               <div className="text-shark-900 font-medium text-md">
                 By EcoFriends
