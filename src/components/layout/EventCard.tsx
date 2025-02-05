@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Progress } from "@heroui/progress";
 
-const EventCard = ({ donation }: { donation: boolean }) => {
+export default function EventCard ({ donation }: { donation: boolean }) {
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSave = () => {
@@ -112,5 +112,3 @@ const EventCard = ({ donation }: { donation: boolean }) => {
     </div>
   );
 };
-
-export default EventCard;

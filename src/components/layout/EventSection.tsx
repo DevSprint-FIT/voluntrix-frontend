@@ -1,7 +1,7 @@
 import EventCard from "./EventCard";
 import Image from "next/image";
 
-const EventSection = () => {
+export default function EventSection() {
   return (
     <div className="w-full flex items-start justify-center">
       <div className="w-[1054px] flex flex-col justify-center text-center">
@@ -28,5 +28,3 @@ const EventSection = () => {
     </div>
   );
 };
-
-export default EventSection;
