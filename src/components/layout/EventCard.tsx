@@ -14,7 +14,7 @@ const EventCard = ({ donation }: { donation: boolean }) => {
   const [value, setValue] = useState(50);
 
   return (
-    <div className="w-[308px] h-[450px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
+    <div className="w-[308px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
       <div className="h-[165px] relative">
         <Image
           src="/images/DummyEvent1.png"
