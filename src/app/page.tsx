@@ -1,10 +1,10 @@
-import FooterSection from "@/components/layout/FooterSection";
+import HomePage from "@/pages/HomePage";
+
 
 export default function Home() {
   return (
     <main>
-      <FooterSection/>
-
+    <HomePage/>
     </main>
   );
 }
