@@ -52,6 +52,20 @@ export default function ServiceSection() {
         <div className="relative">
           <ServiceCard {...services[currentIndex]} />
         </div>
+
+        
+        <div className="flex justify-center mt-12">
+           {services.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-3 mx-2 rounded-full transition-all duration-300 ${
+                   index === currentIndex ? "w-8 bg-black" : "w-3 bg-gray-400"
+               }`}
+             ></button>
+            ))}
+        </div>
+
       </div>
     </div>
   );
