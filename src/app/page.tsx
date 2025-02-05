@@ -1,12 +1,9 @@
-import VolunteerSection from "@/components/layout/VolunteerSection";
+import HomePage from "@/pages/HomePage";
 
 export default function Home() {
   return (
     <main>
-     
-
-    <VolunteerSection/>
-       
+      <HomePage />
     </main>
   );
 }
