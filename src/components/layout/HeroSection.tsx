@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Button from "./Button";
 
 export default function HeroSection() {
   return (
@@ -16,7 +15,15 @@ export default function HeroSection() {
           Empower your team with one platform to manage events, <br />
           engage volunteers, and connect sponsors effortlessly.
         </p>
-        {/* <Button label="Explore Now" variant="primary" showArrow={true} /> */}
+        <button className="bg-shark-950 text-white text-lg font-primary tracking-widest flex items-center gap-2 px-5 py-2 rounded-lg shadow-md">
+          Explore Now
+          <Image
+            src="/icons/arrow.svg"
+            alt="Arrow Icon"
+            width={27}
+            height={20}
+          />
+        </button>
       </div>
 
       <div className="grid grid-cols-2">
