@@ -12,6 +12,14 @@ export default function ServiceSection() {
             "Effortlessly organize and manage events with our all-in-one platform. From event creation to volunteer assignment and task tracking, streamline every step to ensure success.",
           end: "Learn more",
         },
+        {
+            imageUrl: "/images/service-2.png",
+            header: "Volunteer engagement simplified.",
+            paragraph:
+              "Track and manage your volunteers effectively. Gain insights into participation, performance, and contributions to foster stronger engagement.",
+            end: "Learn more",
+          }
+          
       ];
       
   const [currentIndex, setCurrentIndex] = useState(0);
