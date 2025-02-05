@@ -15,15 +15,18 @@ const EventCard = () => {
   };
 
   return (
-    <div className="w-[308px] h-[434px] rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary">
-      <div className="h-[165px]">
+    <div className="w-[308px] h-[434px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
+      <div className="h-[165px] relative">
         <Image
           src="/images/DummyEvent1.png"
-          className="rounded-t-[10px]"
+          className="rounded-t-[10px] transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
           width={308}
           height={165}
           alt="event 1"
         />
+        <button className="w-[92px] h-[36px] rounded-[1px] border-white border-[0.5px] bg-transparent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-secondary text-center text-[12px] font-[500] text-shark-50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+          View Event
+        </button>
       </div>
       <div className="flex justify-center w-[308px] h-[269px] mt-[17px]">
         <div className="w-[258px]">
