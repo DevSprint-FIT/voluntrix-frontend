@@ -6,7 +6,6 @@ interface ServiceCardProps {
   paragraph: string;
   end: string;
 }
-  
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ imageUrl, header, paragraph, end }) => {
   return (
