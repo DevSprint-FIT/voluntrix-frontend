@@ -25,7 +25,7 @@ export default function DashboardLayout({
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
         <main>
-          <ServiceSection />
+          
           {children}</main>
       </body>
     </html>
