@@ -5,10 +5,10 @@ const EventSection = () => {
   return (
     <div className="w-full flex items-start justify-center">
       <div className="w-[1054px] flex flex-col justify-center text-center">
-        <div className="text-primary font-medium text-4xl text-shark-950">
+        <div className="font-primary font-medium text-4xl text-shark-950">
           Stay Updated with the Latest Events
         </div>
-        <div className="text-secondary text-lg text-shark-600 mt-6">
+        <div className="font-secondary text-lg text-shark-600 mt-6">
           Discover upcoming opportunities and see what organizations are
           planning. From local clean-ups to global initiatives, stay connected
           and never miss a chance to make an impact.

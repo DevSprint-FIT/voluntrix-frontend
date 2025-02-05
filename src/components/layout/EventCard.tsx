@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Progress } from "@heroui/progress";
 
 const EventCard = ({ donation }: { donation: boolean }) => {
@@ -23,7 +23,7 @@ const EventCard = ({ donation }: { donation: boolean }) => {
           height={165}
           alt="event 1"
         />
-        <button className="w-[92px] h-[36px] rounded-[1px] border-white border-[0.5px] bg-transparent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-secondary text-center text-[12px] font-[500] text-shark-50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+        <button className="w-[92px] h-[36px] rounded-[1px] border-white border-[0.5px] bg-transparent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-secondary text-center text-[12px] font-[500] text-shark-50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
           View Event
         </button>
       </div>
@@ -55,7 +55,7 @@ const EventCard = ({ donation }: { donation: boolean }) => {
             </p>
             <div className="flex items-center gap-2">
               <div className="flex h-[22px] px-2 justify-center items-center rounded-[4px] bg-[#E7E7E7]">
-                <p className="text-[12px] text-primary font-bold text-shark-600">
+                <p className="text-[12px] font-primary font-bold text-shark-600">
                   Public
                 </p>
               </div>
@@ -68,7 +68,7 @@ const EventCard = ({ donation }: { donation: boolean }) => {
                   height={20}
                   alt="calendar"
                 />
-                <p className="text-secondary text-shark-900 text-[12px] text-left w-[100px] font-bold">
+                <p className="font-secondary text-shark-900 text-[12px] text-left w-[100px] font-bold">
                   Jan 02, 2025
                 </p>
               </div>
@@ -79,7 +79,7 @@ const EventCard = ({ donation }: { donation: boolean }) => {
                   height={20}
                   alt="location"
                 />
-                <p className="text-secondary text-shark-900 text-[12px] text-left font-bold">
+                <p className="font-secondary text-shark-900 text-[12px] text-left font-bold">
                   Reverside Park, Springfield
                 </p>
               </div>
