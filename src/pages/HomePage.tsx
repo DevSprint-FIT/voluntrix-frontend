@@ -1,6 +1,7 @@
 import EventSection from "@/components/layout/EventSection";
 import ServiceSection from "@/components/layout/ServiceSection";
 import VolunteerSection from "@/components/layout/VolunteerSection";
+import FooterSection from "@/components/layout/FooterSection";
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <ServiceSection />
       <EventSection />
       <VolunteerSection />
+      <FooterSection />
     </div>
   );
 }
