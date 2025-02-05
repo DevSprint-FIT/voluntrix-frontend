@@ -15,9 +15,9 @@ const EventSection = () => {
         </div>
         <div className="mt-16 flex flex-col gap-9">
           <div className="flex gap-[65px]">
-            <EventCard />
-            <EventCard />
-            <EventCard />
+            <EventCard donation={true}/>
+            <EventCard donation={false}/>
+            <EventCard donation={false}/>
           </div>
           <div className="flex gap-1 justify-end">
             <p className="text-verdant-600 font-[500]">Explore More Events</p>
