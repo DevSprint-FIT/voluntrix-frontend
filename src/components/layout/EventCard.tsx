@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Progress } from "@heroui/react";
 
-export default function EventCard ({ donation }: { donation: boolean }) {
+export default function EventCard({ donation }: { donation: boolean }) {
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSave = () => {
@@ -15,7 +15,7 @@ export default function EventCard ({ donation }: { donation: boolean }) {
 
   return (
     <div className="w-[308px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
-      <div className="h-[165px] relative">
+      <div className="h-[165px] relative overflow-hidden">
         <Image
           src="/images/DummyEvent1.png"
           className="rounded-t-[10px] transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
@@ -111,4 +111,4 @@ export default function EventCard ({ donation }: { donation: boolean }) {
       )}
     </div>
   );
-};
+}
