@@ -20,7 +20,7 @@ const EventSection = () => {
             <EventCard />
           </div>
           <div className="flex gap-1 justify-end">
-            <p className="text-verdant-150">Explore More Events</p>
+            <p className="text-verdant-600 font-[500]">Explore More Events</p>
             <Image src="/icons/arrow-green.svg" width={24} height={24} alt="arrow-green"/>
           </div>
         </div>
