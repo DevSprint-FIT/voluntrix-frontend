@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Progress } from "@heroui/progress";
+import { Progress } from "@heroui/react";
 
 export default function EventCard ({ donation }: { donation: boolean }) {
   const [isSaved, setIsSaved] = useState(false);
