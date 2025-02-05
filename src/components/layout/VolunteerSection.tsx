@@ -16,7 +16,7 @@ const VolunteerSection = () => {
             Explore stories of impact shared by organizations. See how volunteers are making a difference and get inspired to be part of the change.
           </p>
           <br/>
-         <button className="bg-shark-950 text-white text-lg font-primary tracking-widest flex items-center gap-2 px-5 py-2 rounded-lg shadow-md hover:bg-gray-900">
+         <button className="bg-shark-950 text-white text-lg font-primary tracking-widest flex items-center gap-2 px-5 py-2 rounded-lg shadow-md">
           Explore Now
           <Image
             src="/icons/arrow.svg"
