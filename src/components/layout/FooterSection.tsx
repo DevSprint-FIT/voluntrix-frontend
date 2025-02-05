@@ -1,81 +1,89 @@
+import Image from "next/image";
+
 export default function FooterSection() {
   return (
     <footer className="relative bg-white py-12 px-8 mt-16 w-full">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-        {/* Branding Section */}
-        <div>
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <img
-              src="/images/logo.svg"
-              alt="Voluntrix Logo"
-              className="h-6 w-6"
-            />
-            <h2 className="text-lg font-bold font-primary text-[18px]">
-              Voluntrix
-            </h2>
+      <div className="container mx-auto w-[1200px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-32 text-center md:text-left ">
+          {/* Branding Section */}
+          <div className="w-full">
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              <Image
+                src="/images/logo.svg"
+                alt="Voluntrix Logo"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <h2 className="text-lg font-bold font-primary text-[18px] text-shark-700">
+                Voluntrix
+              </h2>
+            </div>
+            <p className="text-shark-400 mt-4 font-primary text-[14px] tracking-[0.2px]">
+              Empowering volunteers and organizations to <br/> create meaningful change
+              together.
+            </p>
           </div>
-          <p className="text-gray-600 mt-2 font-primary text-[14px]">
-            Empowering volunteers and organizations to create meaningful change
-            together.
-          </p>
-        </div>
 
-        {/* Contact Section */}
-        <div>
-          <h3 className="text-md font-semibold font-primary text-[14px]">
-            Contact Us
-          </h3>
-          <p className="text-gray-600 mt-2 text-[14px] font-primary">
-            Email: support@voluntrix.com
-          </p>
-          <p className="text-gray-600 text-[14px] font-primary">
-            Phone: (+94) 71-456-7890
-          </p>
-        </div>
+          {/* Contact Section */}
+          <div>
+            <h3 className="text-md font-semibold font-primary text-[14px] tracking-[0.2px] text-shark-600">
+              Contact Us
+            </h3>
+            <p className="text-shark-400 mt-2 text-[14px] font-primary">
+              Email: support@voluntrix.com
+            </p>
+            <p className="text-shark-400 text-[14px] font-primary">
+              Phone: (+94) 71-456-7890
+            </p>
+          </div>
 
-        {/* Newsletter Section */}
-        <div>
-          <h3 className="text-md font-semibold font-primary text-[14px]">
-            Stay In Touch
-          </h3>
-          <p className="text-gray-600 mt-2 font-primary text-[14px]">
-            Subscribe to receive updates, access to exclusive features, and
-            more.
-          </p>
-          <div className="mt-3 flex flex-col md:flex-row gap-2 text-[14px] font-primary">
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full md:w-auto border border-black px-3 py-2 rounded-md"
-            />
-            <button className="bg-black text-white rounded-md w-[120px] h-[40px]">
-              Subscribe
-            </button>
+          {/* Newsletter Section */}
+          <div>
+            <h3 className="text-md font-semibold font-primary text-[14px] text-shark-600">
+              Stay In Touch
+            </h3>
+            <div className="w-64">
+              <p className="text-shark-400 mt-2 font-primary text-[14px] tracking-[0.2px]">
+                Subscribe to receive updates, access to exclusive features, and
+                more.
+              </p>
+            </div>
+            <div className="mt-3 flex flex-col md:flex-row gap-2 text-[14px] font-primary">
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full md:w-auto border border-shark-400 px-3 py-2 rounded-sm"
+              />
+              <button className="bg-shark-950 text-white rounded-md w-[100px] h-[40px] tracking-[0.2px]">
+                Subscribe
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <br></br>
-      <hr className="border-t-2 w-[1170px] mx-auto" />
+        <br></br>
+        <hr className="border-t-2 mx-auto" />
 
-      {/* Bottom Section */}
-      <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
-        <div className="text-center md:text-left font-primary ml-[130px]">
-          <p className="text-[14px] ">© 2025 Voluntrix. All Rights Reserved.</p>
-          <p className="text-[10px]">Designed & Developed by DevSprint</p>
-        </div>
+        {/* Bottom Section */}
+        <div className="w-full mt-8 flex md:flex-row items-center justify-between text-shark-400 text-sm">
+          <div className="text-center md:text-left font-primary">
+            <p className="text-[14px] ">© 2025 Voluntrix. All Rights Reserved.</p>
+            <p className="text-[10px]">Designed & Developed by DevSprint</p>
+          </div>
 
-        {/* Links aligned to the right on larger screens */}
-        <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[14px] mr-[130px]">
-          <a href="#" className="hover:text-black">
-            About
-          </a>
-          <a href="#" className="hover:text-black">
-            Privacy Policy
-          </a>
-          <a href="#" className="hover:text-black">
-            Terms of Service
-          </a>
+          {/* Links aligned to the right on larger screens */}
+          <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[14px]">
+            <a href="#" className="hover:text-shark-950">
+              About
+            </a>
+            <a href="#" className="hover:text-shark-950">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-shark-950">
+              Terms of Service
+            </a>
+          </div>
         </div>
       </div>
     </footer>
