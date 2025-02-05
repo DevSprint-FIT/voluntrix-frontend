@@ -7,7 +7,7 @@ export default function ServiceSection() {
     const services = [
         {
           imageUrl: "/images/service-1.png",
-          header: "Effortless event  organization.",
+          header: "Effortless event organization.",
           paragraph:
             "Effortlessly organize and manage events with our all-in-one platform. From event creation to volunteer assignment and task tracking, streamline every step to ensure success.",
           end: "Learn more",
@@ -50,7 +50,15 @@ export default function ServiceSection() {
 
         
         <div className="relative">
-          <ServiceCard {...services[currentIndex]} />
+          <ServiceCard
+           {...services[currentIndex]}
+           header={
+            <>
+              {services[currentIndex].header.split(" ").slice(0, -1).join(" ")} <br />
+              {services[currentIndex].header.split(" ").pop()}
+            </>
+          }
+           />
         </div>
 
         
