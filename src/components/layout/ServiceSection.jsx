@@ -1,0 +1,32 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import ServiceCard from "./ServiceCard";
+
+export default function ServiceSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % services.length);
+    }, 3000); 
+
+    return () => clearInterval(interval);
+  }, [services.length]);
+
+  return (
+    <div className="relative w-full bg-white flex justify-center py-10">
+      
+      <div className="w-[1200px] text-center">
+        <h2 className="text-3xl font-secondary-300 text-gray-800 mb-12">
+          Streamline Your Volunteering <br /> Experience Today
+        </h2>
+
+        
+        <div className="relative">
+          <ServiceCard {...services[currentIndex]} />
+        </div>
+      </div>
+    </div>
+  );
+}
