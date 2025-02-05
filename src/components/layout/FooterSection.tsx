@@ -42,13 +42,13 @@ const FooterSection = () => {
     
      {/* Bottom Section */}
 <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
-  <div className="text-center md:text-left font-primary ml-[70px]">
+  <div className="text-center md:text-left font-primary ml-[130px]">
     <p className="text-[14px] ">© 2025 Voluntrix. All Rights Reserved.</p>
     <p className="text-[10px]">Designed & Developed by DevSprint</p>
   </div>
 
   {/* Links aligned to the right on larger screens */}
-  <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[14px] mr-[70px]">
+  <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[14px] mr-[130px]">
     <a href="#" className="hover:text-black">About</a>
     <a href="#" className="hover:text-black">Privacy Policy</a>
     <a href="#" className="hover:text-black">Terms of Service</a>
