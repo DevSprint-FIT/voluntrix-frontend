@@ -1,21 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Progress } from "@heroui/progress";
 
-const EventCard = () => {
+const EventCard = ({ donation }: { donation: boolean }) => {
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSave = () => {
-    if (isSaved) {
-      setIsSaved(false);
-    } else {
-      setIsSaved(true);
-    }
+    setIsSaved((prevState) => !prevState);
   };
 
+  const [value, setValue] = useState(50);
+
   return (
-    <div className="w-[308px] h-[434px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
+    <div className="w-[308px] h-[450px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
       <div className="h-[165px] relative">
         <Image
           src="/images/DummyEvent1.png"
@@ -28,7 +27,7 @@ const EventCard = () => {
           View Event
         </button>
       </div>
-      <div className="flex justify-center w-[308px] h-[269px] mt-[17px]">
+      <div className="flex justify-center w-[308px] mt-[17px]">
         <div className="w-[258px]">
           <div className="flex flex-col items-start gap-[14px]">
             <div className="flex flex-col items-start self-stretch">
@@ -67,7 +66,7 @@ const EventCard = () => {
                   src="/icons/calendar.svg"
                   width={20}
                   height={20}
-                  alt="save"
+                  alt="calendar"
                 />
                 <p className="text-secondary text-shark-900 text-[12px] text-left w-[100px] font-bold">
                   Jan 02, 2025
@@ -78,7 +77,7 @@ const EventCard = () => {
                   src="/icons/location.svg"
                   width={20}
                   height={20}
-                  alt="save"
+                  alt="location"
                 />
                 <p className="text-secondary text-shark-900 text-[12px] text-left font-bold">
                   Reverside Park, Springfield
@@ -88,6 +87,28 @@ const EventCard = () => {
           </div>
         </div>
       </div>
+      {donation && (
+        <div className="flex justify-center w-[308px] mt-[20px]">
+          <div className="w-[258px] flex gap-1 justify-center items-center flex-col">
+            <Progress
+              aria-label="Downloading..."
+              className="w-[249px]"
+              color="success"
+              showValueLabel={false}
+              size="md"
+              value={value}
+            />
+            <div className="flex gap-1 justify-between w-full px-[4px] text-sm text-secondary ">
+              <div className="text-verdant-600">
+                <span>{100 - value}%</span> to complete
+              </div>
+              <div className="text-shark-300">
+                Goal $<span>20,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
