@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {HeroUIProvider} from "@heroui/react";
 
 export const metadata: Metadata = {
   title: "Voluntrix",
@@ -23,7 +24,11 @@ export default function DashboardLayout({
       <body suppressHydrationWarning>
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
-        <main>{children}</main>
+        <HeroUIProvider>
+          <main>
+            {children}
+          </main>
+          </HeroUIProvider>
       </body>
     </html>
   )
