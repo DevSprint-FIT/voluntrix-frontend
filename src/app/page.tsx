@@ -1,9 +1,9 @@
-import EventSection from "@/components/layout/EventSection";
+import HomePage from "@/pages/HomePage";
 
 export default function Home() {
   return (
     <main>
-      <EventSection />
+      <HomePage />
     </main>
   );
 }
