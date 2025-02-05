@@ -4,6 +4,16 @@ import { useState, useEffect } from "react";
 import ServiceCard from "./ServiceCard";
 
 export default function ServiceSection() {
+    const services = [
+        {
+          imageUrl: "/images/service-1.png",
+          header: "Effortless event organization.",
+          paragraph:
+            "Effortlessly organize and manage events with our all-in-one platform. From event creation to volunteer assignment and task tracking, streamline every step to ensure success.",
+          end: "Learn more",
+        },
+      ];
+      
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
