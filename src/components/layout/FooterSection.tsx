@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function FooterSection() {
   return (
-    <footer className="relative bg-white py-12 px-8 mt-16 w-full">
+    <footer className="relative bg-white py-4 px-8 w-full" >
       <div className="container mx-auto w-[1200px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-32 text-center md:text-left ">
           {/* Branding Section */}
@@ -62,18 +62,17 @@ export default function FooterSection() {
           </div>
         </div>
 
-        <br></br>
-        <hr className="border-t-2 mx-auto" />
+        <hr className="border-t-2 mx-auto mt-16" />
 
         {/* Bottom Section */}
-        <div className="w-full mt-8 flex md:flex-row items-center justify-between text-shark-400 text-sm">
+        <div className="w-full mt-4 flex md:flex-row items-center justify-between text-shark-400 text-sm">
           <div className="text-center md:text-left font-primary">
-            <p className="text-[14px] ">© 2025 Voluntrix. All Rights Reserved.</p>
+            <p className="text-[13px] ">© 2025 Voluntrix. All Rights Reserved.</p>
             <p className="text-[10px]">Designed & Developed by DevSprint</p>
           </div>
 
           {/* Links aligned to the right on larger screens */}
-          <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[14px]">
+          <div className="mt-4 md:mt-0 flex space-x-6 font-primary text-[13px]">
             <a href="#" className="hover:text-shark-950">
               About
             </a>

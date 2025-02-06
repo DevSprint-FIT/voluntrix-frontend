@@ -4,7 +4,7 @@ export default function FeedSection() {
   return (
     <div className="bg-gradient-to-r from-[#D0FBE7] to-[#edfdf6] w-full py-24 px-12 text-center flex items-center justify-center gap-36">
       <div className="max-w-lg pl-6 md:pl-8 md:text-left flex flex-col gap-5">
-        <h1 className=" text-4xl  text-shark-950 font-primary">
+        <h1 className=" text-[2.5rem]  text-shark-950 font-primary leading-[3rem]">
           Celebrate Achievements and Stay Inspired
         </h1>
         <p className="text-shark-900 font-secondary text-[17px] leading-[1.8] ">
@@ -25,8 +25,8 @@ export default function FeedSection() {
         <Image
           src="/images/posts.png"
           alt="Volunteer 1 Image"
-          width={500}
-          height={403}
+          width={600}
+          height={600}
           className="pr-4"
         />
       </div>

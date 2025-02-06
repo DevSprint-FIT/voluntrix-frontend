@@ -3,9 +3,9 @@ import Image from "next/image";
 
 export default function EventSection() {
   return (
-    <div className="w-full flex items-start justify-center">
+    <div className="w-full flex items-start justify-center mt-16 mb-16">
       <div className="w-[1054px] flex flex-col justify-center text-center">
-        <div className="font-primary font-medium text-3xl text-shark-950">
+        <div className="font-primary font-medium text-[2.5rem] text-shark-950">
           Stay Updated with the Latest Events
         </div>
         <div className="font-secondary text-lg text-shark-600 mt-6">

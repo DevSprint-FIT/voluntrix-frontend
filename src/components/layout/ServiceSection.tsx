@@ -40,12 +40,12 @@ export default function ServiceSection() {
   }, [services.length]);
 
   return (
-    <div className="relative w-full bg-white flex justify-center py-10">
+    <div className="relative w-full bg-white flex justify-center mt-16 mb-16">
       <div className="w-[1200px] text-center">
         <h2 className="text-[2.5rem] font-primary font-medium text-shark-900 mb-12" style={{"lineHeight": "3rem"}}>
           Streamline Your Volunteering <br /> Experience Today
         </h2>
-        <div className="relative h-[350px] flex justify-center items-center mt-24 mb-32">
+        <div className="relative h-[350px] flex justify-center items-center mt-20 mb-24">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
