@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="max-w-screen-xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <section className="max-w-screen-xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center hero-section mt-44">
       <div>
         <div className="space-y-3">
           <h1 className="text-[2.6rem] font-bold text-verdant-600 font-primary">
