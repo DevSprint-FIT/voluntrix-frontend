@@ -1,7 +1,10 @@
+"use client";
+
 import EventCard from "./EventCard";
 import Image from "next/image";
 
 export default function EventSection() {
+
   return (
     <div className="w-full flex items-start justify-center mt-16 mb-16">
       <div className="w-[1054px] flex flex-col justify-center text-center">
