@@ -1,17 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Progress } from "@heroui/progress";
+import { fetchEvents } from "@/services/eventService";
+
 
 export default function EventCard({ donation }: { donation: boolean }) {
   const [isSaved, setIsSaved] = useState(false);
+
+  interface Event {
+    title: string;
+    description: string;
+    date: string;
+  }
+
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    fetchEvents()
+      .then((data) => setEvents(data))
+      .catch((error) => console.error("Error fetching events:", error));
+  }, []);
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
   };
 
-  const [value, setValue] = useState(50);
+  const [value] = useState(50);
 
   return (
     <div className="w-[308px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
@@ -33,7 +49,7 @@ export default function EventCard({ donation }: { donation: boolean }) {
             <div className="flex flex-col items-start self-stretch">
               <div className="flex justify-between w-full items-start">
                 <p className="text-shark-950 font-bold text-xl">
-                  River Cleanup Drive
+                  {events.length > 0 ? events[0].title : "Event Title"}
                 </p>
                 <button onClick={handleSave}>
                   <Image
@@ -50,8 +66,8 @@ export default function EventCard({ donation }: { donation: boolean }) {
               </div>
             </div>
             <p className="text-shark-900 text-[13px] font-normal text-left">
-              Help us restore the beauty of our local river by removing trash
-              and debris.
+              {events.length > 0 ? events[0].description : "Event Description"}
+              
             </p>
             <div className="flex items-center gap-2">
               <div className="flex h-[22px] px-2 justify-center items-center rounded-[4px] bg-[#E7E7E7]">
