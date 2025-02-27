@@ -2,13 +2,13 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="max-w-screen-xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center hero-section mt-44">
+    <section className="max-w-screen-xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-0 items-center hero-section mt-32">
       <div>
-        <div className="space-y-3">
-          <h1 className="text-[2.6rem] font-bold text-verdant-600 font-primary">
+        <div className="space-y-4">
+          <h1 className="text-[3rem] font-normal text-verdant-600 font-secondary">
             Goodbye to chaos.
           </h1>
-          <h2 className="text-[1.6rem] font-semibold text-shark-950 font-primary tracking-[0.7px] leading-[1.2]">
+          <h2 className="text-[1.75rem] font-semibold text-shark-950 font-primary tracking-[0.7px] leading-[1.2]">
           <span className="tracking-[1.5px]">Say hello to streamlined</span> <br />
             volunteer management
           </h2>
@@ -17,7 +17,7 @@ export default function HeroSection() {
             engage volunteers, and connect sponsors effortlessly.
           </p>
         </div>
-        <button className="mt-5 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-lg shadow-md">
+        <button className="mt-5 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-[20px] shadow-md">
           Explore Now
           <Image
             src="/icons/arrow.svg"
@@ -30,10 +30,10 @@ export default function HeroSection() {
 
       <div className="relative"> 
         <Image 
-          src="/images/hero.png"
+          src="/images/hero.webp"
           alt="Volunteers cleaning beach"
-          width={550}
-          height={550}
+          width={600}
+          height={600}
         />
       </div>
 
