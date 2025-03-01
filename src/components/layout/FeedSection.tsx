@@ -3,7 +3,7 @@ import { Button } from "@heroui/button";
 
 export default function FeedSection() {
   return (
-    <div className="bg-gradient-to-r from-[#eafdf4] to-[#ffffff] w-full py-16 px-12 text-center flex items-center justify-center gap-36">
+    <div className="bg-gradient-to-r from-[#eafdf4] to-[#ffffff] w-full py-16 px-12 text-center flex items-center justify-center gap-36 mt-20">
       <div className="max-w-lg pl-6 md:pl-8 md:text-left flex flex-col gap-5">
         <h1 className=" text-[3rem]  text-shark-950 font-primary leading-[3rem]">
           Celebrate Achievements and Stay Inspired

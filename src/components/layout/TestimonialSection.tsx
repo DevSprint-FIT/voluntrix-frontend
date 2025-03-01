@@ -2,7 +2,7 @@
 
 export default function TestimonialSection() {
   return (
-    <section className="w-full bg-[#ffffff] py-16 px-8 md:px-16 lg:px-32 flex flex-col items-center text-center font-primary">
+    <section className="w-full bg-[#ffffff] py-16 px-8 md:px-16 lg:px-32 flex flex-col items-center text-center font-primary mt-12 mb-12">
       <div className="max-w-3xl">
         <p className="text-[2rem] md:text-[2.5rem] font-semibold text-shark-950 leading-tight">
           <span className="text-verdant-600">“</span>

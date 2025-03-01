@@ -40,7 +40,7 @@ export default function ServiceSection() {
   }, [services.length]);
 
   return (
-    <div className="relative w-full bg-white flex justify-center mt-12">
+    <div className="relative w-full bg-white flex justify-center mt-20">
       <div className="w-[1250px] text-center">
         <h2 className="text-[2.5rem] font-primary font-medium text-shark-900 mb-12" style={{"lineHeight": "3rem"}}>
           Streamline Your Volunteering <br /> Experience Today
