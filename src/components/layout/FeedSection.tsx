@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button } from "@heroui/button";
 
 export default function FeedSection() {
   return (
@@ -11,7 +12,7 @@ export default function FeedSection() {
           Explore stories of impact shared by organizations. See how volunteers
           are making a difference and get inspired to be part of the change.
         </p>
-        <button className="w-40 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-[20px] shadow-md">
+        <Button variant="shadow" className="w-40 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-[20px]">
           Take a Tour
           <Image
             src="/icons/arrow.svg"
@@ -19,7 +20,7 @@ export default function FeedSection() {
             width={25}
             height={18}
           />
-        </button>
+        </Button>
       </div>
       <div className="md:mt-0 flex space-x-6">
         <Image

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Button } from "@heroui/button";
 
 export default function HeroSection() {
   return (
@@ -36,10 +37,10 @@ export default function HeroSection() {
             engage volunteers, and connect sponsors effortlessly.
           </p>
         </div>
-        <button className="mt-5 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-[20px] shadow-md">
+        <Button variant="shadow" className="mt-5 bg-shark-950 text-white text-md font-primary tracking-[0.8px] flex items-center gap-2 px-5 py-2 rounded-[20px]">
           Explore Now
           <Image src="/icons/arrow.svg" alt="Arrow Icon" width={25} height={18} />
-        </button>
+        </Button>
       </div>
 
       <div className="relative z-10">

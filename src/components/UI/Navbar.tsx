@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Button } from "@heroui/button"; 
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -45,20 +47,18 @@ export default function Navbar() {
             isScrolled ? "text-[0.95rem]" : "text-[1.05rem]"
           }`}
         >
-          <Link href="#" className="hover:text-verdant-600">Features</Link>
-          <Link href="#" className="hover:text-verdant-600">Events</Link>
-          <Link href="#" className="hover:text-verdant-600">Event Feed</Link>
-          <Link href="#" className="hover:text-verdant-600">Volunteers</Link>
+          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Features</Link>
+          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Events</Link>
+          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Event Feed</Link>
+          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Volunteers</Link>
         </div>
 
         {/* Login & Sign Up Buttons */}
         <div className="flex space-x-4 text-[1rem] transition-all duration-300 ease-in-out">
-          <button className="text-md text-shark-950 font-primary px-4 py-1 border-0 tracking-[1px] font-medium">
+          <Button variant="light" className="text-md text-shark-950 font-primary border-0 tracking-[1px] font-medium px-4 py-2 rounded-[20px]">
             Login
-          </button>
-          <button className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] shadow-md tracking-[1px]">
-            Sign Up
-          </button>
+          </Button>
+          <Button variant="shadow" className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]">Sign Up</Button>
         </div>
       </div>
     </nav>

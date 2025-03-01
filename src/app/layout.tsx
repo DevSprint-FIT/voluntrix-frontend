@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Voluntrix",
     description: "Empowering volunteers and organizations worldwide.",
-    // url: "https://voluntrix.com",
+    url: "https://voluntrix-preview.vercel.app/",
     type: "website",
   },
 };

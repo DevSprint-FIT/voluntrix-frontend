@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button } from "@heroui/button";
 
 export default function FooterSection() {
   return (
@@ -54,9 +55,9 @@ export default function FooterSection() {
                 placeholder="Email"
                 className="outline-none bg-transparent px-4 text-shark-950 flex-1"
               />
-              <button className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] shadow-md tracking-[1px]">
+              <Button variant="shadow" className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]">
                 Subscribe
-              </button>
+              </Button>
             </div>
           </div>
         </div>
