@@ -5,6 +5,7 @@ import FooterSection from "@/components/layout/FooterSection";
 import Navbar from "@/components/UI/Navbar";
 import HeroSection from "@/components/layout/HeroSection";
 import TestimonialSection from "@/components/layout/TestimonialSection";
+import GoToTop from "@/components/UI/GoToTop";
 
 export default function HomePage() {
   return (
@@ -17,6 +18,7 @@ export default function HomePage() {
       <TestimonialSection />
       <hr className="w-[1250px] border-t border-shark-200 mx-auto" />
       <FooterSection />
+      <GoToTop />
     </div>
   );
 }

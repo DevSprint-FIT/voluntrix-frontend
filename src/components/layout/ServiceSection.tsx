@@ -65,7 +65,7 @@ export default function ServiceSection() {
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`h-3 mx-2 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "w-8 bg-black" : "w-3 bg-gray-400"
+                index === currentIndex ? "w-8 bg-shark-900" : "w-3 bg-shark-200"
               }`}
             ></button>
           ))}
