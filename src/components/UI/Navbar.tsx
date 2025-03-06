@@ -3,15 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@heroui/button"; 
-
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const trigger = ScrollTrigger.create({
@@ -22,6 +23,10 @@ export default function Navbar() {
 
     return () => trigger.kill();
   }, []);
+
+  const login = () => {
+    router.push("/TestPage");
+  };
 
   return (
     <nav
@@ -55,7 +60,7 @@ export default function Navbar() {
 
         {/* Login & Sign Up Buttons */}
         <div className="flex space-x-4 text-[1rem] transition-all duration-300 ease-in-out">
-          <Button variant="light" className="text-md text-shark-950 font-primary border-0 tracking-[1px] font-medium px-4 py-2 rounded-[20px]">
+          <Button onPress={login} variant="light" className="text-md text-shark-950 font-primary border-0 tracking-[1px] font-medium px-4 py-2 rounded-[20px]">
             Login
           </Button>
           <Button variant="shadow" className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]">Sign Up</Button>
