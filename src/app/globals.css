@@ -7,9 +7,8 @@
   --font-secondary: var(--font-secondary);
 }
 
-
 .bg-success {
-  background-color: #0CBC8B !important;
+  background-color: #0cbc8b !important;
 }
 
 @font-face {
@@ -52,4 +51,40 @@
   src: url('./fonts/UberMoveTextBold.otf') format('truetype');
   font-weight: 700;
   font-style: normal;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(38%) sepia(7%) saturate(150%) hue-rotate(0deg) brightness(85%)
+    contrast(90%);
+}
+
+input[type='date']:focus {
+  border-color: #4f4f4f;
+  outline: none;
+}
+
+input[type='date'] {
+  position: relative;
+  color: var(--shark-600, #5d5d5d);
+  font-size: 14px;
+  padding-left: 24px;
+}
+
+input[type='date']::-webkit-input-placeholder {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--shark-600, #5d5d5d);
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: url('/icons/calendar.svg') no-repeat center;
+  background-size: contain;
 }
