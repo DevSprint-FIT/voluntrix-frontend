@@ -1,14 +1,19 @@
 'use client';
+
 import { useState } from 'react';
 import Image from 'next/image';
+import FilterTag from './FilterTag';
 
 export default function Searchbar() {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
 
   return (
     <div
-      className={`w-[639px] flex flex-col justify-start items-center rounded-${isFocused ? '[20px]' : '[40px]'} border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2`}
+      className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
+        isFocused ? '[20px]' : '[40px]'
+      } bg-white border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2 z-10`}
     >
       <div className="w-[607px] h-8 flex justify-center items-center">
         <input
@@ -20,13 +25,48 @@ export default function Searchbar() {
           onBlur={() => setIsFocused(inputValue.trim() !== '')}
           onChange={(e) => setInputValue(e.target.value)}
         />
-        <Image src={'/icons/search.svg'} width={32} height={32} alt="search" />
+        <Image
+          src="/icons/search.svg"
+          width={32}
+          height={32}
+          alt="Search icon"
+          className="cursor-pointer"
+        />
       </div>
+
       {isFocused && (
-        <>
+        <div className="w-[639px] flex flex-col items-center justify-start rounded-[20px] gap-1">
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
-          <div className="w-[607px] h-8 text-shark-300 text-lg px-2">Search for events by name</div>
-        </>
+          <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg">
+            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
+              <p className="w-[591px]">Search for events by name</p>
+            </div>
+            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
+              <p className="w-[591px]">Search for events by name</p>
+            </div>
+            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
+              <p className="w-[591px]">Search for events by name</p>
+            </div>
+            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
+              <p className="w-[591px]">Search for events by name</p>
+            </div>
+          </div>
+
+          {isFilterOpen && (
+            <>
+              <div className="w-[583px] font-secondary text-shark-800 font-medium text-[16px] mt-4">
+                Filters
+              </div>
+              <div className="w-[607px] flex flex-wrap justify-start items-center mt-1 gap-x-2 gap-y-1">
+                <FilterTag name="Colombo" />
+                <FilterTag name="Colombo" />
+                <FilterTag name="Colombo" />
+                <FilterTag name="Colombo" />
+                <FilterTag name="Colombo" />
+              </div>
+            </>
+          )}
+        </div>
       )}
     </div>
   );
