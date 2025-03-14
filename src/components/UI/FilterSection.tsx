@@ -29,12 +29,30 @@ const districtsByProvince = {
   sabaragamuwa: ['Ratnapura', 'Kegalle'],
 };
 
+const categories = [
+  'Environment',
+  'Sport',
+  'Technology',
+  'Charity',
+  'Education',
+];
+
 export default function FilterSection() {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedProvince, setSelectedProvince] = useState<
+    keyof typeof districtsByProvince | ''
+  >('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category]
+    );
+  };
 
   return (
     <div className="relative w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
@@ -84,13 +102,27 @@ export default function FilterSection() {
                   <SelectField
                     options={provinces}
                     value={selectedProvince}
-                    onChange={setSelectedProvince}
+                    onChange={(value) =>
+                      setSelectedProvince(
+                        value as keyof typeof districtsByProvince
+                      )
+                    }
+                    disabled={false}
                   />
                 </div>
                 <div className="flex flex-col justify-center items-start">
                   <p className="text-sm text-shark-600 font-medium">District</p>
                   <SelectField
-                    options={districtsByProvince[selectedProvince] || []}
+                    options={
+                      selectedProvince
+                        ? districtsByProvince[
+                            selectedProvince as keyof typeof districtsByProvince
+                          ].map((district) => ({
+                            key: district,
+                            label: district,
+                          }))
+                        : []
+                    }
                     value={selectedDistrict}
                     onChange={setSelectedDistrict}
                     disabled={!selectedProvince}
@@ -103,10 +135,21 @@ export default function FilterSection() {
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Category
               </p>
-              <div className="w-[297px] flex flex-wrap gap-3">
-                <div className="h-[40px] border-2 border-shark-300 flex items-center justify-center font-secondary text-shark-950 rounded-[20px] cursor-pointer">
-                  <p className="text-sm m-4">Environment</p>
-                </div>
+              <div className="w-[297px] flex flex-wrap gap-x-1 gap-y-3 font-medium text-sm text-shark-600 font-secondary">
+                {categories.map((category) => (
+                  <div
+                    key={category}
+                    className={`py-2 px-3 border-2 rounded-[20px] cursor-pointer transition-all 
+                      ${
+                        selectedCategories.includes(category)
+                          ? 'border-shark-950 text-shark-950'
+                          : 'border-shark-300'
+                      }`}
+                    onClick={() => toggleCategory(category)}
+                  >
+                    {category}
+                  </div>
+                ))}
               </div>
             </div>
 
