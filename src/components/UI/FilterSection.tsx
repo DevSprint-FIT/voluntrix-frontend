@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
-import { Select, SelectItem } from '@heroui/react';
+import SelectField from './SelectField';
 
-export const provinces = [
+const provinces = [
   { key: 'western', label: 'Western' },
   { key: 'central', label: 'Central' },
   { key: 'southern', label: 'Southern' },
@@ -17,66 +17,33 @@ export const provinces = [
   { key: 'sabaragamuwa', label: 'Sabaragamuwa' },
 ];
 
-export const districts = [
-  // Western Province
-  { key: 'colombo', label: 'Colombo' },
-  { key: 'gampaha', label: 'Gampaha' },
-  { key: 'kalutara', label: 'Kalutara' },
-
-  // Central Province
-  { key: 'kandy', label: 'Kandy' },
-  { key: 'matale', label: 'Matale' },
-  { key: 'nuwara_eliya', label: 'Nuwara Eliya' },
-
-  // Southern Province
-  { key: 'galle', label: 'Galle' },
-  { key: 'matara', label: 'Matara' },
-  { key: 'hambantota', label: 'Hambantota' },
-
-  // Northern Province
-  { key: 'jaffna', label: 'Jaffna' },
-  { key: 'kilinochchi', label: 'Kilinochchi' },
-  { key: 'mannar', label: 'Mannar' },
-  { key: 'vavuniya', label: 'Vavuniya' },
-  { key: 'mullaitivu', label: 'Mullaitivu' },
-
-  // Eastern Province
-  { key: 'batticaloa', label: 'Batticaloa' },
-  { key: 'ampara', label: 'Ampara' },
-  { key: 'trincomalee', label: 'Trincomalee' },
-
-  // North Western Province
-  { key: 'kurunegala', label: 'Kurunegala' },
-  { key: 'puttalam', label: 'Puttalam' },
-
-  // North Central Province
-  { key: 'anuradhapura', label: 'Anuradhapura' },
-  { key: 'polonnaruwa', label: 'Polonnaruwa' },
-
-  // Uva Province
-  { key: 'badulla', label: 'Badulla' },
-  { key: 'monaragala', label: 'Monaragala' },
-
-  // Sabaragamuwa Province
-  { key: 'ratnapura', label: 'Ratnapura' },
-  { key: 'kegalle', label: 'Kegalle' },
-];
+const districtsByProvince = {
+  western: ['Colombo', 'Gampaha', 'Kalutara'],
+  central: ['Kandy', 'Matale', 'Nuwara Eliya'],
+  southern: ['Galle', 'Matara', 'Hambantota'],
+  northern: ['Jaffna', 'Kilinochchi', 'Mannar', 'Vavuniya', 'Mullaitivu'],
+  eastern: ['Batticaloa', 'Ampara', 'Trincomalee'],
+  north_western: ['Kurunegala', 'Puttalam'],
+  north_central: ['Anuradhapura', 'Polonnaruwa'],
+  uva: ['Badulla', 'Monaragala'],
+  sabaragamuwa: ['Ratnapura', 'Kegalle'],
+};
 
 export default function FilterSection() {
-  const [isFilterTabOpen, setIsFilterOpen] = useState(false);
+  const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
 
-  const toggleFilter = () => {
-    setIsFilterOpen((prev) => !prev);
-  };
+  const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
 
   return (
-    <div className="w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
+    <div className="relative w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
       <Button
         variant="shadow"
         className="flex gap-3 w-[143px] h-[56px] bg-verdant-50 text-shark-95 rounded-[40px]"
-        onPress={() => toggleFilter()}
+        onPress={toggleFilter}
       >
-        <Image src={'icons/filter.svg'} width={24} height={24} alt={'filter'} />
+        <Image src="/icons/filter.svg" width={24} height={24} alt="Filter" />
         <p className="text-shark-950 text-lg font-secondary">Filters</p>
       </Button>
 
@@ -106,6 +73,7 @@ export default function FilterSection() {
                 </div>
               </div>
             </div>
+
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Location
@@ -113,26 +81,24 @@ export default function FilterSection() {
               <div className="w-[297px] flex gap-3">
                 <div className="flex flex-col justify-center items-start">
                   <p className="text-sm text-shark-600 font-medium">Province</p>
-                  <Select className="w-[141px] border-2 border-shark-300 rounded-lg">
-                    {provinces.map((province) => (
-                      <SelectItem key={province.key}>
-                        {province.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  <SelectField
+                    options={provinces}
+                    value={selectedProvince}
+                    onChange={setSelectedProvince}
+                  />
                 </div>
                 <div className="flex flex-col justify-center items-start">
                   <p className="text-sm text-shark-600 font-medium">District</p>
-                  <Select className="w-[141px] border-2 border-shark-300 rounded-lg">
-                    {districts.map((district) => (
-                      <SelectItem key={district.key}>
-                        {district.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  <SelectField
+                    options={districtsByProvince[selectedProvince] || []}
+                    value={selectedDistrict}
+                    onChange={setSelectedDistrict}
+                    disabled={!selectedProvince}
+                  />
                 </div>
               </div>
             </div>
+
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Category
@@ -143,6 +109,7 @@ export default function FilterSection() {
                 </div>
               </div>
             </div>
+
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Participation Type
@@ -162,6 +129,7 @@ export default function FilterSection() {
                 </div>
               </div>
             </div>
+
             <div className="w-[297px] flex justify-end gap-3">
               <Button
                 variant="shadow"
