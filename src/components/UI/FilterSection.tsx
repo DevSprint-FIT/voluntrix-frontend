@@ -47,6 +47,8 @@ export default function FilterSection() {
   const [privateSelected, setPrivateSelected] = useState(true);
   const [publicSelected, setPublicSelected] = useState(false);
 
+  const togglePrivate = () => setPrivateSelected((prev) => !prev);
+  const togglePublic = () => setPublicSelected((prev) => !prev);
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -55,8 +57,6 @@ export default function FilterSection() {
         : [...prev, category]
     );
   };
-  const togglePrivate = () => setPrivateSelected((prev) => !prev);
-  const togglePublic = () => setPublicSelected((prev) => !prev);
 
   return (
     <div className="relative w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
@@ -69,9 +69,11 @@ export default function FilterSection() {
         <p className="text-shark-950 text-lg font-secondary">Filters</p>
       </Button>
 
+      {/* Filter tab */}
       {isFilterTabOpen && (
         <div className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-20 z-10 py-7">
           <div className="w-[297px] flex flex-col gap-6">
+            {/* Date */}
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Date Range
@@ -96,6 +98,7 @@ export default function FilterSection() {
               </div>
             </div>
 
+            {/* Location */}
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Location
@@ -135,6 +138,7 @@ export default function FilterSection() {
               </div>
             </div>
 
+            {/* Category */}
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Category
@@ -157,6 +161,7 @@ export default function FilterSection() {
               </div>
             </div>
 
+            {/* Participation */}
             <div className="w-[297px] flex flex-col gap-3">
               <p className="font-secondary text-shark-900 font-medium text-lg">
                 Participation Type
