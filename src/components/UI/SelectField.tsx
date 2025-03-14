@@ -1,24 +1,45 @@
 import { Select, SelectItem } from '@heroui/react';
 
-export default function SelectField({ options, value, onChange, disabled }) {
+interface SelectFieldProps {
+  options: { key: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
+export default function SelectField({
+  options,
+  value,
+  onChange,
+  disabled,
+}: SelectFieldProps) {
   return (
-    <>
-      <Select
-        className="w-[141px] border-2 border-shark-300 rounded-lg"
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-        value={value}
-      >
-        {options.length > 0 ? (
-          options.map((option) => (
-            <SelectItem key={option.key || option} value={option.key || option}>
-              {option.label || option}
-            </SelectItem>
-          ))
-        ) : (
-          <SelectItem disabled>Select Province</SelectItem>
-        )}
-      </Select>
-    </>
+    <Select
+      variant="bordered"
+      className="w-[141px] rounded-lg"
+      classNames={{
+        base: 'border-shark-300',
+        trigger: 'border-shark-300',
+      }}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.value)}
+      value={value}
+    >
+      {options.length > 0 ? (
+        options.map((option) => (
+          <SelectItem
+            className="font-medium text-shark-600"
+            key={option.key}
+            value={option.key}
+          >
+            {option.label}
+          </SelectItem>
+        ))
+      ) : (
+        <SelectItem className="font-medium text-shark-600" isDisabled>
+          Select Province
+        </SelectItem>
+      )}
+    </Select>
   );
 }
