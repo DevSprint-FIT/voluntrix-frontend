@@ -44,6 +44,8 @@ export default function FilterSection() {
   >('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [privateSelected, setPrivateSelected] = useState(true);
+  const [publicSelected, setPublicSelected] = useState(false);
 
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
   const toggleCategory = (category: string) => {
@@ -53,6 +55,8 @@ export default function FilterSection() {
         : [...prev, category]
     );
   };
+  const togglePrivate = () => setPrivateSelected((prev) => !prev);
+  const togglePublic = () => setPublicSelected((prev) => !prev);
 
   return (
     <div className="relative w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
@@ -162,13 +166,27 @@ export default function FilterSection() {
                   <p className="text-[16px] font-medium font-secondary text-shark-600">
                     Private
                   </p>
-                  <Switch defaultSelected size="sm" color="default"></Switch>
+                  <Switch
+                    color="default"
+                    checked={privateSelected}
+                    onChange={togglePrivate}
+                    size="sm"
+                  />
                 </div>
+
                 <div className="flex gap-3">
                   <p className="text-[16px] font-medium font-secondary text-shark-600">
                     Public
                   </p>
-                  <Switch defaultSelected size="sm" color="default"></Switch>
+                  <Switch
+                    color="default"
+                    checked={publicSelected}
+                    onChange={togglePublic}
+                    size="sm"
+                    className={`${
+                      publicSelected ? 'bg-shark-950' : 'bg-gray-300'
+                    } rounded-full`}
+                  />
                 </div>
               </div>
             </div>
