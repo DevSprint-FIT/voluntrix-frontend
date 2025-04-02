@@ -71,11 +71,12 @@ export default function FilterSection() {
 
       {/* Filter tab */}
       {isFilterTabOpen && (
-        <div className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-20 z-10 py-7">
-          <div className="w-[297px] flex flex-col gap-6">
+        <div className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-20 z-10 py-5">
+          <div className="w-[297px] flex flex-col gap-4">
+
             {/* Date */}
-            <div className="w-[297px] flex flex-col gap-3">
-              <p className="font-secondary text-shark-900 font-medium text-lg">
+            <div className="w-[297px] flex flex-col gap-1">
+              <p className="font-secondary text-shark-900 font-medium text-md">
                 Date Range
               </p>
               <div className="w-[297px] flex gap-3">
@@ -85,22 +86,22 @@ export default function FilterSection() {
                   </p>
                   <input
                     type="date"
-                    className="w-[141px] h-8 border-2 border-shark-300 rounded-lg"
+                    className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
                   />
                 </div>
                 <div className="flex flex-col justify-center items-start">
                   <p className="text-sm text-shark-600 font-medium">End Date</p>
                   <input
                     type="date"
-                    className="w-[141px] h-8 border-2 border-shark-300 rounded-lg"
+                    className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
                   />
                 </div>
               </div>
             </div>
 
             {/* Location */}
-            <div className="w-[297px] flex flex-col gap-3">
-              <p className="font-secondary text-shark-900 font-medium text-lg">
+            <div className="w-[297px] flex flex-col gap-1">
+              <p className="font-secondary text-shark-900 font-medium text-md">
                 Location
               </p>
               <div className="w-[297px] flex gap-3">
@@ -139,15 +140,15 @@ export default function FilterSection() {
             </div>
 
             {/* Category */}
-            <div className="w-[297px] flex flex-col gap-3">
-              <p className="font-secondary text-shark-900 font-medium text-lg">
+            <div className="w-[297px] flex flex-col gap-1">
+              <p className="font-secondary text-shark-900 font-medium text-md">
                 Category
               </p>
               <div className="w-[297px] flex flex-wrap gap-x-1 gap-y-3 font-medium text-sm text-shark-600 font-secondary">
                 {categories.map((category) => (
                   <div
                     key={category}
-                    className={`py-2 px-3 border-2 rounded-[20px] cursor-pointer transition-all 
+                    className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
                       ${
                         selectedCategories.includes(category)
                           ? 'border-shark-950 text-shark-950'
@@ -162,13 +163,13 @@ export default function FilterSection() {
             </div>
 
             {/* Participation */}
-            <div className="w-[297px] flex flex-col gap-3">
-              <p className="font-secondary text-shark-900 font-medium text-lg">
+            <div className="w-[297px] flex flex-col gap-1">
+              <p className="font-secondary text-shark-900 font-medium text-md">
                 Participation Type
               </p>
               <div className="w-[297px] flex flex-wrap gap-7">
                 <div className="flex gap-3">
-                  <p className="text-[16px] font-medium font-secondary text-shark-600">
+                  <p className="text-sm font-medium font-secondary text-shark-600">
                     Private
                   </p>
                   <Switch
@@ -179,8 +180,8 @@ export default function FilterSection() {
                   />
                 </div>
 
-                <div className="flex gap-3">
-                  <p className="text-[16px] font-medium font-secondary text-shark-600">
+                <div className="flex gap-3 justify-center">
+                  <p className="text-sm font-medium font-secondary text-shark-600">
                     Public
                   </p>
                   <Switch
