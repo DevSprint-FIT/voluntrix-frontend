@@ -24,6 +24,7 @@ export default function SelectField({
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
       value={value}
+      size={'sm'}
     >
       {options.length > 0 ? (
         options.map((option) => (
