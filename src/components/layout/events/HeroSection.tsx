@@ -7,7 +7,7 @@ export default function HeroSection() {
     <div className="w-full flex items-start justify-center mt-32">
       <div className="w-[1200px] flex flex-col items-center justify-start">
         <Breadcrumb />
-        <div className="w-[806px] h-[248px] mt-16 flex flex-col items-center justify-start">
+        <div className="w-[806px] h-[230px] mt-16 flex flex-col items-center justify-start">
           <p className="font-primary text-shark-950 font-medium text-[44px]">
             <span className="text-verdant-600">Join</span> Meaningful
             <span className="text-verdant-600"> Events</span>
@@ -20,7 +20,7 @@ export default function HeroSection() {
             Discover events that match your passion and make a difference
           </p>
         </div>
-        <div className="relative w-[806px] mt-10 flex gap-6 rounded-10">
+        <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
             <Searchbar />
           </div>
