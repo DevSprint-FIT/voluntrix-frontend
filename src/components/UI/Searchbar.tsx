@@ -15,7 +15,7 @@ export default function Searchbar() {
         isFocused ? '[20px]' : '[40px]'
       } bg-white border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2 z-10`}
     >
-      <div className="w-[607px] h-8 flex justify-center items-center">
+      <div className="w-[607px] h-6 flex justify-center items-center">
         <input
           type="text"
           className="w-[575px] text-shark-950 text-lg outline-none bg-transparent px-2"
@@ -38,23 +38,14 @@ export default function Searchbar() {
         <div className="w-[639px] flex flex-col items-center justify-start rounded-[20px] gap-1">
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
           <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg">
-            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
-              <p className="w-[591px]">Search for events by name</p>
-            </div>
-            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
-              <p className="w-[591px]">Search for events by name</p>
-            </div>
-            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
-              <p className="w-[591px]">Search for events by name</p>
-            </div>
-            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-lg mt-1 hover:bg-shark-50 rounded-lg">
+            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-md mt-1 hover:bg-shark-50 rounded-lg">
               <p className="w-[591px]">Search for events by name</p>
             </div>
           </div>
 
           {isFilterOpen && (
             <>
-              <div className="w-[583px] font-secondary text-shark-800 font-medium text-[16px] mt-4">
+              <div className="w-[583px] font-secondary text-shark-800 font-medium text-md mt-4">
                 Filters
               </div>
               <div className="w-[607px] flex flex-wrap justify-start items-center mt-1 gap-x-2 gap-y-1">
