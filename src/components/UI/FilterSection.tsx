@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
 import SelectField from './SelectField';
@@ -47,6 +47,8 @@ export default function FilterSection() {
   const [privateSelected, setPrivateSelected] = useState(true);
   const [publicSelected, setPublicSelected] = useState(false);
 
+  const filterRef = useRef<HTMLDivElement>(null);
+
   const togglePrivate = () => setPrivateSelected((prev) => !prev);
   const togglePublic = () => setPublicSelected((prev) => !prev);
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
@@ -58,11 +60,30 @@ export default function FilterSection() {
     );
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target as Node)
+      ) {
+        setIsFilterTabOpen(false);
+      }
+    };
+
+    if (isFilterTabOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isFilterTabOpen]);
+
   return (
-    <div className="relative w-[143px] h-[56px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
+    <div className="relative w-[143px] flex flex-col gap-8 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[40px] bg-transparent">
       <Button
         variant="shadow"
-        className="flex gap-3 w-[143px] h-[56px] bg-verdant-50 text-shark-95 rounded-[40px]"
+        className="flex gap-3 w-[143px] h-[52px] bg-verdant-50 text-shark-95 rounded-[40px]"
         onPress={toggleFilter}
       >
         <Image src="/icons/filter.svg" width={24} height={24} alt="Filter" />
@@ -71,9 +92,11 @@ export default function FilterSection() {
 
       {/* Filter tab */}
       {isFilterTabOpen && (
-        <div className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-20 z-10 py-5">
+        <div
+          ref={filterRef}
+          className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[74px] z-10 py-5"
+        >
           <div className="w-[297px] flex flex-col gap-4">
-
             {/* Date */}
             <div className="w-[297px] flex flex-col gap-1">
               <p className="font-secondary text-shark-900 font-medium text-md">
