@@ -39,25 +39,43 @@ const categories = [
 
 export default function FilterSection() {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState<
-    keyof typeof districtsByProvince | ''
-  >('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [privateSelected, setPrivateSelected] = useState(true);
-  const [publicSelected, setPublicSelected] = useState(false);
-
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const togglePrivate = () => setPrivateSelected((prev) => !prev);
-  const togglePublic = () => setPublicSelected((prev) => !prev);
+  const [filters, setFilters] = useState({
+    startDate: '',
+    endDate: '',
+    province: '',
+    district: '',
+    categories: [] as string[],
+    privateSelected: false,
+    publicSelected: false,
+  });
+
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category]
-    );
+
+  const handleCategoryToggle = (category: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter((item) => item !== category)
+        : [...prev.categories, category],
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    console.log('Applied Filters:', filters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      startDate: '',
+      endDate: '',
+      province: '',
+      district: '',
+      categories: [],
+      privateSelected: false,
+      publicSelected: false,
+    });
   };
 
   useEffect(() => {
@@ -110,6 +128,13 @@ export default function FilterSection() {
                   <input
                     type="date"
                     className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
+                    value={filters.startDate}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="flex flex-col justify-center items-start">
@@ -117,6 +142,13 @@ export default function FilterSection() {
                   <input
                     type="date"
                     className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
+                    value={filters.endDate}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -132,31 +164,30 @@ export default function FilterSection() {
                   <p className="text-sm text-shark-600 font-medium">Province</p>
                   <SelectField
                     options={provinces}
-                    value={selectedProvince}
+                    value={filters.province}
                     onChange={(value) =>
-                      setSelectedProvince(
-                        value as keyof typeof districtsByProvince
-                      )
+                      setFilters((prev) => ({ ...prev, province: value }))
                     }
-                    disabled={false}
                   />
                 </div>
                 <div className="flex flex-col justify-center items-start">
                   <p className="text-sm text-shark-600 font-medium">District</p>
                   <SelectField
                     options={
-                      selectedProvince
+                      filters.province
                         ? districtsByProvince[
-                            selectedProvince as keyof typeof districtsByProvince
+                            filters.province as keyof typeof districtsByProvince
                           ].map((district) => ({
                             key: district,
                             label: district,
                           }))
                         : []
                     }
-                    value={selectedDistrict}
-                    onChange={setSelectedDistrict}
-                    disabled={!selectedProvince}
+                    value={filters.district}
+                    onChange={(value) =>
+                      setFilters((prev) => ({ ...prev, district: value }))
+                    }
+                    disabled={!filters.province}
                   />
                 </div>
               </div>
@@ -173,11 +204,11 @@ export default function FilterSection() {
                     key={category}
                     className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
                       ${
-                        selectedCategories.includes(category)
+                        filters.categories.includes(category)
                           ? 'border-shark-950 text-shark-950'
                           : 'border-shark-300'
                       }`}
-                    onClick={() => toggleCategory(category)}
+                    onClick={() => handleCategoryToggle(category)}
                   >
                     {category}
                   </div>
@@ -197,8 +228,13 @@ export default function FilterSection() {
                   </p>
                   <Switch
                     color="default"
-                    checked={privateSelected}
-                    onChange={togglePrivate}
+                    checked={filters.privateSelected}
+                    onChange={() =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        privateSelected: !prev.privateSelected,
+                      }))
+                    }
                     size="sm"
                   />
                 </div>
@@ -209,27 +245,35 @@ export default function FilterSection() {
                   </p>
                   <Switch
                     color="default"
-                    checked={publicSelected}
-                    onChange={togglePublic}
+                    checked={filters.publicSelected}
+                    onChange={() =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        publicSelected: !prev.publicSelected,
+                      }))
+                    }
                     size="sm"
                     className={`${
-                      publicSelected ? 'bg-shark-950' : 'bg-gray-300'
+                      filters.publicSelected ? 'bg-shark-950' : 'bg-gray-300'
                     } rounded-full`}
                   />
                 </div>
               </div>
             </div>
 
+            {/* Action Buttons */}
             <div className="w-[297px] flex justify-end gap-3">
               <Button
                 variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-50 text-shark-950 rounded-[20px]"
+                onPress={handleClearFilters}
               >
                 Clear
               </Button>
               <Button
                 variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-950 text-shark-50 rounded-[20px]"
+                onPress={handleApplyFilters}
               >
                 Apply
               </Button>
