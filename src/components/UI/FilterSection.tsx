@@ -63,7 +63,15 @@ export default function FilterSection() {
   };
 
   const handleApplyFilters = () => {
-    console.log('Applied Filters:', filters);
+    console.log('Applied Filters:');
+    console.log('Start Date:', filters.startDate);
+    console.log('End Date:', filters.endDate);
+    console.log('Province:', filters.province);
+    console.log('District:', filters.district);
+    console.log('Selected Categories:', filters.categories.join(', '));
+    console.log('Private Selected:', filters.privateSelected);
+    console.log('Public Selected:', filters.publicSelected);
+    handleClearFilters();
   };
 
   const handleClearFilters = () => {
@@ -228,8 +236,8 @@ export default function FilterSection() {
                   </p>
                   <Switch
                     color="default"
-                    checked={filters.privateSelected}
-                    onChange={() =>
+                    isSelected={filters.privateSelected}
+                    onValueChange={() =>
                       setFilters((prev) => ({
                         ...prev,
                         privateSelected: !prev.privateSelected,
@@ -245,17 +253,14 @@ export default function FilterSection() {
                   </p>
                   <Switch
                     color="default"
-                    checked={filters.publicSelected}
-                    onChange={() =>
+                    isSelected={filters.publicSelected}
+                    onValueChange={() =>
                       setFilters((prev) => ({
                         ...prev,
                         publicSelected: !prev.publicSelected,
                       }))
                     }
                     size="sm"
-                    className={`${
-                      filters.publicSelected ? 'bg-shark-950' : 'bg-gray-300'
-                    } rounded-full`}
                   />
                 </div>
               </div>
