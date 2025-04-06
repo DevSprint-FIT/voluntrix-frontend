@@ -6,8 +6,6 @@ import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 
 export default function HeroSection() {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -37,11 +35,7 @@ export default function HeroSection() {
         </div>
         <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
-            <Searchbar
-              isFilterOpen={isFilterOpen}
-              setIsFilterOpen={setIsFilterOpen}
-              filters={filters}
-            />
+            <Searchbar filters={filters} />
           </div>
           <FilterSection filters={filters} setFilters={setFilters} />
         </div>
