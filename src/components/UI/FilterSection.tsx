@@ -316,7 +316,7 @@ export default function FilterSection({
             <div className="w-[297px] flex justify-end gap-3">
               <Button
                 variant="shadow"
-                className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-100 text-shark-950 rounded-[20px]"
+                className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-50 text-shark-950 rounded-[20px]"
                 onPress={handleClear}
               >
                 Clear
