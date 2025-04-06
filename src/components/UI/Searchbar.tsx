@@ -16,10 +16,15 @@ type Filters = {
 
 interface SearchbarProps {
   isFilterOpen: boolean;
+  setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filters: Filters;
 }
 
-export default function Searchbar({ isFilterOpen, filters }: SearchbarProps) {
+export default function Searchbar({
+  isFilterOpen,
+  setIsFilterOpen,
+  filters,
+}: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
@@ -59,13 +64,15 @@ export default function Searchbar({ isFilterOpen, filters }: SearchbarProps) {
     filters.categories.forEach((category) => tags.push(category));
 
     setActiveFilterTags(tags);
-  }, [filters]);
+    setIsFilterOpen(tags.length > 0);
+  }, [filters, setIsFilterOpen]);
 
   const handleRemoveFilter = (index: number) => {
     setActiveFilterTags((prevFilters) =>
       prevFilters.filter((_, i) => i !== index)
     );
   };
+
   return (
     <div
       className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${

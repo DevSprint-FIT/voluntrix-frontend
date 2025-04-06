@@ -61,7 +61,11 @@ export default function HeroSection() {
         </div>
         <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
-            <Searchbar isFilterOpen={isFilterOpen} filters={filters} />
+            <Searchbar
+              isFilterOpen={isFilterOpen}
+              setIsFilterOpen={setIsFilterOpen}
+              filters={filters}
+            />
           </div>
           <FilterSection
             filters={filters}

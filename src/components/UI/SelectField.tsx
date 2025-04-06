@@ -31,7 +31,7 @@ export default function SelectField({
           <SelectItem
             className="font-medium text-shark-600"
             key={option.key}
-            value={option.key}
+            value={option.label}
           >
             {option.label}
           </SelectItem>
