@@ -61,6 +61,7 @@ export default function FilterSection({
   onApply,
 }: FilterSectionProps) {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
@@ -72,6 +73,15 @@ export default function FilterSection({
         ? prev.categories.filter((item) => item !== category)
         : [...prev.categories, category],
     }));
+  };
+
+  const handleApplyFilters = () => {
+    if (new Date(filters.endDate) < new Date(filters.startDate)) {
+      setErrorMessage('End Date must be greater than to Start Date');
+      return;
+    }
+    setErrorMessage(null);
+    onApply();
   };
 
   useEffect(() => {
@@ -110,7 +120,7 @@ export default function FilterSection({
           ref={filterRef}
           className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[74px] z-10 py-5"
         >
-          <div className="w-[297px] flex flex-col gap-4">
+          <form className="w-[297px] flex flex-col gap-4">
             {/* Date */}
             <div className="w-[297px] flex flex-col gap-1">
               <p className="font-secondary text-shark-900 font-medium text-md">
@@ -258,6 +268,13 @@ export default function FilterSection({
               </div>
             </div>
 
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="text-red-500 text-sm font-secondary font-medium">
+                {errorMessage}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="w-[297px] flex justify-end gap-3">
               <Button
@@ -267,15 +284,14 @@ export default function FilterSection({
               >
                 Clear
               </Button>
-              <Button
-                variant="shadow"
+              <button
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-950 text-shark-50 rounded-[20px]"
-                onPress={onApply}
+                onClick={handleApplyFilters}
               >
                 Apply
-              </Button>
+              </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </div>
