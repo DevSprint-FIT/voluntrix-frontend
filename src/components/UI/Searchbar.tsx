@@ -15,19 +15,14 @@ type Filters = {
 };
 
 interface SearchbarProps {
-  isFilterOpen: boolean;
-  setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filters: Filters;
 }
 
-export default function Searchbar({
-  isFilterOpen,
-  setIsFilterOpen,
-  filters,
-}: SearchbarProps) {
+export default function Searchbar({ filters }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
