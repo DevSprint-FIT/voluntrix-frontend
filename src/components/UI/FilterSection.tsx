@@ -37,6 +37,16 @@ const categories = [
   'Education',
 ];
 
+const initialFilters: Filters = {
+  startDate: '',
+  endDate: '',
+  province: '',
+  district: '',
+  categories: [],
+  privateSelected: false,
+  publicSelected: false,
+};
+
 type Filters = {
   startDate: string;
   endDate: string;
@@ -50,24 +60,29 @@ type Filters = {
 type FilterSectionProps = {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
-  onClear: () => void;
-  onApply: () => void;
 };
 
 export default function FilterSection({
   filters,
   setFilters,
-  onClear,
-  onApply,
 }: FilterSectionProps) {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
+  const [localFilters, setLocalFilters] = useState<Filters>(filters);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
+  const toggleFilter = () => {
+    setIsFilterTabOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (isFilterTabOpen) {
+      setLocalFilters(filters);
+    }
+  }, [isFilterTabOpen, filters]);
 
   const handleCategoryToggle = (category: string) => {
-    setFilters((prev) => ({
+    setLocalFilters((prev) => ({
       ...prev,
       categories: prev.categories.includes(category)
         ? prev.categories.filter((item) => item !== category)
@@ -75,13 +90,20 @@ export default function FilterSection({
     }));
   };
 
-  const handleApplyFilters = () => {
-    if (new Date(filters.endDate) < new Date(filters.startDate)) {
-      setErrorMessage('End Date must be greater than to Start Date');
+  const handleApply = () => {
+    if (new Date(localFilters.endDate) < new Date(localFilters.startDate)) {
+      setErrorMessage('End Date must be greater than Start Date');
       return;
     }
     setErrorMessage(null);
-    onApply();
+    setFilters(localFilters);
+    setIsFilterTabOpen(false);
+  };
+
+  const handleClear = () => {
+    setLocalFilters(initialFilters);
+    setFilters(initialFilters);
+    setIsFilterTabOpen(false);
   };
 
   useEffect(() => {
@@ -134,9 +156,9 @@ export default function FilterSection({
                   <input
                     type="date"
                     className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
-                    value={filters.startDate}
+                    value={localFilters.startDate || ''}
                     onChange={(e) =>
-                      setFilters((prev) => ({
+                      setLocalFilters((prev) => ({
                         ...prev,
                         startDate: e.target.value,
                       }))
@@ -148,9 +170,9 @@ export default function FilterSection({
                   <input
                     type="date"
                     className="w-[141px] h-8 border-2 border-shark-300 rounded-md"
-                    value={filters.endDate}
+                    value={localFilters.endDate || ''}
                     onChange={(e) =>
-                      setFilters((prev) => ({
+                      setLocalFilters((prev) => ({
                         ...prev,
                         endDate: e.target.value,
                       }))
@@ -170,9 +192,9 @@ export default function FilterSection({
                   <p className="text-sm text-shark-600 font-medium">Province</p>
                   <SelectField
                     options={provinces}
-                    value={filters.province || ''}
+                    value={localFilters.province || ''}
                     onChange={(value) =>
-                      setFilters((prev) => ({
+                      setLocalFilters((prev) => ({
                         ...prev,
                         province: value,
                         district: '',
@@ -184,20 +206,20 @@ export default function FilterSection({
                   <p className="text-sm text-shark-600 font-medium">District</p>
                   <SelectField
                     options={
-                      filters.province
+                      localFilters.province
                         ? districtsByProvince[
-                            filters.province as keyof typeof districtsByProvince
+                            localFilters.province as keyof typeof districtsByProvince
                           ].map((district) => ({
                             key: district,
                             label: district,
                           }))
                         : []
                     }
-                    value={filters.district || ''}
+                    value={localFilters.district || ''}
                     onChange={(value) =>
-                      setFilters((prev) => ({ ...prev, district: value }))
+                      setLocalFilters((prev) => ({ ...prev, district: value }))
                     }
-                    disabled={!filters.province}
+                    disabled={!localFilters.province}
                   />
                 </div>
               </div>
@@ -214,7 +236,7 @@ export default function FilterSection({
                     key={category}
                     className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
                       ${
-                        filters.categories.includes(category)
+                        localFilters.categories.includes(category)
                           ? 'border-shark-950 text-shark-950'
                           : 'border-shark-300'
                       }`}
@@ -238,9 +260,9 @@ export default function FilterSection({
                   </p>
                   <Switch
                     color="default"
-                    isSelected={filters.privateSelected}
+                    isSelected={localFilters.privateSelected}
                     onValueChange={() =>
-                      setFilters((prev) => ({
+                      setLocalFilters((prev) => ({
                         ...prev,
                         privateSelected: !prev.privateSelected,
                       }))
@@ -255,9 +277,9 @@ export default function FilterSection({
                   </p>
                   <Switch
                     color="default"
-                    isSelected={filters.publicSelected}
+                    isSelected={localFilters.publicSelected}
                     onValueChange={() =>
-                      setFilters((prev) => ({
+                      setLocalFilters((prev) => ({
                         ...prev,
                         publicSelected: !prev.publicSelected,
                       }))
@@ -280,16 +302,17 @@ export default function FilterSection({
               <Button
                 variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-50 text-shark-950 rounded-[20px]"
-                onPress={onClear}
+                onPress={handleClear}
               >
                 Clear
               </Button>
-              <button
+              <Button
+                variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-950 text-shark-50 rounded-[20px]"
-                onClick={handleApplyFilters}
+                onPress={handleApply}
               >
                 Apply
-              </button>
+              </Button>
             </div>
           </form>
         </div>
