@@ -95,6 +95,21 @@ export default function FilterSection({
       setErrorMessage('End Date must be greater than Start Date');
       return;
     }
+
+    const isEmpty =
+      !localFilters.startDate &&
+      !localFilters.endDate &&
+      !localFilters.province &&
+      !localFilters.district &&
+      localFilters.categories.length === 0 &&
+      !localFilters.privateSelected &&
+      !localFilters.publicSelected;
+
+    if (isEmpty) {
+      setErrorMessage('Please select at least one filter to apply.');
+      return;
+    }
+
     setErrorMessage(null);
     setFilters(localFilters);
     setIsFilterTabOpen(false);
@@ -292,7 +307,7 @@ export default function FilterSection({
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="text-red-500 text-sm font-secondary font-medium">
+              <div className="text-red-500 text-sm font-secondary">
                 {errorMessage}
               </div>
             )}
@@ -301,7 +316,7 @@ export default function FilterSection({
             <div className="w-[297px] flex justify-end gap-3">
               <Button
                 variant="shadow"
-                className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-50 text-shark-950 rounded-[20px]"
+                className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-100 text-shark-950 rounded-[20px]"
                 onPress={handleClear}
               >
                 Clear
