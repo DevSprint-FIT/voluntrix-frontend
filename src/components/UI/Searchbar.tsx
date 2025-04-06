@@ -67,12 +67,6 @@ export default function Searchbar({
     setIsFilterOpen(tags.length > 0);
   }, [filters, setIsFilterOpen]);
 
-  const handleRemoveFilter = (index: number) => {
-    setActiveFilterTags((prevFilters) =>
-      prevFilters.filter((_, i) => i !== index)
-    );
-  };
-
   return (
     <div
       className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
@@ -117,12 +111,7 @@ export default function Searchbar({
               </div>
               <div className="w-[607px] flex flex-wrap justify-start items-center mt-1 gap-x-2 gap-y-1">
                 {activeFilterTags.map((tag, index) => (
-                  <FilterTag
-                    key={index}
-                    index={index}
-                    name={tag}
-                    onRemove={handleRemoveFilter}
-                  />
+                  <FilterTag key={index} name={tag} />
                 ))}
               </div>
             </>
