@@ -37,7 +37,11 @@ const categories = [
   'Education',
 ];
 
-export default function FilterSection() {
+type FilterSectionProps = {
+  setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function FilterSection({ setIsFilterOpen }: FilterSectionProps) {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +67,6 @@ export default function FilterSection() {
   };
 
   const handleApplyFilters = () => {
-    console.log('Applied Filters:');
     console.log('Start Date:', filters.startDate);
     console.log('End Date:', filters.endDate);
     console.log('Province:', filters.province);
@@ -71,11 +74,12 @@ export default function FilterSection() {
     console.log('Selected Categories:', filters.categories.join(', '));
     console.log('Private Selected:', filters.privateSelected);
     console.log('Public Selected:', filters.publicSelected);
-    handleClearFilters();
+    setIsFilterOpen(true);
   };
 
   const handleClearFilters = () => {
-    setFilters({
+    setFilters((prev) => ({
+      ...prev,
       startDate: '',
       endDate: '',
       province: '',
@@ -83,7 +87,8 @@ export default function FilterSection() {
       categories: [],
       privateSelected: false,
       publicSelected: false,
-    });
+    }));
+    setIsFilterOpen(false);
   };
 
   useEffect(() => {
@@ -172,9 +177,13 @@ export default function FilterSection() {
                   <p className="text-sm text-shark-600 font-medium">Province</p>
                   <SelectField
                     options={provinces}
-                    value={filters.province}
+                    value={filters.province || ''}
                     onChange={(value) =>
-                      setFilters((prev) => ({ ...prev, province: value }))
+                      setFilters((prev) => ({
+                        ...prev,
+                        province: value,
+                        district: '',
+                      }))
                     }
                   />
                 </div>
@@ -191,7 +200,7 @@ export default function FilterSection() {
                           }))
                         : []
                     }
-                    value={filters.district}
+                    value={filters.district || ''}
                     onChange={(value) =>
                       setFilters((prev) => ({ ...prev, district: value }))
                     }

@@ -4,10 +4,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import FilterTag from './FilterTag';
 
-export default function Searchbar() {
+interface SearchbarProps {
+  isFilterOpen: boolean;
+}
+
+export default function Searchbar({ isFilterOpen }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

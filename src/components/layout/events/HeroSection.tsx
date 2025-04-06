@@ -1,8 +1,13 @@
+'use client';
+
+import { useState } from 'react';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 
 export default function HeroSection() {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   return (
     <div className="w-full flex items-start justify-center mt-32">
       <div className="w-[1200px] flex flex-col items-center justify-start">
@@ -22,9 +27,9 @@ export default function HeroSection() {
         </div>
         <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
-            <Searchbar />
+            <Searchbar isFilterOpen={isFilterOpen} />
           </div>
-          <FilterSection />
+          <FilterSection setIsFilterOpen={setIsFilterOpen} />
         </div>
       </div>
     </div>
