@@ -37,23 +37,31 @@ const categories = [
   'Education',
 ];
 
-type FilterSectionProps = {
-  setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
+type Filters = {
+  startDate: string;
+  endDate: string;
+  province: string;
+  district: string;
+  categories: string[];
+  privateSelected: boolean;
+  publicSelected: boolean;
 };
 
-export default function FilterSection({ setIsFilterOpen }: FilterSectionProps) {
+type FilterSectionProps = {
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  onClear: () => void;
+  onApply: () => void;
+};
+
+export default function FilterSection({
+  filters,
+  setFilters,
+  onClear,
+  onApply,
+}: FilterSectionProps) {
   const [isFilterTabOpen, setIsFilterTabOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
-
-  const [filters, setFilters] = useState({
-    startDate: '',
-    endDate: '',
-    province: '',
-    district: '',
-    categories: [] as string[],
-    privateSelected: false,
-    publicSelected: false,
-  });
 
   const toggleFilter = () => setIsFilterTabOpen((prev) => !prev);
 
@@ -64,31 +72,6 @@ export default function FilterSection({ setIsFilterOpen }: FilterSectionProps) {
         ? prev.categories.filter((item) => item !== category)
         : [...prev.categories, category],
     }));
-  };
-
-  const handleApplyFilters = () => {
-    console.log('Start Date:', filters.startDate);
-    console.log('End Date:', filters.endDate);
-    console.log('Province:', filters.province);
-    console.log('District:', filters.district);
-    console.log('Selected Categories:', filters.categories.join(', '));
-    console.log('Private Selected:', filters.privateSelected);
-    console.log('Public Selected:', filters.publicSelected);
-    setIsFilterOpen(true);
-  };
-
-  const handleClearFilters = () => {
-    setFilters((prev) => ({
-      ...prev,
-      startDate: '',
-      endDate: '',
-      province: '',
-      district: '',
-      categories: [],
-      privateSelected: false,
-      publicSelected: false,
-    }));
-    setIsFilterOpen(false);
   };
 
   useEffect(() => {
@@ -280,14 +263,14 @@ export default function FilterSection({ setIsFilterOpen }: FilterSectionProps) {
               <Button
                 variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-50 text-shark-950 rounded-[20px]"
-                onPress={handleClearFilters}
+                onPress={onClear}
               >
                 Clear
               </Button>
               <Button
                 variant="shadow"
                 className="w-[78px] h-[32px] text-[16px] font-secondary bg-shark-950 text-shark-50 rounded-[20px]"
-                onPress={handleApplyFilters}
+                onPress={onApply}
               >
                 Apply
               </Button>

@@ -4,13 +4,25 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import FilterTag from './FilterTag';
 
+type Filters = {
+  startDate: string;
+  endDate: string;
+  province: string;
+  district: string;
+  categories: string[];
+  privateSelected: boolean;
+  publicSelected: boolean;
+};
+
 interface SearchbarProps {
   isFilterOpen: boolean;
+  filters: Filters;
 }
 
-export default function Searchbar({ isFilterOpen }: SearchbarProps) {
+export default function Searchbar({ isFilterOpen, filters }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +47,25 @@ export default function Searchbar({ isFilterOpen }: SearchbarProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFocused, handleClickOutside]);
 
+  useEffect(() => {
+    const tags: string[] = [];
+
+    if (filters.province) tags.push(filters.province);
+    if (filters.district) tags.push(filters.district);
+    if (filters.startDate) tags.push(`From: ${filters.startDate}`);
+    if (filters.endDate) tags.push(`To: ${filters.endDate}`);
+    if (filters.privateSelected) tags.push('Private');
+    if (filters.publicSelected) tags.push('Public');
+    filters.categories.forEach((category) => tags.push(category));
+
+    setActiveFilterTags(tags);
+  }, [filters]);
+
+  const handleRemoveFilter = (index: number) => {
+    setActiveFilterTags((prevFilters) =>
+      prevFilters.filter((_, i) => i !== index)
+    );
+  };
   return (
     <div
       className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
@@ -78,11 +109,14 @@ export default function Searchbar({ isFilterOpen }: SearchbarProps) {
                 Filters
               </div>
               <div className="w-[607px] flex flex-wrap justify-start items-center mt-1 gap-x-2 gap-y-1">
-                <FilterTag name="Colombo" />
-                <FilterTag name="Colombo" />
-                <FilterTag name="Colombo" />
-                <FilterTag name="Colombo" />
-                <FilterTag name="Colombo" />
+                {activeFilterTags.map((tag, index) => (
+                  <FilterTag
+                    key={index}
+                    index={index}
+                    name={tag}
+                    onRemove={handleRemoveFilter}
+                  />
+                ))}
               </div>
             </>
           )}

@@ -8,6 +8,40 @@ import Searchbar from '@/components/UI/Searchbar';
 export default function HeroSection() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  const [filters, setFilters] = useState({
+    startDate: '',
+    endDate: '',
+    province: '',
+    district: '',
+    categories: [] as string[],
+    privateSelected: false,
+    publicSelected: false,
+  });
+
+  const handleApplyFilters = () => {
+    console.log('Start Date:', filters.startDate);
+    console.log('End Date:', filters.endDate);
+    console.log('Province:', filters.province);
+    console.log('District:', filters.district);
+    console.log('Selected Categories:', filters.categories.join(', '));
+    console.log('Private Selected:', filters.privateSelected);
+    console.log('Public Selected:', filters.publicSelected);
+    setIsFilterOpen(true);
+  };
+
+  const handleClearFilters = () => {
+    setFilters((prev) => ({
+      ...prev,
+      startDate: '',
+      endDate: '',
+      province: '',
+      district: '',
+      categories: [],
+      privateSelected: false,
+      publicSelected: false,
+    }));
+  };
+
   return (
     <div className="w-full flex items-start justify-center mt-32">
       <div className="w-[1200px] flex flex-col items-center justify-start">
@@ -27,9 +61,14 @@ export default function HeroSection() {
         </div>
         <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
-            <Searchbar isFilterOpen={isFilterOpen} />
+            <Searchbar isFilterOpen={isFilterOpen} filters={filters} />
           </div>
-          <FilterSection setIsFilterOpen={setIsFilterOpen} />
+          <FilterSection
+            filters={filters}
+            setFilters={setFilters}
+            onClear={handleClearFilters}
+            onApply={handleApplyFilters}
+          />
         </div>
       </div>
     </div>
