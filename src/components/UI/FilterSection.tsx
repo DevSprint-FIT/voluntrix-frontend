@@ -118,7 +118,6 @@ export default function FilterSection({
   const handleClear = () => {
     setLocalFilters(initialFilters);
     setFilters(initialFilters);
-    setIsFilterTabOpen(false);
   };
 
   useEffect(() => {
