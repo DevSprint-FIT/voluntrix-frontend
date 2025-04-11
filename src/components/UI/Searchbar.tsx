@@ -23,9 +23,17 @@ export default function Searchbar({ filters }: SearchbarProps) {
   const [inputValue, setInputValue] = useState('');
   const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const keyWords = [
+    'FIT Future Careers',
+    'Beach Cleanup',
+    'Charity Walk',
+    'Tech Meetup',
+  ];
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
@@ -62,6 +70,17 @@ export default function Searchbar({ filters }: SearchbarProps) {
     setIsFilterOpen(tags.length > 0);
   }, [filters, setIsFilterOpen]);
 
+  useEffect(() => {
+    if (inputValue.length > 0) {
+      const filtered = keyWords.filter((keyword) =>
+        keyword.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      setSearchResults(filtered);
+    } else {
+      setSearchResults(['Search for events by name']);
+    }
+  }, [inputValue]);
+
   return (
     <div
       className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
@@ -77,14 +96,16 @@ export default function Searchbar({ filters }: SearchbarProps) {
           value={inputValue}
           onFocus={() => setIsFocused(true)}
           onChange={(e) => setInputValue(e.target.value)}
+          autoComplete="off"
         />
-        <Image
-          src="/icons/search.svg"
-          width={32}
-          height={32}
-          alt="Search icon"
-          className="cursor-pointer"
-        />
+        <button>
+          <Image
+            src="/icons/search.svg"
+            width={32}
+            height={32}
+            alt="Search icon"
+          />
+        </button>
       </div>
 
       {isFocused && (
@@ -94,9 +115,18 @@ export default function Searchbar({ filters }: SearchbarProps) {
         >
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
           <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg">
-            <div className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-md mt-1 hover:bg-shark-50 rounded-lg">
-              <p className="w-[591px]">Search for events by name</p>
-            </div>
+            {searchResults.map((result, index) => (
+              <div
+                key={index}
+                className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-md mt-1 hover:bg-shark-50 rounded-lg"
+                onClick={() => {
+                  setInputValue(result);
+                  setIsFilterOpen(false);
+                }}
+              >
+                <p className="w-[591px] cursor-pointer">{result}</p>
+              </div>
+            ))}
           </div>
 
           {isFilterOpen && (
