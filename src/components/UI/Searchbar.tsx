@@ -18,6 +18,17 @@ interface SearchbarProps {
   filters: Filters;
 }
 
+const keyWords = [
+  'FIT Future Careers',
+  'Beach Cleanup',
+  'Charity Walk',
+  'Tech Meetup',
+  'Youth Summit',
+  'Startup Pitch',
+  'Tree Planting',
+  'Workshop on AI',
+];
+
 export default function Searchbar({ filters }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -27,13 +38,7 @@ export default function Searchbar({ filters }: SearchbarProps) {
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const keyWords = [
-    'FIT Future Careers',
-    'Beach Cleanup',
-    'Charity Walk',
-    'Tech Meetup',
-  ];
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
@@ -68,17 +73,23 @@ export default function Searchbar({ filters }: SearchbarProps) {
 
     setActiveFilterTags(tags);
     setIsFilterOpen(tags.length > 0);
-  }, [filters, setIsFilterOpen]);
+  }, [filters]);
 
   useEffect(() => {
-    if (inputValue.length > 0) {
-      const filtered = keyWords.filter((keyword) =>
-        keyword.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      setSearchResults(filtered);
-    } else {
-      setSearchResults(['Search for events by name']);
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (inputValue.trim()) {
+        const filtered = keyWords.filter((keyword) =>
+          keyword.toLowerCase().includes(inputValue.toLowerCase())
+        );
+        setSearchResults(filtered.length ? filtered : ['No results found']);
+      } else {
+        setSearchResults(['Search for events by name']);
+      }
+    }, 200);
   }, [inputValue]);
 
   return (
@@ -97,8 +108,9 @@ export default function Searchbar({ filters }: SearchbarProps) {
           onFocus={() => setIsFocused(true)}
           onChange={(e) => setInputValue(e.target.value)}
           autoComplete="off"
+          aria-label="Search for events"
         />
-        <button>
+        <button aria-label="Search">
           <Image
             src="/icons/search.svg"
             width={32}
@@ -114,17 +126,17 @@ export default function Searchbar({ filters }: SearchbarProps) {
           className="w-[639px] flex flex-col items-center justify-start rounded-[20px] gap-1"
         >
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
-          <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg">
+          <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg max-h-[200px] overflow-y-auto">
             {searchResults.map((result, index) => (
               <div
                 key={index}
-                className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-md mt-1 hover:bg-shark-50 rounded-lg"
+                className="w-[635px] h-8 flex justify-center items-start text-shark-300 text-md mt-1 hover:bg-shark-50 rounded-lg cursor-pointer transition"
                 onClick={() => {
                   setInputValue(result);
-                  setIsFilterOpen(false);
+                  setIsFocused(false);
                 }}
               >
-                <p className="w-[591px] cursor-pointer">{result}</p>
+                <p className="w-[591px] truncate">{result}</p>
               </div>
             ))}
           </div>
