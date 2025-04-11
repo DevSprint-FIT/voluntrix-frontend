@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import FilterTag from './FilterTag';
+import axios from 'axios';
 
 type Filters = {
   startDate: string;
@@ -18,23 +19,13 @@ interface SearchbarProps {
   filters: Filters;
 }
 
-const keyWords = [
-  'FIT Future Careers',
-  'Beach Cleanup',
-  'Charity Walk',
-  'Tech Meetup',
-  'Youth Summit',
-  'Startup Pitch',
-  'Tree Planting',
-  'Workshop on AI',
-];
-
 export default function Searchbar({ filters }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [eventTitles, setEventTitles] = useState<string[]>([]);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,15 +73,32 @@ export default function Searchbar({ filters }: SearchbarProps) {
 
     debounceTimeoutRef.current = setTimeout(() => {
       if (inputValue.trim()) {
-        const filtered = keyWords.filter((keyword) =>
-          keyword.toLowerCase().includes(inputValue.toLowerCase())
+        const filtered = eventTitles.filter((title) =>
+          title.toLowerCase().includes(inputValue.toLowerCase())
         );
         setSearchResults(filtered.length ? filtered : ['No results found']);
       } else {
         setSearchResults(['Search for events by name']);
       }
     }, 200);
-  }, [inputValue]);
+  }, [inputValue, eventTitles]);
+
+  useEffect(() => {
+    const fetchEventTitles = async () => {
+      try {
+        const res = await axios.get(
+          'http://localhost:8080/api/public/v1/events/names'
+        );
+        const titles = res.data
+          .map((event: { eventTitle: string }) => event.eventTitle)
+          .filter((title: string) => title);
+        setEventTitles(titles);
+      } catch (error) {
+        console.error('Failed to fetch event titles:', error);
+      }
+    };
+    fetchEventTitles();
+  }, []);
 
   return (
     <div
@@ -128,7 +136,7 @@ export default function Searchbar({ filters }: SearchbarProps) {
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
           <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg max-h-[200px] overflow-y-auto">
             {searchResults.map((result, index) => {
-              const isResultValid = keyWords.includes(result);
+              const isResultValid = eventTitles.includes(result);
               return (
                 <div
                   key={index}
