@@ -23,7 +23,7 @@ export default function EventSection() {
   const scroll = (direction: 'left' | 'right') => {
     const { current } = scrollRef;
     if (current) {
-      const scrollAmount = 300;
+      const scrollAmount = 350;
       current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
@@ -34,10 +34,7 @@ export default function EventSection() {
   return (
     <div className="w-full flex items-start justify-center mt-[88px]">
       <div className="w-[1248px] relative flex justify-center">
-        <div
-          ref={scrollRef}
-          className="w-[1200px] flex flex-col items-start justify-start gap-6 overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar"
-        >
+        <div className="w-[1200px] flex flex-col items-start justify-start gap-6">
           <div className="flex flex-col gap-1 justify-start items-start">
             <p className="font-secondary text-shark-950 font-medium text-3xl">
               Trending Events
@@ -46,12 +43,17 @@ export default function EventSection() {
               Based on your current location, and community engagement
             </p>
           </div>
-          <div className="flex gap-7">
-            <EventCard event={eventData} />
-            <EventCard event={eventData} />
-            <EventCard event={eventData} />
-            <EventCard event={eventData} />
-            <EventCard event={eventData} />
+          <div
+            ref={scrollRef}
+            className="w-[1200px] flex overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar"
+          >
+            <div className="flex gap-7">
+              <EventCard event={eventData} />
+              <EventCard event={eventData} />
+              <EventCard event={eventData} />
+              <EventCard event={eventData} />
+              <EventCard event={eventData} />
+            </div>
           </div>
         </div>
 
