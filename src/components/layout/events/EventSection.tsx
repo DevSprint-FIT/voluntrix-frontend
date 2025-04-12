@@ -17,7 +17,12 @@ const eventData = {
   donationAvailable: false,
 };
 
-export default function EventSection() {
+interface EventSectionProps {
+  title: string;
+  subTitle: string;
+}
+
+export default function EventSection({ title, subTitle }: EventSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -56,16 +61,14 @@ export default function EventSection() {
   }, []);
 
   return (
-    <div className="w-full flex items-start justify-center mt-[88px]">
+    <div className="w-full flex items-start justify-center mb-12">
       <div className="w-[1248px] relative flex justify-center">
         <div className="w-[1200px] flex flex-col items-start justify-start gap-6">
           <div className="flex flex-col gap-1 justify-start items-start">
             <p className="font-secondary text-shark-950 font-medium text-3xl">
-              Trending Events
+              {title}
             </p>
-            <p className="font-secondary text-shark-500 text-lg">
-              Based on your current location, and community engagement
-            </p>
+            <p className="font-secondary text-shark-500 text-lg">{subTitle}</p>
           </div>
           <div
             ref={scrollRef}

@@ -17,7 +17,7 @@ export default function HeroSection() {
   });
 
   return (
-    <div className="w-full flex items-start justify-center mt-32">
+    <div className="w-full flex items-start justify-center mt-32 mb-[88px]">
       <div className="w-[1200px] flex flex-col items-center justify-start">
         <Breadcrumb />
         <div className="w-[806px] h-[230px] mt-16 flex flex-col items-center justify-start">
