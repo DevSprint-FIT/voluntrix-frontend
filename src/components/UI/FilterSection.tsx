@@ -154,7 +154,7 @@ export default function FilterSection({
       {isFilterTabOpen && (
         <div
           ref={filterRef}
-          className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[74px] z-10 py-5"
+          className="absolute w-[340px] flex justify-center items-center bg-white border-2 rounded-[20px] border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[74px] z-20 py-5"
         >
           <form className="w-[297px] flex flex-col gap-4">
             {/* Date */}

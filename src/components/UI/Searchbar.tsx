@@ -104,7 +104,7 @@ export default function Searchbar({ filters }: SearchbarProps) {
     <div
       className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
         isFocused ? '[20px]' : '[40px]'
-      } bg-white border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2 z-10`}
+      } bg-white border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2 z-20`}
     >
       <div className="w-[607px] h-6 flex justify-center items-center">
         <input
