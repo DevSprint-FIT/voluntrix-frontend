@@ -45,8 +45,8 @@ export default function EventCard({event}: {event: Event}) {
           <div className="flex justify-center w-[308px] mt-[17px]">
             <div className="w-[258px]">
               <div className="flex flex-col items-start gap-4">
-                <div className="flex justify-between w-full items-start">
-                  <p className="text-shark-950 font-bold text-xl text-left" >{event.title}</p>
+                <div className="flex w-full items-start">
+                  <p className="w-[234px] text-shark-950 font-bold text-xl text-left text-wrap" >{event.title}</p>
                   <button onClick={handleSave}>
                     <Image
                       src={isSaved ? "/icons/tick-circle.svg" : "/icons/save.svg"}
@@ -56,9 +56,9 @@ export default function EventCard({event}: {event: Event}) {
                     />
                   </button>
                 </div>
-                <p className="text-shark-900 font-medium text-md" style={{"marginTop": "-10px"}}>By {event.organizer}</p>
+                <p className="text-shark-900 font-medium text-md text-wrap" style={{"marginTop": "-10px"}}>By {event.organizer}</p>
                 {!event.donationAvailable && (
-                  <p className="text-shark-900 text-[13px] font-normal text-left">{event.description}</p>
+                  <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">{event.description}</p>                
                 )}
                 <div className="flex items-center gap-2 flex-wrap">
                   {event.specialTags.map((tag, index) => (
