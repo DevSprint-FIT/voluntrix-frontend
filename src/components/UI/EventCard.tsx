@@ -79,7 +79,7 @@ export default function EventCard({event}: {event: Event}) {
                   </div>
                   <div className="flex gap-2 items-start">
                     <Image src="/icons/location.svg" width={20} height={20} alt="location" />
-                    <p className="text-left font-secondary text-shark-900 text-[12px] font-bold">
+                    <p className="w-24 text-left font-secondary text-shark-900 text-[12px] font-bold text-wrap">
                       {event.venue}
                     </p>
                   </div>
