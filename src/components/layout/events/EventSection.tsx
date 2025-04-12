@@ -61,7 +61,7 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
   }, []);
 
   return (
-    <div className="w-full flex items-start justify-center mb-12">
+    <div className="w-full flex items-start justify-center">
       <div className="w-[1248px] relative flex justify-center">
         <div className="w-[1200px] flex flex-col items-start justify-start gap-6">
           <div className="flex flex-col gap-1 justify-start items-start">
@@ -74,7 +74,7 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
             ref={scrollRef}
             className="w-[1200px] flex overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar"
           >
-            <div className="flex gap-7">
+            <div className="flex gap-7 mb-12">
               <EventCard event={eventData} />
               <EventCard event={eventData} />
               <EventCard event={eventData} />
