@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
 
@@ -19,17 +19,41 @@ const eventData = {
 
 export default function EventSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    const { current } = scrollRef;
+    if (current) {
+      setCanScrollLeft(current.scrollLeft > 0);
+      setCanScrollRight(
+        current.scrollLeft + current.clientWidth < current.scrollWidth
+      );
+    }
+  };
 
   const scroll = (direction: 'left' | 'right') => {
     const { current } = scrollRef;
     if (current) {
-      const scrollAmount = 350;
+      const scrollAmount = 450;
       current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
     }
   };
+
+  useEffect(() => {
+    const { current } = scrollRef;
+    if (current) {
+      current.addEventListener('scroll', checkScroll);
+      checkScroll();
+    }
+
+    return () => {
+      current?.removeEventListener('scroll', checkScroll);
+    };
+  }, []);
 
   return (
     <div className="w-full flex items-start justify-center mt-[88px]">
@@ -58,30 +82,36 @@ export default function EventSection() {
         </div>
 
         {/* Left Arrow */}
-        <button
-          onClick={() => scroll('left')}
-          className="rounded-full absolute top-1/2 -translate-y-1/2 left-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
-        >
-          <Image
-            src="/icons/arrow-black-left.svg"
-            width={24}
-            height={24}
-            alt="Arrow left icon"
-          />
-        </button>
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            aria-label="Scroll left"
+            className="rounded-full absolute top-1/2 -translate-y-1/2 left-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+          >
+            <Image
+              src="/icons/arrow-black-left.svg"
+              width={24}
+              height={24}
+              alt="Arrow left icon"
+            />
+          </button>
+        )}
 
         {/* Right Arrow */}
-        <button
-          onClick={() => scroll('right')}
-          className="rounded-full absolute top-1/2 -translate-y-1/2 right-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
-        >
-          <Image
-            src="/icons/arrow-black-right.svg"
-            width={24}
-            height={24}
-            alt="Arrow right icon"
-          />
-        </button>
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            aria-label="Scroll right"
+            className="rounded-full absolute top-1/2 -translate-y-1/2 right-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+          >
+            <Image
+              src="/icons/arrow-black-right.svg"
+              width={24}
+              height={24}
+              alt="Arrow right icon"
+            />
+          </button>
+        )}
       </div>
     </div>
   );
