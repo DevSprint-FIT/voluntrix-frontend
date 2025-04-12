@@ -88,3 +88,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
   background: url('/icons/calendar.svg') no-repeat center;
   background-size: contain;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
