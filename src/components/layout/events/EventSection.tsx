@@ -9,7 +9,7 @@ const eventData = {
   title: 'FIT Future Careers',
   organizer: 'INTECS, UoM',
   description:
-    'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders. Discover career opportunities, attend workshops, and network with experts to shape your future.',
+    'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
   specialTags: ['Private', 'Online', 'Sponsor'],
   date: 'Nov 20, 2025',
   venue: 'FIT Auditorium',
