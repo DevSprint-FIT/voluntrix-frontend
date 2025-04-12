@@ -1,3 +1,6 @@
+'use client';
+
+import { useRef } from 'react';
 import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
 
@@ -15,10 +18,26 @@ const eventData = {
 };
 
 export default function EventSection() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const { current } = scrollRef;
+    if (current) {
+      const scrollAmount = 300;
+      current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <div className="w-full flex items-start justify-center mt-[88px]">
       <div className="w-[1248px] relative flex justify-center">
-        <div className="w-[1200px] flex flex-col items-start justify-start gap-6 overflow-hidden">
+        <div
+          ref={scrollRef}
+          className="w-[1200px] flex flex-col items-start justify-start gap-6 overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar"
+        >
           <div className="flex flex-col gap-1 justify-start items-start">
             <p className="font-secondary text-shark-950 font-medium text-3xl">
               Trending Events
@@ -35,7 +54,12 @@ export default function EventSection() {
             <EventCard event={eventData} />
           </div>
         </div>
-        <button className="rounded-full absolute top-1/2 left-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+
+        {/* Left Arrow */}
+        <button
+          onClick={() => scroll('left')}
+          className="rounded-full absolute top-1/2 -translate-y-1/2 left-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+        >
           <Image
             src="/icons/arrow-black-left.svg"
             width={24}
@@ -43,7 +67,12 @@ export default function EventSection() {
             alt="Arrow left icon"
           />
         </button>
-        <button className="rounded-full absolute top-1/2 right-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scroll('right')}
+          className="rounded-full absolute top-1/2 -translate-y-1/2 right-0 z-10 flex justify-center items-center bg-white w-12 h-12 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+        >
           <Image
             src="/icons/arrow-black-right.svg"
             width={24}
