@@ -26,6 +26,7 @@ export default function PaymentPage() {
       
       console.log("Hash and Merchant ID received:", hash, merchantId);
 
+      // notify url has to be public 
       const payment = {
         sandbox: true,
         merchant_id: merchantId,
