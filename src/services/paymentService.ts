@@ -15,7 +15,7 @@ export interface PaymentDetails {
   
   export async function startPayment(details: PaymentDetails) {
     try {
-      const response = await fetch(`${backendUrl}/payment/start`, {
+      const response = await fetch(`${backendUrl}/api/payment/start`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
