@@ -1,12 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { startPayment, PaymentDetails } from "@/services/paymentService";
 
-declare const payhere: any;
+declare global {
+  interface Window {
+    payhere: any;
+  }
+}
 
 export default function PaymentPage() {
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.payhere) {
+      window.payhere.onCompleted = function (orderId: string) {
+        console.log("Payment completed! OrderID:", orderId);
+        window.location.href = "/checkout/success";
+      };
+
+      window.payhere.onDismissed = function () {
+        window.location.href = "/checkout/fail";
+      };
+
+      window.payhere.onError = function (error: any) {
+        console.error("Error occurred:", error);
+        window.location.href = "/checkout/fail";
+      };
+    }
+  }, []);
+
+
   const handlePayment = async () => {
     const paymentDetails: PaymentDetails = {
       orderId: "ItemNo12345",
@@ -26,7 +50,6 @@ export default function PaymentPage() {
       
       console.log("Hash and Merchant ID received:", hash, merchantId);
 
-      // notify url has to be public 
       const payment = {
         sandbox: true,
         merchant_id: merchantId,
@@ -47,7 +70,7 @@ export default function PaymentPage() {
         hash: hash,
       };
 
-      payhere.startPayment(payment);
+      window.payhere.startPayment(payment);
     } catch (error) {
       console.error("Payment failed:", error);
     }
