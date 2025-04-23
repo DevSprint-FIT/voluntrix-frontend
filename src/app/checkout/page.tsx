@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect } from "react";
-import { startPayment, PaymentDetails } from "@/services/paymentService";
+import { startPayment, PaymentDetails, checkPaymentStatus } from "@/services/paymentService";
 
 declare global {
   interface Window {
@@ -10,46 +11,66 @@ declare global {
   }
 }
 
-export default function PaymentPage() {
+const dummyData : PaymentDetails = {
+  "orderId": "ORD999011",
+  "amount": "50.50",
+  "currency": "LKR",
+  "firstName": "Samantha",
+  "lastName": "Green",
+  "email": "samantha@example.com",
+  "phone": "1234567890",
+  "address": "Another St",
+  "city": "City",
+  "country": "Country",
+  "userType": "VOLUNTEER",
+  "volunteerId": 1,
+  "sponsorId": null,
+  "eventId": 1,
+  "isAnnonymous": false,
+  "transactionType": "DONATION"
+}
 
+
+export default function PaymentPage() {
   useEffect(() => {
     if (typeof window !== "undefined" && window.payhere) {
       window.payhere.onCompleted = function (orderId: string) {
-        console.log("Payment completed! OrderID:", orderId);
-        window.location.href = "/checkout/success";
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          try {
+            const status = await checkPaymentStatus(orderId);
+            if(status === "SUCCESS") {
+              clearInterval(interval);
+              window.location.href = "/checkout/success";
+            } else if (status === "FAILED" || attempts > 10) {
+              clearInterval(interval);
+              window.location.href = "/checkout/fail";
+            }
+            attempts++;
+          } catch (error) {
+            clearInterval(interval);
+            window.location.href = "/checkout/fail";
+          }
+        }, 1000);
       };
-
+  
       window.payhere.onDismissed = function () {
         window.location.href = "/checkout/fail";
       };
-
+  
       window.payhere.onError = function (error: any) {
         console.error("Error occurred:", error);
         window.location.href = "/checkout/fail";
       };
     }
   }, []);
-
-
+  
   const handlePayment = async () => {
-    const paymentDetails: PaymentDetails = {
-      orderId: "ItemNo12345",
-      amount: "100.00",
-      currency: "LKR",
-      firstName: "Saman",
-      lastName: "Perera",
-      email: "samanp@gmail.com",
-      phone: "0771234567",
-      address: "No.1, Galle Road",
-      city: "Colombo",
-      country: "Sri Lanka",
-    };
+    const paymentDetails: PaymentDetails = dummyData;
 
     try {
       const { hash, merchantId } = await startPayment(paymentDetails);
       
-      console.log("Hash and Merchant ID received:", hash, merchantId);
-
       const payment = {
         sandbox: true,
         merchant_id: merchantId,
@@ -57,7 +78,7 @@ export default function PaymentPage() {
         cancel_url: process.env.NEXT_PUBLIC_PAYHERE_FAIL_URL,
         notify_url: process.env.NEXT_PUBLIC_PAYHERE_NOTIFY_URL,
         order_id: paymentDetails.orderId,
-        items: "Item Title",
+        items: paymentDetails.transactionType,
         amount: paymentDetails.amount,
         currency: paymentDetails.currency,
         first_name: paymentDetails.firstName,
@@ -73,6 +94,7 @@ export default function PaymentPage() {
       window.payhere.startPayment(payment);
     } catch (error) {
       console.error("Payment failed:", error);
+      alert(error);
     }
   };
 
@@ -82,7 +104,7 @@ export default function PaymentPage() {
       <button
         id="payhere-payment"
         onClick={handlePayment}
-        className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+        className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
       >
         PayHere Pay
       </button>
