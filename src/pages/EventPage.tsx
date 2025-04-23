@@ -2,6 +2,7 @@ import FooterSection from '@/components/layout/FooterSection';
 import GoToTop from '@/components/UI/GoToTop';
 import Navbar from '@/components/UI/Navbar';
 import Event from '@/components/layout/events/Event';
+import EventSection from '@/components/layout/events/EventSection';
 
 const eventData = {
   imageUrl: '/images/DummyEvent2.png',
@@ -30,6 +31,10 @@ export default function EventPage() {
     <div className="flex flex-col justify-center items-start flex-shrink-0">
       <Navbar />
       <Event event={eventData} sponsor={sponsorData} />
+      <EventSection
+        title={'Based on your browsing history'}
+        subTitle={'Based on searches and prefernces'}
+      />
       <FooterSection />
       <GoToTop />
     </div>
