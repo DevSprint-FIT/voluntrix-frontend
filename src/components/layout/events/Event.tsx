@@ -4,7 +4,6 @@ import Breadcrumb from '@/components/UI/Breadcrumb';
 import { Button, Progress } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
-import EventSection from './EventSection';
 
 // need to fetch this type of structured data to build cards
 interface Event {
@@ -145,7 +144,7 @@ export default function Event({
             </div>
           </div>
         </div>
-        <div className="w-[1150px] flex gap-10 mt-20 mb-28 justify-start">
+        <div className="w-[1150px] flex gap-10 mt-20 justify-start">
           <div className="w-[719px] flex flex-col gap-7 justify-start">
             <p className="text-4xl font-secondary font-medium text-shark-950">
               Spornsorships
@@ -241,10 +240,6 @@ export default function Event({
             </div>
           )}
         </div>
-        <EventSection
-          title={'Based on your browsing history'}
-          subTitle={'Based on searches and prefernces'}
-        />
       </div>
     </div>
   );
