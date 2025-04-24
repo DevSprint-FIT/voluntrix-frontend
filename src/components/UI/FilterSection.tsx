@@ -276,10 +276,16 @@ export default function FilterSection({
                     color="default"
                     isSelected={localFilters.privateSelected}
                     onValueChange={() =>
-                      setLocalFilters((prev) => ({
-                        ...prev,
-                        privateSelected: !prev.privateSelected,
-                      }))
+                      setLocalFilters((prev) => {
+                        const newPrivate = !prev.privateSelected;
+                        return {
+                          ...prev,
+                          privateSelected: newPrivate,
+                          publicSelected: newPrivate
+                            ? false
+                            : prev.publicSelected,
+                        };
+                      })
                     }
                     size="sm"
                   />
@@ -293,10 +299,16 @@ export default function FilterSection({
                     color="default"
                     isSelected={localFilters.publicSelected}
                     onValueChange={() =>
-                      setLocalFilters((prev) => ({
-                        ...prev,
-                        publicSelected: !prev.publicSelected,
-                      }))
+                      setLocalFilters((prev) => {
+                        const newPublic = !prev.publicSelected;
+                        return {
+                          ...prev,
+                          publicSelected: newPublic,
+                          privateSelected: newPublic
+                            ? false
+                            : prev.privateSelected,
+                        };
+                      })
                     }
                     size="sm"
                   />
