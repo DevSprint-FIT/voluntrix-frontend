@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useState } from "react";
-import { Progress } from "@heroui/progress";
-import { Button } from "@heroui/button";
+import Image from 'next/image';
+import { useState } from 'react';
+import { Progress } from '@heroui/progress';
+import { Button } from '@heroui/button';
 
 // need to fetch this type of structured data to build cards
 interface Event {
@@ -18,7 +18,7 @@ interface Event {
   donationAvailable: boolean;
 }
 
-export default function EventCard({event}: {event: Event}) {  
+export default function EventCard({ event }: { event: Event }) {
   const [isSaved, setIsSaved] = useState(false);
   const [value] = useState(50);
 
@@ -32,7 +32,7 @@ export default function EventCard({event}: {event: Event}) {
         <>
           <div className="h-[165px] relative overflow-hidden">
             <Image
-              src={event.imageUrl || "/images/DummyEvent2.png"}
+              src={event.imageUrl || '/images/DummyEvent2.png'}
               className="rounded-t-[10px] transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
               width={310}
               height={165}
@@ -46,19 +46,30 @@ export default function EventCard({event}: {event: Event}) {
             <div className="w-[258px]">
               <div className="flex flex-col items-start gap-4">
                 <div className="flex w-full items-start">
-                  <p className="w-[234px] text-shark-950 font-bold text-xl text-left text-wrap" >{event.title}</p>
+                  <p className="w-[234px] text-shark-950 font-bold text-xl text-left text-wrap">
+                    {event.title}
+                  </p>
                   <button onClick={handleSave}>
                     <Image
-                      src={isSaved ? "/icons/tick-circle.svg" : "/icons/save.svg"}
+                      src={
+                        isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
+                      }
                       width={24}
                       height={24}
                       alt="save"
                     />
                   </button>
                 </div>
-                <p className="text-shark-900 font-medium text-md text-wrap" style={{"marginTop": "-10px"}}>By {event.organizer}</p>
+                <p
+                  className="text-shark-900 font-medium text-md text-wrap"
+                  style={{ marginTop: '-10px' }}
+                >
+                  By {event.organizer}
+                </p>
                 {!event.donationAvailable && (
-                  <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">{event.description}</p>                
+                  <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
+                    {event.description}
+                  </p>
                 )}
                 <div className="flex items-center gap-2 flex-wrap">
                   {event.specialTags.map((tag, index) => (
@@ -66,19 +77,32 @@ export default function EventCard({event}: {event: Event}) {
                       key={index}
                       className="flex h-[22px] px-2 justify-center items-center rounded-[4px] bg-[#E7E7E7]"
                     >
-                      <p className="text-[12px] font-primary font-bold text-shark-600">{tag}</p>
+                      <p className="text-[12px] font-primary font-bold text-shark-600">
+                        {tag}
+                      </p>
                     </div>
                   ))}
                 </div>
                 <div className="flex gap-8">
                   <div className="flex gap-2 items-start">
-                    <Image src="/icons/calendar.svg" width={20} height={20} alt="calendar" />
+                    <Image
+                      src="/icons/calendar.svg"
+                      width={20}
+                      height={20}
+                      alt="calendar"
+                    />
                     <p className="font-secondary text-shark-900 text-[12px] font-bold text-left">
-                      {event.date} <br />{event.time && `at ${event.time}`}
+                      {event.date} <br />
+                      {event.time && `at ${event.time}`}
                     </p>
                   </div>
                   <div className="flex gap-2 items-start">
-                    <Image src="/icons/location.svg" width={20} height={20} alt="location" />
+                    <Image
+                      src="/icons/location.svg"
+                      width={20}
+                      height={20}
+                      alt="location"
+                    />
                     <p className="w-24 text-left font-secondary text-shark-900 text-[12px] font-bold text-wrap">
                       {event.venue}
                     </p>
