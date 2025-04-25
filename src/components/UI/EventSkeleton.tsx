@@ -3,12 +3,12 @@ import { Card, Skeleton } from '@heroui/react';
 export default function EventSkeleton() {
   return (
     <Card
-      className="w-[310px] h-[460px] flex flex-col items-center justify-start bg-white shadow-lg gap-6 p-4"
+      className="w-[310px] h-[460px] flex flex-col items-center justify-start bg-white shadow-lg gap-3"
       radius="md"
     >
       <Skeleton className="w-full h-[165px] rounded-md" />
 
-      <div className="flex flex-col w-full gap-4">
+      <div className="flex flex-col w-full gap-4 p-4">
         <div className="flex items-center justify-between w-full">
           <Skeleton className="w-2/3 h-4 rounded-lg" />
           <Skeleton className="w-6 h-6 rounded-full" />
