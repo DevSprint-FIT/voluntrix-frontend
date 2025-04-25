@@ -1,21 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 import EventList from './EventList';
+import { EventType } from '@/types/EventType';
 
 export default function HeroSection() {
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
     province: '',
     district: '',
-    categories: [] as string[],
+    categories: [] as { id: number; name: string }[],
     privateSelected: false,
     publicSelected: false,
   });
+
+  useEffect(() => {
+    const fetchFilteredEvents = async (): Promise<void> => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await axios.get<EventType[]>(
+          'http://localhost:8080/api/public/v1/events/filter',
+          {
+            params: {
+              startDate: filters.startDate,
+              endDate: filters.endDate,
+              eventVisibility: filters.publicSelected
+                ? 'PUBLIC'
+                : filters.privateSelected
+                ? 'PRIVATE'
+                : '',
+              categoryIds: filters.categories.map((c) => c.id).join(','),
+            },
+          }
+        );
+
+        setEvents(response.data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred while fetching events.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFilteredEvents();
+  }, [filters]);
 
   return (
     <div className="w-full flex flex-col items-center justify-start mt-32 mb-16">
@@ -41,7 +84,7 @@ export default function HeroSection() {
           <FilterSection filters={filters} setFilters={setFilters} />
         </div>
       </div>
-      <EventList />
+      <EventList events={events} loading={loading} error={error} />
     </div>
   );
 }
