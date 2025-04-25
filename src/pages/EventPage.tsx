@@ -3,18 +3,26 @@ import GoToTop from '@/components/UI/GoToTop';
 import Navbar from '@/components/UI/Navbar';
 import Event from '@/components/layout/events/Event';
 import EventSection from '@/components/layout/events/EventSection';
+import { EventType } from '@/types/EventType';
 
-const eventData = {
-  imageUrl: '/images/DummyEvent2.png',
-  title: 'FIT Future Careers',
-  organizer: 'INTECS, UoM',
-  description:
+const eventData: EventType = {
+  eventTitle: 'FIT Future Careers',
+  eventDescription:
     'Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look: .Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite perfect nostrud nisi intricate Content. Qui  international first-class nulla ut. Punctual adipisicing, essential lovely queen tempor eiusmod irure. ',
-  specialTags: ['Private', 'Online', 'Sponsor'],
-  date: 'Nov 20, 2025',
-  venue: 'FIT Auditorium',
-  time: '10:00 AM',
-  donationAvailable: true,
+  eventLocation: 'FIT Auditorium',
+  eventDate: '2025-11-20',
+  eventTime: '10:00:00',
+  eventImageUrl: '/images/DummyEvent2.png',
+  eventType: 'ONLINE',
+  eventVisibility: 'PRIVATE',
+  eventStatus: 'PENDING',
+  sponsorshipEnabled: true,
+  donationEnabled: true,
+  categories: [
+    { categoryId: 1, categoryName: 'environment' },
+    { categoryId: 3, categoryName: 'technology' },
+  ],
+  organizer: 'INTECS, UoM',
 };
 
 const sponsorData = {
