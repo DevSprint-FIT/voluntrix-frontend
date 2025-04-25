@@ -14,6 +14,26 @@ export default function EventCard({ event }: { event: EventType }) {
     setIsSaved((prevState) => !prevState);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(date); // Output: "Nov 20, 2025"
+  };
+
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(date); // Output: "10:00 AM"
+  };
+
   return (
     <div className="w-[310px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
       {event && (
@@ -80,8 +100,8 @@ export default function EventCard({ event }: { event: EventType }) {
                       alt="calendar"
                     />
                     <p className="font-secondary text-shark-900 text-[12px] font-bold text-left">
-                      {event.eventDate} <br />
-                      {event.eventTime && `at ${event.eventTime}`}
+                      {formatDate(event.eventDate)} <br />
+                      {event.eventTime && `at ${formatTime(event.eventTime)}`}
                     </p>
                   </div>
                   <div className="flex gap-2 items-start">

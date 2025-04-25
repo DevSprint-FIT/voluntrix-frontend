@@ -4,19 +4,7 @@ import Breadcrumb from '@/components/UI/Breadcrumb';
 import { Button, Progress } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
-
-// need to fetch this type of structured data to build cards
-interface Event {
-  imageUrl: string;
-  title: string;
-  organizer: string;
-  description: string;
-  specialTags: string[];
-  date: string;
-  venue: string;
-  time?: string;
-  donationAvailable: boolean;
-}
+import { EventType } from '@/types/EventType';
 
 interface Sponsor {
   sponsorships: string[];
@@ -26,7 +14,7 @@ export default function Event({
   event,
   sponsor,
 }: {
-  event: Event;
+  event: EventType;
   sponsor: Sponsor;
 }) {
   const [isSaved, setIsSaved] = useState(false);
@@ -34,6 +22,26 @@ export default function Event({
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(date); // Output: "Nov 20, 2025"
+  };
+
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(date); // Output: "10:00 AM"
   };
 
   return (
@@ -54,7 +62,7 @@ export default function Event({
               <div className="flex flex-col gap-2">
                 <div className="flex w-full items-start">
                   <p className="w-[513px] font-secondary text-shark-950 font-medium text-4xl text-left text-wrap">
-                    {event.title}
+                    {event.eventTitle}
                   </p>
                   <button onClick={handleSave}>
                     <Image
@@ -89,7 +97,7 @@ export default function Event({
                     alt="calendar"
                   />
                   <p className="font-secondary text-shark-950 text-[16px] font-medium text-left">
-                    {event.date}
+                    {formatDate(event.eventDate)}
                   </p>
                 </div>
                 <div className="flex gap-2 items-center">
@@ -100,7 +108,7 @@ export default function Event({
                     alt="clock"
                   />
                   <p className="font-secondary text-shark-950 text-[16px] font-medium text-left">
-                    {event.time && `${event.time}`}
+                    {event.eventTime && `${formatTime(event.eventTime)}`}
                   </p>
                 </div>
                 <div className="flex gap-2 items-center">
@@ -111,14 +119,14 @@ export default function Event({
                     alt="location"
                   />
                   <p className="w-[200px] text-left font-secondary text-shark-950 text-[16px] font-medium text-wrap">
-                    {event.venue}
+                    {event.eventLocation}
                   </p>
                 </div>
               </div>
               {(() => {
-                const sentences = event.description.match(/[^.!?]+[.!?]+/g) || [
-                  event.description,
-                ];
+                const sentences = event.eventDescription.match(
+                  /[^.!?]+[.!?]+/g
+                ) || [event.eventDescription];
                 const firstParagraph = sentences.slice(0, 2).join(' ');
                 const secondParagraph = sentences.slice(2).join(' ');
 
@@ -195,7 +203,7 @@ export default function Event({
               Sponsor Now
             </Button>
           </div>
-          {event.donationAvailable && (
+          {event.donationEnabled && (
             <div className="w-[400px] flex flex-col gap-7 justify-start">
               <p className="text-4xl font-secondary font-medium text-shark-950">
                 Donations
