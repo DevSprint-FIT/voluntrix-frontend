@@ -10,7 +10,7 @@ type Filters = {
   endDate: string;
   province: string;
   district: string;
-  categories: string[];
+  categories: { id: number; name: string }[];
   privateSelected: boolean;
   publicSelected: boolean;
 };
@@ -60,7 +60,7 @@ export default function Searchbar({ filters }: SearchbarProps) {
     if (filters.endDate) tags.push(`To: ${filters.endDate}`);
     if (filters.privateSelected) tags.push('Private');
     if (filters.publicSelected) tags.push('Public');
-    filters.categories.forEach((category) => tags.push(category));
+    filters.categories.forEach((category) => tags.push(category.name));
 
     setActiveFilterTags(tags);
     setIsFilterOpen(tags.length > 0);
