@@ -1,4 +1,5 @@
 import EventCard from '@/components/UI/EventCard';
+import EventSkeleton from '@/components/UI/EventSkeleton';
 import { EventType } from '@/types/EventType';
 
 type EventListProps = {
@@ -11,7 +12,11 @@ export default function EventList({ events, loading, error }: EventListProps) {
   return (
     <>
       {loading ? (
-        console.log('Loading events...')
+        <div className="w-[1054px] flex justify-start gap-[62px] mt-16">
+          {[...Array(3)].map((_, index) => (
+            <EventSkeleton key={index} />
+          ))}
+        </div>
       ) : error ? (
         console.log('Failed to load events' + error)
       ) : events.length > 0 ? (
