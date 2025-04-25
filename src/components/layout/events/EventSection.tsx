@@ -3,18 +3,26 @@
 import { useRef, useEffect, useState } from 'react';
 import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
+import { EventType } from '@/types/EventType';
 
-const eventData = {
-  imageUrl: '/images/DummyEvent2.png',
-  title: 'FIT Future Careers',
-  organizer: 'INTECS, UoM',
-  description:
+const eventData: EventType = {
+  eventTitle: 'FIT Future Careers',
+  eventDescription:
     'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
-  specialTags: ['Private', 'Online', 'Sponsor'],
-  date: 'Nov 20, 2025',
-  venue: 'FIT Auditorium',
-  time: '10:00 AM',
-  donationAvailable: false,
+  eventLocation: 'FIT Auditorium',
+  eventDate: '2025-11-20',
+  eventTime: '10:00:00',
+  eventImageUrl: '/images/DummyEvent2.png',
+  eventType: 'ONLINE',
+  eventVisibility: 'PRIVATE',
+  eventStatus: 'PENDING',
+  sponsorshipEnabled: true,
+  donationEnabled: false,
+  categories: [
+    { categoryId: 1, categoryName: 'environment' },
+    { categoryId: 3, categoryName: 'technology' },
+  ],
+  organizer: 'INTECS, UoM',
 };
 
 interface EventSectionProps {
