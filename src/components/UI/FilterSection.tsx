@@ -30,11 +30,11 @@ const districtsByProvince = {
 };
 
 const categories = [
-  'Environment',
-  'Sport',
-  'Technology',
-  'Charity',
-  'Education',
+  { id: 1, name: 'Environment' },
+  { id: 2, name: 'Sport' },
+  { id: 3, name: 'Technology' },
+  { id: 4, name: 'Charity' },
+  { id: 5, name: 'Education' },
 ];
 
 const initialFilters: Filters = {
@@ -52,7 +52,7 @@ type Filters = {
   endDate: string;
   province: string;
   district: string;
-  categories: string[];
+  categories: { id: number; name: string }[];
   privateSelected: boolean;
   publicSelected: boolean;
 };
@@ -81,21 +81,20 @@ export default function FilterSection({
     }
   }, [isFilterTabOpen, filters]);
 
-  const handleCategoryToggle = (category: string) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-      categories: prev.categories.includes(category)
-        ? prev.categories.filter((item) => item !== category)
-        : [...prev.categories, category],
-    }));
+  const handleCategoryToggle = (id: number, name: string) => {
+    setLocalFilters((prev) => {
+      const exists = prev.categories.some((cat) => cat.id === id);
+
+      return {
+        ...prev,
+        categories: exists
+          ? prev.categories.filter((cat) => cat.id !== id)
+          : [...prev.categories, { id, name }],
+      };
+    });
   };
 
   const handleApply = () => {
-    if (new Date(localFilters.endDate) < new Date(localFilters.startDate)) {
-      setErrorMessage('End Date must be greater than Start Date');
-      return;
-    }
-
     const isEmpty =
       !localFilters.startDate &&
       !localFilters.endDate &&
@@ -107,6 +106,11 @@ export default function FilterSection({
 
     if (isEmpty) {
       setErrorMessage('Please select at least one filter to apply.');
+      return;
+    }
+
+    if (new Date(localFilters.endDate) < new Date(localFilters.startDate)) {
+      setErrorMessage('End Date must be greater than Start Date');
       return;
     }
 
@@ -245,20 +249,24 @@ export default function FilterSection({
                 Category
               </p>
               <div className="w-[297px] flex flex-wrap gap-x-1 gap-y-3 font-medium text-sm text-shark-600 font-secondary">
-                {categories.map((category) => (
-                  <div
-                    key={category}
-                    className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
-                      ${
-                        localFilters.categories.includes(category)
-                          ? 'border-shark-950 text-shark-950'
-                          : 'border-shark-300'
-                      }`}
-                    onClick={() => handleCategoryToggle(category)}
-                  >
-                    {category}
-                  </div>
-                ))}
+                {categories.map((category) => {
+                  const isSelected = localFilters.categories.some(
+                    (cat) => cat.id === category.id
+                  );
+
+                  return (
+                    <div
+                      key={category.id}
+                      className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
+        ${isSelected ? 'border-shark-950 text-shark-950' : 'border-shark-300'}`}
+                      onClick={() =>
+                        handleCategoryToggle(category.id, category.name)
+                      }
+                    >
+                      {category.name}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
