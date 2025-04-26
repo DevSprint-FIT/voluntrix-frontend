@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import FilterSection from '@/components/UI/FilterSection';
@@ -11,7 +11,7 @@ import { EventType } from '@/types/EventType';
 export default function HeroSection() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [filters, setFilters] = useState({
     startDate: '',
@@ -23,26 +23,37 @@ export default function HeroSection() {
     publicSelected: false,
   });
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const fetchFilteredEvents = async (): Promise<void> => {
       try {
         setLoading(true);
         setError(null);
 
+        const params: Record<string, string> = {};
+
+        if (filters.startDate) params.startDate = filters.startDate;
+        if (filters.endDate) params.endDate = filters.endDate;
+
+        if (filters.publicSelected) {
+          params.eventVisibility = 'PUBLIC';
+        } else if (filters.privateSelected) {
+          params.eventVisibility = 'PRIVATE';
+        }
+
+        if (filters.categories.length > 0) {
+          params.categoryIds = filters.categories.map((c) => c.id).join(',');
+        }
+
         const response = await axios.get<EventType[]>(
           'http://localhost:8080/api/public/v1/events/filter',
-          {
-            params: {
-              startDate: filters.startDate,
-              endDate: filters.endDate,
-              eventVisibility: filters.publicSelected
-                ? 'PUBLIC'
-                : filters.privateSelected
-                ? 'PRIVATE'
-                : '',
-              categoryIds: filters.categories.map((c) => c.id).join(','),
-            },
-          }
+          { params }
         );
 
         setEvents(response.data);
