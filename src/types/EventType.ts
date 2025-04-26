@@ -1,4 +1,5 @@
 export type EventType = {
+  eventId: number;
   eventTitle: string;
   eventDescription: string;
   eventLocation: string;
