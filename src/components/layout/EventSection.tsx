@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { EventType } from '@/types/EventType';
 
 const eventData: EventType = {
+  eventId: 1,
   eventTitle: 'FIT Future Careers',
   eventDescription:
     'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
