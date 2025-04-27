@@ -1,6 +1,5 @@
 'use client';
 
-import Breadcrumb from '@/components/UI/Breadcrumb';
 import { Button, Progress } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -45,9 +44,8 @@ export default function Event({
   };
 
   return (
-    <div className="w-full flex items-start justify-center mt-32 mb-[88px]">
+    <div className="w-full flex items-start justify-center mb-[88px]">
       <div className="w-[1200px] flex flex-col items-center justify-start">
-        <Breadcrumb />
         <div className="mt-14 flex gap-20">
           <div className="w-[522px] flex items-center justify-end">
             <Image
