@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import Breadcrumb from '@/components/UI/Breadcrumb';
 import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 import EventList from './EventList';
@@ -72,9 +71,8 @@ export default function HeroSection() {
   }, [filters]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-start mt-32 mb-16">
+    <div className="w-full flex flex-col items-center justify-start mb-16">
       <div className="w-[1200px] flex flex-col items-center justify-start">
-        <Breadcrumb />
         <div className="w-[806px] h-[230px] mt-16 flex flex-col items-center justify-start">
           <p className="font-primary text-shark-950 font-medium text-[44px]">
             <span className="text-verdant-600">Join</span> Meaningful
