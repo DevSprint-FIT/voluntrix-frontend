@@ -3,9 +3,11 @@ export type EventType = {
   eventTitle: string;
   eventDescription: string;
   eventLocation: string;
-  eventDate: string;
+  eventStartDate: string;
+  eventEndDate: string;
   eventTime: string;
   eventImageUrl: string;
+  volunteerCount: number;
   eventType: string;
   eventVisibility: string;
   eventStatus: string;

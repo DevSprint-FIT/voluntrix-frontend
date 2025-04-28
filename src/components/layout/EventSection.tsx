@@ -10,9 +10,11 @@ const eventData: EventType = {
   eventDescription:
     'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
   eventLocation: 'FIT Auditorium',
-  eventDate: '2025-11-20',
+  eventStartDate: '2025-11-20',
+  eventEndDate: '2025-11-22',
   eventTime: '10:00:00',
   eventImageUrl: '/images/DummyEvent2.png',
+  volunteerCount: 0,
   eventType: 'ONLINE',
   eventVisibility: 'PRIVATE',
   eventStatus: 'PENDING',

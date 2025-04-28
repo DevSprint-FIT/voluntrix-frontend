@@ -95,7 +95,7 @@ export default function Event({
                     alt="calendar"
                   />
                   <p className="font-secondary text-shark-950 text-[16px] font-medium text-left">
-                    {formatDate(event.eventDate)}
+                    {formatDate(event.eventStartDate)}
                   </p>
                 </div>
                 <div className="flex gap-2 items-center">

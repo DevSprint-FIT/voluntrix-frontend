@@ -100,7 +100,7 @@ export default function EventCard({ event }: { event: EventType }) {
                       alt="calendar"
                     />
                     <p className="font-secondary text-shark-900 text-[12px] font-bold text-left">
-                      {formatDate(event.eventDate)} <br />
+                      {formatDate(event.eventStartDate)} <br />
                       {event.eventTime && `at ${formatTime(event.eventTime)}`}
                     </p>
                   </div>
