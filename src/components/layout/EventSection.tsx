@@ -3,6 +3,7 @@
 import EventCard from '../UI/EventCard';
 import Image from 'next/image';
 import { EventType } from '@/types/EventType';
+import { useRouter } from 'next/navigation';
 
 const eventData: EventType = {
   eventId: 1,
@@ -28,6 +29,11 @@ const eventData: EventType = {
 };
 
 export default function EventSection() {
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    router.push('/events');
+  };
   return (
     <div className="w-full flex items-start justify-center mt-24">
       <div className="w-[1054px] flex flex-col justify-center text-center">
@@ -43,7 +49,10 @@ export default function EventSection() {
           <div className="flex gap-[65px]">
             <EventCard event={eventData} />
           </div>
-          <div className="flex gap-1 justify-end">
+          <div
+            className="flex gap-1 justify-end cursor-pointer"
+            onClick={handleNavigate}
+          >
             <p className="text-verdant-600 font-[500]">Explore More Events</p>
             <Image
               src="/icons/arrow-green.svg"
