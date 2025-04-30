@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Progress } from '@heroui/progress';
 import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
+import { useRouter } from 'next/navigation';
 
 export default function EventCard({ event }: { event: EventType }) {
   const [isSaved, setIsSaved] = useState(false);
@@ -34,6 +35,12 @@ export default function EventCard({ event }: { event: EventType }) {
     }).format(date); // Output: "10:00 AM"
   };
 
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    router.push(`/events/${event.eventId}`);
+  };
+
   return (
     <div className="w-[310px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
       {event && (
@@ -46,7 +53,10 @@ export default function EventCard({ event }: { event: EventType }) {
               height={165}
               alt={event.eventTitle}
             />
-            <Button className="w-[92px] h-[36px] rounded-[5px] border-white border-[0.5px] bg-transparent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-secondary text-center text-[12px] font-[500] text-shark-50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+            <Button
+              onPress={handleNavigate}
+              className="w-[92px] h-[36px] rounded-[5px] border-white border-[0.5px] bg-transparent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-secondary text-center text-[12px] font-[500] text-shark-50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out"
+            >
               View Event
             </Button>
           </div>
