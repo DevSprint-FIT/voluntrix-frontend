@@ -45,3 +45,16 @@ export const fetchSearchedEvents = async (
     throw error;
   }
 };
+
+export const fetchEventTitles = async () => {
+  try {
+    const response = await axios.get(
+      'http://localhost:8080/api/public/v1/events/names'
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    throw error;
+  }
+};

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import FilterTag from './FilterTag';
-import axios from 'axios';
+import { fetchEventTitles } from '@/services/eventService';
 
 type Filters = {
   startDate: string;
@@ -85,12 +85,10 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
   }, [inputValue, eventTitles]);
 
   useEffect(() => {
-    const fetchEventTitles = async () => {
+    const getEventTitles = async () => {
       try {
-        const res = await axios.get(
-          'http://localhost:8080/api/public/v1/events/names'
-        );
-        const titles = res.data
+        const eventTitles = await fetchEventTitles();
+        const titles = eventTitles
           .map((event: { eventTitle: string }) => event.eventTitle)
           .filter((title: string) => title);
         setEventTitles(titles);
@@ -98,7 +96,7 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
         console.error('Failed to fetch event titles:', error);
       }
     };
-    fetchEventTitles();
+    getEventTitles();
   }, []);
 
   return (
@@ -121,7 +119,7 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
               e.preventDefault();
               setSearchText(inputValue);
               setIsFocused(false);
-              inputRef.current?.blur()
+              inputRef.current?.blur();
             }
           }}
           autoComplete="off"
