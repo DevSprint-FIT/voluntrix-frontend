@@ -43,7 +43,8 @@ export default function EventPage(/*{ params }: { params: { eventId: number } }*
       };
 
       getEvent();
-    } /*,[ params.eventId ]*/
+    },
+    [] /*,[ params.eventId ]*/
   );
 
   return (
