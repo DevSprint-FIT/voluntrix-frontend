@@ -17,9 +17,10 @@ type Filters = {
 
 interface SearchbarProps {
   filters: Filters;
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Searchbar({ filters }: SearchbarProps) {
+export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeFilterTags, setActiveFilterTags] = useState<string[]>([]);
@@ -118,7 +119,12 @@ export default function Searchbar({ filters }: SearchbarProps) {
           autoComplete="off"
           aria-label="Search for events"
         />
-        <button aria-label="Search">
+        <button
+          aria-label="Search"
+          onClick={() => {
+            setSearchText(inputValue);
+          }}
+        >
           <Image
             src="/icons/search.svg"
             width={32}

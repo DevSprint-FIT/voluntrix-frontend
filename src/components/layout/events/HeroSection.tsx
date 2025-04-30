@@ -11,6 +11,7 @@ export default function HeroSection() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchText, setSearchText] = useState<string>('');
 
   const [filters, setFilters] = useState({
     startDate: '',
@@ -30,7 +31,7 @@ export default function HeroSection() {
       return;
     }
 
-    const fetchFilteredEvents = async (): Promise<void> => {
+    const fetchFilteredEvents = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -70,6 +71,37 @@ export default function HeroSection() {
     fetchFilteredEvents();
   }, [filters]);
 
+  useEffect(() => {
+    if (isFirstRender.current) {
+      return;
+    }
+
+    const fetchSearchedEvents = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await axios.get<EventType[]>(
+          'http://localhost:8080/api/public/v1/events/search',
+          { params: { query: searchText } }
+        );
+        setEvents(response.data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred while searching events.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (searchText.trim() !== '') {
+      fetchSearchedEvents();
+    }
+  }, [searchText]);
+
   return (
     <div className="w-full flex flex-col items-center justify-start mb-16">
       <div className="w-[1200px] flex flex-col items-center justify-start">
@@ -88,7 +120,7 @@ export default function HeroSection() {
         </div>
         <div className="relative w-[806px] flex gap-6 rounded-10">
           <div className="w-[639px] relative">
-            <Searchbar filters={filters} />
+            <Searchbar filters={filters} setSearchText={setSearchText} />
           </div>
           <FilterSection filters={filters} setFilters={setFilters} />
         </div>
