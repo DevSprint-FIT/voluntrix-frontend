@@ -7,9 +7,9 @@ import Event from '@/components/layout/events/Event';
 import EventSection from '@/components/layout/events/EventSection';
 import { EventType } from '@/types/EventType';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import EventSkeleton from '@/components/UI/EventSkeleton';
 import Breadcrumb from '@/components/UI/Breadcrumb';
+import { fetchEventById } from '@/services/eventService';
 
 const sponsorData = {
   sponsorships: [
@@ -27,12 +27,10 @@ export default function EventPage(/*{ params }: { params: { eventId: number } }*
 
   useEffect(
     () => {
-      const fetchEventById = async () => {
+      const getEvent = async () => {
         try {
-          const response = await axios.get<EventType>(
-            `http://localhost:8080/api/public/v1/events/1`
-          );
-          setEvent(response.data);
+          const eventData = await fetchEventById(1);
+          setEvent(eventData);
         } catch (err: unknown) {
           if (err instanceof Error) {
             setError(err.message);
@@ -44,11 +42,8 @@ export default function EventPage(/*{ params }: { params: { eventId: number } }*
         }
       };
 
-      fetchEventById();
-    },
-    [
-      /*params.eventId*/
-    ]
+      getEvent();
+    } /*,[ params.eventId ]*/
   );
 
   return (

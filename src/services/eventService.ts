@@ -1,15 +1,15 @@
-export async function fetchEvents() {
-    try {
-      const response = await fetch("http://localhost:8080/api/events");
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch events");
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      return [];
-    }
-}
-  
+import axios from 'axios';
+import { EventType } from '@/types/EventType';
+
+export const fetchEventById = async (id: number): Promise<EventType> => {
+  try {
+    const response = await axios.get<EventType>(
+      `http://localhost:8080/api/public/v1/events/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    throw error;
+  }
+};
