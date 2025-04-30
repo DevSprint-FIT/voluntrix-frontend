@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 import EventList from './EventList';
@@ -24,16 +24,10 @@ export default function HeroSection() {
     categories: [] as { id: number; name: string }[],
     privateSelected: false,
     publicSelected: false,
+    ready: false,
   });
 
-  const isFirstRender = useRef(true);
-
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
     const getFilteredEvents = async () => {
       try {
         setLoading(true);
@@ -68,14 +62,13 @@ export default function HeroSection() {
       }
     };
 
-    getFilteredEvents();
+    if (filters.ready) {
+      console.log('fetch filter');
+      getFilteredEvents();
+    }
   }, [filters]);
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      return;
-    }
-
     const getSearchedEvents = async () => {
       try {
         setLoading(true);

@@ -45,6 +45,7 @@ const initialFilters: Filters = {
   categories: [],
   privateSelected: false,
   publicSelected: false,
+  ready: false,
 };
 
 type Filters = {
@@ -55,6 +56,7 @@ type Filters = {
   categories: { id: number; name: string }[];
   privateSelected: boolean;
   publicSelected: boolean;
+  ready: boolean;
 };
 
 type FilterSectionProps = {
@@ -114,8 +116,9 @@ export default function FilterSection({
       return;
     }
 
+    const updatedFilters = { ...localFilters, ready: true };
     setErrorMessage(null);
-    setFilters(localFilters);
+    setFilters(updatedFilters);
     setIsFilterTabOpen(false);
   };
 
