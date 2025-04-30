@@ -6,6 +6,7 @@ import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 import EventList from './EventList';
 import { EventType } from '@/types/EventType';
+import { fetchFilteredEvents } from '@/services/eventService';
 
 export default function HeroSection() {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -31,7 +32,7 @@ export default function HeroSection() {
       return;
     }
 
-    const fetchFilteredEvents = async () => {
+    const getFilteredEvents = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -51,12 +52,9 @@ export default function HeroSection() {
           params.categoryIds = filters.categories.map((c) => c.id).join(',');
         }
 
-        const response = await axios.get<EventType[]>(
-          'http://localhost:8080/api/public/v1/events/filter',
-          { params }
-        );
+        const events = await fetchFilteredEvents(params);
 
-        setEvents(response.data);
+        setEvents(events);
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
@@ -68,7 +66,7 @@ export default function HeroSection() {
       }
     };
 
-    fetchFilteredEvents();
+    getFilteredEvents();
   }, [filters]);
 
   useEffect(() => {

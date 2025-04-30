@@ -13,3 +13,19 @@ export const fetchEventById = async (id: number): Promise<EventType> => {
     throw error;
   }
 };
+
+export const fetchFilteredEvents = async (
+  params: Record<string, string>
+): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/v1/events/filter',
+      { params }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    throw error;
+  }
+};
