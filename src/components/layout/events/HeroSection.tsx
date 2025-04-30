@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import FilterSection from '@/components/UI/FilterSection';
 import Searchbar from '@/components/UI/Searchbar';
 import EventList from './EventList';
 import { EventType } from '@/types/EventType';
-import { fetchFilteredEvents } from '@/services/eventService';
+import {
+  fetchFilteredEvents,
+  fetchSearchedEvents,
+} from '@/services/eventService';
 
 export default function HeroSection() {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -74,16 +76,13 @@ export default function HeroSection() {
       return;
     }
 
-    const fetchSearchedEvents = async () => {
+    const getSearchedEvents = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get<EventType[]>(
-          'http://localhost:8080/api/public/v1/events/search',
-          { params: { query: searchText } }
-        );
-        setEvents(response.data);
+        const events = await fetchSearchedEvents(searchText);
+        setEvents(events);
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
@@ -96,7 +95,7 @@ export default function HeroSection() {
     };
 
     if (searchText.trim() !== '') {
-      fetchSearchedEvents();
+      getSearchedEvents();
     }
   }, [searchText]);
 

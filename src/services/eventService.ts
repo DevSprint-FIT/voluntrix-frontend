@@ -29,3 +29,19 @@ export const fetchFilteredEvents = async (
     throw error;
   }
 };
+
+export const fetchSearchedEvents = async (
+  searchText: string
+): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/v1/events/search',
+      { params: { query: searchText } }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    throw error;
+  }
+};
