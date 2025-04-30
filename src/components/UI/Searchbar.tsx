@@ -116,6 +116,14 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
           value={inputValue}
           onFocus={() => setIsFocused(true)}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              setSearchText(inputValue);
+              setIsFocused(false);
+              inputRef.current?.blur()
+            }
+          }}
           autoComplete="off"
           aria-label="Search for events"
         />
