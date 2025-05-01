@@ -1,5 +1,3 @@
-// services/organizationSettingsService.ts
-
 export type OrganizationSettings = {
   email: string;
   username: string;
