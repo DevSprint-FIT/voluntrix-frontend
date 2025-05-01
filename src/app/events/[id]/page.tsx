@@ -1,12 +1,13 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Event from '@/components/layout/events/Event';
 import EventSection from '@/components/layout/events/EventSection';
-import { EventType } from '@/types/EventType';
-import { useEffect, useState } from 'react';
 import EventSkeleton from '@/components/UI/EventSkeleton';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/eventService';
+import { EventType } from '@/types/EventType';
+import ErrorDisplay from '@/components/UI/EventErrorDisplay';
 
 const sponsorData = {
   sponsorships: [
@@ -17,16 +18,30 @@ const sponsorData = {
   ],
 };
 
-export default function EventPage({ params }: { params: { eventId: number } }) {
+export default function EventPage({ params }: { params: { id: string } }) {
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const eventId = Number(params.id);
+
   useEffect(() => {
+    if (isNaN(eventId)) {
+      setError('Invalid event ID');
+      setLoading(false);
+      return;
+    }
+
     const getEvent = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const eventData = await fetchEventById(1);
-        setEvent(eventData);
+        const eventData = await fetchEventById(eventId);
+        if (eventData) {
+          setEvent(eventData);
+        } else {
+          setError('Event not found');
+        }
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
@@ -39,22 +54,25 @@ export default function EventPage({ params }: { params: { eventId: number } }) {
     };
 
     getEvent();
-  }, [params.eventId]);
+  }, [eventId]);
 
   return (
-    <div className="flex flex-col justify-center items-start flex-shrink-0">
+    <div className="flex flex-col justify-start items-center flex-shrink-0">
       <Breadcrumb />
+
       {loading ? (
         <EventSkeleton />
       ) : error ? (
-        <div className="text-center w-full py-10 text-red-500"></div>
+        <ErrorDisplay error={error} />
       ) : event ? (
-        <Event event={event} sponsor={sponsorData} />
+        <>
+          <Event event={event} sponsor={sponsorData} />
+          <EventSection
+            title="Based on your browsing history"
+            subTitle="Based on searches and preferences"
+          />
+        </>
       ) : null}
-      <EventSection
-        title={'Based on your browsing history'}
-        subTitle={'Based on searches and prefernces'}
-      />
     </div>
   );
 }
