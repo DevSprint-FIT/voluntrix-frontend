@@ -7,7 +7,7 @@ import EventSkeleton from '@/components/UI/EventSkeleton';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/eventService';
 import { EventType } from '@/types/EventType';
-import ErrorDisplay from '@/components/UI/EventErrorDisplay';
+import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
 
 const sponsorData = {
   sponsorships: [
@@ -63,7 +63,9 @@ export default function EventPage({ params }: { params: { id: string } }) {
       {loading ? (
         <EventSkeleton />
       ) : error ? (
-        <ErrorDisplay error={error} />
+        <div className="mb-20">
+          <EventErrorDisplay error={error} />
+        </div>
       ) : event ? (
         <>
           <Event event={event} sponsor={sponsorData} />
