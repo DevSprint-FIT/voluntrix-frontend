@@ -4,7 +4,7 @@ import { EventType } from '@/types/EventType';
 export const fetchEventById = async (id: number): Promise<EventType> => {
   try {
     const response = await axios.get<EventType>(
-      `http://localhost:8080/api/public/v1/events/${id}`
+      `http://localhost:8080/api/public/events/${id}`
     );
 
     return response.data;
@@ -19,7 +19,7 @@ export const fetchFilteredEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/v1/events/filter',
+      'http://localhost:8080/api/public/events/filter',
       { params }
     );
 
@@ -35,7 +35,7 @@ export const fetchSearchedEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/v1/events/search',
+      'http://localhost:8080/api/public/events/search',
       { params: { query: searchText } }
     );
 
@@ -49,7 +49,7 @@ export const fetchSearchedEvents = async (
 export const fetchEventTitles = async () => {
   try {
     const response = await axios.get(
-      'http://localhost:8080/api/public/v1/events/names'
+      'http://localhost:8080/api/public/events/names'
     );
 
     return response.data;
