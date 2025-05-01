@@ -237,7 +237,7 @@ export default function Event({
               >
                 Donate Now
                 <Image
-                  src={'icons/arrow-white-angel.svg'}
+                  src={'/icons/arrow-white-angel.svg'}
                   width={32}
                   height={32}
                   alt="arrow"
