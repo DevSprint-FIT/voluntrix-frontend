@@ -13,7 +13,7 @@ export default function ErrorDisplay({ error }: ErrorDisplayProps) {
     error.includes('Invalid');
 
   return (
-    <div className="flex flex-col items-center gap-4 mt-10 mb-20">
+    <div className="flex flex-col items-center gap-4 mt-16">
       <Image
         src={isNetworkError ? '/icons/wifi-off.svg' : '/icons/file-x.svg'}
         alt="error icon"
