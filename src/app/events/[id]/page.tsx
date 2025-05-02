@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useEffect, useState } from 'react';
 import Event from '@/components/layout/events/Event';
 import EventSection from '@/components/layout/events/EventSection';
@@ -18,12 +19,17 @@ const sponsorData = {
   ],
 };
 
-export default function EventPage({ params }: { params: { id: string } }) {
+export default function EventPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const eventId = Number(id);
+
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const eventId = Number(params.id);
 
   useEffect(() => {
     if (isNaN(eventId)) {
