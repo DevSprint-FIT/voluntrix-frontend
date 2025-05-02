@@ -101,8 +101,8 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
 
   return (
     <div
-      className={`absolute w-[639px] flex flex-col justify-start items-center rounded-${
-        isFocused ? '[20px]' : '[40px]'
+      className={`absolute w-[639px] flex flex-col justify-start items-center ${
+        isFocused ? 'rounded-[20px]' : 'rounded-[40px]'
       } bg-white border-2 border-shark-200 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] py-3 gap-2 z-20`}
     >
       <div className="w-[607px] h-6 flex justify-center items-center">
@@ -116,10 +116,13 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              e.preventDefault();
-              setSearchText(inputValue);
-              setIsFocused(false);
-              inputRef.current?.blur();
+              const trimmedValue = inputValue.trim();
+              if (trimmedValue) {
+                e.preventDefault();
+                setSearchText(trimmedValue);
+                setIsFocused(false);
+                inputRef.current?.blur();
+              }
             }
           }}
           autoComplete="off"
@@ -128,7 +131,9 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
         <button
           aria-label="Search"
           onClick={() => {
-            setSearchText(inputValue);
+            if (inputValue.trim()) {
+              setSearchText(inputValue.trim());
+            }
           }}
         >
           <Image
@@ -163,6 +168,7 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
                     if (isResultValid) {
                       setInputValue(result);
                       setIsFocused(false);
+                      setSearchText(result);
                     }
                   }}
                 >
