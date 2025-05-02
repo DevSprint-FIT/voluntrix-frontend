@@ -10,7 +10,7 @@ interface OTPModalProps {
   onClose: () => void;
   email: string;
   onVerificationSuccess: () => void;
-  onRedirect?: () => void; // Add callback for redirect handling
+  onRedirect?: () => void; 
 }
 
 const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }: OTPModalProps) => {
@@ -99,7 +99,6 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
         <ModalBody>
           <div className="space-y-4">
             <Input
-              label="Verification Code"
               placeholder="Enter 6-digit code"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}

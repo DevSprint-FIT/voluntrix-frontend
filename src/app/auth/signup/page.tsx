@@ -38,7 +38,7 @@ export default function SignupPage() {
     }
   };
 
-  const handleRedirectToRoleSelection = (type: 'signup' | 'google' = 'signup', delay: number = 1500) => {
+  const handleRedirectToRoleSelection = (type: 'signup' | 'google' = 'signup', delay: number = 500) => {
     setRedirectType(type);
     setIsRedirecting(true);
     setTimeout(() => {
@@ -80,7 +80,7 @@ export default function SignupPage() {
     
     setTimeout(() => {
       window.location.href = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/role-selection')}`;
-    }, 800);
+    }, 600); // Shorter delay for Google OAuth
   };
 
   const handleSubmit = async () => {
@@ -110,7 +110,7 @@ export default function SignupPage() {
         }
         
         // Show loading before redirecting to role selection
-        handleRedirectToRoleSelection('signup', 1500);
+        handleRedirectToRoleSelection('signup', 600); // Quick loading for role selection
       } else {
         setErrors({ general: result.message });
       }
@@ -291,7 +291,7 @@ export default function SignupPage() {
         }}
         onRedirect={() => {
           // Show loading and redirect
-          handleRedirectToRoleSelection('signup', 1500);
+          handleRedirectToRoleSelection('signup', 600); // Quick loading for role selection
         }}
       />
 
@@ -306,13 +306,13 @@ export default function SignupPage() {
               </div>
             </div>
             <h3 className="text-xl font-bold text-shark-950 font-secondary mb-2">
-              {redirectType === 'google' ? 'Connecting with Google...' : 'Welcome to Voluntrix! 🎉'}
+              {redirectType === 'google' ? 'Connecting with Google...' : 'Account Created!'}
             </h3>
             <p className="text-shark-600 font-primary text-sm mb-1">
-              {redirectType === 'google' ? 'Redirecting to Google OAuth' : 'Account created successfully'}
+              {redirectType === 'google' ? 'Redirecting to Google OAuth' : 'Setting up your profile'}
             </p>
             <p className="text-shark-500 font-primary text-xs">
-              {redirectType === 'google' ? 'Please wait...' : 'Setting up your profile...'}
+              {redirectType === 'google' ? 'Please wait...' : 'Just a moment...'}
             </p>
           </div>
         </div>
