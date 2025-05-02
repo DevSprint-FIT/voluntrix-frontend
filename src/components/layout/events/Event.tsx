@@ -180,7 +180,7 @@ export default function Event({
               className="w-[272px] h-[79px] flex items-center justify-center gap-3 rounded-[20px] border border-shark-600 bg-white"
             >
               <Image
-                src={'icons/document.svg'}
+                src={'/icons/document.svg'}
                 width={40}
                 height={40}
                 alt="document"
