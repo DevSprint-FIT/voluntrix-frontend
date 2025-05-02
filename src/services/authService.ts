@@ -1,17 +1,21 @@
 interface User {
-  id: number;
+  userId: number;
   email: string;
-  name: string;
-  role: "VOLUNTEER" | "ORGANIZATION" | "SPONSOR";
-  isProfileCompleted: boolean;
+  fullName: string;
+  handle: string;
+  role: string;
+  emailVerified: boolean;
+  profileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
 }
 
 interface SignupData {
-  name: string;
-  username?: string;
   email: string;
+  handle: string;
+  fullName: string;
   password: string;
-  role: "VOLUNTEER" | "ORGANIZATION" | "SPONSOR";
 }
 
 interface LoginData {
@@ -20,9 +24,22 @@ interface LoginData {
 }
 
 interface SignupResponseDto {
+  message: string;
+  data: {
     token: string;
+    userId: number;
+    email: string;
+    handle: string;
+    fullName: string;
     role: string;
-    isProfileCompleted: boolean;
+    createdAt: string;
+    lastLogin: string;
+    authProvider: string;
+    nextStep: string;
+    redirectUrl: string;
+    emailVerified: boolean;
+    profileCompleted: boolean;
+  };
 }
 
 interface ErrorResponse {
@@ -31,11 +48,16 @@ interface ErrorResponse {
 }
 
 interface UserProfileResponse {
-  id: number;
+  userId: number;
   email: string;
-  name: string;
+  fullName: string;
+  handle: string;
   role: string;
-  isProfileCompleted: boolean;
+  emailVerified: boolean;
+  profileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
 }
 
 class AuthService {
@@ -98,7 +120,7 @@ class AuthService {
     return headers;
   }
   
-  async signup(data: SignupData): Promise<{ success: boolean; message: string; user?: User }> {
+  async signup(data: SignupData): Promise<{ success: boolean; message: string; user?: User; nextStep?: string }> {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/signup`, {
         method: "POST",
@@ -106,11 +128,10 @@ class AuthService {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: data.name,
-          username: data.username,
           email: data.email,
-          password: data.password,
-          role: data.role
+          handle: data.handle,
+          fullName: data.fullName,
+          password: data.password
         }),
       });
       
@@ -124,23 +145,33 @@ class AuthService {
       
       const result: SignupResponseDto = await response.json();
       
-      if (result.token) {
-        this.setToken(result.token);
+      if (result.data.token) {
+        this.setToken(result.data.token);
         const user: User = {
-          id: 0, 
-          email: data.email,
-          name: data.name,
-          role: result.role as "VOLUNTEER" | "ORGANIZATION" | "SPONSOR",
-          isProfileCompleted: result.isProfileCompleted,
+          userId: result.data.userId,
+          email: result.data.email,
+          fullName: result.data.fullName,
+          handle: result.data.handle,
+          role: result.data.role,
+          emailVerified: result.data.emailVerified,
+          profileCompleted: result.data.profileCompleted,
+          authProvider: result.data.authProvider,
+          createdAt: result.data.createdAt,
+          lastLogin: result.data.lastLogin,
         };
         this.user = user;
       }
       
-      return {
+      const returnValue = {
         success: true,
-        message: "Account created successfully",
+        message: result.message,
+        nextStep: result.data.nextStep,
         ...(this.user ? { user: this.user } : {}),
       };
+      
+      console.log("AuthService returning:", JSON.stringify(returnValue, null, 2));
+      
+      return returnValue;
     } catch (error) {
       console.error("Signup error:", error);
       return { success: false, message: "Network error. Please try again." };
@@ -167,15 +198,20 @@ class AuthService {
       
       const result: SignupResponseDto = await response.json();
       
-      if (result.token) {
-        this.setToken(result.token);
+      if (result.data.token) {
+        this.setToken(result.data.token);
         // Create user object from response
         const user: User = {
-          id: 0, 
-          email: data.email,
-          name: "", 
-          role: result.role as "VOLUNTEER" | "ORGANIZATION" | "SPONSOR",
-          isProfileCompleted: result.isProfileCompleted,
+          userId: result.data.userId,
+          email: result.data.email,
+          fullName: result.data.fullName,
+          handle: result.data.handle,
+          role: result.data.role,
+          emailVerified: result.data.emailVerified,
+          profileCompleted: result.data.profileCompleted,
+          authProvider: result.data.authProvider,
+          createdAt: result.data.createdAt,
+          lastLogin: result.data.lastLogin,
         };
         this.user = user;
         console.log("User logged in:", this.user);
@@ -210,7 +246,7 @@ class AuthService {
   }
   
   async getCurrentUser(): Promise<User | null> {
-    if (this.user && this.user.id !== 0) return this.user;
+    if (this.user && this.user.userId !== 0) return this.user;
     
     if (!this.isAuthenticated()) return null;
     
@@ -230,11 +266,16 @@ class AuthService {
       
       const result: UserProfileResponse = await response.json();
       this.user = {
-        id: result.id,
+        userId: result.userId,
         email: result.email,
-        name: result.name,
-        role: result.role as "VOLUNTEER" | "ORGANIZATION" | "SPONSOR",
-        isProfileCompleted: result.isProfileCompleted,
+        fullName: result.fullName,
+        handle: result.handle,
+        role: result.role,
+        emailVerified: result.emailVerified,
+        profileCompleted: result.profileCompleted,
+        authProvider: result.authProvider,
+        createdAt: result.createdAt,
+        lastLogin: result.lastLogin,
       };
       return this.user;
     } catch (error) {
@@ -244,37 +285,6 @@ class AuthService {
     }
   }
 
-  async updateUserRole(role: "VOLUNTEER" | "ORGANIZATION" | "SPONSOR"): Promise<{ success: boolean; message: string }> {
-    if (!this.isAuthenticated()) {
-      return { success: false, message: "Not authenticated" };
-    }
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/update-role`, {
-        method: "PUT",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify({ role }),
-      });
-
-      if (!response.ok) {
-        const errorResult: ErrorResponse = await response.json();
-        return { 
-          success: false, 
-          message: errorResult.message || "Failed to update role" 
-        };
-      }
-
-      // Update local user object
-      if (this.user) {
-        this.user.role = role;
-      }
-
-      return { success: true, message: "Role updated successfully" };
-    } catch (error) {
-      console.error("Error updating role:", error);
-      return { success: false, message: "Network error. Please try again." };
-    }
-  }
 }
 
 export default AuthService.getInstance();

@@ -7,10 +7,11 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
+import OTPModal from "@/components/UI/OTPModal";
 
 interface SignupFormData {
-  name: string;
-  username: string;
+  fullName: string;
+  handle: string;
   email: string;
   password: string;
 }
@@ -19,9 +20,12 @@ export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [redirectType, setRedirectType] = useState<'signup' | 'google'>('signup');
   const [formData, setFormData] = useState<SignupFormData>({
-    name: "",
-    username: "",
+    fullName: "",
+    handle: "",
     email: "",
     password: "",
   });
@@ -34,15 +38,23 @@ export default function SignupPage() {
     }
   };
 
+  const handleRedirectToRoleSelection = (type: 'signup' | 'google' = 'signup', delay: number = 1500) => {
+    setRedirectType(type);
+    setIsRedirecting(true);
+    setTimeout(() => {
+      router.push('/auth/role-selection');
+    }, delay);
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = "Full name is required";
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
     }
     
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+    if (!formData.handle.trim()) {
+      newErrors.handle = "Handle is required";
     }
     
     if (!formData.email.trim()) {
@@ -63,8 +75,12 @@ export default function SignupPage() {
 
   const handleGoogleSignup = () => {
     setIsLoading(true);
-    // After Google OAuth, redirect to role selection
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google?redirect_uri=/auth/role-selection';
+    setRedirectType('google');
+    setIsRedirecting(true);
+    
+    setTimeout(() => {
+      window.location.href = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/role-selection')}`;
+    }, 800);
   };
 
   const handleSubmit = async () => {
@@ -73,15 +89,28 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       const result = await authService.signup({
-        name: formData.name,
+        fullName: formData.fullName,
+        handle: formData.handle,
         email: formData.email,
         password: formData.password,
-        role: "VOLUNTEER", // Default role, will be selected later
       });
       
-      if (result.success) {
-        // Redirect to role selection
-        router.push('/auth/role-selection');
+      if (result.success) {        
+        // Always store user data and token first
+        if (result.user) {
+          console.log("User data received:", result.user);
+        }
+        
+        // Check if email verification is needed
+        console.log("Checking nextStep:", result.nextStep);
+        if (result.nextStep === "VERIFY_EMAIL") {
+          // Show OTP modal for email verification
+          setShowOTPModal(true);
+          return; 
+        }
+        
+        // Show loading before redirecting to role selection
+        handleRedirectToRoleSelection('signup', 1500);
       } else {
         setErrors({ general: result.message });
       }
@@ -137,10 +166,10 @@ export default function SignupPage() {
           <Input
             label="Full Name"
             placeholder="Enter your full name"
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            isInvalid={!!errors.name}
-            errorMessage={errors.name}
+            value={formData.fullName}
+            onChange={(e) => handleInputChange("fullName", e.target.value)}
+            isInvalid={!!errors.fullName}
+            errorMessage={errors.fullName}
             size="lg"
             classNames={{
               input: "font-primary text-shark-900",
@@ -150,12 +179,12 @@ export default function SignupPage() {
           />
 
           <Input
-            label="Username"
-            placeholder="Choose a username"
-            value={formData.username}
-            onChange={(e) => handleInputChange("username", e.target.value)}
-            isInvalid={!!errors.username}
-            errorMessage={errors.username}
+            label="Handle"
+            placeholder="Choose a unique handle"
+            value={formData.handle}
+            onChange={(e) => handleInputChange("handle", e.target.value)}
+            isInvalid={!!errors.handle}
+            errorMessage={errors.handle}
             size="lg"
             classNames={{
               input: "font-primary text-shark-900",
@@ -238,18 +267,56 @@ export default function SignupPage() {
               <Image src="/icons/google.svg" alt="Google" width={20} height={20} className="mr-2" />
               Continue with Google
             </Button>
-          </div>
+        </div>
 
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-shark-600 font-primary">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-verdant-600 hover:text-verdant-700 font-medium">
-                Sign in
-              </Link>
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-shark-600 font-primary">
+            Already have an account?{" "}
+            <Link href="/auth/login" className="text-verdant-600 hover:text-verdant-700 font-medium">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* OTP Modal */}
+      <OTPModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        email={formData.email}
+        onVerificationSuccess={() => {
+          // Handle successful verification
+          console.log("Email verified successfully");
+        }}
+        onRedirect={() => {
+          // Show loading and redirect
+          handleRedirectToRoleSelection('signup', 1500);
+        }}
+      />
+
+      {/* Redirecting Loading Overlay */}
+      {isRedirecting && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm mx-4 text-center animate-in zoom-in duration-500">
+            <div className="mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 relative">
+                <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-shark-950 font-secondary mb-2">
+              {redirectType === 'google' ? 'Connecting with Google...' : 'Welcome to Voluntrix! 🎉'}
+            </h3>
+            <p className="text-shark-600 font-primary text-sm mb-1">
+              {redirectType === 'google' ? 'Redirecting to Google OAuth' : 'Account created successfully'}
+            </p>
+            <p className="text-shark-500 font-primary text-xs">
+              {redirectType === 'google' ? 'Please wait...' : 'Setting up your profile...'}
             </p>
           </div>
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}
