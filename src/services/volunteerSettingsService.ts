@@ -17,7 +17,7 @@ export const getVolunteerSettingsByUsername = async (
       );
     }
 
-    const { volunteerId, email, username } = await response.json();
+    const { volunteerId, email, usernamename } = await response.json();
     return {
       volunteerId,
       email,
