@@ -134,6 +134,20 @@ const SettingsPage = () => {
         </Button>
       </div>
 
+      {/* Availability */}
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
+        <h2 className="font-secondary font-semibold text-xl mb-2">
+          Availability
+        </h2>
+        <div className="mb-4 text-shark-700">
+          While unavailable, your account will be hidden and rewards won’t get
+          affected.
+        </div>
+        <Button className="rounded-full bg-shark-950 text-shark-50 font-primary">
+          Set Your Availability
+        </Button>
+      </div>
+
       {/* Danger Zone */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pr-20 pl-10">
         <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">
