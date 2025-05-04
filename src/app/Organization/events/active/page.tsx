@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +10,7 @@ export default function ActiveEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const orgId = 4; // Replace this with actual org ID 
+  const orgId = 4; // Replace  with actual org ID 
 
   useEffect(() => {
     const fetchEvents = async () => {
