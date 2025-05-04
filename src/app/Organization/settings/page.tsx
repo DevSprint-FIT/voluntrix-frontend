@@ -9,7 +9,7 @@ const SettingsPage = () => {
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const username = "IEEEUOM";
+  const username = "IEEEUOM"; 
 
   useEffect(() => {
     const loadOrganization = async () => {
@@ -22,7 +22,6 @@ const SettingsPage = () => {
         setLoading(false);
       }
     };
-
     loadOrganization();
   }, []);
 
