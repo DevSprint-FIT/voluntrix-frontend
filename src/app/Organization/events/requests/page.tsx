@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Check, X } from "lucide-react";
@@ -6,7 +5,6 @@ import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
 import { Event, getEventsByOrgId } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
-
 
 export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
