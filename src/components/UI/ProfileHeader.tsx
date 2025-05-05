@@ -11,12 +11,27 @@ interface ProfileHeaderProps {
     institute?: string;
     isVerified?: boolean;
     followerCount?: number;
-    joinedDate?: string;
+    joinedDate?: number[]; 
     imageUrl?: string;
   };
 }
 
 const ProfileHeader: React.FC<{ data: ProfileHeaderProps["data"] }> = ({ data }) => {
+  // Function to convert joinedDate array to a valid Date
+  const formatJoinedDate = (joinedDate: number[]) => {
+    if (Array.isArray(joinedDate) && joinedDate.length >= 7) {
+      const [year, month, day, hour, minute, second] = joinedDate;
+      // Construct a date from the array 
+      const date = new Date(year, month - 1, day, hour, minute, second);
+      return date.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return "Unknown";
+  };
+
   return (
     <div className="flex items-start p-6 bg-shark-50 rounded-2xl shadow-sm gap-6 mb-6">
       {/* Profile Image */}
@@ -62,11 +77,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderProps["data"] }> = ({ data })
             <span>
               Joined{" "}
               {data?.joinedDate
-                ? new Date(data.joinedDate).toLocaleDateString("en-US", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })
+                ? formatJoinedDate(data.joinedDate) 
                 : "Unknown"}
             </span>
           </div>
