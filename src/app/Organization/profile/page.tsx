@@ -7,6 +7,8 @@ import ProfileHeader from "@/components/UI/ProfileHeader";
 import AboutSection from "@/components/UI/AboutSection";
 import BankInformation from "@/components/UI/BankInformation";
 import ContactInformation from "@/components/UI/ContactInformation";
+import SocialLinks from "@/components/UI/SocialLinks";
+
 
 const Page = () => {
   const [organizationData, setOrganizationData] = useState<any>(null); 
@@ -15,7 +17,7 @@ const Page = () => {
     // Fetch organization data by username
     const fetchData = async () => {
       try {
-        const data = await getOrganizationByUsername("IEEEUOM"); // Replace with the actual username
+        const data = await getOrganizationByUsername("IEEESLIT"); // Replace with the actual username
         setOrganizationData(data);
       } catch (error) {
         console.error("Error fetching organization data:", error);
@@ -45,10 +47,17 @@ const Page = () => {
 
       <AboutSection description={organizationData.description} />
       <div className="flex gap-24">
-      <ContactInformation data={{ email: organizationData.email, phone: organizationData.phone, website: organizationData.website }} />
-      <BankInformation data={{ bankName: organizationData.bankName, accountNumber: organizationData.accountNumber }} />
-      
+          <ContactInformation data={{ email: organizationData.email, phone: organizationData.phone, website: organizationData.website }} />
+          <BankInformation data={{ bankName: organizationData.bankName, accountNumber: organizationData.accountNumber }} />
       </div>
+
+      <SocialLinks
+          data={{
+            facebookLink: organizationData.facebookLink,
+            instagramLink: organizationData.instagramLink,
+            linkedinLink: organizationData.linkedinLink
+          }}
+      />
       
     </div>
   );
