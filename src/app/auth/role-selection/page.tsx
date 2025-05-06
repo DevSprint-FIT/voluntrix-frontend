@@ -142,7 +142,7 @@ const RoleSelectionPage = () => {
         >
           <Image src="/images/logo.svg" alt="Voluntrix Logo" width={120} height={40} className="h-10 mb-4" priority />
           <h1 className="text-4xl font-bold text-shark-900 mb-2 font-primary">
-            Welcome <span className="text-verdant-600">{user?.fullName || ""}</span>
+            Welcome <span className="text-verdant-600 font-medium">{user?.fullName || ""}</span>
           </h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -182,7 +182,7 @@ const RoleSelectionPage = () => {
               <Card
                 className={`cursor-pointer transition-all duration-300 h-full bg-white/70 backdrop-blur-sm hover:bg-white/90 relative ${
                   selectedRole === role.id
-                    ? "ring-2 ring-verdant-500 shadow-lg bg-white/90"
+                    ? "ring-2 ring-verdant-500 shadow-sm bg-white/90"
                     : ""
                 }`}
                 isPressable
@@ -190,7 +190,7 @@ const RoleSelectionPage = () => {
               >
                 <CardBody className="p-8">
                   {/* Radio Button */}
-                  <div className="absolute top-6 left-6">
+                  <div className="absolute top-5 left-5">
                     <div className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ${
                       selectedRole === role.id 
                         ? "border-verdant-500 bg-verdant-500" 
@@ -203,8 +203,8 @@ const RoleSelectionPage = () => {
                   </div>
 
                   {/* Icon */}
-                  <div className="flex justify-center mb-6 mt-4">
-                    <div className={`p-4 rounded-xl transition-colors ${
+                  <div className="flex justify-center mb-4 mt-3">
+                    <div className={`p-3 rounded-xl transition-colors ${
                       selectedRole === role.id 
                         ? "bg-verdant-100" 
                         : "bg-shark-50"

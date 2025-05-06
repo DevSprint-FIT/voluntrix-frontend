@@ -48,16 +48,19 @@ interface ErrorResponse {
 }
 
 interface UserProfileResponse {
-  userId: number;
-  email: string;
-  fullName: string;
-  handle: string;
-  role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  authProvider: string;
-  createdAt: string;
-  lastLogin: string;
+  message: string;
+  data: {
+    userId: number;
+    email: string;
+    fullName: string;
+    handle: string;
+    role: string;
+    emailVerified: boolean;
+    profileCompleted: boolean;
+    authProvider: string;
+    createdAt: string;
+    lastLogin: string;
+  };
 }
 
 class AuthService {
@@ -266,16 +269,16 @@ class AuthService {
       
       const result: UserProfileResponse = await response.json();
       this.user = {
-        userId: result.userId,
-        email: result.email,
-        fullName: result.fullName,
-        handle: result.handle,
-        role: result.role,
-        emailVerified: result.emailVerified,
-        profileCompleted: result.profileCompleted,
-        authProvider: result.authProvider,
-        createdAt: result.createdAt,
-        lastLogin: result.lastLogin,
+        userId: result.data.userId,
+        email: result.data.email,
+        fullName: result.data.fullName,
+        handle: result.data.handle,
+        role: result.data.role,
+        emailVerified: result.data.emailVerified,
+        profileCompleted: result.data.profileCompleted,
+        authProvider: result.data.authProvider,
+        createdAt: result.data.createdAt,
+        lastLogin: result.data.lastLogin,
       };
       return this.user;
     } catch (error) {
