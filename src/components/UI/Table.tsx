@@ -1,0 +1,54 @@
+import React from "react";
+
+export type Column<T> = {
+  header: string;
+  accessor: keyof T;
+  cell?: (value: T[keyof T], row: T) => React.ReactNode;
+};
+
+type TableProps<T> = {
+  columns: Column<T>[];
+  data: T[];
+};
+
+export default function Table<T extends Record<string, any>>({
+  columns,
+  data,
+}: TableProps<T>) {
+  return (
+    <div className="overflow-x-auto rounded-xl shadow-sm">
+      <table className="min-w-full divide-y divide-shark-100 bg-white text-sm border-separate border-spacing-y-2">
+        <thead className="bg-white">
+          <tr>
+            {columns.map((col, idx) => (
+              <th
+                key={idx}
+                className="px-6 py-3 text-left font-secondary text-shark-600"
+              >
+                {col.header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, i) => (
+            <tr key={i}>
+              {columns.map((col, j) => {
+                const cellValue = row[col.accessor];
+                return (
+                  <td
+                    key={j}
+                    style={{ backgroundColor: "#F8F8F8" }}
+                    className="px-6 py-4 text-shark-900 font-secondary font-bold "
+                  >
+                    {col.cell ? col.cell(cellValue, row) : String(cellValue)}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
