@@ -7,6 +7,7 @@ import { Card, CardBody, Button } from "@heroui/react";
 import { User, Building, Heart, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import authService from "@/services/authService";
+import userService from "@/services/userService";
 
 interface User {
   userId: number;
@@ -103,13 +104,36 @@ const RoleSelectionPage = () => {
     if (!selectedRole) return;
 
     setIsLoading(true);
+    setError("");
+    
     try {
-      // TODO: Implement role update API call
-      // For now, just redirect to dashboard
-      router.push('/dashboard');
+      const currentToken = authService.getToken();
+      if (!currentToken) {
+        throw new Error("No authentication token found");
+      }
+
+      const result = await userService.setUserRole(selectedRole, currentToken);
+      
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      console.log("Role update response:", result.data);
+
+      if (result.data?.token) {
+        // Set the new token with updated role
+        authService.setNewToken(result.data.token);
+        
+        console.log("Role updated successfully:", result.data.role);
+        console.log("New token set with role-based authentication");
+        
+        router.push('/dashboard');
+      } else {
+        throw new Error("No token received from role update");
+      }
     } catch (error) {
       console.error("Error selecting role:", error);
-      setError("Something went wrong. Please try again.");
+      setError(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

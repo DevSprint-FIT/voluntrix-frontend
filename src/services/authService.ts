@@ -103,6 +103,12 @@ class AuthService {
     }
   }
   
+  // Public method to set new token (for role updates)
+  setNewToken(token: string): void {
+    this.setToken(token);
+    this.user = null;
+  }
+  
   private clearToken(): void {
     this.token = null;
     if (typeof window !== 'undefined') {
