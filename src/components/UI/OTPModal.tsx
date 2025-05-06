@@ -17,6 +17,8 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
   const router = useRouter();
 
   const handleVerifyOTP = async () => {
@@ -32,6 +34,8 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
       const result = await emailVerificationService.verifyEmail(email, otp);
       
       if (result.success) {
+        // Only call success callback if verification actually succeeded
+        console.log("Email verified successfully");
         onVerificationSuccess();
         onClose();
         if (onRedirect) {
@@ -40,7 +44,10 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
           router.push('/auth/role-selection');
         }
       } else {
+        // Show error message and don't proceed
+        console.log("Email verification failed:", result.message);
         setError(result.message);
+        setOtp("");
       }
     } catch (error) {
       console.error("OTP verification error:", error);
@@ -60,11 +67,16 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
   };
 
   const handleResendOTP = async () => {
+    setIsResending(true);
+    setError("");
+    setResendMessage("");
+    
     try {
       const result = await emailVerificationService.resendVerificationCode(email);
       if (result.success) {
-        setError("");
-        // You can add a success toast/notification here if needed
+        setResendMessage("Verification code sent successfully!");
+        // Clear the success message after 3 seconds
+        setTimeout(() => setResendMessage(""), 3000);
         console.log("Verification code resent successfully");
       } else {
         setError(result.message);
@@ -72,6 +84,8 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
     } catch (error) {
       console.error("Resend OTP error:", error);
       setError("Failed to resend code. Please try again.");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -101,26 +115,42 @@ const OTPModal = ({ isOpen, onClose, email, onVerificationSuccess, onRedirect }:
             <Input
               placeholder="Enter 6-digit code"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => {
+                setOtp(e.target.value);
+                // Clear error when user starts typing
+                if (error) setError("");
+              }}
               isInvalid={!!error}
               errorMessage={error}
               size="lg"
               maxLength={6}
+              disabled={isLoading}
               classNames={{
-                input: "font-primary text-shark-900 text-center text-lg tracking-widest",
+                input: `font-primary text-shark-900 text-center text-lg tracking-widest ${isLoading ? 'opacity-50' : ''}`,
                 label: "font-secondary text-shark-500 text-sm font-normal",
                 inputWrapper: "py-3",
               }}
             />
             
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <button
                 type="button"
                 onClick={handleResendOTP}
-                className="text-verdant-600 hover:text-verdant-700 text-sm font-medium font-primary"
+                disabled={isResending || isLoading}
+                className={`text-sm font-medium font-primary ${
+                  isResending || isLoading 
+                    ? 'text-shark-400 cursor-not-allowed' 
+                    : 'text-verdant-600 hover:text-verdant-700'
+                }`}
               >
-                Resend Code
+                {isResending ? "Sending..." : "Resend Code"}
               </button>
+              
+              {resendMessage && (
+                <p className="text-sm text-green-600 font-primary">
+                  {resendMessage}
+                </p>
+              )}
             </div>
           </div>
         </ModalBody>

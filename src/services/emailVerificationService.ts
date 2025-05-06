@@ -22,6 +22,8 @@ class EmailVerificationService {
 
   async verifyEmail(email: string, otp: string): Promise<{ success: boolean; message: string }> {
     try {
+      console.log("Attempting email verification for:", email, "with OTP:", otp);
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/verify-email`, {
         method: "POST",
         headers: {
@@ -33,8 +35,11 @@ class EmailVerificationService {
         }),
       });
 
+      console.log("Verification response status:", response.status);
+
       if (!response.ok) {
         const errorResult: ErrorResponse = await response.json();
+        console.log("Verification failed with error:", errorResult);
         return {
           success: false,
           message: errorResult.message || "Invalid OTP. Please try again.",
@@ -42,6 +47,7 @@ class EmailVerificationService {
       }
 
       const result: VerificationResponse = await response.json();
+      console.log("Verification successful:", result);
       return {
         success: true,
         message: result.message || "Email verified successfully",
