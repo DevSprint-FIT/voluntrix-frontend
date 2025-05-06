@@ -187,14 +187,17 @@ class AuthService {
     }
   }
   
-  async login(data: LoginData): Promise<{ success: boolean; message: string; user?: User }> {
+  async login(data: LoginData): Promise<{ success: boolean; message: string; user?: User; nextStep?: string }> {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
       });
       
       if (!response.ok) {
@@ -206,6 +209,7 @@ class AuthService {
       }
       
       const result: SignupResponseDto = await response.json();
+      console.log("Login API response:", result);
       
       if (result.data.token) {
         this.setToken(result.data.token);
@@ -225,15 +229,31 @@ class AuthService {
         this.user = user;
         console.log("User logged in:", this.user);
         
-        // Immediately fetch full user profile
-        await this.getCurrentUser();
+        // Determine next step based on user state
+        let nextStep = "dashboard"; // default
+        
+        if (!user.role || user.role === "null") {
+          nextStep = "role-selection";
+        } else if (user.role && !user.profileCompleted) {
+          nextStep = "profile-form";
+        } else if (user.profileCompleted) {
+          nextStep = "dashboard";
+        }
+        
+        console.log("Determined next step:", nextStep);
+        
+        return {
+          success: true,
+          message: result.message || "Login successful",
+          user: this.user,
+          nextStep: nextStep,
+        };
+      } else {
+        return {
+          success: false,
+          message: "No authentication token received",
+        };
       }
-      
-      return {
-        success: true,
-        message: "Login successful",
-        ...(this.user ? { user: this.user } : {}),
-      };
     } catch (error) {
       console.error("Login error:", error);
       return { success: false, message: "Network error. Please try again." };

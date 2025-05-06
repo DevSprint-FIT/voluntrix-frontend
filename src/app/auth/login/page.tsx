@@ -92,9 +92,22 @@ export default function LoginPage() {
         password: formData.password,
       });
       
-      if (result.success) {
-        // Redirect to dashboard
-        router.push('/dashboard');
+      if (result.success && result.nextStep) {
+        console.log("Login successful, navigating to:", result.nextStep);
+        
+        // Navigate based on user state
+        switch (result.nextStep) {
+          case "role-selection":
+            router.push('/auth/role-selection');
+            break;
+          case "profile-form":
+            router.push('/auth/profile-form');
+            break;
+          case "dashboard":
+          default:
+            router.push('/dashboard');
+            break;
+        }
       } else {
         setErrors({ general: result.message });
       }
