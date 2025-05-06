@@ -2,15 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Card, CardBody, Button } from "@heroui/react";
-import { User, Building, Heart } from "lucide-react";
+import { User, Building, Heart, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import authService from "@/services/authService";
+
+interface User {
+  userId: number;
+  email: string;
+  fullName: string;
+  handle: string;
+  role: string;
+  emailVerified: boolean;
+  profileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
+}
 
 const RoleSelectionPage = () => {
   const [selectedRole, setSelectedRole] = useState<"VOLUNTEER" | "ORGANIZATION" | "SPONSOR" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   // Check if user is authenticated
@@ -28,6 +44,9 @@ const RoleSelectionPage = () => {
           router.replace('/dashboard');
           return;
         }
+        
+        // Set user data for welcome message
+        setUser(user);
       } catch (error) {
         console.error('Auth check error:', error);
         router.replace('/auth/signup');
@@ -45,36 +64,33 @@ const RoleSelectionPage = () => {
       id: "VOLUNTEER" as const,
       title: "Volunteer",
       description: "Join events and make a difference in your community",
-      icon: <User className="w-8 h-8 text-verdant-600" />,
+      icon: <User className="w-6 h-6 text-verdant-600" />,
       features: [
-        "Discover volunteer opportunities",
-        "Track your volunteer hours",
-        "Connect with organizations",
-        "Earn recognition and badges"
+        "Discover opportunities",
+        "Track volunteer commitments",
+        "Connect with causes",
       ]
     },
     {
       id: "ORGANIZATION" as const,
       title: "Organization",
       description: "Create events and manage volunteers for your cause",
-      icon: <Building className="w-8 h-8 text-verdant-600" />,
+      icon: <Building className="w-6 h-6 text-verdant-600" />,
       features: [
-        "Create and manage events",
-        "Recruit volunteers",
-        "Track event impact",
-        "Build your community"
+        "Organize events",
+        "Track impact",
+        "Build community"
       ]
     },
     {
       id: "SPONSOR" as const,
       title: "Sponsor",
       description: "Support causes and fund meaningful initiatives",
-      icon: <Heart className="w-8 h-8 text-verdant-600" />,
+      icon: <Heart className="w-6 h-6 text-verdant-600" />,
       features: [
-        "Sponsor events and causes",
-        "Track donation impact",
-        "Connect with organizations",
-        "Build brand visibility"
+        "Support volunteering events",
+        "Connect with orgs",
+        "Build visibility"
       ]
     }
   ];
@@ -102,7 +118,7 @@ const RoleSelectionPage = () => {
   // Show loading while checking authentication status
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-verdant-50 to-verdant-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 relative">
             <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
@@ -115,77 +131,134 @@ const RoleSelectionPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-verdant-50 to-verdant-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-shark-950 mb-4">
-            Choose Your Role
+    <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100">
+      <div className="max-w-[72rem] mx-auto px-6 py-12">
+        {/* Welcome Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-left mb-10"
+        >
+          <Image src="/images/logo.svg" alt="Voluntrix Logo" width={120} height={40} className="h-10 mb-4" priority />
+          <h1 className="text-4xl font-bold text-shark-900 mb-2 font-primary">
+            Welcome <span className="text-verdant-600">{user?.fullName || ""}</span>
           </h1>
-          <p className="text-lg text-shark-600 max-w-2xl mx-auto">
-            Select how you&apos;d like to contribute to the community. You can always change this later in your profile settings.
-          </p>
-        </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-md text-shark-700 font-secondary"
+          >
+            Choose your role to get started on your journey
+          </motion.p>
+        </motion.div>
 
+        {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto">
-            <p className="text-red-600 text-sm font-primary">{error}</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-8 bg-red-50 border border-red-200 rounded-xl p-4 max-w-md mx-auto"
+          >
+            <p className="text-red-600 text-sm font-primary text-center">{error}</p>
+          </motion.div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {roles.map((role) => (
-            <Card
+        {/* Role Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+        >
+          {roles.map((role, index) => (
+            <motion.div
               key={role.id}
-              className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-                selectedRole === role.id
-                  ? "ring-2 ring-verdant-600 shadow-lg transform scale-105"
-                  : "hover:shadow-md"
-              }`}
-              isPressable
-              onPress={() => handleRoleSelect(role.id)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
             >
-              <CardBody className="p-8 text-center">
-                <div className="mb-6 flex justify-center">
-                  {role.icon}
-                </div>
-                
-                <h3 className="text-2xl font-bold text-shark-950 mb-4">
-                  {role.title}
-                </h3>
-                
-                <p className="text-shark-600 mb-6 text-base">
-                  {role.description}
-                </p>
-                
-                <div className="space-y-3">
-                  {role.features.map((feature, index) => (
-                    <div key={index} className="flex items-center justify-center text-sm text-shark-700">
-                      <div className="w-2 h-2 bg-verdant-600 rounded-full mr-3"></div>
-                      {feature}
+              <Card
+                className={`cursor-pointer transition-all duration-300 h-full bg-white/70 backdrop-blur-sm hover:bg-white/90 relative ${
+                  selectedRole === role.id
+                    ? "ring-2 ring-verdant-500 shadow-lg bg-white/90"
+                    : ""
+                }`}
+                isPressable
+                onPress={() => handleRoleSelect(role.id)}
+              >
+                <CardBody className="p-8">
+                  {/* Radio Button */}
+                  <div className="absolute top-6 left-6">
+                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ${
+                      selectedRole === role.id 
+                        ? "border-verdant-500 bg-verdant-500" 
+                        : "border-shark-300 bg-white"
+                    }`}>
+                      {selectedRole === role.id && (
+                        <div className="w-2.5 h-2.5 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                      )}
                     </div>
-                  ))}
-                </div>
-                
-                {selectedRole === role.id && (
-                  <div className="mt-6 w-full h-1 bg-verdant-600 rounded-full"></div>
-                )}
-              </CardBody>
-            </Card>
-          ))}
-        </div>
+                  </div>
 
-        <div className="text-center">
+                  {/* Icon */}
+                  <div className="flex justify-center mb-6 mt-4">
+                    <div className={`p-4 rounded-xl transition-colors ${
+                      selectedRole === role.id 
+                        ? "bg-verdant-100" 
+                        : "bg-shark-50"
+                    }`}>
+                      {role.icon}
+                    </div>
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-shark-950 mb-2 text-center font-primary">
+                    {role.title}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-shark-600 mb-6 text-center text-sm font-secondary leading-relaxed">
+                    {role.description}
+                  </p>
+                  
+                  {/* Features */}
+                  <div className="space-y-3">
+                    {role.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center text-[0.92rem] text-shark-700">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          selectedRole === role.id ? "bg-verdant-500" : "bg-shark-400"
+                        }`}></div>
+                        <span className="font-secondary">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardBody>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Continue Button */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="flex justify-end"
+        >
           <Button
             color="primary"
             size="lg"
-            className="px-12 py-3 text-lg font-semibold bg-verdant-600 hover:bg-verdant-700"
+            className="px-6 py-3 text-base font-semibold bg-verdant-600 hover:bg-verdant-700 font-primary rounded-full"
             isDisabled={!selectedRole}
             isLoading={isLoading}
             onPress={handleContinue}
+            endContent={!isLoading && <ArrowRight className="w-4 h-4" />}
           >
-            Continue
+            {isLoading ? "Setting up..." : "Continue"}
           </Button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
