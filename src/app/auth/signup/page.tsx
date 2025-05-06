@@ -50,7 +50,6 @@ export default function SignupPage() {
         }
       } catch (error) {
         console.error('Auth check error:', error);
-        // If there's an error, clear any invalid tokens
         await authService.logout();
       } finally {
         setIsCheckingAuth(false);
@@ -139,7 +138,7 @@ export default function SignupPage() {
         }
         
         // Show loading before redirecting to role selection
-        handleRedirectToRoleSelection('signup', 600); // Quick loading for role selection
+        handleRedirectToRoleSelection('signup', 600);
       } else {
         setErrors({ general: result.message });
       }
