@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input, Select, SelectItem, Avatar, Textarea, Card, CardBody, Chip, Checkbox } from "@heroui/react";
+import { Button, Input, Select, SelectItem, Avatar, Textarea, Card, CardBody, Chip, Switch, Checkbox } from "@heroui/react";
 import { motion } from "framer-motion";
 import { Camera, Mail, Phone, Building2, User, Info } from "lucide-react";
 import OTPModal from "@/components/UI/OTPModal";
@@ -22,7 +22,7 @@ interface User {
 interface VolunteerFormData {
   selectedInstitute: string;
   instituteEmail: string;
-  isAvailable: string;
+  isAvailable: boolean;
   about: string;
   profilePicture: File | null;
   phoneNumber: string;
@@ -63,13 +63,6 @@ const sriLankanUniversities = [
   { key: "kdu", label: "General Sir John Kotelawala Defence University (KDU)", domain: "@kdu.ac.lk" }
 ];
 
-const availabilityOptions = [
-  { key: "full-time", label: "Full Time" },
-  { key: "part-time", label: "Part Time" },
-  { key: "weekends", label: "Weekends Only" },
-  { key: "flexible", label: "Flexible" }
-];
-
 interface VolunteerProfileFormProps {
   user: User;
   onSubmit: (formData: VolunteerFormData) => Promise<void>;
@@ -85,7 +78,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   const [formData, setFormData] = useState<VolunteerFormData>({
     selectedInstitute: "",
     instituteEmail: "",
-    isAvailable: "",
+    isAvailable: true,
     about: "",
     profilePicture: null,
     phoneNumber: "",
@@ -94,10 +87,18 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   });
 
   // Handle input changes
-  const handleInputChange = (field: keyof VolunteerFormData, value: string) => {
+  const handleInputChange = (field: keyof VolunteerFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  // Handle availability toggle
+  const handleAvailabilityChange = (isAvailable: boolean) => {
+    setFormData(prev => ({ ...prev, isAvailable }));
+    if (errors.isAvailable) {
+      setErrors(prev => ({ ...prev, isAvailable: "" }));
     }
   };
 
@@ -231,9 +232,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
       newErrors.instituteEmail = "Please enter a valid email address";
     }
     
-    if (!formData.isAvailable) {
-      newErrors.isAvailable = "Please select your availability";
-    }
+    // Availability is no longer required - it's just a toggle
     
     if (!formData.about.trim()) {
       newErrors.about = "Please tell us about yourself";
@@ -367,7 +366,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                       ))}
                     </Select>
                     {isInstituteVerified && (
-                      <p className="text-green-600 text-xs mt-2 font-primary flex items-center">
+                      <p className="text-verdant-600 text-xs mt-2 font-primary flex items-center">
                         <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -446,33 +445,29 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                 />
               </div>
 
-              {/* Availability - Required */}
+              {/* Availability - Toggle */}
               <div>
                 <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
-                  Availability <span className="text-red-600">*</span>
+                  Current Availability
                 </h3>
-                <Select
-                  label="When are you available to volunteer?"
-                  placeholder="Select your availability"
-                  selectedKeys={formData.isAvailable ? [formData.isAvailable] : []}
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0] as string;
-                    handleInputChange("isAvailable", selected || "");
-                  }}
-                  isInvalid={!!errors.isAvailable}
-                  errorMessage={errors.isAvailable}
-                  size="lg"
-                  classNames={{
-                    label: "font-secondary text-shark-500 text-sm font-normal",
-                    trigger: "py-3",
-                  }}
-                >
-                  {availabilityOptions.map((option) => (
-                    <SelectItem key={option.key} value={option.key}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </Select>
+                <div className="flex items-center space-x-4">
+                  <Switch
+                    isSelected={formData.isAvailable}
+                    onValueChange={handleAvailabilityChange}
+                    size="sm"
+                    classNames={{
+                      base: "inline-flex items-center",
+                      wrapper: "group-data-[selected=true]:bg-verdant-500",
+                      thumb: "group-data-[selected=true]:bg-white",
+                      label: "text-sm font-secondary text-shark-700 ml-2",
+                    }}
+                  >
+                    I am currently available to volunteer
+                  </Switch>
+                </div>
+                <p className="text-xs text-shark-500 mt-2 font-primary tracking-[0.025rem]">
+                  You can update your availability status anytime in your profile settings.
+                </p>
               </div>
 
               {/* About Section - Required */}
@@ -577,14 +572,15 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                   </div>
                 )}
                 
-                {formData.isAvailable && (
-                  <div>
-                    <p className="text-shark-500 font-secondary">Availability</p>
+                <div>
+                  <p className="text-shark-500 font-secondary">Availability Status</p>
+                  <div className="flex items-center mt-1">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${formData.isAvailable ? 'bg-verdant-500' : 'bg-gray-400'}`}></div>
                     <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">
-                      {availabilityOptions.find(opt => opt.key === formData.isAvailable)?.label}
+                      {formData.isAvailable ? 'Available to volunteer' : 'Currently unavailable'}
                     </p>
                   </div>
-                )}
+                </div>
                 
                 {formData.selectedCategories.length > 0 && (
                   <div>
@@ -613,9 +609,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                     isSelected={formData.agreeToTerms}
                     onValueChange={handleTermsChange}
                     size="sm"
-                    color="success"
                     classNames={{
                       base: "inline-flex w-full max-w-full items-start",
+                      wrapper: "data-[selected=true]:bg-verdant-600 data-[selected=true]:border-verdant-600 before:border-verdant-600 group-data-[selected=true]:bg-verdant-600 group-data-[selected=true]:border-verdant-600 after:bg-verdant-600 data-[selected=true]:after:bg-verdant-600 group-data-[selected=true]:after:bg-verdant-600",
+                      icon: "text-white data-[selected=true]:text-white",
                       label: "text-sm font-secondary text-shark-700 leading-relaxed ml-2",
                     }}
                   >

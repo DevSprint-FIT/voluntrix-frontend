@@ -23,7 +23,7 @@ interface User {
 interface VolunteerFormData {
   selectedInstitute: string;
   instituteEmail: string;
-  isAvailable: string;
+  isAvailable: boolean;
   about: string;
   profilePicture: File | null;
   phoneNumber: string;
