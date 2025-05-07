@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input, Select, SelectItem, Avatar, Textarea, Card, CardBody, Chip } from "@heroui/react";
+import { Button, Input, Select, SelectItem, Avatar, Textarea, Card, CardBody, Chip, Checkbox } from "@heroui/react";
 import { motion } from "framer-motion";
-import { Camera, Mail, Phone, Building2, User } from "lucide-react";
+import { Camera, Mail, Phone, Building2, User, Info } from "lucide-react";
 import OTPModal from "@/components/UI/OTPModal";
 
 interface User {
@@ -20,13 +20,14 @@ interface User {
 }
 
 interface VolunteerFormData {
-  institute: string;
+  selectedInstitute: string;
   instituteEmail: string;
   isAvailable: string;
   about: string;
   profilePicture: File | null;
   phoneNumber: string;
   selectedCategories: string[];
+  agreeToTerms: boolean;
 }
 
 // Interest categories for volunteers
@@ -46,6 +47,20 @@ const interestCategories = [
   "Food & Nutrition",
   "Mental Health Support",
   "Special Needs Support"
+];
+
+// Sri Lankan Universities with their email domains
+const sriLankanUniversities = [
+  { key: "uoc", label: "University of Colombo", domain: "@edu.cmb.ac.lk" },
+  { key: "uop", label: "University of Peradeniya", domain: "@pdn.ac.lk" },
+  { key: "usj", label: "University of Sri Jayewardenepura", domain: "@sjp.ac.lk" },
+  { key: "uom", label: "University of Moratuwa", domain: "@uom.lk" },
+  { key: "uok", label: "University of Kelaniya", domain: "@stu.kln.ac.lk" },
+  { key: "sliit", label: "Sri Lanka Institute of Information Technology (SLIIT)", domain: "@sliit.lk" },
+  { key: "nsbm", label: "NSBM Green University", domain: "@nsbm.ac.lk" },
+  { key: "ric", label: "Royal Institute of Colombo (RIC)", domain: "@ric.edu" },
+  { key: "iit", label: "Informatics Institute of Technology (IIT)", domain: "@iit.ac.lk" },
+  { key: "kdu", label: "General Sir John Kotelawala Defence University (KDU)", domain: "@kdu.ac.lk" }
 ];
 
 const availabilityOptions = [
@@ -68,13 +83,14 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<VolunteerFormData>({
-    institute: "",
+    selectedInstitute: "",
     instituteEmail: "",
     isAvailable: "",
     about: "",
     profilePicture: null,
     phoneNumber: "",
-    selectedCategories: []
+    selectedCategories: [],
+    agreeToTerms: false
   });
 
   // Handle input changes
@@ -83,11 +99,18 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
     }
+  };
 
-    // If institute name is cleared, reset institute verification
-    if (field === 'institute' && !value.trim()) {
+  // Handle institute selection
+  const handleInstituteChange = (instituteKey: string) => {
+    const selectedUni = sriLankanUniversities.find(uni => uni.key === instituteKey);
+    if (selectedUni) {
+      setFormData(prev => ({ ...prev, selectedInstitute: instituteKey }));
+      // Reset institute verification when institute changes
       setIsInstituteVerified(false);
-      setFormData(prev => ({ ...prev, instituteEmail: "" }));
+      if (errors.selectedInstitute) {
+        setErrors(prev => ({ ...prev, selectedInstitute: "" }));
+      }
     }
   };
 
@@ -127,16 +150,36 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
     }));
   };
 
+  // Handle terms agreement
+  const handleTermsChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, agreeToTerms: checked }));
+    if (errors.agreeToTerms) {
+      setErrors(prev => ({ ...prev, agreeToTerms: "" }));
+    }
+  };
+
   // Handle institute verification
   const handleInstituteVerification = () => {
-    if (!formData.institute.trim()) {
-      setErrors(prev => ({ ...prev, institute: "Please enter institute name first" }));
+    if (!formData.selectedInstitute) {
+      setErrors(prev => ({ ...prev, selectedInstitute: "Please select a institute first" }));
       return;
     }
     if (!formData.instituteEmail.trim()) {
-      setErrors(prev => ({ ...prev, instituteEmail: "Please enter institute email" }));
+      setErrors(prev => ({ ...prev, instituteEmail: "Please enter your institute email" }));
       return;
     }
+    
+    const selectedUni = sriLankanUniversities.find(uni => uni.key === formData.selectedInstitute);
+    const expectedDomain = selectedUni?.domain;
+    
+    if (expectedDomain && !formData.instituteEmail.endsWith(expectedDomain)) {
+      setErrors(prev => ({ 
+        ...prev, 
+        instituteEmail: `Email must end with ${expectedDomain} for ${selectedUni.label}` 
+      }));
+      return;
+    }
+    
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.instituteEmail)) {
       setErrors(prev => ({ ...prev, instituteEmail: "Please enter a valid email address" }));
       return;
@@ -155,7 +198,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   // Handle institute OTP verification cancel
   const handleInstituteVerificationCancel = () => {
     setShowInstituteOTP(false);
-    setFormData(prev => ({ ...prev, institute: "", instituteEmail: "" }));
+    setFormData(prev => ({ ...prev, selectedInstitute: "", instituteEmail: "" }));
     setIsInstituteVerified(false);
   };
 
@@ -163,16 +206,24 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    // Institute information is optional, but if user provides institute name or email, both must be provided and verified
-    if (formData.institute.trim() || formData.instituteEmail.trim()) {
-      if (!formData.institute.trim()) {
-        newErrors.institute = "Institute name is required when adding institute information";
+    // Institute information is optional, but if user provides institute or email, both must be provided and verified
+    if (formData.selectedInstitute || formData.instituteEmail.trim()) {
+      if (!formData.selectedInstitute) {
+        newErrors.selectedInstitute = "Institute selection is required when adding institute information";
       }
       if (!formData.instituteEmail.trim()) {
         newErrors.instituteEmail = "Institute email is required when adding institute information";
       }
-      if (formData.institute.trim() && formData.instituteEmail.trim() && !isInstituteVerified) {
+      if (formData.selectedInstitute && formData.instituteEmail.trim() && !isInstituteVerified) {
         newErrors.general = "Please verify your institute email before submitting the form";
+      }
+      
+      // Validate email domain matches selected institute
+      if (formData.selectedInstitute && formData.instituteEmail.trim()) {
+        const selectedUni = sriLankanUniversities.find(uni => uni.key === formData.selectedInstitute);
+        if (selectedUni && !formData.instituteEmail.endsWith(selectedUni.domain)) {
+          newErrors.instituteEmail = `Email must end with ${selectedUni.domain} for ${selectedUni.label}`;
+        }
       }
     }
     
@@ -196,6 +247,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
     
     if (formData.selectedCategories.length === 0) {
       newErrors.categories = "Please select at least one interest category";
+    }
+    
+    if (!formData.agreeToTerms) {
+      newErrors.agreeToTerms = "You must agree to the Terms of Service and Privacy Policy";
     }
     
     setErrors(newErrors);
@@ -271,71 +326,97 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
 
               {/* Institute Information - Optional */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
-                  <Building2 className="w-5 h-5 mr-2" />
-                  Institute Information
-                  <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
-                </h3>
+                <div className="flex items-center">
+                  <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
+                    <Building2 className="w-5 h-5 mr-2" />
+                    Institute Information
+                    <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
+                  </h3>
+                  <div className="group relative ml-2 mb-4">
+                    <Info className="w-4 h-4 text-shark-400 hover:text-shark-600 cursor-help" />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-shark-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      <div className="font-medium mb-1">Institute Verification</div>
+                      <div>Verifying your institute email allows you to access private events that are exclusively available to students and staff from your institution.</div>
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-shark-800"></div>
+                    </div>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    label="Institute/University Name"
-                    placeholder="Enter your institute name"
-                    value={formData.institute}
-                    onChange={(e) => handleInputChange("institute", e.target.value)}
-                    isInvalid={!!errors.institute}
-                    errorMessage={errors.institute}
-                    size="lg"
-                    isDisabled={isInstituteVerified}
-                    classNames={{
-                      input: "font-primary text-shark-900 tracking-[0.025rem]",
-                      label: "font-secondary text-shark-500 text-sm font-normal",
-                      inputWrapper: "py-3",
-                    }}
-                    endContent={isInstituteVerified && (
-                      <div className="text-green-500">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                  />
                   <div>
-                    <Input
-                      label="Institute Email"
-                      type="email"
-                      placeholder="Enter institute email"
-                      value={formData.instituteEmail}
-                      onChange={(e) => handleInputChange("instituteEmail", e.target.value)}
-                      isInvalid={!!errors.instituteEmail}
-                      errorMessage={errors.instituteEmail}
+                    <Select
+                      label="Select Your Institute"
+                      placeholder="Choose your institute"
+                      selectedKeys={formData.selectedInstitute ? [formData.selectedInstitute] : []}
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleInstituteChange(selected || "");
+                      }}
+                      isInvalid={!!errors.selectedInstitute}
+                      errorMessage={errors.selectedInstitute}
                       size="lg"
                       isDisabled={isInstituteVerified}
                       classNames={{
-                        input: "font-primary text-shark-900 tracking-[0.025rem]",
                         label: "font-secondary text-shark-500 text-sm font-normal",
-                        inputWrapper: "py-3",
+                        trigger: "py-3",
                       }}
-                    />
-                    {!isInstituteVerified && (formData.institute.trim() || formData.instituteEmail.trim()) ? (
-                      <Button
-                        size="sm"
-                        className="mt-2 bg-verdant-600 text-white font-primary tracking-[0.025rem]"
-                        onPress={handleInstituteVerification}
-                        isDisabled={!formData.institute.trim() || !formData.instituteEmail.trim()}
-                      >
-                        <Mail className="w-4 h-4 mr-1" />
-                        Verify Institute
-                      </Button>
-                    ) : isInstituteVerified ? (
+                    >
+                      {sriLankanUniversities.map((institute) => (
+                        <SelectItem key={institute.key} value={institute.key}>
+                          {institute.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    {isInstituteVerified && (
                       <p className="text-green-600 text-xs mt-2 font-primary flex items-center">
                         <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         Institute verified successfully
                       </p>
-                    ) : (formData.institute.trim() || formData.instituteEmail.trim()) ? (
+                    )}
+                  </div>
+                  <div>
+                    <div className="relative">
+                      <Input
+                        label="Institute Email"
+                        type="email"
+                        placeholder={formData.selectedInstitute ? 
+                          "Enter your institue username" :
+                          "Select institute first"
+                        }
+                        value={formData.instituteEmail}
+                        onChange={(e) => handleInputChange("instituteEmail", e.target.value)}
+                        isInvalid={!!errors.instituteEmail}
+                        errorMessage={errors.instituteEmail}
+                        size="lg"
+                        isDisabled={isInstituteVerified || !formData.selectedInstitute}
+                        classNames={{
+                          input: "font-primary text-shark-900 tracking-[0.025rem]",
+                          label: "font-secondary text-shark-500 text-sm font-normal",
+                          inputWrapper: "py-3",
+                        }}
+                        endContent={
+                          formData.selectedInstitute && (
+                            <div className="text-shark-500 text-sm font-primary tracking-[0.025rem]">
+                              {sriLankanUniversities.find(u => u.key === formData.selectedInstitute)?.domain}
+                            </div>
+                          )
+                        }
+                      />
+                    </div>
+                    {!isInstituteVerified && (formData.selectedInstitute || formData.instituteEmail.trim()) ? (
+                      <Button
+                        size="sm"
+                        className="mt-2 bg-verdant-600 text-white font-primary tracking-[0.025rem]"
+                        onPress={handleInstituteVerification}
+                        isDisabled={!formData.selectedInstitute || !formData.instituteEmail.trim()}
+                      >
+                        <Mail className="w-4 h-4 mr-1" />
+                        Verify Institute Email
+                      </Button>
+                    ) : (formData.selectedInstitute || formData.instituteEmail.trim()) && !isInstituteVerified ? (
                       <p className="text-orange-600 text-xs mt-2 font-primary tracking-[0.025rem]">
-                        Please fill both institute name and email to verify
+                        Please select institute and fill email to verify
                       </p>
                     ) : null}
                   </div>
@@ -479,10 +560,12 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                   <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">{user?.email}</p>
                 </div>
                 
-                {formData.institute && (
+                {formData.selectedInstitute && (
                   <div>
                     <p className="text-shark-500 font-secondary">Institute</p>
-                    <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">{formData.institute}</p>
+                    <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">
+                      {sriLankanUniversities.find(u => u.key === formData.selectedInstitute)?.label}
+                    </p>
                     {isInstituteVerified && (
                       <p className="text-green-600 text-xs flex items-center mt-1">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -524,19 +607,53 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
               </div>
               
               <div className="mt-6 pt-4 border-t border-shark-200">
+                {/* Terms and Conditions - Required */}
+                <div className="mb-4">
+                  <Checkbox
+                    isSelected={formData.agreeToTerms}
+                    onValueChange={handleTermsChange}
+                    size="sm"
+                    color="success"
+                    classNames={{
+                      base: "inline-flex w-full max-w-full items-start",
+                      label: "text-sm font-secondary text-shark-700 leading-relaxed ml-2",
+                    }}
+                  >
+                    By creating an account, you agree to our{" "}
+                    <a 
+                      href="/terms-of-service" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-verdant-600 hover:text-verdant-700 underline font-medium"
+                    >
+                      Terms of Service
+                    </a>
+                    {" "}and{" "}
+                    <a 
+                      href="/privacy-policy" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-verdant-600 hover:text-verdant-700 underline font-medium"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </Checkbox>
+                  {errors.agreeToTerms && (
+                    <p className="text-red-500 text-sm mt-2 ml-2">{errors.agreeToTerms}</p>
+                  )}
+                </div>
+                
                 <Button
                   color="primary"
                   size="lg"
-                  className="w-full bg-verdant-600 hover:bg-verdant-700 font-primary rounded-lg tracking-[0.025rem]"
+                  className="w-full bg-verdant-600 hover:bg-verdant-700 font-primary rounded-lg tracking-[0.025rem] disabled:opacity-50 disabled:cursor-not-allowed"
                   onPress={handleSubmit}
                   isLoading={isLoading}
-                  isDisabled={isLoading}
+                  isDisabled={isLoading || !formData.agreeToTerms}
                 >
                   {isLoading ? "Saving Profile..." : "Complete Profile"}
                 </Button>
-                <p className="text-xs text-shark-500 mt-2 text-center font-primary">
-                  Make sure all information is correct before submitting
-                </p>
               </div>
             </CardBody>
           </Card>

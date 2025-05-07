@@ -21,7 +21,7 @@ interface User {
 }
 
 interface VolunteerFormData {
-  institute: string;
+  selectedInstitute: string;
   instituteEmail: string;
   isAvailable: string;
   about: string;
