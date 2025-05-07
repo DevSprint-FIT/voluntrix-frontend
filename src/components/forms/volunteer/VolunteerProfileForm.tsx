@@ -127,14 +127,6 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
     }));
   };
 
-  // Handle remove category
-  const handleRemoveCategory = (category: string) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedCategories: prev.selectedCategories.filter(c => c !== category)
-    }));
-  };
-
   // Handle institute verification
   const handleInstituteVerification = () => {
     if (!formData.institute.trim()) {
@@ -171,9 +163,17 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    // Institute information is optional, but if provided, must be verified
-    if (formData.institute.trim() && formData.instituteEmail.trim() && !isInstituteVerified) {
-      newErrors.general = "Please verify your institute email first";
+    // Institute information is optional, but if user provides institute name or email, both must be provided and verified
+    if (formData.institute.trim() || formData.instituteEmail.trim()) {
+      if (!formData.institute.trim()) {
+        newErrors.institute = "Institute name is required when adding institute information";
+      }
+      if (!formData.instituteEmail.trim()) {
+        newErrors.instituteEmail = "Institute email is required when adding institute information";
+      }
+      if (formData.institute.trim() && formData.instituteEmail.trim() && !isInstituteVerified) {
+        newErrors.general = "Please verify your institute email before submitting the form";
+      }
     }
     
     if (formData.instituteEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.instituteEmail)) {
@@ -190,7 +190,6 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
       newErrors.about = "Please provide at least 50 characters about yourself";
     }
     
-    // Phone number is optional, but if provided, must be valid
     if (formData.phoneNumber.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = "Please enter a valid phone number";
     }
@@ -222,17 +221,17 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
             {/* Error Message */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-600 text-sm font-primary">{errors.general}</p>
+                <p className="text-red-600 text-sm font-primary tracking-[0.025rem]">{errors.general}</p>
               </div>
             )}
 
             <div className="space-y-8">
               {/* Profile Picture Section - Optional */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary flex items-center">
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
                   <User className="w-5 h-5 mr-2" />
                   Profile Picture
-                  <span className="text-xs text-shark-500 ml-2 font-primary">(Optional)</span>
+                  <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
                 </h3>
                 <div className="flex items-center space-x-6">
                   <div className="relative">
@@ -257,10 +256,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                     />
                   </div>
                   <div>
-                    <p className="text-sm text-shark-600 font-primary mb-1">
+                    <p className="text-sm text-shark-600 font-primary mb-1 tracking-[0.025rem]">
                       Upload a profile picture to help organizations recognize you
                     </p>
-                    <p className="text-xs text-shark-500 font-primary">
+                    <p className="text-xs text-shark-500 font-secondary">
                       JPG, PNG, or GIF. Max file size 5MB.
                     </p>
                     {errors.profilePicture && (
@@ -272,10 +271,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
 
               {/* Institute Information - Optional */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary flex items-center">
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
                   <Building2 className="w-5 h-5 mr-2" />
                   Institute Information
-                  <span className="text-xs text-shark-500 ml-2 font-primary">(Optional)</span>
+                  <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -288,7 +287,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                     size="lg"
                     isDisabled={isInstituteVerified}
                     classNames={{
-                      input: "font-primary text-shark-900",
+                      input: "font-primary text-shark-900 tracking-[0.025rem]",
                       label: "font-secondary text-shark-500 text-sm font-normal",
                       inputWrapper: "py-3",
                     }}
@@ -312,16 +311,17 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                       size="lg"
                       isDisabled={isInstituteVerified}
                       classNames={{
-                        input: "font-primary text-shark-900",
+                        input: "font-primary text-shark-900 tracking-[0.025rem]",
                         label: "font-secondary text-shark-500 text-sm font-normal",
                         inputWrapper: "py-3",
                       }}
                     />
-                    {!isInstituteVerified && formData.institute.trim() && formData.instituteEmail.trim() ? (
+                    {!isInstituteVerified && (formData.institute.trim() || formData.instituteEmail.trim()) ? (
                       <Button
                         size="sm"
-                        className="mt-2 bg-verdant-600 text-white font-primary"
+                        className="mt-2 bg-verdant-600 text-white font-primary tracking-[0.025rem]"
                         onPress={handleInstituteVerification}
+                        isDisabled={!formData.institute.trim() || !formData.instituteEmail.trim()}
                       >
                         <Mail className="w-4 h-4 mr-1" />
                         Verify Institute
@@ -333,6 +333,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                         </svg>
                         Institute verified successfully
                       </p>
+                    ) : (formData.institute.trim() || formData.instituteEmail.trim()) ? (
+                      <p className="text-orange-600 text-xs mt-2 font-primary tracking-[0.025rem]">
+                        Please fill both institute name and email to verify
+                      </p>
                     ) : null}
                   </div>
                 </div>
@@ -340,10 +344,10 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
 
               {/* Contact Information - Optional */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary flex items-center">
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
                   <Phone className="w-5 h-5 mr-2" />
                   Contact Information
-                  <span className="text-xs text-shark-500 ml-2 font-primary">(Optional)</span>
+                  <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
                 </h3>
                 <Input
                   label="Phone Number"
@@ -354,7 +358,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                   errorMessage={errors.phoneNumber}
                   size="lg"
                   classNames={{
-                    input: "font-primary text-shark-900",
+                    input: "font-primary text-shark-900 tracking-[0.025rem]",
                     label: "font-secondary text-shark-500 text-sm font-normal",
                     inputWrapper: "py-3",
                   }}
@@ -363,8 +367,8 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
 
               {/* Availability - Required */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary">
-                  Availability *
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
+                  Availability <span className="text-red-600">*</span>
                 </h3>
                 <Select
                   label="When are you available to volunteer?"
@@ -392,8 +396,8 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
 
               {/* About Section - Required */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary">
-                  About Yourself *
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
+                  About Yourself <span className="text-red-600">*</span>
                 </h3>
                 <Textarea
                   label="Tell us about yourself"
@@ -405,21 +409,21 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                   minRows={4}
                   maxRows={6}
                   classNames={{
-                    input: "font-primary text-shark-900",
+                    input: "font-primary text-shark-900 tracking-[0.025rem]",
                     label: "font-secondary text-shark-500 text-sm font-normal",
                   }}
                 />
-                <p className="text-xs text-shark-500 mt-1 font-primary">
+                <p className="text-xs text-shark-500 mt-1 font-primary tracking-[0.025rem]">
                   {formData.about.length}/500 characters (minimum 50 required)
                 </p>
               </div>
 
               {/* Interest Categories - Required */}
               <div>
-                <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary">
-                  Interest Categories *
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
+                  Areas of Interest <span className="text-red-600">*</span>
                 </h3>
-                <p className="text-sm text-shark-600 mb-4 font-primary">
+                <p className="text-[0.9rem] text-shark-600 mb-4 font-primary tracking-[0.025rem]">
                   Select the areas you&apos;re interested in volunteering for:
                 </p>
                 
@@ -430,7 +434,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                       key={category}
                       type="button"
                       onClick={() => handleCategoryToggle(category)}
-                      className={`p-3 rounded-lg border-2 transition-all text-left text-sm font-primary ${
+                      className={`p-3 rounded-lg border-2 transition-all text-left text-[0.8rem] font-secondary ${
                         formData.selectedCategories.includes(category)
                           ? 'border-verdant-500 bg-verdant-50 text-verdant-800'
                           : 'border-shark-200 bg-white hover:border-shark-300 text-shark-700'
@@ -440,28 +444,6 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                     </button>
                   ))}
                 </div>
-
-                {/* Selected Categories Display */}
-                {formData.selectedCategories.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-shark-700 mb-2 font-secondary">
-                      Selected Categories:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.selectedCategories.map((category) => (
-                        <Chip
-                          key={category}
-                          onClose={() => handleRemoveCategory(category)}
-                          variant="flat"
-                          color="success"
-                          className="bg-verdant-100 text-verdant-800 font-primary"
-                        >
-                          {category}
-                        </Chip>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 
                 {errors.categories && (
                   <p className="text-red-500 text-sm mt-2">{errors.categories}</p>
@@ -482,25 +464,25 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
         <div className="sticky top-8">
           <Card className="bg-white/70 backdrop-blur-sm shadow-sm">
             <CardBody className="p-6">
-              <h3 className="text-lg font-semibold text-shark-950 mb-4 font-secondary">
+              <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
                 Profile Summary
               </h3>
               
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="font-medium text-shark-700 font-secondary">Full Name</p>
-                  <p className="text-shark-600 font-primary">{user?.fullName}</p>
-                </div>
+                  <p className="text-shark-500 font-secondary">Full Name</p>
+                  <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">{user?.fullName}</p>
+                </div> 
                 
                 <div>
-                  <p className="font-medium text-shark-700 font-secondary">Email</p>
-                  <p className="text-shark-600 font-primary">{user?.email}</p>
+                  <p className="text-shark-500 font-secondary">Email</p>
+                  <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">{user?.email}</p>
                 </div>
                 
                 {formData.institute && (
                   <div>
-                    <p className="font-medium text-shark-700 font-secondary">Institute</p>
-                    <p className="text-shark-600 font-primary">{formData.institute}</p>
+                    <p className="text-shark-500 font-secondary">Institute</p>
+                    <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">{formData.institute}</p>
                     {isInstituteVerified && (
                       <p className="text-green-600 text-xs flex items-center mt-1">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -514,8 +496,8 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                 
                 {formData.isAvailable && (
                   <div>
-                    <p className="font-medium text-shark-700 font-secondary">Availability</p>
-                    <p className="text-shark-600 font-primary">
+                    <p className="text-shark-500 font-secondary">Availability</p>
+                    <p className="text-shark-800 font-primary tracking-[0.025rem] font-medium">
                       {availabilityOptions.find(opt => opt.key === formData.isAvailable)?.label}
                     </p>
                   </div>
@@ -523,7 +505,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                 
                 {formData.selectedCategories.length > 0 && (
                   <div>
-                    <p className="font-medium text-shark-700 font-secondary">Interests</p>
+                    <p className="text-shark-500 font-secondary">Interests</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {formData.selectedCategories.map((category) => (
                         <Chip
@@ -531,7 +513,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                           size="sm"
                           variant="flat"
                           color="success"
-                          className="bg-verdant-100 text-verdant-800 text-xs font-primary"
+                          className="bg-verdant-100 text-verdant-800 text-xs font-primary tracking-[0.025rem] font-medium"
                         >
                           {category}
                         </Chip>
@@ -545,7 +527,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                 <Button
                   color="primary"
                   size="lg"
-                  className="w-full bg-verdant-600 hover:bg-verdant-700 font-primary rounded-lg"
+                  className="w-full bg-verdant-600 hover:bg-verdant-700 font-primary rounded-lg tracking-[0.025rem]"
                   onPress={handleSubmit}
                   isLoading={isLoading}
                   isDisabled={isLoading}

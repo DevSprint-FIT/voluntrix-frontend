@@ -128,7 +128,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-shark-600 font-primary">Checking authentication...</p>
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">Checking authentication...</p>
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center p-8 relative">
       <Link 
         href="/"
-        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
+        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm tracking-[0.025rem]"
       >
         <Image 
           src="/icons/arrow-back.svg" 
@@ -162,7 +162,7 @@ export default function LoginPage() {
           <h2 className="text-2xl font-medium text-shark-950 font-secondary mb-2">
             Welcome back
           </h2>
-          <p className="text-shark-600 font-primary">
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">
             Sign in to continue making a difference
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
             errorMessage={errors.email}
             size="lg"
             classNames={{
-              input: "font-primary text-shark-900",
+              input: "font-primary text-shark-900 tracking-[0.02rem]",
               label: "font-secondary text-shark-500 text-sm font-normal",
               inputWrapper: "py-3",
             }}
@@ -202,7 +202,7 @@ export default function LoginPage() {
             errorMessage={errors.password}
             size="lg"
             classNames={{
-              input: "font-primary text-shark-900",
+              input: "font-primary text-shark-900 tracking-[0.02rem]",
               label: "font-secondary text-shark-500 text-sm font-normal",
               inputWrapper: "py-3",
             }}
@@ -225,7 +225,7 @@ export default function LoginPage() {
           <div className="text-right">
             <Link 
               href="/auth/forgot-password" 
-              className="text-sm text-verdant-600 hover:text-verdant-700 font-primary font-medium"
+              className="text-sm text-verdant-600 hover:text-verdant-700 font-primary font-medium tracking-[0.02rem]"
             >
               Forgot your password?
             </Link>
@@ -245,7 +245,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-shark-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gradient-to-br from-verdant-50 via-white to-verdant-50 text-shark-500 font-primary">Or continue with</span>
+              <span className="px-2 bg-gradient-to-br from-verdant-50 via-white to-verdant-50 text-shark-500 font-primary tracking-[0.025rem]">Or continue with</span>
             </div>
           </div>
 
@@ -253,7 +253,7 @@ export default function LoginPage() {
           <Button
             onPress={handleGoogleLogin}
             variant="bordered"
-            className="w-full border-shark-200 text-shark-700 font-primary py-3 rounded-[20px] hover:bg-shark-50"
+            className="w-full border-shark-200 text-shark-700 font-primary tracking-[0.025rem] py-3 rounded-[20px] hover:bg-shark-50"
             size="lg"
             isDisabled={isLoading}
           >
@@ -263,7 +263,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-shark-600 font-primary">
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">
             Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="text-verdant-600 hover:text-verdant-700 font-medium">
               Create one

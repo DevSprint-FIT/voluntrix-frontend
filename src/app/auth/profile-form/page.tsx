@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import authService from "@/services/authService";
 import VolunteerProfileForm from "@/components/forms/volunteer/VolunteerProfileForm";
+import Image from "next/image";
 
 interface User {
   userId: number;
@@ -79,17 +80,13 @@ const ProfileFormPage = () => {
   const handleSubmit = async (formData: VolunteerFormData) => {
     setIsLoading(true);
     try {
-      // Here you would typically call an API to save the profile data
       console.log("Profile data:", formData);
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Redirect to dashboard after successful submission
       router.push('/dashboard');
     } catch (error) {
       console.error("Profile submission failed:", error);
-      // Handle error - you might want to show an error message
     } finally {
       setIsLoading(false);
     }
@@ -117,22 +114,21 @@ const ProfileFormPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100">
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Header Section - Left aligned */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-left mb-12"
         >
+          <Image src="/images/logo.svg" alt="Voluntrix Logo" width={120} height={40} className="h-10 mb-4" priority />
           <h1 className="text-4xl font-bold text-shark-950 mb-2 font-secondary">
-            Complete Your Profile
+            Complete Your <span className="text-verdant-600 capitalize">{user.role.toLowerCase()}</span> Profile
           </h1>
-          <p className="text-lg text-shark-600 font-primary">
-            Set up your {user.role.toLowerCase()} profile to get started.
+          <p className="text-[1.15rem] text-shark-600 font-primary tracking-[0.025rem]">
+            Set up your profile to get started.
           </p>
         </motion.div>
 
-        {/* Render different forms based on user role */}
         {user.role.toLowerCase() === 'volunteer' ? (
           <VolunteerProfileForm 
             user={user} 
@@ -140,7 +136,6 @@ const ProfileFormPage = () => {
             isLoading={isLoading} 
           />
         ) : (
-          /* Placeholder for other role forms */
           <div className="text-center py-12">
             <p className="text-shark-600 font-primary">
               Profile form for {user.role} coming soon...

@@ -159,7 +159,7 @@ export default function SignupPage() {
             <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-shark-600 font-primary">Checking authentication...</p>
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">Checking authentication...</p>
         </div>
       </div>
     );
@@ -169,7 +169,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center p-8 relative">
       <Link 
         href="/"
-        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
+        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm tracking-[0.05rem]"
       >
         <Image 
           src="/icons/arrow-back.svg" 
@@ -193,7 +193,7 @@ export default function SignupPage() {
           <h2 className="text-2xl font-medium text-shark-950 font-secondary mb-2">
             Create your account
           </h2>
-          <p className="text-shark-600 font-primary">
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">
             Start making a difference today
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function SignupPage() {
         <div className="space-y-6">
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-600 text-sm font-primary">{errors.general}</p>
+              <p className="text-red-600 text-sm font-primary tracking-[0.02rem]">{errors.general}</p>
             </div>
           )}
 
@@ -215,7 +215,7 @@ export default function SignupPage() {
             errorMessage={errors.fullName}
             size="lg"
             classNames={{
-              input: "font-primary text-shark-900",
+              input: "font-primary text-shark-900 tracking-[0.02rem]",
               label: "font-secondary text-shark-500 text-sm font-normal",
               inputWrapper: "py-3",
             }}
@@ -230,7 +230,7 @@ export default function SignupPage() {
             errorMessage={errors.handle}
             size="lg"
             classNames={{
-              input: "font-primary text-shark-900",
+              input: "font-primary text-shark-900 tracking-[0.02rem]",
               label: "font-secondary text-shark-500 text-sm font-normal",
               inputWrapper: "py-3",
             }}
@@ -246,7 +246,7 @@ export default function SignupPage() {
               errorMessage={errors.email}
               size="lg"
               classNames={{
-                input: "font-primary text-shark-900",
+                input: "font-primary text-shark-900 tracking-[0.02rem]",
                 label: "font-secondary text-shark-500 text-sm font-normal",
                 inputWrapper: "py-3",
               }}
@@ -262,7 +262,7 @@ export default function SignupPage() {
               errorMessage={errors.password}
               size="lg"
               classNames={{
-                input: "font-primary text-shark-900",
+                input: "font-primary text-shark-900 tracking-[0.025rem]",
                 label: "font-secondary text-shark-500 text-sm font-normal",
                 inputWrapper: "py-3",
               }}
@@ -295,7 +295,7 @@ export default function SignupPage() {
                 <div className="w-full border-t border-shark-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gradient-to-br from-verdant-50 via-white to-verdant-50 text-shark-500 font-primary">Or continue with</span>
+                <span className="px-2 bg-gradient-to-br from-verdant-50 via-white to-verdant-50 text-shark-500 font-primary tracking-[0.025rem]">Or continue with</span>
               </div>
             </div>
 
@@ -303,7 +303,7 @@ export default function SignupPage() {
             <Button
               onPress={handleGoogleSignup}
               variant="bordered"
-              className="w-full border-shark-200 text-shark-700 font-primary py-3 rounded-[20px] hover:bg-shark-50"
+              className="w-full border-shark-200 text-shark-700 font-primary py-3 rounded-[20px] hover:bg-shark-50 tracking-[0.025rem]"
               size="lg"
               isDisabled={isLoading}
             >
@@ -314,7 +314,7 @@ export default function SignupPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-shark-600 font-primary">
+          <p className="text-shark-600 font-primary tracking-[0.025rem]">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-verdant-600 hover:text-verdant-700 font-medium">
               Sign in
@@ -351,10 +351,10 @@ export default function SignupPage() {
             <h3 className="text-xl font-bold text-shark-950 font-secondary mb-2">
               {redirectType === 'google' ? 'Connecting with Google...' : 'Account Created!'}
             </h3>
-            <p className="text-shark-600 font-primary text-sm mb-1">
+            <p className="text-shark-600 font-primary text-sm mb-1 tracking-[0.025rem]">
               {redirectType === 'google' ? 'Redirecting to Google OAuth' : 'Setting up your profile'}
             </p>
-            <p className="text-shark-500 font-primary text-xs">
+            <p className="text-shark-500 font-primary text-xs tracking-[0.025rem]">
               {redirectType === 'google' ? 'Please wait...' : 'Just a moment...'}
             </p>
           </div>

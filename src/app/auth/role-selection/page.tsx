@@ -165,14 +165,14 @@ const RoleSelectionPage = () => {
           className="text-left mb-10"
         >
           <Image src="/images/logo.svg" alt="Voluntrix Logo" width={120} height={40} className="h-10 mb-4" priority />
-          <h1 className="text-4xl font-bold text-shark-900 mb-2 font-primary">
+          <h1 className="text-[2.4rem] font-bold text-shark-900 font-secondary">
             Welcome <span className="text-verdant-600 font-medium">{user?.fullName || ""}</span>
           </h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-md text-shark-700 font-secondary"
+            className="text-[1.15rem] text-shark-700 font-primary tracking-[0.025rem]"
           >
             Choose your role to get started on your journey
           </motion.p>
@@ -204,9 +204,9 @@ const RoleSelectionPage = () => {
               transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
             >
               <Card
-                className={`cursor-pointer transition-all duration-300 h-full bg-white/70 backdrop-blur-sm hover:bg-white/90 relative ${
+                className={`cursor-pointer transition-all duration-300 h-full bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 relative ${
                   selectedRole === role.id
-                    ? "ring-2 ring-verdant-500 shadow-sm bg-white/90"
+                    ? "ring-2 ring-verdant-500 bg-white/90"
                     : ""
                 }`}
                 isPressable
@@ -238,7 +238,7 @@ const RoleSelectionPage = () => {
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-shark-950 mb-2 text-center font-primary">
+                  <h3 className="text-xl font-bold text-shark-950 mb-2 text-center font-primary tracking-[0.025rem]">
                     {role.title}
                   </h3>
                   
