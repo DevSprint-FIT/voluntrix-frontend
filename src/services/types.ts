@@ -28,5 +28,19 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface Reaction {
+  id: number;
+  socialFeedId: number;
+  userId: number;
+  userType: string;
+  reacted: boolean;
+  createdAt: string;
+}
+
+export interface CreateReaction {
+  socialFeedId: number;
+  userId: number;
+  userType: string;
+}
 
 
