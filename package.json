@@ -9,13 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@heroui/progress": "^2.2.15",
     "@heroui/react": "^2.7.6",
+    "@types/react-native": "^0.73.0",
     "framer-motion": "^12.3.1",
     "gsap": "^3.12.7",
     "lucide-react": "^0.492.0",
     "next": "^15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-native-svg": "^15.11.2",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
