@@ -1,5 +1,9 @@
 export type EventType = "ONLINE" | "ONSITE";
-export type ContributionArea = "DESIGN" | "LEADERSHIP" | string;
+export type ContributionArea =
+  | "DESIGN"
+  | "EDITORIAL"
+  | "LOGISTICS"
+  | "PROGRAMMING";
 
 export type ActiveEvent = {
   eventName: string;
@@ -13,7 +17,7 @@ export type CompletedEvent = {
   startDate: number[]; // [year, month, day]
   endDate: number[]; // [year, month, day]
   eventType: EventType;
-  contributionArea: string;
+  contributionArea: ContributionArea;
 };
 
 export type AppliedEvent = {
