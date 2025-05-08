@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import authService from "@/services/authService";
 import VolunteerProfileForm from "@/components/forms/volunteer/VolunteerProfileForm";
+import OrganizationProfileForm from "@/components/forms/organization/OrganizationProfileForm";
+import SponsorProfileForm from "@/components/forms/sponsor/SponsorProfileForm";
 import Image from "next/image";
 
 interface User {
@@ -29,6 +31,32 @@ interface VolunteerFormData {
   phoneNumber: string;
   selectedCategories: string[];
 }
+
+interface OrganizationFormData {
+  phone: string;
+  institute: string;
+  imageUrl: File | null;
+  bankName: string;
+  accountNumber: string;
+  description: string;
+  website: string;
+  facebookLink: string;
+  linkedinLink: string;
+  instagramLink: string;
+}
+
+interface SponsorFormData {
+  company: string;
+  jobTitle: string;
+  mobileNumber: string;
+  website: string;
+  sponsorshipNote: string;
+  documentUrl: File | null;
+  linkedinProfile: string;
+  address: string;
+}
+
+// type FormData = VolunteerFormData | OrganizationFormData | SponsorFormData;
 
 const ProfileFormPage = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -77,7 +105,7 @@ const ProfileFormPage = () => {
     checkAuthStatus();
   }, [router]);
 
-  const handleSubmit = async (formData: VolunteerFormData) => {
+  const handleSubmit = async (formData: VolunteerFormData | OrganizationFormData | SponsorFormData) => {
     setIsLoading(true);
     try {
       console.log("Profile data:", formData);
@@ -131,6 +159,18 @@ const ProfileFormPage = () => {
 
         {user.role.toLowerCase() === 'volunteer' ? (
           <VolunteerProfileForm 
+            user={user} 
+            onSubmit={handleSubmit} 
+            isLoading={isLoading} 
+          />
+        ) : user.role.toLowerCase() === 'organization' ? (
+          <OrganizationProfileForm 
+            user={user} 
+            onSubmit={handleSubmit} 
+            isLoading={isLoading} 
+          />
+        ) : user.role.toLowerCase() === 'sponsor' ? (
+          <SponsorProfileForm 
             user={user} 
             onSubmit={handleSubmit} 
             isLoading={isLoading} 
