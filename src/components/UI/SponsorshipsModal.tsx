@@ -68,12 +68,12 @@ const SponsorshipModal: React.FC<{
                 >
                   <div 
                     className={`w-8 h-8 rounded-md border flex items-center justify-center mr-4 cursor-pointer ${
-                      pkg.available ? 'border-green-500' : 'border-gray-300'
+                      pkg.available ? 'border-[#029972]' : 'border-gray-300'
                     }`}
                     onClick={() => pkg.available && setSelectedPackage(pkg.id)}
                   >
                     {pkg.available && selectedPackage === pkg.id && (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#029972]">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                     )}
@@ -98,7 +98,7 @@ const SponsorshipModal: React.FC<{
                 {benefits.map((benefit) => (
                   <div key={benefit.id} className="mb-4 flex items-center">
                     <div className="w-8 h-8 flex items-center justify-center mr-2">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#029972]">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                     </div>
