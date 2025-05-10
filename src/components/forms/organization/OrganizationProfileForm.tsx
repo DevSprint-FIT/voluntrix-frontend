@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button, Input, Avatar, Textarea, Card, CardBody, Checkbox } from "@heroui/react";
 import { motion } from "framer-motion";
-import { Camera, Building2, User, CreditCard, Globe, Facebook, Linkedin, Instagram } from "lucide-react";
+import { Camera, Building2, User, CreditCard, Globe, Facebook, Linkedin, Instagram, FileText, Upload, X } from "lucide-react";
 
 interface User {
   userId: number;
@@ -29,6 +29,7 @@ interface OrganizationFormData {
   facebookLink: string;
   linkedinLink: string;
   instagramLink: string;
+  verificationDocument: File | null;
   agreeToTerms: boolean;
 }
 
@@ -53,6 +54,7 @@ const OrganizationProfileForm: React.FC<OrganizationProfileFormProps> = ({ user,
     facebookLink: "",
     linkedinLink: "",
     instagramLink: "",
+    verificationDocument: null,
     agreeToTerms: false
   });
 
@@ -88,6 +90,50 @@ const OrganizationProfileForm: React.FC<OrganizationProfileFormProps> = ({ user,
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // Handle verification document upload
+  const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type (allow PDFs, images, and common document formats)
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg', 
+        'image/png',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      
+      if (!allowedTypes.includes(file.type)) {
+        setErrors(prev => ({ ...prev, verificationDocument: "Please upload PDF, DOC, DOCX, or image files only" }));
+        return;
+      }
+      
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, verificationDocument: "File should be less than 10MB" }));
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, verificationDocument: file }));
+      setErrors(prev => ({ ...prev, verificationDocument: "" }));
+    }
+  };
+
+  // Handle document removal
+  const handleDocumentRemove = () => {
+    setFormData(prev => ({ ...prev, verificationDocument: null }));
+  };
+
+  // Format file size for display
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   // Handle terms agreement
@@ -407,6 +453,77 @@ const OrganizationProfileForm: React.FC<OrganizationProfileFormProps> = ({ user,
                   />
                 </div>
               </div>
+
+              {/* Verification Document - Optional */}
+              <div>
+                <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary flex items-center">
+                  <FileText className="w-5 h-5 mr-2" />
+                  Verification Document
+                  <span className="text-xs text-verdant-600 ml-2 font-primary font-medium tracking-[0.02rem]">(Optional)</span>
+                </h3>
+                <div className="space-y-4">
+                  {!formData.verificationDocument ? (
+                    <div className="border-2 border-dashed border-shark-300 rounded-lg p-6 hover:border-verdant-400 transition-colors">
+                      <div className="text-center">
+                        <p className="text-sm text-shark-600 font-primary mb-1 tracking-[0.025rem]">
+                          Upload a document to verify your organization
+                        </p>
+                        <p className="text-xs text-shark-500 font-secondary mb-3">
+                          Registration certificate, tax exemption letter, or other official documents
+                        </p>
+                        <label
+                          htmlFor="verification-document"
+                          className="inline-flex items-center px-4 py-2 bg-verdant-600 hover:bg-verdant-700 text-white text-sm font-medium rounded-lg cursor-pointer transition-colors"
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Choose File
+                        </label>
+                        <input
+                          id="verification-document"
+                          type="file"
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          onChange={handleDocumentUpload}
+                          className="hidden"
+                        />
+                      </div>
+                      <p className="text-xs text-shark-500 text-center mt-2 font-secondary">
+                        Supported formats: PDF, DOC, DOCX, JPG, PNG • Max 10MB
+                      </p>
+                      {errors.verificationDocument && (
+                        <p className="text-red-500 text-sm text-center mt-2">{errors.verificationDocument}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="border border-shark-200 rounded-lg p-4 bg-shark-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <FileText className="w-6 h-6 text-verdant-600" />
+                          <div>
+                            <p className="text-sm font-medium text-shark-800 font-primary tracking-[0.025rem]">
+                              {formData.verificationDocument.name}
+                            </p>
+                            <p className="text-xs text-shark-500 font-secondary">
+                              {formatFileSize(formData.verificationDocument.size)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="ghost"
+                          className="text-shark-400 hover:text-red-500 hover:bg-red-50"
+                          onPress={handleDocumentRemove}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] mt-2">
+                        This document will be reviewed by our team for organization verification
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </CardBody>
         </Card>
@@ -499,6 +616,20 @@ const OrganizationProfileForm: React.FC<OrganizationProfileFormProps> = ({ user,
                           <Instagram className="w-4 h-4" />
                         </a>
                       )}
+                    </div>
+                  </div>
+                )}
+                
+                {formData.verificationDocument && (
+                  <div>
+                    <p className="text-shark-500 font-secondary">Verification Document</p>
+                    <div className="flex items-center mt-1">
+                      <FileText className="w-3 h-3 mr-1 text-verdant-600" />
+                      <span className="text-shark-800 font-primary tracking-[0.025rem] font-medium text-sm truncate">
+                        {formData.verificationDocument.name.length > 25 
+                          ? formData.verificationDocument.name.substring(0, 25) + '...' 
+                          : formData.verificationDocument.name}
+                      </span>
                     </div>
                   </div>
                 )}

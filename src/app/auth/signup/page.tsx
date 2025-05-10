@@ -222,6 +222,9 @@ export default function SignupPage() {
               inputWrapper: "py-3",
             }}
           />
+          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] -mt-4">
+            For organizations: Use your organization&apos;s official name (e.g., &apos;Red Cross Society&apos;)
+          </p>
 
           <Input
             label="Handle"
@@ -237,6 +240,9 @@ export default function SignupPage() {
               inputWrapper: "py-3",
             }}
           />
+          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] -mt-4">
+            For organizations: Use a recognizable handle (e.g., &apos;@redcross&apos; or &apos;@greenpeace&apos;)
+          </p>
 
             <Input
               label="Email Address"

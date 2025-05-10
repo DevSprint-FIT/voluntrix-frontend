@@ -94,10 +94,19 @@ const ProfileFormContent = () => {
         const validTypes = ['volunteer', 'organization', 'sponsor'];
         let finalType = '';
 
-        if (typeParam && validTypes.includes(typeParam)) {
-          finalType = typeParam;
-        } else if (userRole && validTypes.includes(userRole) && userRole !== 'null') {
+        // Prioritize user's actual role over URL parameter for security
+        if (userRole && validTypes.includes(userRole) && userRole !== 'null') {
           finalType = userRole;
+          
+          // If URL param doesn't match user's role, redirect to correct URL or 404
+          if (typeParam && typeParam !== userRole) {
+            // Redirect to 404 if user tries to access wrong profile type
+            router.replace('/not-found');
+            return;
+          }
+        } else if (typeParam && validTypes.includes(typeParam)) {
+          // Only allow URL param if user has no role set (shouldn't happen in normal flow)
+          finalType = typeParam;
         } else {
           // Fallback: redirect to role selection if no valid type
           router.replace('/auth/role-selection');
