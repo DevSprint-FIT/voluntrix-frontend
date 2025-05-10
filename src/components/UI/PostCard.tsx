@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MoreHorizontal, Heart, MessageSquare, SquareArrowOutUpRight, SendHorizonal } from "lucide-react";
 import ConfirmationModal from "./ConfirmationModal";
+import { getUserReaction, reactToPost, removeReaction, getReactionsForPost } from "@/services/reactionService";
+import ShareModal from "./ShareModal";
 
 interface PostCardProps {
   user: string;
@@ -9,10 +11,13 @@ interface PostCardProps {
   followers: number;
   content: string;
   imageUrl?: string;
-  mediaType?: "TEXT" |"IMAGE" | "VIDEO";
+  mediaType?: "NONE" |"IMAGE" | "VIDEO";
   profileImageUrl?: string;
   postId: number;
   impressions: number;
+  userId: number;
+  userType: string;
+  isPublicView?: boolean;
   onEdit?: (post: {
     postId: number;
     content: string;
@@ -33,6 +38,9 @@ const PostCard: React.FC<PostCardProps> = ({
   profileImageUrl,
   postId,
   impressions,
+  userId,
+  userType,
+  isPublicView = false,
   onDelete,
   onEdit,
   onLike,
@@ -40,7 +48,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(impressions);
+  const [likeCount, setLikeCount] = useState(0);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleDeleteClick = () => {
     setShowMenu(false);
@@ -52,17 +61,47 @@ const PostCard: React.FC<PostCardProps> = ({
     setShowConfirmModal(false);
   };
 
-  const toggleLike = () => {
+  const toggleLike = async () => {
     const newLikedState = !liked;
     setLiked(newLikedState);
-    setLikeCount((prev) => prev + (newLikedState ? 1 : -1));
+  
+    if (newLikedState) {
+      await reactToPost({ socialFeedId: postId, userId, userType });
+    } else {
+      await removeReaction(postId, userId, userType);
+    }
+  
+    // Re-fetch like count after reacting
+    const allReactions = await getReactionsForPost(postId);
+    const totalLikes = allReactions.filter(r => r.reacted).length;
+    setLikeCount(totalLikes);
+  
     onLike?.(postId, newLikedState);
   };
-
+  
+  useEffect(() => {
+    const fetchReactionsAndUserReaction = async () => {
+      // Get total likes
+      const allReactions = await getReactionsForPost(postId);
+      const totalLikes = allReactions.filter(r => r.reacted).length;
+      setLikeCount(totalLikes);
+  
+      // Check if current user liked the post
+      const userReaction = await getUserReaction(postId, userId, userType);
+      if (userReaction) {
+        setLiked(userReaction.reacted);
+      }
+    };
+  
+    fetchReactionsAndUserReaction();
+  }, [postId, userId, userType]);
+  
+  
   return (
     <div className="bg-white p-4 rounded-xl shadow mb-4 m-4 relative">
-      {/* 3 Dots */}
-      <div className="absolute top-4 right-4">
+      {/* 3 Dots (Edit/Delete) - only show if not public view*/}
+      {!isPublicView && (
+          <div className="absolute top-4 right-4">
         <button onClick={() => setShowMenu(!showMenu)}>
           <MoreHorizontal className="w-5 h-5"/>
         </button>
@@ -86,6 +125,8 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         )}
       </div>
+      )}
+      
 
        {/* Custom Confirmation Modal */}
        <ConfirmationModal
@@ -137,13 +178,12 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
 
 
-
       {/* Like */}
       <div className="flex items-center justify-around text-sm text-gray-600 border-t mt-4 pt-2">
         <button onClick={toggleLike}
-        className="flex items-center gap-1 text-sm text-gray-600 hover:text-red-500"
+        className="flex items-center gap-1 text-sm text-shark-600 hover:text-red-500"
         >
-          <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-gray-400"}`}/>
+          <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-shark-400"}`}/>
           <span>Like</span>
         </button>
 
@@ -154,7 +194,9 @@ const PostCard: React.FC<PostCardProps> = ({
         </button>
 
         {/* Share */}
-        <button className="flex items-center gap-1 hover:text-verdant-500">
+        <button className="flex items-center gap-1 hover:text-verdant-500"
+         onClick={() => setShowShareModal(true)}
+        >
           < SquareArrowOutUpRight className="w-5 h-5"/>
           <span>Share</span>
         </button>
@@ -166,14 +208,19 @@ const PostCard: React.FC<PostCardProps> = ({
           <input 
               type="text"
               placeholder="Write a comment..."
-              className="flex-1 border rounded-full px-4 py-1 h-10 text-sm bg-gray-100 focus:outline-none"
+              className="flex-1 border rounded-full px-4 py-1 h-10 text-sm bg-shark-50 focus:outline-none"
           />
           <SendHorizonal />
         </div>
       </div>
 
+      <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          shareUrl={`http://localhost:3000/Organization/feed/${postId}`}
 
-    </div>
+      />
+   </div>
   );
 };
 
