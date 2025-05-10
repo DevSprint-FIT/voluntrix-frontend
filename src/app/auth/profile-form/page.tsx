@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import authService from "@/services/authService";
 import VolunteerProfileForm from "@/components/forms/volunteer/VolunteerProfileForm";
@@ -58,11 +58,13 @@ interface SponsorFormData {
 
 // type FormData = VolunteerFormData | OrganizationFormData | SponsorFormData;
 
-const ProfileFormPage = () => {
+const ProfileFormContent = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [profileType, setProfileType] = useState<string>("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Check if user is authenticated and has role
   useEffect(() => {
@@ -79,20 +81,32 @@ const ProfileFormPage = () => {
           return;
         }
 
-        // Check if user has role, if not redirect to role selection
-        if (!user.role || user.role === "null") {
-          router.replace('/auth/role-selection');
-          return;
-        }
-
         // Check if profile is already completed
         if (user.profileCompleted) {
           router.replace('/dashboard');
           return;
         }
+
+        // Get profile type from URL params or user role
+        const typeParam = searchParams.get('type');
+        const userRole = user.role?.toLowerCase();
+        
+        const validTypes = ['volunteer', 'organization', 'sponsor'];
+        let finalType = '';
+
+        if (typeParam && validTypes.includes(typeParam)) {
+          finalType = typeParam;
+        } else if (userRole && validTypes.includes(userRole) && userRole !== 'null') {
+          finalType = userRole;
+        } else {
+          // Fallback: redirect to role selection if no valid type
+          router.replace('/auth/role-selection');
+          return;
+        }
         
         // User has role but profile not completed - perfect for this page
         setUser(user);
+        setProfileType(finalType);
       } catch (error) {
         console.error('Auth check error:', error);
         router.replace('/auth/signup');
@@ -103,7 +117,7 @@ const ProfileFormPage = () => {
     };
 
     checkAuthStatus();
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleSubmit = async (formData: VolunteerFormData | OrganizationFormData | SponsorFormData) => {
     setIsLoading(true);
@@ -150,26 +164,26 @@ const ProfileFormPage = () => {
         >
           <Image src="/images/logo.svg" alt="Voluntrix Logo" width={120} height={40} className="h-10 mb-4" priority />
           <h1 className="text-4xl font-bold text-shark-950 mb-2 font-secondary">
-            Complete Your <span className="text-verdant-600 capitalize">{user.role.toLowerCase()}</span> Profile
+            Complete Your <span className="text-verdant-600 capitalize">{profileType || user.role.toLowerCase()}</span> Profile
           </h1>
           <p className="text-[1.15rem] text-shark-600 font-primary tracking-[0.025rem]">
             Set up your profile to get started.
           </p>
         </motion.div>
 
-        {user.role.toLowerCase() === 'volunteer' ? (
+        {(profileType || user.role.toLowerCase()) === 'volunteer' ? (
           <VolunteerProfileForm 
             user={user} 
             onSubmit={handleSubmit} 
             isLoading={isLoading} 
           />
-        ) : user.role.toLowerCase() === 'organization' ? (
+        ) : (profileType || user.role.toLowerCase()) === 'organization' ? (
           <OrganizationProfileForm 
             user={user} 
             onSubmit={handleSubmit} 
             isLoading={isLoading} 
           />
-        ) : user.role.toLowerCase() === 'sponsor' ? (
+        ) : (profileType || user.role.toLowerCase()) === 'sponsor' ? (
           <SponsorProfileForm 
             user={user} 
             onSubmit={handleSubmit} 
@@ -178,12 +192,30 @@ const ProfileFormPage = () => {
         ) : (
           <div className="text-center py-12">
             <p className="text-shark-600 font-primary">
-              Profile form for {user.role} coming soon...
+              Profile form for {profileType || user.role} coming soon...
             </p>
           </div>
         )}
       </div>
     </div>
+  );
+};
+
+const ProfileFormPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-shark-600 font-primary">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ProfileFormContent />
+    </Suspense>
   );
 };
 

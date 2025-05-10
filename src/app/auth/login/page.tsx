@@ -32,8 +32,10 @@ export default function LoginPage() {
           const user = await authService.getCurrentUser();
           if (user) {
             // Redirect based on profile completion status
-            if (!user.profileCompleted) {
+            if (user.role == null) {
               router.replace('/auth/role-selection');
+            } else if (!user.profileCompleted) {
+              router.replace(`/auth/profile-form?type=${user.role.toLowerCase()}`);
             } else {
               router.replace('/dashboard');
             }

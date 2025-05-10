@@ -127,7 +127,15 @@ const RoleSelectionPage = () => {
         console.log("Role updated successfully:", result.data.role);
         console.log("New token set with role-based authentication");
         
-        router.push('/dashboard');
+        // Redirect to appropriate profile form based on role
+        const roleRoutes = {
+          VOLUNTEER: '/auth/profile-form?type=volunteer',
+          ORGANIZATION: '/auth/profile-form?type=organization', 
+          SPONSOR: '/auth/profile-form?type=sponsor'
+        };
+        
+        const redirectPath = roleRoutes[selectedRole] || '/dashboard';
+        router.push(redirectPath);
       } else {
         throw new Error("No token received from role update");
       }
