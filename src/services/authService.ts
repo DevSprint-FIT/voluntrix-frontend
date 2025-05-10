@@ -4,8 +4,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -37,8 +37,8 @@ interface SignupResponseDto {
     authProvider: string;
     nextStep: string;
     redirectUrl: string;
-    emailVerified: boolean;
-    profileCompleted: boolean;
+    isEmailVerified: boolean;
+    isProfileCompleted: boolean;
   };
 }
 
@@ -55,8 +55,8 @@ interface UserProfileResponse {
     fullName: string;
     handle: string;
     role: string;
-    emailVerified: boolean;
-    profileCompleted: boolean;
+    isEmailVerified: boolean;
+    isProfileCompleted: boolean;
     authProvider: string;
     createdAt: string;
     lastLogin: string;
@@ -162,8 +162,8 @@ class AuthService {
           fullName: result.data.fullName,
           handle: result.data.handle,
           role: result.data.role,
-          emailVerified: result.data.emailVerified,
-          profileCompleted: result.data.profileCompleted,
+          isEmailVerified: result.data.isEmailVerified,
+          isProfileCompleted: result.data.isProfileCompleted,
           authProvider: result.data.authProvider,
           createdAt: result.data.createdAt,
           lastLogin: result.data.lastLogin,
@@ -220,8 +220,8 @@ class AuthService {
           fullName: result.data.fullName,
           handle: result.data.handle,
           role: result.data.role,
-          emailVerified: result.data.emailVerified,
-          profileCompleted: result.data.profileCompleted,
+          isEmailVerified: result.data.isEmailVerified,
+          isProfileCompleted: result.data.isProfileCompleted,
           authProvider: result.data.authProvider,
           createdAt: result.data.createdAt,
           lastLogin: result.data.lastLogin,
@@ -234,9 +234,9 @@ class AuthService {
         
         if (!user.role || user.role === "null") {
           nextStep = "role-selection";
-        } else if (user.role && !user.profileCompleted) {
+        } else if (user.role && !user.isProfileCompleted) {
           nextStep = "profile-form";
-        } else if (user.profileCompleted) {
+        } else if (user.isProfileCompleted) {
           nextStep = "dashboard";
         }
         
@@ -300,8 +300,8 @@ class AuthService {
         fullName: result.data.fullName,
         handle: result.data.handle,
         role: result.data.role,
-        emailVerified: result.data.emailVerified,
-        profileCompleted: result.data.profileCompleted,
+        isEmailVerified: result.data.isEmailVerified,
+        isProfileCompleted: result.data.isProfileCompleted,
         authProvider: result.data.authProvider,
         createdAt: result.data.createdAt,
         lastLogin: result.data.lastLogin,
@@ -311,6 +311,24 @@ class AuthService {
       console.error("Error fetching current user:", error);
       this.clearToken();
       return null;
+    }
+  }
+
+  async updateProfileStatus(isProfileCompleted: boolean): Promise<void> {
+    try {
+      if (this.user) {
+        // Update local user state
+        this.user.isProfileCompleted = isProfileCompleted;
+        
+        // Optionally, you can also call backend to update the status
+        // await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/profile-status`, {
+        //   method: "PUT",
+        //   headers: this.getAuthHeaders(),
+        //   body: JSON.stringify({ isProfileCompleted }),
+        // });
+      }
+    } catch (error) {
+      console.error("Error updating profile status:", error);
     }
   }
 
