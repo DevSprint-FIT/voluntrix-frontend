@@ -4,6 +4,9 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import authService from "@/services/authService";
+import { createOrganization } from "@/services/organizationService";
+import { createVolunteer } from "@/services/volunteerService";
+import { createSponsor } from "@/services/sponsorService";
 import VolunteerProfileForm from "@/components/forms/volunteer/VolunteerProfileForm";
 import OrganizationProfileForm from "@/components/forms/organization/OrganizationProfileForm";
 import SponsorProfileForm from "@/components/forms/sponsor/SponsorProfileForm";
@@ -15,8 +18,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -43,6 +46,8 @@ interface OrganizationFormData {
   facebookLink: string;
   linkedinLink: string;
   instagramLink: string;
+  verificationDocument: File | null;
+  agreeToTerms: boolean;
 }
 
 interface SponsorFormData {
@@ -77,13 +82,16 @@ const ProfileFormContent = () => {
         
         const user = await authService.getCurrentUser();
         if (!user) {
-          router.replace('/auth/signup');
+          router.replace('/auth/login');
           return;
         }
 
         // Check if profile is already completed
-        if (user.profileCompleted) {
-          router.replace('/dashboard');
+        if (user.isProfileCompleted) {
+          router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);
+          return;
+        } else if (user.role == null) {
+          router.replace("/auth/role-selection");
           return;
         }
 
@@ -133,11 +141,51 @@ const ProfileFormContent = () => {
     try {
       console.log("Profile data:", formData);
       
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      router.push('/dashboard');
+      // Handle different form types
+      if (profileType === 'organization') {
+        const orgData = formData as OrganizationFormData;
+        const response = await createOrganization(orgData);
+        
+        console.log("Organization created successfully:", response);
+        
+        // Navigate to organization dashboard
+        router.push('/Organization/dashboard');
+        return;
+      }
+
+      // Handle volunteer profile submission
+      if (profileType === 'volunteer') {
+        const volData = formData as VolunteerFormData;
+        const response = await createVolunteer(volData);
+
+        console.log("Volunteer created successfully:", response);
+
+        // Navigate to volunteer dashboard
+        router.push('/Volunteer/dashboard');
+        return;
+      }
+
+      // Handle sponsor profile submission
+      if (profileType === 'sponsor') {
+        const sponsorData = formData as SponsorFormData;
+        const response = await createSponsor(sponsorData);
+
+        console.log("Sponsor created successfully:", response);
+
+        // Navigate to sponsor dashboard
+        router.push('/Sponsor/dashboard');
+        return;
+      }
+
     } catch (error) {
       console.error("Profile submission failed:", error);
+      
+      // Show error message to user
+      if (error instanceof Error) {
+        alert(`Profile submission failed: ${error.message}`);
+      } else {
+        alert('Profile submission failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

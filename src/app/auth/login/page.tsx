@@ -34,10 +34,10 @@ export default function LoginPage() {
             // Redirect based on profile completion status
             if (user.role == null) {
               router.replace('/auth/role-selection');
-            } else if (!user.profileCompleted) {
+            } else if (!user.isProfileCompleted) {
               router.replace(`/auth/profile-form?type=${user.role.toLowerCase()}`);
             } else {
-              router.replace('/dashboard');
+              router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);
             }
             return;
           }

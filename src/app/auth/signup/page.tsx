@@ -36,16 +36,21 @@ export default function SignupPage() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
+        if (!authService.isAuthenticated()) {
+          router.replace('/auth/signup');
+          return;
+        }
+
         if (authService.isAuthenticated()) {
           const user = await authService.getCurrentUser();
           if (user) {
             // Redirect based on profile completion status
             if (user.role == null) {
               router.replace('/auth/role-selection');
-            } else if (!user.profileCompleted) {
+            } else if (!user.isProfileCompleted) {
               router.replace(`/auth/profile-form?type=${user.role.toLowerCase()}`);
             } else {
-              router.replace('/dashboard');
+              router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);
             }
             return;
           }
@@ -222,8 +227,8 @@ export default function SignupPage() {
               inputWrapper: "py-3",
             }}
           />
-          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] -mt-4">
-            For organizations: Use your organization&apos;s official name (e.g., &apos;Red Cross Society&apos;)
+          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] ml-4" style={{ marginTop: '5px' }}>
+            <span className="text-verdant-600">For organizations:</span> Use your organization&apos;s official name
           </p>
 
           <Input
@@ -240,8 +245,8 @@ export default function SignupPage() {
               inputWrapper: "py-3",
             }}
           />
-          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] -mt-4">
-            For organizations: Use a recognizable handle (e.g., &apos;@redcross&apos; or &apos;@greenpeace&apos;)
+          <p className="text-xs text-shark-500 font-primary tracking-[0.025rem] ml-4" style={{ marginTop: '5px' }}>
+            <span className="text-verdant-600">For organizations:</span> Use a recognizable handle
           </p>
 
             <Input

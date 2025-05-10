@@ -15,8 +15,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -35,15 +35,20 @@ const RoleSelectionPage = () => {
     const checkAuthStatus = async () => {
       try {
         if (!authService.isAuthenticated()) {
-          router.replace('/auth/signup');
+          router.replace('/auth/login');
           return;
         }
         
         const user = await authService.getCurrentUser();
-        if (user && user.profileCompleted) {
-          // User already completed profile, redirect to dashboard
-          router.replace('/dashboard');
-          return;
+        if (user) {
+          // Redirect based on profile completion status
+          if (user.role == null) {
+            router.replace('/auth/role-selection');
+          } else if (!user.isProfileCompleted) {
+            router.replace(`/auth/profile-form?type=${user.role.toLowerCase()}`);
+          } else {
+            router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);
+          }
         }
         
         // Set user data for welcome message

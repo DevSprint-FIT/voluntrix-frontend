@@ -11,8 +11,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;

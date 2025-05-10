@@ -12,8 +12,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -360,7 +360,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                       }}
                     >
                       {sriLankanUniversities.map((institute) => (
-                        <SelectItem key={institute.key} value={institute.key}>
+                        <SelectItem key={institute.key}>
                           {institute.label}
                         </SelectItem>
                       ))}
@@ -431,7 +431,7 @@ const VolunteerProfileForm: React.FC<VolunteerProfileFormProps> = ({ user, onSub
                 </h3>
                 <Input
                   label="Phone Number"
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your phone number: +94717283921"
                   value={formData.phoneNumber}
                   onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
                   isInvalid={!!errors.phoneNumber}
