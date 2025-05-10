@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import uploadImage from "@/utils/uploadImage";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Underline } from "lucide-react";
+import {Textarea} from "@heroui/react";
 
 interface PostModalProps {
   onClose: () => void;
@@ -8,7 +9,7 @@ interface PostModalProps {
     content: string,
     mediaUrl?: string,
     mediaSizeInBytes?: number,
-    mediaType?: "TEXT" | "IMAGE" | "VIDEO",
+    mediaType?: "NONE" | "IMAGE" | "VIDEO",
     postId?: number 
   ) => void;
   organizationName: string;
@@ -48,19 +49,24 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const handleSubmit = async () => {
     setIsUploading(true);
-    let uploadedUrl = previewImage;
-    let fileSize = imageFile?.size || 0;
-    let mediaType: "TEXT" | "IMAGE" | "VIDEO" = "TEXT";
-
     try {
+      let uploadedUrl: string | undefined = undefined;
+      let fileSize: number | undefined = undefined;
+      let mediaType: "NONE" | "IMAGE" | "VIDEO" | undefined = undefined;
+  
       if (imageFile) {
         const uploadedResult = await uploadImage(imageFile);
         uploadedUrl = uploadedResult.url;
+        fileSize = imageFile.size;
         mediaType = imageFile.type.startsWith("video") ? "VIDEO" : "IMAGE";
-      } else if (previewImage) {
-        mediaType = "IMAGE";
+      } else if (previewImage && previewImage !== "") {
+        mediaType = "IMAGE"; // this assumes previewImage is an image from an edit
+        uploadedUrl = previewImage;
+      } else {
+        mediaType = "NONE";
+        uploadedUrl = undefined;
       }
-
+  
       await onSubmit(content, uploadedUrl, fileSize, mediaType, postId); 
       onClose();
     } catch (error) {
@@ -70,33 +76,35 @@ const PostModal: React.FC<PostModalProps> = ({
       setIsUploading(false);
     }
   };
+  
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-shark-950 bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg w-[90%] max-w-lg shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-shark-500 hover:text-shark-700"
         >
           ✕
         </button>
 
-        <h2 className="text-lg font-semibold mb-4">
+        <h2 className="text-lg font-secondary font-semibold mb-4">
           {postId ? "Edit Post" : "Create Post"}
         </h2>
 
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="What do you want to talk about?"
-          className="w-full p-2 border rounded mb-4"
+        <Textarea
+           value={content}
+           onChange={(e) => setContent(e.target.value)}
+           placeholder="What do you want to talk about?"
+           minRows={7}
+           className="w-full h-24 mb-3"
         />
+
 
         <div className="flex items-center gap-3 mb-4">
           <label className="cursor-pointer text-verdant-600 flex items-center gap-2">
             <ImageIcon size={18} />
-        
-            <input 
+             <input 
                type="file"
                accept="image/*, video/*"
                className="hidden" 
