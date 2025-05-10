@@ -61,10 +61,10 @@ export async function createPost(
       },
       body: JSON.stringify({
         content,
-        mediaUrl: mediaUrl || null,
-        mediaType,
         organizationId,
-        mediaSizeInBytes
+        mediaUrl: mediaUrl || null,
+        mediaType: mediaType || "NONE",
+        mediaSizeInBytes: mediaSizeInBytes || null,
       }),
     });
 
@@ -83,7 +83,7 @@ export async function createPost(
       ...result,
       timeAgo: getTimeAgoFromDate(createdAtDate),
       createdAt: createdAtDate.toISOString(),
-      updatedAt: updatedAtDate.toISOString()
+      updatedAt: updatedAtDate.toISOString(),
     };
   } catch (error) {
     console.error("Error creating post:", error);
@@ -91,11 +91,15 @@ export async function createPost(
   }
 }
 
+
 //Delete a post by ID
 export async function deletePost(postId: number): Promise<boolean> {
   try{
     const response = await fetch(`http://localhost:8080/api/public/social-feed/${postId}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if(!response.ok){
