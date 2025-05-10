@@ -1,4 +1,4 @@
-export type MediaType = "TEXT" | "IMAGE" | "VIDEO";
+export type MediaType = "IMAGE" | "VIDEO" | "NONE";
 
 export interface Post {
   id: number;
@@ -13,6 +13,7 @@ export interface Post {
   organizationImageUrl: string;
   impressions?: number;
   shares?: number;
+  institute?: string;
 }
 
 export interface Organization {
