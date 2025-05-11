@@ -56,7 +56,7 @@ const SettingsPage = () => {
       <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">Settings</h1>
 
       {/* Email Section */}
-      <div className="bg-shark-50 shadow rounded-2xl p-6 mb-6 pr-20 pl-10">
+      <div className="bg-[#FBFBFB] shadow-sm  rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="font-secondary font-semibold text-xl">Your email address</h2>
@@ -126,7 +126,7 @@ const SettingsPage = () => {
       </div>
 
       {/* Phone Verification Section */}
-      <div className="bg-shark-50 shadow rounded-2xl p-6 mb-6 pr-20 pl-10">
+      <div className="bg-[#FBFBFB] shadow rounded-2xl p-6 mb-6 pr-20 pl-10">
         <h2 className="font-secondary font-semibold text-xl mb-2">Phone Verification</h2>
         <div className="mb-4 text-shark-700">
           {organization?.isVerified ? (
@@ -149,7 +149,7 @@ const SettingsPage = () => {
       </div>
 
       {/* Danger Zone Section */}
-      <div className="bg-shark-50 shadow rounded-2xl p-6 pl-10">
+      <div className="bg-[#FBFBFB] shadow rounded-2xl p-6 pl-10">
         <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">Danger Zone</h2>
         <div className="mb-4 text-gray-500">Permanently delete your account and all data.</div>
         <Button
