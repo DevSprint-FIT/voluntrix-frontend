@@ -1,33 +1,43 @@
-// src/components/BankInformation.tsx
 "use client";
 
 import React from "react";
 
 interface BankInformationProps {
-  data: {
+  data?: {
     bankName?: string;
     accountNumber?: string;
   };
 }
 
 const BankInformation: React.FC<BankInformationProps> = ({ data }) => {
-    return (
-      <div className="bg-shark-50 p-6 rounded-lg shadow flex-1 mb-6">
-        <h2 className="text-xl font-semibold mb-2">Bank Information</h2>
-        <div className="space-y-4">
+  return (
+    <div className="bg-[#FBFBFB] p-6 rounded-lg shadow-sm flex-1 mb-6">
+      <h2 className="text-xl font-semibold mb-2">Bank Information</h2>
+      <div className="space-y-4">
+        {/* Bank Name */}
+        <div>
+          <p className="text-shark-500">Bank Name</p>
           <div>
-            <p>Bank Name</p>
-            <p>{data?.bankName || "Not Provided"}</p>
+            {data?.bankName !== undefined && data?.bankName !== null
+              ? (data.bankName || "-")
+              : <div className="w-48 h-4 bg-shark-100 rounded"></div>}
           </div>
-          
+        </div>
+
+        {/* Account Number */}
+        <div>
+          <p className="text-shark-500">Account Number</p>
           <div>
-            <p>Account Number</p>
-            <p> {data?.accountNumber ? `****${data.accountNumber.slice(-4)}` : "Not Provided"}</p>
+            {data?.accountNumber !== undefined && data?.accountNumber !== null
+              ? (data.accountNumber
+                  ? `****${data.accountNumber.slice(-4)}`
+                  : "-")
+              : <div className="w-32 h-4 bg-shark-100 rounded"></div>}
           </div>
-         
         </div>
       </div>
-    );
-  };
-  
-  export default BankInformation;
+    </div>
+  );
+};
+
+export default BankInformation;
