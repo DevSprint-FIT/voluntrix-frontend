@@ -38,8 +38,8 @@ const SponsorshipModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl relative">
-        {/* Close button */}
+      <div className="bg-white rounded-3xl w-full max-w-4xl relative p-12">
+        
         <button 
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
@@ -51,58 +51,66 @@ const SponsorshipModal: React.FC<{
           </svg>
         </button>
 
-        {/* Modal content */}
+       
         <div className="p-8">
-          <h2 className="text-3xl font-bold text-center mb-2">Become a Proud Sponsor of Voluntrix Events</h2>
-          <p className="text-gray-600 text-center mb-8">
-            Support community-driven events and gain brand exposure through our flexible sponsorship packages.
+          <h2 className="text-[1.85rem] font-bold text-center mb-2 font-primary">Become a Proud Sponsor of Voluntrix Events</h2>
+          <p className="text-shark-600 text-center mb-8 font-secondary text-sm">
+            Support community-driven events and gain brand exposure through<br /> our flexible sponsorship packages.
           </p>
 
-          <div className="flex flex-col md:flex-row">
-            {/* Packages */}
-            <div className="md:w-1/2 pr-4">
+          <div className="flex flex-col md:flex-row gap-6">
+            
+            <div className="md:w-1/2 space-y-6">
               {packages.map((pkg) => (
                 <div 
-                  key={pkg.id} 
-                  className="mb-4 flex items-center"
+                  key={pkg.id}
+                  className={`p-4 rounded-xl   transition-all duration-300 cursor-pointer bg-[#fbfbfb] ${
+                    selectedPackage === pkg.id ? '' : 'border-gray-200'
+                  } ${!pkg.available ? 'opacity-60' : 'hover:shadow-xl'}`}
+                  onClick={() => pkg.available && setSelectedPackage(pkg.id)}
                 >
-                  <div 
-                    className={`w-8 h-8 rounded-md border flex items-center justify-center mr-4 cursor-pointer ${
-                      pkg.available ? 'border-[#029972]' : 'border-gray-300'
-                    }`}
-                    onClick={() => pkg.available && setSelectedPackage(pkg.id)}
-                  >
-                    {pkg.available && selectedPackage === pkg.id && (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#029972]">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-xl">{pkg.name}</h3>
-                    <p className="text-gray-700">{pkg.price}</p>
-                  </div>
-                  {!pkg.available && (
-                    <span className="bg-gray-200 text-gray-700 text-sm px-2 py-1 rounded">
-                      Not Available
-                    </span>
-                  )}
+                  <label className="flex items-start space-x-4 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value={pkg.id}
+                      checked={selectedPackage === pkg.id}
+                      onChange={() => pkg.available && setSelectedPackage(pkg.id)}
+                      disabled={!pkg.available}
+                      className="w-5 h-5 mt-1 accent-[#029972]"
+                    />
+                    <div className="flex gap-9">
+                      <div className='flex flex-col'>
+                        
+                    <span className="font-bold text-xl">{pkg.name}</span>
+                      <span className="text-gray-700">{pkg.price}</span>
+
+                        
+                        </div>  
+                      
+                      {!pkg.available && (
+                        <span className=" bg-gray-200 text-gray-700 text-sm px-2 rounded  mt-1 flex h-5 ">
+                          Not Available
+                        </span>
+                      )}
+                    </div>
+                  </label>
                 </div>
               ))}
             </div>
 
-            {/* Benefits */}
-            <div className="md:w-1/2 pl-4">
-              <h3 className="font-semibold text-xl mb-4">Includes :</h3>
+            
+            <div className="md:w-1/2 pl-4  rounded-3xl bg-[#fbfbfb]">
+            <br></br>
+              <h3 className="font-semibold text-xl mb-4 ">Includes :</h3>
               <div>
                 {benefits.map((benefit) => (
-                  <div key={benefit.id} className="mb-4 flex items-center">
-                    <div className="w-8 h-8 flex items-center justify-center mr-2">
+                  <div key={benefit.id} className="mb-4 flex items-center gap-8">
+                    <div className=" flex items-center justify-center mr-2 order-1">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#029972]">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                     </div>
-                    <p>{benefit.description}</p>
+                    <p className='w-80'>{benefit.description}</p>
                   </div>
                 ))}
               </div>
@@ -124,15 +132,3 @@ const SponsorshipModal: React.FC<{
 };
 
 export default SponsorshipModal;
-
-// Usage example:
-// const App = () => {
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   
-//   return (
-//     <div>
-//       <button onClick={() => setIsModalOpen(true)}>Open Sponsorship Modal</button>
-//       <SponsorshipModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-//     </div>
-//   );
-// };

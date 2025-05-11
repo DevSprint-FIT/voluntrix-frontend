@@ -15,12 +15,12 @@ export default function DonationModal({ open, setOpen }: DonationModalProps) {
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md mx-4 sm:mx-0 p-12 relative">
         
         {/* Close Button (Optional) */}
-        <button
-          onClick={() => setOpen(false)}
-          className="absolute top-3 right-5 text-gray-500 hover:text-gray-700"
+        <Button
+          onPress={() => setOpen(false)}
+          className="absolute top-3 right-[-5px] text-gray-500 hover:text-gray-700 bg-transparent text-2xl "
         >
           ✕
-        </button>
+        </Button>
 
         <Image
           className="mx-auto mt-2"
@@ -40,14 +40,14 @@ export default function DonationModal({ open, setOpen }: DonationModalProps) {
 
         <div className="mt-6 flex flex-col gap-2">
           <Button 
-            onClick={() => setOpen(false)}
+            onPress={() => setOpen(false)}
             className="w-full py-6 bg-[#029972] text-white text-sm font-semibold rounded-lg"
           >
             Yes! Let me donate LKR 1,000
           </Button>
           <Button
           variant='bordered'
-            onClick={() => setOpen(false)}
+            onPress={() => setOpen(false)}
             className="w-full py-6 border-2 border-[#029972] text-[#029972] text-sm font-semibold rounded-lg"
           >
             No thanks. Complete my own Donation
