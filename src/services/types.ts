@@ -50,6 +50,8 @@ export interface PublicFeedOrganizationDetails{
   institute: string;
   description: string;
   isVerified?: boolean;
+  imageUrl?: string;
+  id: number;
 }
 
 export interface PublicFeedVolunteerDetails{

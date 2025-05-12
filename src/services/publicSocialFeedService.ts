@@ -28,7 +28,7 @@ try {
 }
 
 // Volunteer details
-export async function getVolunteerDetails(username: string){
+export async function getVolunteerDetails(username: string): Promise<PublicFeedVolunteerDetails | null>{
   try {
     const res = await fetch(`http://localhost:8080/api/public/volunteers/${username}`);
     if (!res.ok) throw new Error("Failed to fetch volunteer data");
@@ -44,17 +44,52 @@ export async function getVolunteerDetails(username: string){
 }
 
 // Organization details
-export async function getOrganizationDetails(username: string){
+export async function getOrganizationDetails(username: string): Promise<PublicFeedOrganizationDetails | null>{
   try{
     const res = await fetch(`http://localhost:8080/api/public/organizations/by-username/${username}`);
     if (!res.ok) throw new Error("Failed to fetch organization data");
 
     const json = await res.json();
-    const { name, institute, description, isVerified, imageUrl } = json.data;
+    const { name, institute, description, isVerified, imageUrl, id } = json.data;
 
-    return { name, institute, description, isVerified, imageUrl };
+    return { name, institute, description, isVerified, imageUrl, id };
   } catch (error) {
     console.error("Error fetching organization data:", error);
     return null;
+  }
+}
+
+// All organizations for feed right sidebar
+export async function getAllOrganizations(): Promise<PublicFeedOrganizationDetails[]>{
+  try {
+    const res = await fetch("http://localhost:8080/api/public/organizations");
+    if (!res.ok) throw new Error("Failed to fetch organizations");
+
+    const json = await res.json(); 
+
+    return json.data.map((org: any) => ({
+      id: org.id,
+      name: org.name,
+      imageUrl: org.imageUrl,
+      isVerified: org.isVerified,
+      institute: org.institute,
+    }));
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    return[];
+  }
+}
+
+// Fetch followed organization IDs for a volunteer
+export async function getFollowedOrganizationIds(volunteerId: number): Promise<number[]>{
+  try {
+    const res = await fetch(`http://localhost:8080/api/public/follow/${volunteerId}`);
+    if (!res.ok) throw new Error("Failed to fetch followed organization IDs");
+
+    const ids: number[] = await res.json(); // List of org IDs
+    return ids;
+  } catch (error) {
+    console.error("Error fetching followed organizations:", error);
+    return[];
   }
 }
