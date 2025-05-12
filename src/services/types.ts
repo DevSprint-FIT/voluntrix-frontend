@@ -45,3 +45,17 @@ export interface CreateReaction {
 }
 
 
+export interface PublicFeedOrganizationDetails{
+   name: string;
+  institute: string;
+  description: string;
+  isVerified?: boolean;
+}
+
+export interface PublicFeedVolunteerDetails{
+  firstName: string;
+  lastName: string;
+  institute: string;
+  about: string;
+}
+
