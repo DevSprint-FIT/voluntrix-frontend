@@ -1,7 +1,8 @@
 "use client";
 
 import { X, AlertTriangle } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@heroui/button";
 
 interface AccountDeletionModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ const AccountDeletionModal = ({
   onClose,
   onConfirm,
 }: AccountDeletionModalProps) => {
+
+  const [confirmChecked, setConfirmChecked] = useState(false);
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -47,7 +50,7 @@ const AccountDeletionModal = ({
         </div>
 
         {/* Description */}
-        <p className="text-red-600 font-medium mb-2">
+        <p className="text-red-600 font-secondary font-medium mb-2">
           This action cannot be undone!
         </p>
 
@@ -61,15 +64,13 @@ const AccountDeletionModal = ({
         </p>
 
         {/* Checkbox */}
-        <div className="flex items-start mb-6 bg-shark-50 p-3 rounded">
+        <div className="flex items-start mb-6 bg-[#FBFBFB] p-3 rounded">
           <input
             type="checkbox"
             id="confirmDelete"
             className="mt-1 mr-2"
-            onChange={(e) => {
-              const btn = document.getElementById("delete-btn") as HTMLButtonElement;
-              btn.disabled = !e.target.checked;
-            }}
+            checked={confirmChecked}
+            onChange={(e) => setConfirmChecked(e.target.checked)}
           />
           <label htmlFor="confirmDelete" className="text-sm">
             I understand this action is permanent.
@@ -78,20 +79,20 @@ const AccountDeletionModal = ({
 
         {/* Buttons */}
         <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-full border border-shark-900 text-shark-950 hover:bg-shark-50"
+          <Button
+            onPress={onClose}
+            className="px-4 py-2 rounded-full border border-shark-300 text-shark-950 hover:bg-shark-50"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             id="delete-btn"
-            disabled
-            onClick={onConfirm}
-            className="px-4 py-2 rounded-full text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={!confirmChecked}
+            onPress={onConfirm}
+            className="px-4 py-2 rounded-full text-white bg-red-600 hover:bg-red-400 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Delete Account
-          </button>
+          </Button>
         </div>
       </div>
     </div>
