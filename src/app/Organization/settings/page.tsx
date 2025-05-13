@@ -5,6 +5,7 @@ import {
   getOrganizationSettingsByUsername,
   updateOrganizationEmail,
   OrganizationSettings,
+  deleteOrganizationById
 } from "@/services/organizationSettingsService";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -57,7 +58,7 @@ const SettingsPage = () => {
 
       {/* Email Section */}
       <div className="bg-[#FBFBFB] shadow-sm  rounded-2xl p-6 mb-6 pr-20 pl-10">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="font-secondary font-semibold text-xl">Your email address</h2>
 
@@ -104,21 +105,14 @@ const SettingsPage = () => {
             )}
           </div>
 
-          {/* Username and Account Number */}
-          <div className="flex flex-col">
+          {/* Username */}
+          <div className="flex flex-col justify-start">
             <div className="font-secondary text-shark-950 font-medium">Your username</div>
-            <div className="font-secondary text-shark-600">
+            <div className="font-secondary  text-shark-700">
               {organization ? (
-                `@${organization.username.replace(/\s+/g, "")}`
+                `${organization.username} (not editable)`
               ) : (
                 <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
-              )}
-            </div>
-
-            <div className="font-secondary text-shark-950 mt-2 font-medium">Account Number</div>
-            <div className="font-secondary text-shark-600">
-              {organization?.accountNumber || (
-                <div className="h-4 w-28 bg-shark-100 rounded animate-pulse"></div>
               )}
             </div>
           </div>
@@ -126,7 +120,7 @@ const SettingsPage = () => {
       </div>
 
       {/* Phone Verification Section */}
-      <div className="bg-[#FBFBFB] shadow rounded-2xl p-6 mb-6 pr-20 pl-10">
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <h2 className="font-secondary font-semibold text-xl mb-2">Phone Verification</h2>
         <div className="mb-4 text-shark-700">
           {organization?.isVerified ? (
@@ -149,9 +143,9 @@ const SettingsPage = () => {
       </div>
 
       {/* Danger Zone Section */}
-      <div className="bg-[#FBFBFB] shadow rounded-2xl p-6 pl-10">
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
         <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">Danger Zone</h2>
-        <div className="mb-4 text-gray-500">Permanently delete your account and all data.</div>
+        <div className="mb-4 text-shark-700">Permanently delete your account and all data.</div>
         <Button
           onPress={() => setOpen(true)}
           className="rounded-full bg-red-600 text-shark-50 font-primary"
@@ -165,9 +159,16 @@ const SettingsPage = () => {
       <AccountDeletionModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={() => {
-          console.log("Confirmed deletion");
-          setOpen(false);
+        onConfirm={async () => {
+          if(!organization) return;
+
+          try {
+            await deleteOrganizationById(organization.id);
+            setOpen(false);
+            router.push("/");
+          } catch (error) {
+             console.error("Failed to delete account", error);
+          }
         }}
       />
     </div>
