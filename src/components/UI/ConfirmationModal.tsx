@@ -1,4 +1,6 @@
 import React from "react";
+import { Button } from "@heroui/button";
+import { X } from "lucide-react";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -25,13 +27,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           onClick={onCancel}
           className="absolute top-4 right-4 text-shark-400 hover:text-shark-600 text-xl"
         >
-          ×
+          <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
           <svg
-            className="w-5 h-5 text-verdant-500"
+            className="w-5 h-5 text-red-500"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -47,18 +49,18 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         {/* Buttons */}
         <div className="flex justify-end gap-4">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 rounded-full border border-shark-600 text-shark-600 hover:bg-shark-50"
+          <Button
+            onPress={onCancel}
+            className="px-4 py-2 rounded-full border border-shark-300 bg-white text-shark-950 hover:bg-shark-50"
           >
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 rounded-full bg-verdant-500 text-white hover:bg-verdant-300"
+          </Button>
+          <Button
+            onPress={onConfirm}
+            className="px-4 py-2 rounded-full bg-shark-950 text-white hover:bg-shark-400"
           >
             Submit
-          </button>
+          </Button>
         </div>
       </div>
     </div>
