@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import uploadImage from "@/utils/uploadImage";
 import { Image as ImageIcon, Underline } from "lucide-react";
 import {Textarea} from "@heroui/react";
+import { Button } from "@heroui/button";
 
 interface PostModalProps {
   onClose: () => void;
@@ -17,6 +18,7 @@ interface PostModalProps {
   initialContent?: string;
   initialImageUrl?: string;
   postId?: number;
+  isEditing?: boolean;
 }
 
 const PostModal: React.FC<PostModalProps> = ({
@@ -26,7 +28,8 @@ const PostModal: React.FC<PostModalProps> = ({
   organizationImageUrl,
   initialContent = '',
   initialImageUrl = '',
-  postId
+  postId,
+  isEditing
 }) => {
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -60,7 +63,7 @@ const PostModal: React.FC<PostModalProps> = ({
         fileSize = imageFile.size;
         mediaType = imageFile.type.startsWith("video") ? "VIDEO" : "IMAGE";
       } else if (previewImage && previewImage !== "") {
-        mediaType = "IMAGE"; // this assumes previewImage is an image from an edit
+        mediaType = "IMAGE"; 
         uploadedUrl = previewImage;
       } else {
         mediaType = "NONE";
@@ -89,7 +92,7 @@ const PostModal: React.FC<PostModalProps> = ({
         </button>
 
         <h2 className="text-lg font-secondary font-semibold mb-4">
-          {postId ? "Edit Post" : "Create Post"}
+          {isEditing ? "Edit Post" : "Create Post"}
         </h2>
 
         <Textarea
@@ -102,7 +105,7 @@ const PostModal: React.FC<PostModalProps> = ({
 
 
         <div className="flex items-center gap-3 mb-4">
-          <label className="cursor-pointer text-verdant-600 flex items-center gap-2">
+          <label className="cursor-pointer text-shark-600 flex items-center gap-2">
             <ImageIcon size={18} />
              <input 
                type="file"
@@ -117,13 +120,13 @@ const PostModal: React.FC<PostModalProps> = ({
           ) : null}
         </div>
         <div className="flex justify-end">
-          <button
-           onClick={handleSubmit}
+          <Button
+           onPress={handleSubmit}
            disabled={isUploading}
-           className="bg-verdant-500 text-white px-4 py-2 rounded-full hover:bg-verdant-300"
+           className="bg-shark-950 text-white px-4 py-2 rounded-full hover:bg-shark-400"
         >
-          {isUploading ? "Submitting..." : postId ? "Update" : "Post"}
-        </button>
+          {isUploading ? "Submitting..." : isEditing ? "Update" : "Post"}
+        </Button>
         </div>
         
       </div>
