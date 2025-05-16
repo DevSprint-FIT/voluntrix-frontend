@@ -34,7 +34,7 @@ export default function SocialFeed() {
   });
   const [filter, setFilter] = useState('all');
 
-  const organizationId = 1; 
+  const organizationId = 1;
   const userId = 1;
   const userType = "ORGANIZATION";
 

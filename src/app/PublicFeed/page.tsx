@@ -42,9 +42,9 @@ const PublicFeedPage = () => {
       sharesGrowth: "0%",
     });
 
-  const userId = 1;
+  const userId = 1;    //3
   const userType: "ORGANIZATION" = "ORGANIZATION"; 
- const username = "IEEESLIT"; 
+ const username = "IEEESLIT";   //marie
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,4 +1,4 @@
-import { Reaction, CreateReaction } from "./types";
+import { Reaction, CreateReaction, ReactionStatusDTO } from "./types";
 
 const BASE_URL = "http://localhost:8080/api/public/reactions";
 
@@ -45,23 +45,30 @@ export async function getUserReaction(
   socialFeedId: number,
   userId: number,
   userType: string
-): Promise<Reaction | null> {
+): Promise<ReactionStatusDTO | null> {
   try {
     const response = await fetch(`${BASE_URL}/${socialFeedId}/${userId}/${userType}`);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      const errorObj = errorText ? JSON.parse(errorText) : null;
-
-      // If the error is "no reaction", handle gracefully
-      if (errorObj?.error?.includes("No reaction found")) {
-        return null; 
+      if (response.status === 404) {
+        // No reaction found for the user on this post
+        return null;
       }
+
+      
+      const errorText = await response.text();
+      let errorObj = null;
+      try {
+        errorObj = errorText ? JSON.parse(errorText) : null;
+      } catch {
+        
+      }
+
       console.error("Server error response (non-OK):", errorObj || errorText || "No content");
       throw new Error("Failed to fetch user reaction");
     }
 
-    const data = await response.json();
+    const data: ReactionStatusDTO = await response.json();
     return data;
   } catch (error) {
     console.error("Error getting user reaction:", error);

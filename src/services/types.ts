@@ -44,6 +44,10 @@ export interface CreateReaction {
   userType: string;
 }
 
+export interface ReactionStatusDTO {
+  userId: number;
+  reacted: boolean;
+}
 
 export interface PublicFeedOrganizationDetails{
    name: string;
