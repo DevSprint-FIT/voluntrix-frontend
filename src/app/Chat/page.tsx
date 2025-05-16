@@ -20,13 +20,13 @@ const Chat: React.FC = () => {
   const baseUrl = 'http://localhost:8080/api/public/messages';
 
   const sendMessage = async () => {
-    if (!content.trim()) return;
+    if (!content.trim()) return; //trim - removing spaces in the front and the back
 
     try {
       const response = await fetch(baseUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ //stringify - java script objects cannot be send so converting to JSON
           senderId: loggedInUser,
           receiverId,
           content,
@@ -36,7 +36,7 @@ const Chat: React.FC = () => {
       if (!response.ok) throw new Error('Failed to send message');
 
       setStatus('Message sent!');
-      setTimeout(() => setStatus(''), 3000);
+      setTimeout(() => setStatus(''), 3000); 
       setContent('');
       getMessages();
     } catch (error) {
@@ -57,7 +57,7 @@ const Chat: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
 
     let interval: ReturnType<typeof setInterval>;
 
