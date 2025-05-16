@@ -101,7 +101,7 @@ export default function EventCard({ event }: { event: EventType }) {
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-8">
+                <div className="flex gap-7">
                   <div className="flex gap-2 items-start">
                     <Image
                       src="/icons/calendar.svg"
