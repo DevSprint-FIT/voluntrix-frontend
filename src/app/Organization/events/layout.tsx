@@ -17,7 +17,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
   const [counts, setCounts] = useState<EventStatusCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const orgId = 4; // Replace with actual org ID
+  const orgId = 1; // Replace with actual org ID
 
   useEffect(() => {
     const getCounts = async () => {

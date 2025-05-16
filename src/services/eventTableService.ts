@@ -12,15 +12,14 @@ export type Event = {
 export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Promise<Event[]> => {
   try {
     let url = `http://localhost:8080/api/public/organizations/${orgId}/events`;
-
     if (status) {
       url += `?status=${status}`;
     }
-    
+
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.statusText}`);
+      throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -30,6 +29,7 @@ export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Pro
     throw error;
   }
 };
+
 
 
 
