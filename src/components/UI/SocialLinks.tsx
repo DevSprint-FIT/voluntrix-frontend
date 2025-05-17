@@ -12,82 +12,50 @@ interface SocialLinksProps {
 }
 
 const SocialLinks: React.FC<SocialLinksProps> = ({ data }) => {
-  if (!data) {
-    return (
-      <div className="bg-[#FBFBFB] p-6 rounded-lg shadow-sm mt-7 w-full md:w-[34rem]">
-        <div className="mb-4">
-          <h2 className="font-secondary text-xl font-medium">Social Links</h2>
-        </div>
+  const renderLink = (link?: string) => {
+    if (data === undefined) {
+      // Still loading
+      return <div className="w-32 h-4 bg-shark-100 rounded" />;
+    }
 
-        <div className="flex flex-col gap-4 text-shark-900">
-          <div className="flex items-center gap-2">
-            <FaFacebook className="text-[#0866FF]" />
-            <div className="w-32 h-4 bg-shark-100 rounded"></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <FaInstagram className="text-[#E1306C]" />
-            <div className="w-32 h-4 bg-shark-100 rounded"></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <FaLinkedin className="text-[#0A66C2]" />
-            <div className="w-32 h-4 bg-shark-100 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    if (link) {
+      return (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-black hover:underline break-all"
+        >
+          {link}
+        </a>
+      );
+    }
+
+    // Data loaded but link is missing
+    return <span className="text-shark-400">-</span>;
+  };
 
   return (
-    <div className="bg-shark-50 p-6 rounded-lg shadow mt-7 w-full md:w-[545px]">
-      <div className="mb-4">
-        <h2 className="font-secondary text-xl font-medium">Social Links</h2>
-      </div>
+    <div className="bg-[#FBFBFB] p-6 rounded-lg shadow-sm w-full md:w-[545px] mt-7">
+      <h2 className="text-xl font-semibold mb-4">Social Links</h2>
 
       <div className="flex flex-col gap-4 text-shark-900">
+        {/* Facebook */}
         <div className="flex items-center gap-2">
-          <FaFacebook className="text-[#0866FF]" />
-          {data.facebookLink ? (
-            <a
-              href={data.facebookLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:underline break-all"
-            >
-              {data.facebookLink}
-            </a>
-          ) : (
-            <span className="text-shark-400">-</span>
-          )}
+          <FaFacebook className="text-[#0866FF] text-3xl" />
+          <div>{renderLink(data?.facebookLink)}</div>
         </div>
+
+        {/* Instagram */}
         <div className="flex items-center gap-2">
-          <FaInstagram className="text-[#E1306C]" />
-          {data.instagramLink ? (
-            <a
-              href={data.instagramLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:underline break-all"
-            >
-              {data.instagramLink}
-            </a>
-          ) : (
-            <span className="text-shark-400">-</span>
-          )}
+          <FaInstagram className="text-[#E1306C] text-3xl" />
+          <div>{renderLink(data?.instagramLink)}</div>
         </div>
+
+        {/* LinkedIn */}
         <div className="flex items-center gap-2">
-          <FaLinkedin className="text-[#0A66C2]" />
-          {data.linkedinLink ? (
-            <a
-              href={data.linkedinLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:underline break-all"
-            >
-              {data.linkedinLink}
-            </a>
-          ) : (
-            <span className="text-shark-400">-</span>
-          )}
+          <FaLinkedin className="text-[#0A66C2] text-3xl" />
+          <div>{renderLink(data?.linkedinLink)}</div>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const orgId = 4; // Change the id
+  const orgId = 1; // Change the id
 
   useEffect(() => {
     const fetchEvents = async () => {

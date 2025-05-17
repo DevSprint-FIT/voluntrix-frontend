@@ -7,6 +7,8 @@ import AboutSection from "@/components/UI/AboutSection";
 import BankInformation from "@/components/UI/BankInformation";
 import ContactInformation from "@/components/UI/ContactInformation";
 import SocialLinks from "@/components/UI/SocialLinks";
+import { Button } from "@heroui/react";
+import { Pencil } from "lucide-react";
 
 const Page = () => {
   const [organizationData, setOrganizationData] = useState<any>(null);
@@ -25,7 +27,14 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-5 mt-0">
+      {/* Title */}
+      <span className="text-shark-300">Organization / Profile</span>
+      <h1 className="text-2xl font-primary font-bold mb-4">Profile</h1>
+      <Button className="font-primary border rounded-full text-shark-50 bg-shark-950 mb-4">
+        <Pencil className="w-4 h-4" />
+        Edit Your Public Profile</Button>
+
       {/* ProfileHeader Section */}
       {!organizationData ? (
         <div className="w-full h-48 bg-gray-200 rounded-lg mb-6"></div>

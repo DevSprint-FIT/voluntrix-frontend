@@ -19,13 +19,13 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ count, label, subtext
       </div>
 
       <h3 className="font-secondary text-shark-950 font-medium">{label}</h3>
-      <p className="text-2xl font-bold text-verdant-600">
+      <div className="text-2xl font-bold text-verdant-600">
         {loading ? (
         <div className="w-6 h-6 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin mx-auto" />
         ) : (
         count
         )}
-     </p>
+     </div>
 
       <p className="font-secondary text-shark-300">{subtext}</p>
     </div>
