@@ -10,7 +10,7 @@ export default function ActiveEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const orgId = 4; // Replace  with actual org ID 
+  const orgId = 1; // Replace  with  org ID 
 
   useEffect(() => {
     const fetchEvents = async () => {

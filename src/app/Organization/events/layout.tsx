@@ -91,7 +91,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       <div className="py-8">
         {children}
 
-        {/* Pagination */}
+        {/* Pagination 
         <div className="flex justify-center items-center space-x-2 mt-8">
           <button 
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -121,6 +121,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
             {">"}
           </button>
         </div>
+        */}
       </div>
 
     </div>

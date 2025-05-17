@@ -11,7 +11,7 @@ export default function CompletedEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const orgId = 4; // Replace with organizationId
+  const orgId = 1; // Replace with organizationId
 
   useEffect(() => {
     const fetchEvents = async () => {
