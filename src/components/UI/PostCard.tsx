@@ -25,6 +25,7 @@ interface PostCardProps {
   }) => void;
   onDelete?: (postId: number) => void;
   onLike?: (postId: number, liked: boolean) => void;
+  handleShareClick: (postId: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -44,6 +45,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onDelete,
   onEdit,
   onLike,
+  handleShareClick
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -77,6 +79,12 @@ const PostCard: React.FC<PostCardProps> = ({
     setLikeCount(totalLikes);
   
     onLike?.(postId, newLikedState);
+  };
+
+   const onShare = (platform: string) => {
+    handleShareClick(postId);  
+    setShowShareModal(false);
+    
   };
   
   useEffect(() => {
@@ -218,7 +226,7 @@ const PostCard: React.FC<PostCardProps> = ({
           isOpen={showShareModal}
           onClose={() => setShowShareModal(false)}
           shareUrl={`http://localhost:3000/Organization/feed/${postId}`}
-
+           handleShareClick={(platform) => onShare(platform)}
       />
    </div>
   );
