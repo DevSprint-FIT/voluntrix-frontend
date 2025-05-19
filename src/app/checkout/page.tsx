@@ -12,12 +12,12 @@ declare global {
 }
 
 const dummyData : PaymentDetails = {
-  "orderId": "ORD999011",
-  "amount": "50.50",
+  "orderId": "ORD999021",
+  "amount": "100.00",
   "currency": "LKR",
   "firstName": "Samantha",
   "lastName": "Green",
-  "email": "samantha@example.com",
+  "email": "samantha@gmail.com",
   "phone": "1234567890",
   "address": "Another St",
   "city": "City",
