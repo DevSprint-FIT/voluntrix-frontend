@@ -10,6 +10,7 @@ import MetricCard from "@/components/UI/MetricCard";
 import { HeartIcon, Share2Icon, FileTextIcon } from "lucide-react";
 import { calculateMetrics } from "@/services/utils";
 import SuggestedOrganizations from "@/components/UI/SuggestedOrganizations";
+import { updatePost } from "@/services/socialFeedService";
 
 interface ProfileCardProps {
   name: string;
@@ -45,6 +46,35 @@ const PublicFeedPage = () => {
   const userId = 1;    //3
   const userType: "ORGANIZATION" = "ORGANIZATION"; 
  const username = "IEEESLIT";   //marie
+
+ const handleShareClick = async (postId: number) => {
+  try {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    await updatePost(
+      postId,
+      post.content,
+      post.mediaUrl,
+      post.impressions,
+      (post.shares || 0) + 1
+    );
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) =>
+        p.id === postId ? { ...p, shares: (p.shares || 0) + 1 } : p
+      )
+    );
+
+    setMetrics((prevMetrics) => ({
+      ...prevMetrics,
+      totalShares: prevMetrics.totalShares + 1,
+    }));
+  } catch (error) {
+    console.error("Error sharing post:", error);
+  }
+};
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,6 +158,7 @@ const PublicFeedPage = () => {
               onLike={handleLike}
               userId={userId}
               userType={userType}
+              handleShareClick={handleShareClick}
             />
           ))
         )}

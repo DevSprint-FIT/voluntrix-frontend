@@ -67,7 +67,16 @@ export default function SocialFeed() {
     try {
       
       if (editingPost) {
-        const updatedPost = await updatePost(editingPost.postId, content, mediaUrl);
+        const existingPost = posts.find(post => post.id === editingPost.postId);
+        if(!existingPost) return;
+
+        const updatedPost = await updatePost(
+          editingPost.postId,
+          content, 
+          mediaUrl,
+          existingPost.impressions,
+          existingPost.shares
+        );
 
        
         setPosts((prevPosts) =>
@@ -146,6 +155,28 @@ export default function SocialFeed() {
       }
     }
   };
+
+ const handleShareClick = async (postId: number) => {
+  const updatedPost = posts.find((post) => post.id === postId);
+  if (updatedPost) {
+    const updatedPostCopy = { ...updatedPost, shares: (updatedPost.shares || 0) + 1 };
+    setPosts(prevPosts => prevPosts.map(post => post.id === postId ? updatedPostCopy : post));
+    
+    try {
+      await updatePost(
+        postId,
+        updatedPostCopy.content,
+        updatedPostCopy.mediaUrl,
+        updatedPostCopy.impressions,
+        updatedPostCopy.shares
+      );
+    } catch (error) {
+      console.error("Failed to update share count in the database:", error);
+    }
+  }
+};
+
+
 
   return (
     <div>
@@ -226,6 +257,7 @@ export default function SocialFeed() {
                 }
                 onDelete={handleDeletePost}
                 onLike={handleLikeClick}
+                handleShareClick={handleShareClick}
               />
             ))}
           </div>
