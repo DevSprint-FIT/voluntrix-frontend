@@ -122,7 +122,8 @@ export async function updatePost(
   postId: number,
   content: string,
   mediaUrl?: string,
-  impressions?: number
+  impressions?: number,
+  shares?: number
 ): Promise<Post | null> {
   try {
     const body: any = { content };
@@ -133,6 +134,10 @@ export async function updatePost(
 
     if (typeof impressions === "number") {
       body.impressions = impressions;
+    }
+
+    if (typeof shares === "number"){
+      body.shares = shares;
     }
 
     const response = await fetch(`http://localhost:8080/api/public/social-feed/${postId}`, {
