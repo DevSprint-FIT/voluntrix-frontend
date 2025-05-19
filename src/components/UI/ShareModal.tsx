@@ -7,7 +7,7 @@ interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   shareUrl: string;
-  handleShareClick: (platform: string) => void; // New prop to track share clicks
+  handleShareClick: (platform: string) => void; 
 }
 
 const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUrl, handleShareClick }) => {
