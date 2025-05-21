@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllOrganizations, getFollowedOrganizationIds } from "@/services/publicSocialFeedService";
+import { getAllOrganizations, getFollowedOrganizationIds, followOrganization } from "@/services/publicSocialFeedService";
 import { PublicFeedOrganizationDetails } from "@/services/types";
 
 
@@ -22,6 +22,15 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
     if (volunteerId) fetchData(); 
   }, [volunteerId]);
 
+  const handleFollow = async (orgId: number) => {
+    try {
+      await followOrganization(volunteerId, orgId);
+      setUnfollowedOrgs(prev => prev.filter(org => org.id !== orgId));
+    } catch (error) {
+      alert("Failed to follow organization");
+    }
+  }
+
   return (
     <div className="p-4 border-none rounded  w-full bg-[#FBFBFB] mt-10">
       <h2 className="text-xl font-secondary font-semibold mb-6">Suggested Organizations</h2>
@@ -43,8 +52,10 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
                 </div>
                 
               </div>
-              <button className="px-3 py-1 bg-shark-950 text-white text-sm rounded-full hover:bg-shark-500">
-                Follow
+              <button className="px-3 py-1 bg-shark-950 text-white text-sm rounded-full hover:bg-shark-500 whitespace-nowrap"
+              onClick={() => handleFollow(org.id)}
+              >
+                + Follow
               </button>
             </li>
           ))}
