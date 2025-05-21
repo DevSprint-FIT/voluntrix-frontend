@@ -93,3 +93,26 @@ export async function getFollowedOrganizationIds(volunteerId: number): Promise<n
     return[];
   }
 }
+
+// Follow an organization
+export async function followOrganization(volunteerId: number, organizationId: number): Promise<string> {
+  try {
+    const res = await fetch("http://localhost:8080/api/public/follow/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+       body: JSON.stringify({ volunteerId, organizationId }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || "Failed to follow organization");
+    }
+
+    return await res.text();
+  } catch (error) {
+    console.error("Error following organization:", error);
+    throw error;
+  }
+}
