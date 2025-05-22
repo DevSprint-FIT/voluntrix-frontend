@@ -11,6 +11,7 @@ import { HeartIcon, Share2Icon, FileTextIcon } from "lucide-react";
 import { calculateMetrics } from "@/services/utils";
 import SuggestedOrganizations from "@/components/UI/SuggestedOrganizations";
 import { updatePost } from "@/services/socialFeedService";
+import { fetchPosts } from "@/services/socialFeedService";
 
 interface ProfileCardProps {
   name: string;
@@ -105,6 +106,13 @@ const PublicFeedPage = () => {
               profileImageUrl: orgData.imageUrl,
               isVerified: orgData.isVerified,
             });
+
+            // Fetch only the posts by this organization
+            const orgPosts = await fetchPosts(orgData.id);
+
+            const orgMetrics = calculateMetrics(orgPosts);
+            setMetrics(orgMetrics);
+
           }
         }
       } catch (error) {
@@ -128,7 +136,7 @@ const PublicFeedPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6">
+    <div className="mt-10 flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6 ">
       
       {/* Left Sidebar – Dynamic Profile */}
       <aside className="hidden md:block md:w-1/5 -ml-8 mr-10 sticky top-6 self-start">
@@ -137,7 +145,6 @@ const PublicFeedPage = () => {
 
       {/* Main Feed */}
       <main className="w-full md:w-3/5">
-        <h1 className="text-2xl font-secondary font-bold mb-4">Social Feed</h1>
         {posts.length === 0 ? (
           <p>No posts available.</p>
         ) : (
@@ -169,30 +176,30 @@ const PublicFeedPage = () => {
       <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-6 self-start">
         <MetricCard
           title="Total Posts"
-          value={posts.length}
+          value={metrics.totalPosts}
           percentageChange={`${metrics.postGrowth} this month`}
           icon={
-            <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
+            <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
               <FileTextIcon className="w-5 h-5" />
             </div>
           }
         />
         <MetricCard
           title="Impressions"
-          value={posts.reduce((sum, post) => sum + (post.impressions || 0), 0)}
+          value={metrics.totalImpressions}
           percentageChange={`${metrics.impressionsGrowth} this month`}
           icon={
-            <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
+            <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
               <HeartIcon className="w-5 h-5" />
             </div>
           }
         />
         <MetricCard
           title="Shares"
-          value={posts.reduce((sum, post) => sum + (post.shares || 0), 0)}
+          value={metrics.totalShares}
           percentageChange={`${metrics.sharesGrowth} this month`}
           icon={
-            <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
+            <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
               <Share2Icon className="w-5 h-5" />
             </div>
           }

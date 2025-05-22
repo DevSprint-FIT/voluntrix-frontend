@@ -179,17 +179,34 @@ export default function SocialFeed() {
 
 
   return (
+    <div >
+      <div className="flex justify-between items-center px-4">
+  {/* Left Side */}
+  <div className="pl-4">
+    <p className="text-shark-300">Organization / Social Feed</p>
+    <h1 className="font-secondary text-2xl font-bold">Social Feed</h1>
+  </div>
+
+  {/* Right Side */}
+  <div className="flex items-center space-x-2 pr-4">
+    <img
+      src={organization?.imageUrl} 
+      alt="Institute Logo"
+      className="w-10 h-10 rounded-full object-cover"
+    />
     <div>
-      <div className="pl-4">
-        <p className="text-shark-300">Organization / Social Feed</p>
-        <h1 className="font-secondary text-2xl font-bold">Social Feed</h1>
+        <h2 className="font-semibold text-lg font-secondary">{organization?.name}</h2>
+        <p className="font-medium font-secondary text-shark-800">{organization?.institute}</p>
       </div>
+  </div>
+</div>
+
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Left Content */}
         <div className="md:col-span-3 space-y-4 mt-1">
           {/* Start a Post */}
-          <div className="bg-[#F8F8F8] p-6 rounded-xl mb-4">
+          <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
               {organization?.imageUrl ? (
                 <img
@@ -198,7 +215,7 @@ export default function SocialFeed() {
                   alt="Organization"
                 />
               ) : (
-                <div className="w-10 h-10 bg-gray-300 rounded-full" />
+                <div className="w-10 h-10 bg-shark-300 rounded-full" />
               )}
               <button
                 onClick={() => setShowModal(true)}
@@ -210,27 +227,30 @@ export default function SocialFeed() {
           </div>
 
           {/* Activity Feed */}
-          <div className="bg-[#F8F8F8] p-4 rounded-xl">
-            <h2 className="text-lg font-semibold mb-4">All activity</h2>
+          <div className="bg-[#FBFBFB] p-4 rounded-xl">
+            <h2 className="text-xl font-secondary font-bold mb-4">All activity</h2>
             <div className="flex gap-3 p-2">
               <button
-                  onClick={() => setFilter('all')}
-                  className={`w-20 px-4 py-1 rounded-full ${filter === 'all' ? 'bg-shark-400' : 'bg-shark-950'} text-white hover:bg-shark-400`}
+                   onClick={() => setFilter('all')}
+                   className={`w-20 px-4 py-1 rounded-full 
+                   ${filter === 'all' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
-                Posts
-              </button>
+             Posts
+            </button>
               <button
-                  onClick={() => setFilter('images')}
-                  className={`w-20 px-4 py-1 rounded-full ${filter === 'images' ? 'bg-shark-400' : 'bg-shark-950'} text-white hover:bg-shark-400`}
+                   onClick={() => setFilter('images')}
+                   className={`w-20 px-4 py-1 rounded-full 
+                   ${filter === 'images' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
-                Images
-              </button>
+              Images
+             </button>
               <button 
-                  onClick={() => setFilter('videos')}
-                  className={`w-20 px-4 py-1 rounded-full ${filter === 'videos' ? 'bg-shark-400' : 'bg-shark-950'} text-white hover:bg-shark-400`}
+                   onClick={() => setFilter('videos')}
+                   className={`w-20 px-4 py-1 rounded-full 
+                   ${filter === 'videos' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
-                    Videos
-              </button>
+             Videos
+            </button>
             </div>
             {filteredPosts.map((post) => (
               <PostCard
@@ -270,7 +290,7 @@ export default function SocialFeed() {
             value={posts.length}
             percentageChange={`${metrics.postGrowth} this month`}
             icon={
-              <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
                 <FileTextIcon className="w-5 h-5" />
               </div>
             }
@@ -280,7 +300,7 @@ export default function SocialFeed() {
             value={posts.reduce((sum, post) => sum + (post.impressions || 0), 0)}
             percentageChange={`${metrics.impressionsGrowth} this month`}
             icon={
-              <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
                 <HeartIcon className="w-5 h-5" />
               </div>
             }
@@ -290,34 +310,34 @@ export default function SocialFeed() {
             value={posts.reduce((sum, post) => sum + (post.shares || 0), 0)}
             percentageChange={`${metrics.sharesGrowth} this month`}
             icon={
-              <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
                 <Share2Icon className="w-5 h-5" />
               </div>
             }
           />
 
           {/* Storage Card */}
-          <div className="bg-[#F8F8F8] p-5 rounded-xl">
+          <div className="bg-[#FBFBFB] p-5 rounded-xl">
             <div className="flex justify-between items-start mb-2">
               <div className="font-secondary text-xs bg-shark-100 rounded-full p-2">FREE PLAN</div>
-              <div className="bg-verdant-100 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 ml-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 ml-4 ">
                 <UploadCloud className="w-6 h-6" />
               </div>
             </div>
 
             <div className="text-center">
                <h3 className="font-bold mb-1 font-secondary text-xl">Your Storage</h3>
-               <p className="text-sm text-gray-500 mb-3">Supervise your drive space<br/> in the easiest way</p>
-               <button className="bg-verdant-100 rounded-full pl-2 pr-2 pt-1 pb-1 text-verdant-700 border border-verdant-700">Upgrade</button>
+               <p className="text-sm text-shark-300 mb-3">Supervise your drive space<br/> in the easiest way</p>
+               <button className="bg-verdant-50 rounded-full pl-2 pr-2 pt-1 pb-1 text-verdant-700 border border-verdant-700 font-secondary">Upgrade</button>
             </div>
             
-            <div className="bg-gray-100 rounded-full h-2 overflow-hidden mb-2 mt-2">
+            <div className="bg-shark-100 rounded-full h-2 overflow-hidden mb-2 mt-2">
               <div
                 className="bg-verdant-500 h-full"
                 style={{ width: `${Math.min(storageUsedPercentage, 100)}%` }}
               ></div>
             </div>
-            <div className="flex justify-between text-sm text-gray-500">
+            <div className="flex justify-between text-sm text-shark-500">
               <span>{totalMediaSizeInGB.toFixed(2)} GB</span>
               <span>{storageLimitInGB} GB</span>
             </div>
