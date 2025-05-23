@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import { EventStatusCounts, getEventStatusCounts } from "@/services/eventStatsService";
+import { getOrganizationById, Organization } from "@/services/organizationService";
 
 const tabs = [
   { name: "Active Events", href: "/Organization/events/active" },
@@ -16,6 +17,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const [counts, setCounts] = useState<EventStatusCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const orgId = 1; // Replace with actual org ID
 
@@ -31,7 +33,17 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       }
     };
 
+    const fetchOrganization = async () => {
+      try {
+        const data = await getOrganizationById(orgId);
+        setOrganization(data);
+      } catch (error) {
+        console.error("Failed to fetch organization:", error);
+      }
+    };
+
     getCounts();
+    fetchOrganization();
   }, [orgId]);
 
   const handlePageClick = (pageNumber: number) => {
@@ -41,9 +53,28 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
   return (
     <div className="p-4">
 
-      {/* Title */}
-      <span className="text-shark-300">Organization / Events</span>
-      <h1 className="text-2xl font-primary font-bold mb-4">Events</h1>
+      {/* Title with Organization Info */}
+      <div className="flex justify-between items-center mb-4 px-4">
+      {/* Left Side: Title */}
+        <div>
+           <p className="text-shark-300">Organization / Events</p>
+           <h1 className="text-2xl font-primary font-bold">Events</h1>
+        </div>
+
+      {/* Right Side: Organization Info */}
+         <div className="flex items-center gap-3">
+           <img
+             src={organization?.imageUrl} 
+             alt="Organization Logo"
+             className="w-10 h-10 rounded-full object-cover"
+           />
+         <div>
+           <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
+           <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{organization?.institute}</p>       
+         </div>
+       </div>
+    </div>
+
 
       {/* Event Status Cards */}
       <div className="flex gap-8 mb-8 justify-start">

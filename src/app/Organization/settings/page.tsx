@@ -20,6 +20,12 @@ const SettingsPage = () => {
 
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
+  const [orgProfile, setOrgProfile] = useState<{
+  imageUrl: string;
+  name: string;
+  institute: string;
+} | null>(null);
+
 
   const router = useRouter();
   const username = "IEEESLIT";
@@ -53,8 +59,27 @@ const SettingsPage = () => {
 
   return (
     <div className="p-5">
-      <span className="text-shark-300">Organization / Settings</span>
-      <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">Settings</h1>
+        {/* Title with Organization Info */}
+      <div className="flex justify-between items-center mb-4 px-4">
+      {/* Left Side: Title */}
+        <div>
+           <p className="text-shark-300">Organization / Settings</p>
+           <h1 className="text-2xl font-primary font-bold">Settings</h1>
+        </div>
+
+      {/* Right Side: Organization Info */}
+         <div className="flex items-center gap-3">
+           <img
+             src={organization?.imageUrl} 
+             alt="Organization Logo"
+             className="w-10 h-10 rounded-full object-cover"
+           />
+         <div>
+           <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
+           <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{organization?.institute}</p>       
+         </div>
+       </div>
+    </div>
 
       {/* Email Section */}
       <div className="bg-[#FBFBFB] shadow-sm  rounded-2xl p-6 mb-6 pr-20 pl-10">
