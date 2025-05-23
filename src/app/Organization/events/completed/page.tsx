@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
 import { Event, getEventsByOrgId } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
+import { formatDate } from "@/utils/dateUtils";
 
 
 export default function CompletedEventsPage() {
@@ -37,7 +38,11 @@ export default function CompletedEventsPage() {
         </div>
       )
      },
-    { header: "Date", accessor: "eventDate" },
+    { header: "Date", accessor: "eventEndDate",
+      cell: (value) => (
+        <span>{formatDate(value)}</span>
+      )
+     },
     { header: "Location", accessor: "eventLocation" },
     { header: "Status", accessor: "eventStatus",
       cell: () => (
@@ -46,6 +51,7 @@ export default function CompletedEventsPage() {
         </span>
       ),
      },
+     {header: "No of Volunteers", accessor: "volunteerCount"}
   ];
 
   

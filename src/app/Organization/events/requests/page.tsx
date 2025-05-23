@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
 import { Event, getEventsByOrgId } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -36,11 +37,15 @@ export default function EventRequestsPage() {
         </div>
       )
      },
-    { header: "Date", accessor: "eventDate" },
+    { header: "Date", accessor: "eventStartDate",
+      cell: (value) => (
+        <span>{formatDate(value)}</span>
+      )
+     },
     { header: "Location", accessor: "eventLocation" },
     { header: "Status", accessor: "eventStatus",
       cell: () => (
-        <span className=" rounded-full bg-orange-100 px-3 py-1 text-xs  text-orange-400">
+        <span className=" rounded-full bg-[#FDF5EC] px-3 py-1 text-xs  text-[#BD6F01]">
           Pending
         </span>
       ),
