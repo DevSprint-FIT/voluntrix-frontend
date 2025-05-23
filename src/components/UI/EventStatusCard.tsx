@@ -11,10 +11,10 @@ interface EventStatusCardProps {
 const EventStatusCard: React.FC<EventStatusCardProps> = ({ count, label, subtext, loading }) => {
   return (
     <div
-      style={{ backgroundColor: "#F8F8F8" }}
+      style={{ backgroundColor: "#FBFBFB" }}
       className="rounded-xl p-6 min-w-[24rem] flex-grow-0 flex-shrink-0 relative"
     >
-      <div className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-verdant-100 rounded-full p-2">
+      <div className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-verdant-50 rounded-full p-2">
         <BarChart size={24} className="text-verdant-700" />
       </div>
 
@@ -27,7 +27,7 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ count, label, subtext
         )}
      </div>
 
-      <p className="font-secondary text-shark-300">{subtext}</p>
+      <p className="font-secondary text-xs text-shark-300">{subtext}</p>
     </div>
   );
 };
