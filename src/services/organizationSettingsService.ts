@@ -3,6 +3,9 @@ export type OrganizationSettings = {
   email: string;
   username: string;
   isVerified: boolean;
+  imageUrl: string;
+  name: string;
+  institute: string;
 };
 
 export const getOrganizationSettingsByUsername = async (username: string): Promise<OrganizationSettings> => {
@@ -13,9 +16,9 @@ export const getOrganizationSettingsByUsername = async (username: string): Promi
       throw new Error(`Failed to fetch organization settings: ${response.statusText}`);
     }
 
-    const {id, email, usernamename, isVerified } = (await response.json()).data;
+    const {id, email, usernamename, isVerified, imageUrl, name, institute } = (await response.json()).data;
 
-    return {id, email, username, isVerified };
+    return {id, email, username, isVerified, imageUrl, name, institute };
   } catch (error) {
     console.error("Error fetching organization settings:", error);
     throw error;
