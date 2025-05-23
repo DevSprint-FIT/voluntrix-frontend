@@ -106,7 +106,7 @@ const PostCard: React.FC<PostCardProps> = ({
   
   
   return (
-    <div className="bg-white p-4 rounded-xl shadow mb-4 m-4 relative">
+    <div className="bg-white p-4 rounded-xl mb-4 m-4 relative">
       {/* 3 Dots (Edit/Delete) - only show if not public view*/}
       {!isPublicView && (
           <div className="absolute top-4 right-4">
@@ -114,7 +114,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <MoreHorizontal className="w-5 h-5"/>
         </button>
         {showMenu && (
-          <div className="absolute right-0 mt-2 bg-white border shadow rounded text-sm w-40">
+          <div className="absolute right-0 mt-2 bg-white border rounded text-sm w-40">
             <button
                className="block px-4 py-2 bg-white hover:bg-shark-100  w-full text-left font-secondary rounded-md"
                onClick={() => {

@@ -204,7 +204,7 @@ export default function SocialFeed() {
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Left Content */}
-        <div className="md:col-span-3 space-y-4 mt-1">
+        <div className="md:col-span-3 space-y-4 mt-1 w-[80%]">
           {/* Start a Post */}
           <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
@@ -227,26 +227,26 @@ export default function SocialFeed() {
           </div>
 
           {/* Activity Feed */}
-          <div className="bg-[#FBFBFB] p-4 rounded-xl">
-            <h2 className="text-xl font-secondary font-bold mb-4">All activity</h2>
-            <div className="flex gap-3 p-2">
+          <div className="bg-[#FBFBFB] p-6 rounded-xl">
+            <h2 className="text-2xl font-secondary font-bold mb-4 pl-4 text-shark-950">All activity</h2>
+            <div className="flex gap-3 pl-4 pb-4">
               <button
                    onClick={() => setFilter('all')}
-                   className={`w-20 px-4 py-1 rounded-full 
+                   className={`w-20 px-2 py-1 rounded-full 
                    ${filter === 'all' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
              Posts
             </button>
               <button
                    onClick={() => setFilter('images')}
-                   className={`w-20 px-4 py-1 rounded-full 
+                   className={`w-20 px-2 py-1 rounded-full 
                    ${filter === 'images' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
               Images
              </button>
               <button 
                    onClick={() => setFilter('videos')}
-                   className={`w-20 px-4 py-1 rounded-full 
+                   className={`w-20 px-2 py-1 rounded-full 
                    ${filter === 'videos' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
               >
              Videos
@@ -284,7 +284,7 @@ export default function SocialFeed() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-4 fixed right-0 mr-[10%] w-[20%]">
           <MetricCard
             title="Total Posts"
             value={posts.length}
