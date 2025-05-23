@@ -195,9 +195,9 @@ export default function SocialFeed() {
       className="w-10 h-10 rounded-full object-cover"
     />
     <div>
-        <h2 className="font-semibold text-lg font-secondary">{organization?.name}</h2>
-        <p className="font-medium font-secondary text-shark-800">{organization?.institute}</p>
-      </div>
+      <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
+      <p className="font-secondary  text-shark-700 text-xs leading-tight">{organization?.institute}</p>       
+    </div>
   </div>
 </div>
 
