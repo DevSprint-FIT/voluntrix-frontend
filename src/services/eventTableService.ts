@@ -3,9 +3,11 @@ export type EventStatus =  "PENDING" | "ACTIVE" | "COMPLETE" ;
 export type Event = {
   eventId: number;
   eventTitle: string;
-  eventDate: string;
+  eventStartDate: string;
+  eventEndDate: string;
   eventLocation: string;
   eventStatus: EventStatus;
+  volunteerCount: number;
 };
 
 //  Fetch events (optionally by status)
