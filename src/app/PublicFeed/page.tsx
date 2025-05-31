@@ -12,6 +12,7 @@ import { calculateMetrics } from "@/services/utils";
 import SuggestedOrganizations from "@/components/UI/SuggestedOrganizations";
 import { updatePost } from "@/services/socialFeedService";
 import { fetchPosts } from "@/services/socialFeedService";
+import Navbar from "@/components/UI/Navbar";
 
 interface ProfileCardProps {
   name: string;
@@ -136,15 +137,17 @@ const PublicFeedPage = () => {
   };
 
   return (
-    <div className="mt-10 flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6 ">
+    <>
+    <Navbar />
+    <div className="mt-20 flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6 ">
       
       {/* Left Sidebar – Dynamic Profile */}
-      <aside className="hidden md:block md:w-1/5 -ml-8 mr-10 sticky top-6 self-start">
+      <aside className="hidden md:block md:w-1/5 -ml-8 mr-16 sticky top-24 self-start">
         {profile && <ProfileCard {...profile} />}
       </aside>
 
       {/* Main Feed */}
-      <main className="w-full md:w-3/5">
+      <main className= "w-[45%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
         {posts.length === 0 ? (
           <p>No posts available.</p>
         ) : (
@@ -173,7 +176,7 @@ const PublicFeedPage = () => {
 
       {/* Right Sidebar – Only for ORGANIZATION */}
     {isOrganization(userType) && (
-      <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-6 self-start">
+      <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-24 self-start  mr-[8%] w-[20%] ml-6">
         <MetricCard
           title="Total Posts"
           value={metrics.totalPosts}
@@ -217,6 +220,7 @@ const PublicFeedPage = () => {
         )}
 
     </div>
+    </>
   );
 };
 

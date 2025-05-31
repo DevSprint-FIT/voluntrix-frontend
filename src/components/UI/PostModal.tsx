@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import uploadImage from "@/utils/uploadImage";
-import { Image as ImageIcon, Underline } from "lucide-react";
+import { Image as ImageIcon, Pencil } from "lucide-react";
 import {Textarea} from "@heroui/react";
 import { Button } from "@heroui/button";
 
@@ -83,42 +83,78 @@ const PostModal: React.FC<PostModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-shark-950 bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg w-[90%] max-w-lg shadow-lg relative">
+      <div className="bg-white p-8 rounded-lg w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-shark-500 hover:text-shark-700"
+          className="absolute top-3 right-6 text-shark-500 hover:text-shark-700"
         >
           ✕
         </button>
 
-        <h2 className="text-lg font-secondary font-semibold mb-4">
-          {isEditing ? "Edit Post" : "Create Post"}
-        </h2>
+        {isEditing ? (
+           <h2 className="text-lg font-secondary font-semibold mb-4">
+              Edit Post
+           </h2>
+        ) : (
+        <div className="flex items-center gap-3 mb-4">
+           {organizationImageUrl && (
+             <img
+                src={organizationImageUrl}
+                alt={organizationName}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+           )}
+          <div className="flex flex-col">
+             <span className="font-semibold font-secondary ">{organizationName}</span>
+             <span className="text-sm text-shark-500 -mt-1">Post to Anyone</span>
+          </div>
+        </div>
+    )}
+
 
         <Textarea
            value={content}
            onChange={(e) => setContent(e.target.value)}
            placeholder="What do you want to talk about?"
            minRows={7}
-           className="w-full h-24 mb-3"
+           className="w-full h-30 mb-3 " 
         />
 
 
-        <div className="flex items-center gap-3 mb-4">
-          <label className="cursor-pointer text-shark-600 flex items-center gap-2">
-            <ImageIcon size={18} />
-             <input 
-               type="file"
-               accept="image/*, video/*"
-               className="hidden" 
-               onChange={handleFileChange} />
-          </label>
-          {previewImage && imageFile?.type?.startsWith("video") ? (
-            <video src={previewImage} controls className="h-32 rounded" />
-          ) : previewImage ? (
-            <img src={previewImage} alt="Preview" className="h-16 rounded" />
-          ) : null}
-        </div>
+       <div className="flex flex-col gap-3 mb-4">
+         {previewImage && imageFile?.type?.startsWith("video") ? (
+           <video
+            src={previewImage}
+            controls
+            className="w-full max-w-md max-h-[300px] rounded-lg object-contain mx-auto"
+           />
+         ) : previewImage ? (
+          <img
+            src={previewImage}
+            alt="Preview"
+            className="w-full max-w-md max-h-[300px] rounded-lg object-contain mx-auto"
+           />
+        ) : null}
+
+      <label className="cursor-pointer text-shark-600 flex items-center gap-2 self-start">
+         {previewImage ? (
+        <>
+        <Pencil size={18} />
+        </>
+      ) : (
+      <>
+        <ImageIcon size={18} />
+        <span className="text-sm">Add Media</span>
+      </>
+    )}
+       <input
+          type="file"
+          accept="image/*, video/*"
+          className="hidden"
+          onChange={handleFileChange}
+       />
+      </label>
+     </div>
         <div className="flex justify-end">
           <Button
            onPress={handleSubmit}

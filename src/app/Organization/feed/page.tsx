@@ -180,7 +180,7 @@ export default function SocialFeed() {
 
   return (
     <div >
-      <div className="flex justify-between items-center px-4">
+      <div className="flex justify-between items-center px-4 ml-8">
   {/* Left Side */}
   <div className="pl-4">
     <p className="text-shark-300">Organization / Social Feed</p>
@@ -202,9 +202,9 @@ export default function SocialFeed() {
 </div>
 
 
-      <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-4 ml-8">
         {/* Left Content */}
-        <div className="md:col-span-3 space-y-4 mt-1 w-[80%]">
+        <div className="md:col-span-8 space-y-4 mt-1 ">
           {/* Start a Post */}
           <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
@@ -284,7 +284,7 @@ export default function SocialFeed() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-4 fixed right-0 mr-[10%] w-[20%]">
+        <div className="hidden md:block space-y-4 sticky top-6 self-start md:col-span-4 ml-5">
           <MetricCard
             title="Total Posts"
             value={posts.length}
@@ -319,7 +319,7 @@ export default function SocialFeed() {
           {/* Storage Card */}
           <div className="bg-[#FBFBFB] p-5 rounded-xl">
             <div className="flex justify-between items-start mb-2">
-              <div className="font-secondary text-xs bg-shark-100 rounded-full p-2">FREE PLAN</div>
+              <div className="font-secondary text-[0.625rem] bg-shark-100 rounded-full pr-2 pl-2 pt-1 pb-1">FREE PLAN</div>
               <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 ml-4 ">
                 <UploadCloud className="w-6 h-6" />
               </div>
@@ -328,19 +328,23 @@ export default function SocialFeed() {
             <div className="text-center">
                <h3 className="font-bold mb-1 font-secondary text-xl">Your Storage</h3>
                <p className="text-sm text-shark-300 mb-3">Supervise your drive space<br/> in the easiest way</p>
-               <button className="bg-verdant-50 rounded-full pl-2 pr-2 pt-1 pb-1 text-verdant-700 border border-verdant-700 font-secondary">Upgrade</button>
+               <button className="bg-verdant-50 rounded-full pl-3 pr-3 pt-0 pb-0 text-verdant-800 border border-verdant-800 font-secondary font-medium">Upgrade</button>
             </div>
             
-            <div className="bg-shark-100 rounded-full h-2 overflow-hidden mb-2 mt-2">
-              <div
-                className="bg-verdant-500 h-full"
-                style={{ width: `${Math.min(storageUsedPercentage, 100)}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-sm text-shark-500">
+            <div className="flex justify-between text-sm text-shark-400">
               <span>{totalMediaSizeInGB.toFixed(2)} GB</span>
               <span>{storageLimitInGB} GB</span>
             </div>
+
+            {/* Progress bar */}
+            <div className="bg-shark-100 rounded-full h-2 overflow-hidden mt-2">
+              <div
+                className="bg-verdant-500 h-full"
+                style={{ width: `${Math.min(storageUsedPercentage, 100)}%` }}
+              >
+            </div>
+            </div>
+            
           </div>
         </div>
       </div>
