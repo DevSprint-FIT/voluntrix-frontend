@@ -147,7 +147,7 @@ const PublicFeedPage = () => {
       </aside>
 
       {/* Main Feed */}
-      <main className= "w-[45%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
+      <main className= "w-[55%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
         {posts.length === 0 ? (
           <p>No posts available.</p>
         ) : (
@@ -176,7 +176,7 @@ const PublicFeedPage = () => {
 
       {/* Right Sidebar – Only for ORGANIZATION */}
     {isOrganization(userType) && (
-      <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-24 self-start  mr-[8%] w-[20%] ml-6">
+      <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-24 self-start  mr-[3%] w-[22%] ml-10">
         <MetricCard
           title="Total Posts"
           value={metrics.totalPosts}

@@ -11,7 +11,7 @@ interface MetricCardProps {
 
 const MetricCard:React.FC<MetricCardProps> = ({ title, value, percentageChange, icon}) => {
     return(
-        <div className="w-[22rem] bg-[#FBFBFB] rounded-xl p-5 pr-2 shadow-sm flex justify-between items-center mb-3  ">
+        <div className="w-[20rem] bg-[#FBFBFB] rounded-xl p-5 pr-2 shadow-sm flex justify-between items-center mb-3  ">
             <div className="flex flex-col ">
                <div className="text-shark-900 font-medium">{title}</div>
                <div className="text-2xl font-bold text-verdant-600">{value}</div>

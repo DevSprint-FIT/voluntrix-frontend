@@ -284,7 +284,7 @@ export default function SocialFeed() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="hidden md:block space-y-4 sticky top-6 self-start md:col-span-4 ml-5">
+        <div className="hidden md:block space-y-4 sticky top-6 self-start md:col-span-4 ml-9">
           <MetricCard
             title="Total Posts"
             value={posts.length}
