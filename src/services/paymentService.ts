@@ -1,16 +1,14 @@
-const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export interface PaymentDetails {
   orderId: string;
   amount: string;
   currency: string;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   email: string;
-  phone: string;
-  address: string;
-  city: string;
-  country: string;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  country: string | null;
   userType: string,
   volunteerId: number | null,
   sponsorId: number | null,
@@ -21,7 +19,11 @@ export interface PaymentDetails {
   
 export async function startPayment(details: PaymentDetails) {
   try {
-    const response = await fetch(`${backendUrl}/api/payment/start`, {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/start`;
+    console.log("Payment API URL:", apiUrl);
+    console.log("Payment details:", details);
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,12 +31,27 @@ export async function startPayment(details: PaymentDetails) {
       body: JSON.stringify(details),
     });
 
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
     if (!response.ok) {
-      throw new Error("Failed to generate hash for payment.");
+      const errorText = await response.text();
+      console.error("Error response body:", errorText);
+      throw new Error(`Failed to generate hash for payment. Status: ${response.status}, Response: ${errorText}`);
     }
 
-    const { hash, merchantId } = await response.json();
-    return { hash, merchantId };
+    const responseText = await response.text();
+    console.log("Raw response:", responseText);
+
+    try {
+      const data = JSON.parse(responseText);
+      const { hash, merchantId } = data;
+      return { hash, merchantId };
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      console.error("Response was not valid JSON:", responseText);
+      throw new Error("Server returned invalid JSON response");
+    }
   } catch (error) {
     console.error("Error in startPayment:", error);
     throw error;
@@ -44,16 +61,33 @@ export async function startPayment(details: PaymentDetails) {
 
 export async function checkPaymentStatus(orderId: string): Promise<string> {
   try {
-    const response = await fetch(`${backendUrl}/api/payment/status/${orderId}`, {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/status/${orderId}`;
+    console.log("Payment status API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
       method: "GET",
     });
 
+    console.log("Status check response status:", response.status);
+
     if (!response.ok) {
-      throw new Error("Failed to fetch payment status.");
+      const errorText = await response.text();
+      console.error("Status check error response:", errorText);
+      throw new Error(`Failed to fetch payment status. Status: ${response.status}, Response: ${errorText}`);
     }
 
-    const { status } = await response.json();
-    return status;
+    const responseText = await response.text();
+    console.log("Status check raw response:", responseText);
+
+    try {
+      const data = JSON.parse(responseText);
+      const { status } = data;
+      return status;
+    } catch (parseError) {
+      console.error("JSON parse error in status check:", parseError);
+      console.error("Response was not valid JSON:", responseText);
+      throw new Error("Server returned invalid JSON response for status check");
+    }
   } catch (error) {
     console.error("Error in checkPaymentStatus:", error);
     throw error;
