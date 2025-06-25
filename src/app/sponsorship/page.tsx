@@ -1,25 +1,27 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardBody, Button, Input, Select, SelectItem, Checkbox } from "@heroui/react";
-import { Shield, Gift, Calendar } from "lucide-react";
+import { Shield, Award, Calendar } from "lucide-react";
 import Navbar from "@/components/UI/Navbar";
 import authService from "@/services/authService";
 import { User } from "@/services/authService";
 import { generatePaymentID } from "@/services/paymentService";
 
-interface DonationFormData {
+interface SponsorshipFormData {
   currency: string;
   amount: string;
-  fullName: string;
-  email: string;
-  address: string;
-  city: string;
-  country: string;
   eventName: string;
   agreeToTerms: boolean;
+}
+
+interface SponsorshipPackage {
+  packageName: string;
+  payableAmount: number;
+  currency: string;
+  benefits: string[];
+  eventName: string;
 }
 
 const currencies = [
@@ -28,31 +30,40 @@ const currencies = [
   { key: "EUR", label: "EUR - Euro", symbol: "€" },
 ];
 
-export default function DonationPage() {
+export default function SponsorshipPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
-  
-  const [formData, setFormData] = useState<DonationFormData>({
+
+  // Mock sponsorship package data - this would come from API
+  const [sponsorshipPackage] = useState<SponsorshipPackage>({
+    packageName: "Gold Sponsor Package",
+    payableAmount: 50000,
     currency: "LKR",
+    benefits: [
+      "Logo on event banners and materials",
+      "Dedicated social media posts",
+      "Speaking opportunity at event",
+      "Premium booth location",
+      "VIP networking access"
+    ],
+    eventName: "Tech Innovation Summit 2025"
+  });
+  
+  const [formData, setFormData] = useState<SponsorshipFormData>({
+    currency: sponsorshipPackage.currency,
     amount: "",
-    fullName: "",
-    email: "",
-    address: "",
-    city: "",
-    country: "",
-    eventName: "General Donation", // Default or could be set from props/query params
+    eventName: sponsorshipPackage.eventName,
     agreeToTerms: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Generate payment order ID when component mounts
   useEffect(() => {
     const generateOrderId = async () => {
       try {
-        const newOrderId = await generatePaymentID("DONATION");
+        const newOrderId = await generatePaymentID("SPONSORSHIP");
         setOrderId(newOrderId);
       } catch (error) {
         console.error("Error generating order ID:", error);
@@ -63,9 +74,9 @@ export default function DonationPage() {
     generateOrderId();
   }, []);
 
-  // Check authentication and auto-fill user data
+  // Check authentication and verify sponsor role
   useEffect(() => {
-    const checkAuthAndFillData = async () => {
+    const checkAuthAndRole = async () => {
       try {
         const authenticated = authService.isAuthenticated();
         setIsAuthenticated(authenticated);
@@ -74,23 +85,26 @@ export default function DonationPage() {
           const currentUser = await authService.getCurrentUser();
           if (currentUser) {
             setUser(currentUser);
-            // Auto-fill form with user data
-            setFormData(prev => ({
-              ...prev,
-              fullName: currentUser.fullName || "",
-              email: currentUser.email || "",
-            }));
+            
+            // TODO: Add role verification for sponsors
+            // if (currentUser.role !== 'sponsor') {
+            //   router.push('/unauthorized');
+            //   return;
+            // }
           }
+        } else {
+          // Redirect to login if not authenticated
+          // router.push('/auth/login');
         }
       } catch (error) {
         console.error("Error checking auth status:", error);
       }
     };
 
-    checkAuthAndFillData();
+    checkAuthAndRole();
   }, []);
 
-  const handleInputChange = (field: keyof DonationFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof SponsorshipFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -102,13 +116,7 @@ export default function DonationPage() {
     const newErrors: Record<string, string> = {};
     
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = "Please enter a valid donation amount";
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required to send payment invoice";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.amount = "Please enter a valid sponsorship amount";
     }
     
     if (!formData.agreeToTerms) {
@@ -125,8 +133,9 @@ export default function DonationPage() {
     setIsLoading(true);
     try {
       // Here you'll integrate with your payment processing
-      console.log("Donation form data:", formData);
+      console.log("Sponsorship form data:", formData);
       console.log("Order ID:", orderId);
+      console.log("Package:", sponsorshipPackage);
       
       // Simulate processing delay
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -135,13 +144,14 @@ export default function DonationPage() {
       // router.push('/payment-processing');
       
     } catch (error) {
-      console.error("Donation submission failed:", error);
+      console.error("Sponsorship submission failed:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const selectedCurrency = currencies.find(c => c.key === formData.currency);
+  const packageCurrency = currencies.find(c => c.key === sponsorshipPackage.currency);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 relative">
@@ -157,7 +167,7 @@ export default function DonationPage() {
               <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
             <h3 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
-              Processing Your Donation
+              Processing Your Sponsorship
             </h3>
             <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
               Please wait while we prepare your payment...
@@ -174,63 +184,110 @@ export default function DonationPage() {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-
-          
           {/* Order ID Display */}
           <div className="mb-6">
-            <p className="text-shark-500 text-sm font-primary mb-1">Donation Order</p>
+            <p className="text-shark-500 text-sm font-primary mb-1">Sponsorship Order</p>
             <h2 className="text-3xl font-bold text-verdant-600 font-secondary tracking-wider">
               #{orderId || "Loading..."}
             </h2>
           </div>
           
           <h1 className="text-4xl font-bold text-shark-950 mb-2 font-secondary">
-            Make a <span className="text-verdant-600">Donation</span>
+            Complete Your <span className="text-verdant-600">Sponsorship</span>
           </h1>
           <p className="text-[1.15rem] text-shark-600 font-primary tracking-[0.025rem] max-w-2xl">
-            Your contribution helps us make a difference in the community. Every donation counts!
+            Thank you for supporting our mission. Your sponsorship makes a significant impact!
           </p>
           
+          {/* Sponsor Welcome */}
+          {isAuthenticated && user && (
+            <div className="mt-4 flex items-center space-x-2 text-sm text-verdant-600">
+              <Shield className="w-4 h-4" />
+              <span className="font-primary">Welcome back, {user.fullName}!</span>
+            </div>
+          )}
         </motion.div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Donation Form */}
+          {/* Sponsorship Form */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-8"
+            className="lg:col-span-8 space-y-6"
           >
+            {/* Event Information */}
+            <Card className="bg-white/70 backdrop-blur-sm shadow-lg">
+              <CardBody className="p-8">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Calendar className="w-5 h-5 text-verdant-600" />
+                  <h3 className="text-xl font-semibold text-shark-900 font-secondary">
+                    Event Information
+                  </h3>
+                </div>
+                
+                <Input
+                  label="Event Name"
+                  value={formData.eventName}
+                  isReadOnly
+                  classNames={{
+                    input: "font-primary text-shark-900 tracking-[0.02rem]",
+                    label: "font-secondary text-shark-500 text-sm font-normal",
+                  }}
+                />
+              </CardBody>
+            </Card>
+
+            {/* Package Information */}
+            <Card className="bg-white/70 backdrop-blur-sm shadow-lg">
+              <CardBody className="p-8">
+                <div className="flex items-center space-x-2 mb-6">
+                  <Award className="w-5 h-5 text-verdant-600" />
+                  <h3 className="text-xl font-semibold text-shark-900 font-secondary">
+                    Your Sponsorship Package
+                  </h3>
+                </div>
+
+                <div className="bg-verdant-50 rounded-lg p-6 mb-6">
+                  <h4 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
+                    {sponsorshipPackage.packageName}
+                  </h4>
+                  <p className="text-2xl font-bold text-verdant-600 font-secondary mb-4">
+                    {packageCurrency?.symbol}{sponsorshipPackage.payableAmount.toLocaleString()} {sponsorshipPackage.currency}
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-shark-700 font-secondary mb-2">Package Benefits:</p>
+                    {sponsorshipPackage.benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-verdant-500 rounded-full"></div>
+                        <span className="text-sm text-shark-600 font-primary">{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Input
+                  label="Package Payable Amount"
+                  value={`${packageCurrency?.symbol}${sponsorshipPackage.payableAmount.toLocaleString()} ${sponsorshipPackage.currency}`}
+                  isReadOnly
+                  description="This is your package commitment amount"
+                  classNames={{
+                    input: "font-primary text-shark-900 tracking-[0.02rem] font-medium",
+                    label: "font-secondary text-shark-500 text-sm font-normal",
+                    description: "font-primary text-xs text-shark-400",
+                  }}
+                />
+              </CardBody>
+            </Card>
+
+            {/* Payment Details */}
             <Card className="bg-white/70 backdrop-blur-sm shadow-lg">
               <CardBody className="p-8">
                 <h3 className="text-xl font-semibold text-shark-900 mb-6 font-secondary">
-                  Donation Details
+                  Payment Details
                 </h3>
-
-                {/* Event Information */}
-                <div className="mb-6">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Calendar className="w-4 h-4 text-verdant-600" />
-                    <h4 className="text-lg font-medium text-shark-900 font-secondary">
-                      Event Information
-                    </h4>
-                  </div>
-                  
-                  <Input
-                    label="Event Name"
-                    placeholder="Enter event name (optional)"
-                    isReadOnly
-                    value={formData.eventName}
-                    onChange={(e) => handleInputChange("eventName", e.target.value)}
-                    description="Leave as 'General Donation' if not for a specific event"
-                    classNames={{
-                      input: "font-primary text-shark-900 tracking-[0.02rem]",
-                      label: "font-secondary text-shark-500 text-sm font-normal",
-                      description: "font-primary text-xs text-shark-400",
-                    }}
-                  />
-                </div>
 
                 {/* Currency & Amount */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -254,7 +311,7 @@ export default function DonationPage() {
                   <Input
                     label={
                       <span>
-                        Donation Amount <span className="text-red-500">*</span>
+                        Payment Amount <span className="text-red-500">*</span>
                       </span>
                     }
                     type="number"
@@ -266,108 +323,21 @@ export default function DonationPage() {
                         {selectedCurrency?.symbol}
                       </span>
                     }
+                    description="You can pay any amount towards your sponsorship"
                     isInvalid={!!errors.amount}
                     errorMessage={errors.amount}
                     classNames={{
                       input: "font-primary text-shark-900 tracking-[0.02rem]",
                       label: "font-secondary text-shark-500 text-sm font-normal",
-                    }}
-                  />
-                </div>
-
-                {/* Donor Information */}
-                <div className="space-y-4 mb-6">
-                  <h4 className="text-lg font-medium text-shark-900 font-secondary">
-                    Donor Information
-                  </h4>
-                  
-                  <Input
-                    label="Full Name"
-                    placeholder="Enter your full name (optional)"
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange("fullName", e.target.value)}
-                    description="Optional - for donation recognition"
-                    classNames={{
-                      input: "font-primary text-shark-900 tracking-[0.02rem]",
-                      label: "font-secondary text-shark-500 text-sm font-normal",
                       description: "font-primary text-xs text-shark-400",
                     }}
                   />
-
-                  <Input
-                    label={
-                      <span>
-                        Email Address <span className="text-red-500">*</span>
-                      </span>
-                    }
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    isInvalid={!!errors.email}
-                    errorMessage={errors.email}
-                    description="Required - we'll send your payment invoice here"
-                    classNames={{
-                      input: "font-primary text-shark-900 tracking-[0.02rem]",
-                      label: "font-secondary text-shark-500 text-sm font-normal",
-                      description: "font-primary text-xs text-shark-400",
-                    }}
-                  />
-                </div>
-
-                {/* Address Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <h4 className="text-lg font-medium text-shark-900 font-secondary">
-                      Address Information
-                    </h4>
-                    <Gift className="w-4 h-4 text-verdant-600" />
-                  </div>
-                  
-                  <p className="text-[0.8rem] text-shark-500 font-primary">
-                    Optional - This information will be used to <span className="text-verdant-500">send rewards to our top donors</span>
-                  </p>
-
-                  <Input
-                    label="Address"
-                    placeholder="Enter your address (optional)"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                    classNames={{
-                      input: "font-primary text-shark-900 tracking-[0.02rem]",
-                      label: "font-secondary text-shark-500 text-sm font-normal",
-                    }}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Input
-                      label="City"
-                      placeholder="Enter city"
-                      value={formData.city}
-                      onChange={(e) => handleInputChange("city", e.target.value)}
-                      classNames={{
-                        input: "font-primary text-shark-900 tracking-[0.02rem]",
-                        label: "font-secondary text-shark-500 text-sm font-normal",
-                      }}
-                    />
-
-                    <Input
-                      label="Country"
-                      placeholder="Enter country"
-                      value={formData.country}
-                      onChange={(e) => handleInputChange("country", e.target.value)}
-                      classNames={{
-                        input: "font-primary text-shark-900 tracking-[0.02rem]",
-                        label: "font-secondary text-shark-500 text-sm font-normal",
-                      }}
-                    />
-                  </div>
                 </div>
               </CardBody>
             </Card>
           </motion.div>
 
-          {/* Donation Summary */}
+          {/* Sponsorship Summary */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -377,7 +347,7 @@ export default function DonationPage() {
             <Card className="bg-white/70 backdrop-blur-sm shadow-lg sticky top-6">
               <CardBody className="p-6">
                 <h3 className="text-lg font-semibold text-shark-900 mb-4 font-secondary">
-                  Donation Summary
+                  Sponsorship Summary
                 </h3>
 
                 <div className="space-y-3 mb-6">
@@ -390,37 +360,37 @@ export default function DonationPage() {
                     <span className="text-shark-600 font-primary text-sm">Event:</span>
                     <span className="text-shark-900 font-medium font-secondary text-xs">{formData.eventName}</span>
                   </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-shark-600 font-primary text-sm">Package:</span>
+                    <span className="text-shark-900 font-medium font-secondary text-xs">{sponsorshipPackage.packageName}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-shark-600 font-primary text-sm">Package Amount:</span>
+                    <span className="text-shark-900 font-medium font-secondary">
+                      {packageCurrency?.symbol}{sponsorshipPackage.payableAmount.toLocaleString()} {sponsorshipPackage.currency}
+                    </span>
+                  </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-shark-600 font-primary text-sm">Amount:</span>
+                    <span className="text-shark-600 font-primary text-sm">Paying Now:</span>
                     <span className="text-shark-900 font-medium font-secondary">
                       {selectedCurrency?.symbol}{formData.amount || "0.00"} {formData.currency}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-shark-600 font-primary text-sm">Currency:</span>
-                    <span className="text-shark-900 font-medium font-secondary">{formData.currency}</span>
-                  </div>
-
-                  {formData.fullName && (
+                  {user && (
                     <div className="flex justify-between items-center">
-                      <span className="text-shark-600 font-primary text-sm">Donor:</span>
-                      <span className="text-shark-900 font-medium font-secondary">{formData.fullName}</span>
-                    </div>
-                  )}
-
-                  {formData.email && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-shark-600 font-primary text-sm">Email:</span>
-                      <span className="text-shark-900 font-medium font-secondary text-xs">{formData.email}</span>
+                      <span className="text-shark-600 font-primary text-sm">Sponsor:</span>
+                      <span className="text-shark-900 font-medium font-secondary text-xs">{user.fullName}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="border-t border-shark-200 pt-4 mb-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium text-shark-900 font-secondary">Total:</span>
+                    <span className="text-lg font-medium text-shark-900 font-secondary">Payment Total:</span>
                     <span className="text-xl font-bold text-verdant-600 font-secondary">
                       {selectedCurrency?.symbol}{formData.amount || "0.00"} {formData.currency}
                     </span>
@@ -440,7 +410,7 @@ export default function DonationPage() {
                       label: "text-sm font-secondary text-shark-700 leading-relaxed ml-2",
                     }}
                   >
-                    I agree to the terms and conditions for donations
+                    I agree to the terms and conditions for sponsorship
                   </Checkbox>
                   {errors.agreeToTerms && (
                     <p className="text-red-500 text-xs mt-1 font-primary">{errors.agreeToTerms}</p>

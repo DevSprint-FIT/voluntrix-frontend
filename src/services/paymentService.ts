@@ -93,3 +93,32 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
     throw error;
   }
 }
+
+
+export async function generatePaymentID(paymentType: string): Promise<string> {
+  try {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/generate-order-id?paymentType=${paymentType}`;
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ paymentType }),
+    });
+
+    console.log("Generate ID response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response body:", errorText);
+      throw new Error(`Failed to generate payment ID. Status: ${response.status}, Response: ${errorText}`);
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error("Error in generatePaymentID:", error);
+    throw error;
+  }
+}
