@@ -11,21 +11,9 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/d
 import { Avatar } from "@heroui/avatar";
 import { Bell } from "lucide-react";
 import AuthService from "@/services/authService";
+import { User } from "@/services/authService";
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface User {
-  userId: number;
-  email: string;
-  fullName: string;
-  handle: string;
-  role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  authProvider: string;
-  createdAt: string;
-  lastLogin: string;
-}
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -256,7 +244,7 @@ export default function Navbar() {
               <DropdownTrigger>
                 <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity duration-200">
                   <Avatar
-                    src={`/icons/user.png`} // You can customize this path
+                    src={user.imageURL || "/images/user.png"} // You can customize this path
                     alt={user.fullName}
                     size="sm"
                     className="w-8 h-8"

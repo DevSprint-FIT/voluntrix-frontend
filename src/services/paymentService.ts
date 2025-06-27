@@ -1,3 +1,5 @@
+import authService from "./authService";
+
 export interface PaymentDetails {
   orderId: string;
   amount: string;
@@ -95,30 +97,57 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
 }
 
 
-export async function generatePaymentID(paymentType: string): Promise<string> {
+export interface SponsorshipPaymentDetails {
+  orderId: string;
+  eventTitle: string;
+  price: number;
+  type: string;
+  benefits: string;
+  payableAmount: number;
+}
+
+export interface SponsorshipPaymentResponse {
+  message: string;
+  data: SponsorshipPaymentDetails;
+}
+
+export async function getSponsorshipPaymentDetails(requestId: number): Promise<SponsorshipPaymentDetails> {
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/generate-order-id?paymentType=${paymentType}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sponsorship-requests/sponsor-requests/${requestId}`;
+    console.log("Sponsorship payment details API URL:", apiUrl);
 
     const response = await fetch(apiUrl, {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${authService.getToken()}`,
       },
-      body: JSON.stringify({ paymentType }),
     });
-
-    console.log("Generate ID response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Error response body:", errorText);
-      throw new Error(`Failed to generate payment ID. Status: ${response.status}, Response: ${errorText}`);
+      console.error("Sponsorship details error response:", errorText);
+      throw new Error(`Failed to fetch sponsorship details. Status: ${response.status}, Response: ${errorText}`);
     }
 
-    const result = await response.json();
-    return result.data;
+    const responseText = await response.text();
+
+    try {
+      const responseData: SponsorshipPaymentResponse = JSON.parse(responseText);
+      console.log("Sponsorship details parsed:", responseData);
+      
+      if (!responseData.data) {
+        throw new Error("Invalid response format: missing data field");
+      }
+      
+      return responseData.data;
+    } catch (parseError) {
+      console.error("JSON parse error in sponsorship details:", parseError);
+      console.error("Response was not valid JSON:", responseText);
+      throw new Error("Server returned invalid JSON response for sponsorship details");
+    }
   } catch (error) {
-    console.error("Error in generatePaymentID:", error);
+    console.error("Error in getSponsorshipPaymentDetails:", error);
     throw error;
   }
 }

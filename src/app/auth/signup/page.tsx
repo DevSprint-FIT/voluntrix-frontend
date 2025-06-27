@@ -114,8 +114,8 @@ export default function SignupPage() {
     setIsRedirecting(true);
     
     setTimeout(() => {
-      window.location.href = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/role-selection')}`;
-    }, 600); // Shorter delay for Google OAuth
+      window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/google`;
+    }, 600);
   };
 
   const handleSubmit = async () => {
