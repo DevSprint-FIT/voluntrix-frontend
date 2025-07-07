@@ -38,8 +38,7 @@ export default function Table<T extends Record<string, any>>({
                 return (
                   <td
                     key={j}
-                    style={{ backgroundColor: "#F8F8F8" }}
-                    className="px-6 py-4 text-shark-900 font-secondary font-bold "
+                    className="px-6 py-4 text-shark-900 font-secondary font-bold bg-[#FBFBFB]"
                   >
                     {col.cell ? col.cell(cellValue, row) : String(cellValue)}
                   </td>

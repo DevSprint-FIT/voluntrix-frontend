@@ -12,7 +12,7 @@ import { Button } from "@heroui/button";
 const SettingsPage = () => {
   const [volunteer, setVolunteer] = useState<VolunteerSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  //const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [editingEmail, setEditingEmail] = useState(false);
