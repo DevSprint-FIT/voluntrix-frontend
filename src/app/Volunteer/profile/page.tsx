@@ -25,7 +25,7 @@ const FollowedOrganizationsModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between px-10 pt-8 pb-4">
+        <div className="flex items-center justify-between px-10 pt-6 pb-2">
           <h2 className="text-xl font-semibold font-secondary text-gray-900">
             Followed Organizations
           </h2>
@@ -37,7 +37,7 @@ const FollowedOrganizationsModal = ({
           </button>
         </div>
 
-        <div className="px-6 pt-2 pb-8 max-h-96 overflow-y-auto">
+        <div className="px-6 pt-2 pb-6 max-h-96 overflow-y-auto">
           {organizations.length === 0 ? (
             <p className="text-gray-500 font-secondary text-center py-8">
               No organizations followed yet.
