@@ -119,25 +119,18 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         </h3>
       </div>
 
-      {/* Month labels */}
-      <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary">
-        {months.map((month, index) => (
-          <span key={index} className="text-center">
-            {month}
-          </span>
-        ))}
-      </div>
-
-      {/* Days of week labels */}
-      <div className="flex items-center space-x-1">
-        <div className="w-8 text-right">
+      {/* Main grid container */}
+      <div className="flex items-start space-x-1">
+        {/* Days of week labels */}
+        <div className="w-10 text-right pr-2">
+          {/* Empty space for month labels alignment */}
+          <div className="h-5 mb-2"></div>
+          {/* Day labels */}
           <div className="space-y-1">
             {days.map((day, index) => (
               <div
                 key={index}
-                className={`h-3 text-xs text-[#B0B0B0] font-secondary ${
-                  index % 2 === 0 ? "block" : "hidden"
-                }`}
+                className="h-3 text-xs text-[#B0B0B0] font-secondary flex items-center justify-end"
               >
                 {day}
               </div>
@@ -145,35 +138,50 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
           </div>
         </div>
 
-        {/* Contribution grid */}
-        <div className="flex space-x-1">
-          {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="space-y-1">
-              {week.map((day, dayIndex) => (
-                <div
-                  key={dayIndex}
-                  className={`w-3 h-3 rounded-sm ${
-                    day
-                      ? volunteerDashboardService.getContributionIntensity(
-                          day.contributions
-                        )
-                      : "bg-transparent"
-                  }`}
-                  title={
-                    day
-                      ? `${day.contributions} contributions on ${day.date}`
-                      : ""
-                  }
-                />
-              ))}
-            </div>
-          ))}
+        {/* Month labels and contribution grid */}
+        <div className="flex-1">
+          {/* Month labels */}
+          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5">
+            {months.map((month, index) => (
+              <span
+                key={index}
+                className="text-center w-3 flex items-center justify-center"
+              >
+                {month}
+              </span>
+            ))}
+          </div>
+
+          {/* Contribution grid */}
+          <div className="flex space-x-2">
+            {weeks.map((week, weekIndex) => (
+              <div key={weekIndex} className="space-y-1">
+                {week.map((day, dayIndex) => (
+                  <div
+                    key={dayIndex}
+                    className={`w-3 h-3 rounded-sm ${
+                      day
+                        ? volunteerDashboardService.getContributionIntensity(
+                            day.contributions
+                          )
+                        : "bg-transparent"
+                    }`}
+                    title={
+                      day
+                        ? `${day.contributions} contributions on ${day.date}`
+                        : ""
+                    }
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between text-xs text-[#B0B0B0] mt-4 font-secondary">
-        <div className="flex items-center space-x-2">
+      <div className="flex justify-end mt-4">
+        <div className="flex items-center space-x-2 text-xs text-[#B0B0B0] font-secondary">
           <span>Less</span>
           <div className="flex space-x-1">
             <div className="w-3 h-3 bg-gray-100 rounded-sm" />
