@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   getVolunteerSettingsByUsername,
   updateVolunteerEmail,
+  updateVolunteerAvailability,
   VolunteerSettings,
 } from "@/services/volunteerSettingsService";
 import { useRouter } from "next/navigation";
@@ -12,14 +13,14 @@ import { Button } from "@heroui/button";
 const SettingsPage = () => {
   const [volunteer, setVolunteer] = useState<VolunteerSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  //const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
+  const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
   const router = useRouter();
-  const username = "marie";
+  const username = "anne13";
 
   useEffect(() => {
     const loadVolunteer = async () => {
@@ -50,6 +51,42 @@ const SettingsPage = () => {
       console.error("Failed to update email:", error);
     }
   };
+
+  const handleToggleAvailability = async () => {
+    if (!volunteer) return;
+
+    setUpdatingAvailability(true);
+    try {
+      const newAvailability = !volunteer.isAvailable;
+      const updated = await updateVolunteerAvailability(
+        volunteer.volunteerId,
+        newAvailability
+      );
+      setVolunteer(updated);
+    } catch (error) {
+      console.error("Failed to update availability:", error);
+    } finally {
+      setUpdatingAvailability(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-5">
+        <span className="text-shark-300">Volunteer / Settings</span>
+        <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">
+          Settings
+        </h1>
+        <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
+          <div className="animate-pulse">
+            <div className="h-6 bg-shark-100 rounded mb-4"></div>
+            <div className="h-4 bg-shark-100 rounded mb-2"></div>
+            <div className="h-4 bg-shark-100 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-5">
@@ -120,31 +157,39 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Phone Verification */}
-      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-        <h2 className="font-secondary font-semibold text-xl mb-2">
-          Phone Verification
-        </h2>
-        <div className="mb-4 text-shark-700">
-          Your account is not verified. Verifying your account with a phone
-          number allows you to do more on Voluntrix.
-        </div>
-        <Button className="rounded-full bg-shark-950 text-shark-50 font-primary">
-          Phone verify
-        </Button>
-      </div>
-
       {/* Availability */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <h2 className="font-secondary font-semibold text-xl mb-2">
           Availability
         </h2>
         <div className="mb-4 text-shark-700">
-          While unavailable, your account will be hidden and rewards won’t get
+          While unavailable, your account will be hidden and rewards won't get
           affected.
         </div>
-        <Button className="rounded-full bg-shark-950 text-shark-50 font-primary">
-          Set Your Availability
+        <div className="mb-4">
+          <div className="flex items-center gap-2">
+            <div className="font-secondary text-shark-950 font-medium">
+              Current Status:
+            </div>
+            <div
+              className={`font-secondary font-medium ${
+                volunteer?.isAvailable ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {volunteer?.isAvailable ? "Available" : "Not Available"}
+            </div>
+          </div>
+        </div>
+        <Button
+          onPress={handleToggleAvailability}
+          disabled={updatingAvailability}
+          className="rounded-full bg-shark-950 text-shark-50 font-primary"
+        >
+          {updatingAvailability
+            ? "Updating..."
+            : volunteer?.isAvailable
+            ? "Set Not Available"
+            : "Set Available"}
         </Button>
       </div>
 
