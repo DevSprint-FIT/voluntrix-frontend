@@ -36,16 +36,18 @@ const StatCard = ({
   color?: string;
   bgColor?: string;
 }) => (
-  <div className="bg-white rounded-lg p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-600 mb-1 font-secondary">{title}</p>
+  <div className="bg-[#FBFBFB] rounded-lg p-6">
+    <div className="flex items-start space-x-6">
+      <div
+        className={`p-4 rounded-full ${bgColor} flex items-center justify-center`}
+      >
+        <Icon size={32} className={color} />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm text-[#B0B0B0] mb-1 font-secondary">{title}</p>
         <p className="text-2xl font-bold text-gray-900 font-secondary">
           {value}
         </p>
-      </div>
-      <div className={`p-3 rounded-lg ${bgColor}`}>
-        <Icon size={24} className={color} />
       </div>
     </div>
   </div>
@@ -118,7 +120,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
       </div>
 
       {/* Month labels */}
-      <div className="flex justify-between text-xs text-gray-500 mb-2 font-secondary">
+      <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary">
         {months.map((month, index) => (
           <span key={index} className="text-center">
             {month}
@@ -133,7 +135,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
             {days.map((day, index) => (
               <div
                 key={index}
-                className={`h-3 text-xs text-gray-500 font-secondary ${
+                className={`h-3 text-xs text-[#B0B0B0] font-secondary ${
                   index % 2 === 0 ? "block" : "hidden"
                 }`}
               >
@@ -170,8 +172,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between text-xs text-gray-500 mt-4 font-secondary">
-        <span>Learn how we count contributions</span>
+      <div className="flex items-center justify-between text-xs text-[#B0B0B0] mt-4 font-secondary">
         <div className="flex items-center space-x-2">
           <span>Less</span>
           <div className="flex space-x-1">
@@ -226,7 +227,7 @@ const VolunteerDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-secondary">Loading dashboard...</p>
+          <p className="text-[#B0B0B0] font-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -251,7 +252,7 @@ const VolunteerDashboard = () => {
   if (!dashboardData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600 font-secondary">
+        <p className="text-[#B0B0B0] font-secondary">
           No dashboard data available.
         </p>
       </div>
@@ -259,11 +260,11 @@ const VolunteerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-6 py-4">
         <div>
-          <nav className="text-sm text-gray-500 mb-2 font-secondary">
+          <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
             Volunteer / Dashboard
           </nav>
           <h1 className="text-2xl font-bold text-gray-900 font-secondary">
@@ -280,39 +281,39 @@ const VolunteerDashboard = () => {
               title="Current Level"
               value={`Level ${dashboardData.currentLevel}`}
               icon={Crown}
-              color="text-blue-600"
-              bgColor="bg-blue-50"
+              color="text-[#029972]"
+              bgColor="bg-[#ECFDF6]"
             />
             <StatCard
               title="Total Volunteering"
               value={`${dashboardData.totalVolunteeringEvents} Events`}
               icon={BarChart3}
-              color="text-green-600"
-              bgColor="bg-green-50"
+              color="text-[#029972]"
+              bgColor="bg-[#ECFDF6]"
             />
             <StatCard
               title="Total Donations"
               value={`LKR ${dashboardData.totalDonations.toLocaleString()}`}
               icon={DollarSign}
-              color="text-purple-600"
-              bgColor="bg-purple-50"
+              color="text-[#029972]"
+              bgColor="bg-[#ECFDF6]"
             />
             <StatCard
               title="Total Profile Views"
               value="1k+"
               icon={Eye}
-              color="text-orange-600"
-              bgColor="bg-orange-50"
+              color="text-[#029972]"
+              bgColor="bg-[#ECFDF6]"
             />
           </div>
 
           {/* Contribution Calendar */}
-          <div className="bg-white rounded-lg p-6 mb-8">
+          <div className="bg-[#FBFBFB] rounded-lg p-6 mb-8">
             <ContributionGrid data={dashboardData.contributionsData} />
           </div>
 
           {/* Contributions Chart */}
-          <div className="bg-white rounded-lg p-6">
+          <div className="bg-[#FBFBFB] rounded-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center space-x-2">
@@ -325,17 +326,19 @@ const VolunteerDashboard = () => {
             </div>
 
             <div className="mb-6">
-              <div className="flex items-baseline space-x-2">
+              <div>
                 <span className="text-3xl font-bold text-gray-900 font-secondary">
                   925
                 </span>
-                <span className="text-sm text-gray-500 font-secondary">
-                  Total Contributions
-                </span>
-                <span className="flex items-center text-sm text-green-600 font-medium font-secondary">
-                  <TrendingUp size={16} className="mr-1" />
-                  {volunteerDashboardService.getPercentageChange()}
-                </span>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className="text-sm text-[#B0B0B0] font-secondary">
+                    Total Contributions
+                  </span>
+                  <span className="flex items-center text-sm text-green-600 font-medium font-secondary">
+                    <TrendingUp size={16} className="mr-1" />
+                    {volunteerDashboardService.getPercentageChange()}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -351,9 +354,15 @@ const VolunteerDashboard = () => {
                   <YAxis hide />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#1F2937",
+                      backgroundColor: "#10B981",
                       border: "none",
                       borderRadius: "8px",
+                      color: "white",
+                    }}
+                    labelStyle={{
+                      color: "white",
+                    }}
+                    itemStyle={{
                       color: "white",
                     }}
                   />
@@ -363,7 +372,12 @@ const VolunteerDashboard = () => {
                     stroke="#10B981"
                     strokeWidth={3}
                     dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: "#10B981" }}
+                    activeDot={{
+                      r: 6,
+                      fill: "white",
+                      stroke: "#10B981",
+                      strokeWidth: 2,
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
