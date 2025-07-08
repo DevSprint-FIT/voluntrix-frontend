@@ -36,11 +36,13 @@ const StatCard = ({
   color?: string;
   bgColor?: string;
 }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
+  <div className="bg-white rounded-lg p-6">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-gray-600 mb-1">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        <p className="text-sm text-gray-600 mb-1 font-secondary">{title}</p>
+        <p className="text-2xl font-bold text-gray-900 font-secondary">
+          {value}
+        </p>
       </div>
       <div className={`p-3 rounded-lg ${bgColor}`}>
         <Icon size={24} className={color} />
@@ -109,14 +111,14 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-gray-900 font-secondary">
           {volunteerDashboardService.calculateTotalContributions(data)}{" "}
           contributions in the last year
         </h3>
       </div>
 
       {/* Month labels */}
-      <div className="flex justify-between text-xs text-gray-500 mb-2">
+      <div className="flex justify-between text-xs text-gray-500 mb-2 font-secondary">
         {months.map((month, index) => (
           <span key={index} className="text-center">
             {month}
@@ -131,7 +133,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
             {days.map((day, index) => (
               <div
                 key={index}
-                className={`h-3 text-xs text-gray-500 ${
+                className={`h-3 text-xs text-gray-500 font-secondary ${
                   index % 2 === 0 ? "block" : "hidden"
                 }`}
               >
@@ -168,7 +170,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between text-xs text-gray-500 mt-4">
+      <div className="flex items-center justify-between text-xs text-gray-500 mt-4 font-secondary">
         <span>Learn how we count contributions</span>
         <div className="flex items-center space-x-2">
           <span>Less</span>
@@ -223,8 +225,8 @@ const VolunteerDashboard = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -234,10 +236,10 @@ const VolunteerDashboard = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
+          <p className="text-red-600 mb-4 font-secondary">Error: {error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-secondary"
           >
             Retry
           </button>
@@ -249,7 +251,9 @@ const VolunteerDashboard = () => {
   if (!dashboardData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">No dashboard data available.</p>
+        <p className="text-gray-600 font-secondary">
+          No dashboard data available.
+        </p>
       </div>
     );
   }
@@ -257,12 +261,14 @@ const VolunteerDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b px-6 py-4">
+      <div className="bg-white px-6 py-4">
         <div>
-          <nav className="text-sm text-gray-500 mb-2">
+          <nav className="text-sm text-gray-500 mb-2 font-secondary">
             Volunteer / Dashboard
           </nav>
-          <h1 className="text-2xl font-bold text-gray-900">Main Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900 font-secondary">
+            Main Dashboard
+          </h1>
         </div>
       </div>
 
@@ -301,16 +307,16 @@ const VolunteerDashboard = () => {
           </div>
 
           {/* Contribution Calendar */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <div className="bg-white rounded-lg p-6 mb-8">
             <ContributionGrid data={dashboardData.contributionsData} />
           </div>
 
           {/* Contributions Chart */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center space-x-2">
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 font-secondary">
                     <span>{selectedYear}</span>
                     <ChevronDown size={16} />
                   </button>
@@ -320,11 +326,13 @@ const VolunteerDashboard = () => {
 
             <div className="mb-6">
               <div className="flex items-baseline space-x-2">
-                <span className="text-3xl font-bold text-gray-900">925</span>
-                <span className="text-sm text-gray-500">
+                <span className="text-3xl font-bold text-gray-900 font-secondary">
+                  925
+                </span>
+                <span className="text-sm text-gray-500 font-secondary">
                   Total Contributions
                 </span>
-                <span className="flex items-center text-sm text-green-600 font-medium">
+                <span className="flex items-center text-sm text-green-600 font-medium font-secondary">
                   <TrendingUp size={16} className="mr-1" />
                   {volunteerDashboardService.getPercentageChange()}
                 </span>
