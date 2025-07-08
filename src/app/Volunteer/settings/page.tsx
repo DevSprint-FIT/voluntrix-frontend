@@ -52,7 +52,7 @@ const NotificationModal = ({
         <div className="flex justify-end">
           <Button
             onPress={onClose}
-            className={`rounded-full font-primary ${
+            className={`rounded-full font-primary tracking-wide text-base ${
               type === "success"
                 ? "bg-green-600 text-white"
                 : "bg-red-600 text-white"
@@ -174,7 +174,7 @@ const SettingsPage = () => {
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="font-secondary font-semibold text-xl">
+            <h2 className="font-secondary font-semibold text-2xl">
               Your email address
             </h2>
             <div className="mb-4 text-shark-700">
@@ -195,13 +195,13 @@ const SettingsPage = () => {
                   <div className="flex gap-2 mt-4">
                     <Button
                       onPress={() => setEditingEmail(false)}
-                      className="rounded-full bg-shark-100 text-shark-900 font-primary"
+                      className="rounded-full bg-shark-100 text-shark-900 font-primary tracking-wide text-base"
                     >
                       Cancel
                     </Button>
                     <Button
                       onPress={handleSaveEmail}
-                      className="rounded-full bg-shark-950 text-shark-50 font-primary"
+                      className="rounded-full bg-shark-950 text-shark-50 font-primary tracking-wide text-base"
                     >
                       Save
                     </Button>
@@ -213,7 +213,7 @@ const SettingsPage = () => {
             {!editingEmail && (
               <Button
                 onPress={() => setEditingEmail(true)}
-                className="rounded-full bg-shark-950 text-shark-50 font-primary"
+                className="rounded-full bg-shark-950 text-shark-50 font-primary tracking-wide text-base"
               >
                 Change email
               </Button>
@@ -237,7 +237,7 @@ const SettingsPage = () => {
 
       {/* Availability */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-        <h2 className="font-secondary font-semibold text-xl mb-2">
+        <h2 className="font-secondary font-semibold text-2xl mb-2">
           Availability
         </h2>
         <div className="mb-4 text-shark-700">
@@ -261,7 +261,7 @@ const SettingsPage = () => {
         <Button
           onPress={handleToggleAvailability}
           disabled={updatingAvailability}
-          className="rounded-full bg-shark-950 text-shark-50 font-primary"
+          className="rounded-full bg-shark-950 text-shark-50 font-primary tracking-wide text-base"
         >
           {updatingAvailability
             ? "Updating..."
@@ -273,13 +273,13 @@ const SettingsPage = () => {
 
       {/* Danger Zone */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pr-20 pl-10">
-        <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">
+        <h2 className="font-secondary font-semibold text-2xl text-red-600 mb-2">
           Danger Zone
         </h2>
         <div className="mb-4 text-shark-700">
           Permanently delete your account and all data.
         </div>
-        <Button className="rounded-full bg-red-600 text-shark-50 font-primary">
+        <Button className="rounded-full bg-red-600 text-shark-50 font-primary tracking-wide text-base">
           Delete Account
         </Button>
       </div>
