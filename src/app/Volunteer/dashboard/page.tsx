@@ -141,11 +141,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         {/* Month labels and contribution grid */}
         <div className="flex-1">
           {/* Month labels */}
-          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5">
+          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5 px-10">
             {months.map((month, index) => (
               <span
                 key={index}
-                className="text-center w-3 flex items-center justify-center"
+                className="text-center flex items-center justify-center"
               >
                 {month}
               </span>
@@ -153,7 +153,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
           </div>
 
           {/* Contribution grid */}
-          <div className="flex space-x-2">
+          <div className="flex space-x-1.5">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="space-y-1">
                 {week.map((day, dayIndex) => (
@@ -180,7 +180,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-end mt-4 mr-8">
         <div className="flex items-center space-x-2 text-xs text-[#B0B0B0] font-secondary">
           <span>Less</span>
           <div className="flex space-x-1">
@@ -270,7 +270,7 @@ const VolunteerDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white px-6 py-4">
+      <div className="bg-white px-9 py-4">
         <div>
           <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
             Volunteer / Dashboard
@@ -282,7 +282,7 @@ const VolunteerDashboard = () => {
       </div>
 
       <div className="p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
