@@ -1,4 +1,4 @@
-import Sidebar from "@/components/UI/Sidebar";
+import VolunteerSidebar from "@/components/UI/VolunteerSidebar";
 import React from "react";
 
 export default function VolunteerLayout({
@@ -8,8 +8,8 @@ export default function VolunteerLayout({
 }) {
   return (
     <div className="flex">
-      <Sidebar />
-      <div className="flex-1 p-6 ml-5">{children}</div>
+      <VolunteerSidebar />
+      <div className="flex-1 p-6 ml-60">{children}</div>
     </div>
   );
 }
