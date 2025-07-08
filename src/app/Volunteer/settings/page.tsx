@@ -9,6 +9,62 @@ import {
 } from "@/services/volunteerSettingsService";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
+import { X, CheckCircle, AlertCircle } from "lucide-react";
+
+// Modal Component
+const NotificationModal = ({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  type: "success" | "error";
+  title: string;
+  message: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl w-full max-w-md mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            {type === "success" ? (
+              <CheckCircle className="text-green-600" size={24} />
+            ) : (
+              <AlertCircle className="text-red-600" size={24} />
+            )}
+            <h2 className="text-lg font-semibold font-secondary text-gray-900">
+              {title}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <p className="text-gray-600 font-secondary mb-6">{message}</p>
+        <div className="flex justify-end">
+          <Button
+            onPress={onClose}
+            className={`rounded-full font-primary ${
+              type === "success"
+                ? "bg-green-600 text-white"
+                : "bg-red-600 text-white"
+            }`}
+          >
+            OK
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SettingsPage = () => {
   const [volunteer, setVolunteer] = useState<VolunteerSettings | null>(null);
@@ -18,6 +74,12 @@ const SettingsPage = () => {
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [updatingAvailability, setUpdatingAvailability] = useState(false);
+
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"success" | "error">("success");
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
 
   const router = useRouter();
   const username = "anne13";
@@ -47,8 +109,24 @@ const SettingsPage = () => {
       );
       setVolunteer(updated);
       setEditingEmail(false);
+
+      // Show success modal
+      setModalType("success");
+      setModalTitle("Email Updated");
+      setModalMessage("Your email address has been successfully updated.");
+      setModalOpen(true);
     } catch (error) {
       console.error("Failed to update email:", error);
+
+      // Show error modal
+      setModalType("error");
+      setModalTitle("Update Failed");
+      setModalMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to update email address. Please try again."
+      );
+      setModalOpen(true);
     }
   };
 
@@ -205,6 +283,15 @@ const SettingsPage = () => {
           Delete Account
         </Button>
       </div>
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+      />
     </div>
   );
 };
