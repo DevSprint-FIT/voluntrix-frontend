@@ -36,7 +36,7 @@ const VolunteerWorkspaceSidebar = () => {
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       {/* Logo */}
       <div>
-        <div className="mb-8 flex justify-center">
+        <div className="mb-24 mt-4 flex justify-center">
           <img
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
@@ -46,7 +46,7 @@ const VolunteerWorkspaceSidebar = () => {
 
         {/* Navigation */}
         <nav>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-12">
             {menuItems.map((item) => {
               const isActive = selectedItem === item.name;
 
@@ -54,7 +54,7 @@ const VolunteerWorkspaceSidebar = () => {
                 <Link key={item.name} href={item.href || "#"}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
-                    className={`w-full cursor-pointer text-left flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 relative ${
+                    className={`w-full cursor-pointer text-left flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 relative ${
                       isActive ? "text-verdant-700 font-semibold" : ""
                     }`}
                   >
@@ -90,7 +90,7 @@ const VolunteerWorkspaceSidebar = () => {
       <div>
         <button
           onClick={() => setSelectedItem("Back")}
-          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
+          className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
             <ArrowLeft className="h-5 w-5" />
