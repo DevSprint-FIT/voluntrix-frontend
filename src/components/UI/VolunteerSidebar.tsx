@@ -108,7 +108,7 @@ const VolunteerSidebar = () => {
       <div>
         <button
           onClick={() => setSelectedItem("Logout")}
-          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-shark-50 group text-sm text-shark-950 w-full text-left"
+          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
             <LogOut className="h-5 w-5" />
