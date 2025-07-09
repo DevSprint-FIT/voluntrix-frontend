@@ -31,9 +31,6 @@ const Page = () => {
       {/* Title */}
       <span className="text-shark-300">Organization / Profile</span>
       <h1 className="text-2xl font-primary font-bold mb-4">Profile</h1>
-      <Button className="font-primary border rounded-full text-shark-50 bg-shark-950 mb-4">
-        <Pencil className="w-4 h-4" />
-        Edit Your Public Profile</Button>
 
       {/* ProfileHeader Section */}
       {!organizationData ? (
@@ -58,27 +55,39 @@ const Page = () => {
       {/* Contact and Bank Information */}
       <div className="flex gap-24">
         <ContactInformation
-          data={organizationData ? {
-            email: organizationData.email,
-            phone: organizationData.phone,
-            website: organizationData.website
-          } : undefined}
+          data={
+            organizationData
+              ? {
+                  email: organizationData.email,
+                  phone: organizationData.phone,
+                  website: organizationData.website,
+                }
+              : undefined
+          }
         />
         <BankInformation
-          data={organizationData ? {
-            bankName: organizationData.bankName,
-            accountNumber: organizationData.accountNumber
-          } : undefined}
+          data={
+            organizationData
+              ? {
+                  bankName: organizationData.bankName,
+                  accountNumber: organizationData.accountNumber,
+                }
+              : undefined
+          }
         />
       </div>
 
       {/* Social Links */}
       <SocialLinks
-        data={organizationData ? {
-          facebookLink: organizationData.facebookLink,
-          instagramLink: organizationData.instagramLink,
-          linkedinLink: organizationData.linkedinLink
-        } : undefined}
+        data={
+          organizationData
+            ? {
+                facebookLink: organizationData.facebookLink,
+                instagramLink: organizationData.instagramLink,
+                linkedinLink: organizationData.linkedinLink,
+              }
+            : undefined
+        }
       />
     </div>
   );

@@ -23,8 +23,6 @@
   color: inherit; /* Use default text color */
 }
 
-
-
 /* Keep your event highlight class */
 .highlight-event {
   @apply bg-blue-500 text-white rounded-full;
@@ -47,7 +45,7 @@
 
 /* Set the calendar background color to #FBFBFB */
 .react-calendar {
-  background-color: #FBFBFB !important;
+  background-color: #fbfbfb !important;
   border: none;
   font-family: inherit;
 }
@@ -55,8 +53,8 @@
 /* Style the month/year label */
 .react-calendar__navigation__label {
   background-color: #ecfdf5 !important; /* verdant-50 */
-  color: #047857 !important;            /* verdant-600 */
-  border-radius: 9999px !important;     /* rounded-full */
+  color: #047857 !important; /* verdant-600 */
+  border-radius: 9999px !important; /* rounded-full */
   padding: 6px 12px !important;
   font-weight: 600;
   font-family: inherit;
@@ -64,13 +62,11 @@
 
 /* Highlight event dates with verdant-600 background */
 .react-calendar__tile.highlight-event {
-  background-color: #0cbc8b!important; /* verdant-600 */
+  background-color: #0cbc8b !important; /* verdant-600 */
   color: white !important;
   border-radius: 50px;
   font-weight: 600;
-;
 }
-
 
 /* Style for the year dropdown to show years from current to bottom */
 .year-dropdown {
@@ -95,9 +91,3 @@
 .year-dropdown option:hover {
   background-color: #f3f4f6;
 }
-
-
-
-
-
-
