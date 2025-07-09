@@ -32,15 +32,15 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
   }
 
   return (
-    <div className="p-4 border-none rounded  w-full bg-[#FBFBFB] mt-10">
-      <h2 className="text-xl font-secondary font-semibold mb-6">Suggested Organizations</h2>
+    <div className="p-3 border-none rounded-xl  w-full bg-[#FBFBFB] mt-1">
+      <h2 className="text-xl font-secondary font-semibold mb-6 mt-2">Suggested Organizations</h2>
       {unfollowedOrgs.length === 0 ? (
         <p>No new organizations to follow.</p>
       ) : (
         <ul className="space-y-3">
           {unfollowedOrgs.map(org => (
             <li key={org.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 ">
                 <img
                   src={org.imageUrl || "/default-org.png"}
                   alt={org.name}
@@ -52,7 +52,7 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
                 </div>
                 
               </div>
-              <button className="px-3 py-1 bg-shark-950 text-white text-sm rounded-full hover:bg-shark-500 whitespace-nowrap"
+              <button className="px-3 py-2 bg-shark-950 text-white text-sm rounded-full hover:bg-shark-500 whitespace-nowrap mr-2"
               onClick={() => handleFollow(org.id)}
               >
                 + Follow

@@ -45,9 +45,9 @@ const PublicFeedPage = () => {
       sharesGrowth: "0%",
     });
 
-  const userId = 1;    //3
-  const userType: "ORGANIZATION" = "ORGANIZATION"; 
- const username = "IEEESLIT";   //marie
+  const userId = 1;    // 3
+  const userType:   "ORGANIZATION" = "ORGANIZATION";   //  "VOLUNTEER" = "VOLUNTEER"  
+ const username = "IEEESLIT";   //  marie
 
  const handleShareClick = async (postId: number) => {
   try {
@@ -110,7 +110,6 @@ const PublicFeedPage = () => {
 
             // Fetch only the posts by this organization
             const orgPosts = await fetchPosts(orgData.id);
-
             const orgMetrics = calculateMetrics(orgPosts);
             setMetrics(orgMetrics);
 
@@ -142,12 +141,12 @@ const PublicFeedPage = () => {
     <div className="mt-20 flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6 ">
       
       {/* Left Sidebar – Dynamic Profile */}
-      <aside className="hidden md:block md:w-1/5 -ml-8 mr-16 sticky top-24 self-start">
+      <aside className="hidden md:block md:w-1/5 -ml-4 mr-16 sticky top-24 self-start">
         {profile && <ProfileCard {...profile} />}
       </aside>
 
       {/* Main Feed */}
-      <main className= "w-[55%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
+      <main className= "w-[50%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
         {posts.length === 0 ? (
           <p>No posts available.</p>
         ) : (
@@ -155,6 +154,7 @@ const PublicFeedPage = () => {
             <PostCard
               key={post.id}
               postId={post.id}
+              username="{post.organizationUsername}"
               content={post.content}
               imageUrl={post.mediaUrl}
               mediaType={post.mediaType}
@@ -214,7 +214,7 @@ const PublicFeedPage = () => {
 
     {/* Right Sidebar – For VOLUNTEER */}
          {isVolunteer(userType) && (
-         <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-6 self-start">
+         <aside className="hidden md:block md:w-1/4 space-y-4 sticky top-6 self-start">
          <SuggestedOrganizations volunteerId={userId} />
          </aside>
         )}

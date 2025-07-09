@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Progress } from "@heroui/progress";
 import { Button } from "@heroui/button";
 
-// need to fetch this type of structured data to build cards
 interface Event {
   imageUrl: string;
   title: string;

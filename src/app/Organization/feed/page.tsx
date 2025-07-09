@@ -88,7 +88,6 @@ export default function SocialFeed() {
         );
         setEditingPost(null);
       } else {
-        //  creating a new post, submit it and add to the state
         const newPost = await createPost(content, organization.id, mediaUrl, mediaType, mediaSizeInBytes);
         if (newPost) {
           setPosts((prevPosts) => [newPost, ...prevPosts]);
@@ -256,7 +255,8 @@ export default function SocialFeed() {
               <PostCard
                 key={post.id}
                 user={post.organizationName}
-                institute={(organization?.institute ?? "").toUpperCase()}
+                username="{post.organizationUsername}"
+                institute={(organization?.institute ?? "")}
                 followers={organization?.followerCount ?? 0}
                 timeAgo={post.timeAgo ?? ""}
                 content={post.content}
@@ -328,7 +328,7 @@ export default function SocialFeed() {
             <div className="text-center">
                <h3 className="font-bold mb-1 font-secondary text-xl">Your Storage</h3>
                <p className="text-sm text-shark-300 mb-3">Supervise your drive space<br/> in the easiest way</p>
-               <button className="bg-verdant-50 rounded-full pl-3 pr-3 pt-0 pb-0 text-verdant-800 border border-verdant-800 font-secondary font-medium">Upgrade</button>
+               <button className="bg-verdant-50 rounded-full pl-3 pr-3 pt-1 pb-1 text-verdant-800 border border-verdant-800 font-secondary font-medium">Upgrade</button>
             </div>
             
             <div className="flex justify-between text-sm text-shark-400">
