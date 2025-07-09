@@ -36,7 +36,7 @@ const VolunteerSidebar = () => {
     { name: "Home", icon: Home, href: "/" },
     { name: "Dashboard", icon: BarChart, href: "/Volunteer/dashboard" },
     { name: "Profile", icon: User, href: "/Volunteer/profile" },
-    { name: "Events", icon: Calendar, href: "/Volunteer/events" },
+    { name: "Events", icon: Calendar, href: "/Volunteer/events/active" },
     {
       name: "Notifications",
       icon: Bell,
