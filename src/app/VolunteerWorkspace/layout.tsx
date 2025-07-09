@@ -39,7 +39,7 @@ export default function VolunteerWorkspaceLayout({
       <VolunteerWorkspaceSidebar />
       <div className="flex-1 ml-60">
         {/* Event Dropdown Header */}
-        <div className="bg-white border-b px-6 py-4 sticky top-0 z-20">
+        <div className="bg-white border-b px-6 py-4 pt-10 sticky top-0 z-20">
           <div className="relative inline-block">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
