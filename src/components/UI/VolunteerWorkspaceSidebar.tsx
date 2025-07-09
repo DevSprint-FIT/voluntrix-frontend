@@ -22,8 +22,12 @@ const VolunteerWorkspaceSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Tasks", icon: ListTodo, href: "/workspace/tasks" },
-    { name: "Leaderboard", icon: Trophy, href: "/workspace/leaderboard" },
+    { name: "Tasks", icon: ListTodo, href: "/VolunteerWorkspace/tasks" },
+    {
+      name: "Leaderboard",
+      icon: Trophy,
+      href: "/VolunteerWorkspace/leaderboard",
+    },
     {
       name: "Notifications",
       icon: Bell,
