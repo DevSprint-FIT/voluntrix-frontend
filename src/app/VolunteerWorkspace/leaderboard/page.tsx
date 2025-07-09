@@ -6,7 +6,7 @@ import { Trophy, Medal, Award, Star } from "lucide-react";
 interface Volunteer {
   id: string;
   name: string;
-  avatar?: string;
+  profilePictureUrl?: string;
   rewardPoints: number;
 }
 
@@ -77,16 +77,7 @@ const LeaderboardPage = () => {
   };
 
   const getRankBadgeColor = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case 2:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case 3:
-        return "bg-amber-100 text-amber-800 border-amber-200";
-      default:
-        return "bg-verdant-100 text-verdant-800 border-verdant-200";
-    }
+    return "bg-verdant-100 text-verdant-800 border-verdant-200";
   };
 
   const getInitials = (name: string) => {
@@ -119,16 +110,16 @@ const LeaderboardPage = () => {
         {/* Full Leaderboard Table */}
         <div className="bg-white rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <thead className="bg-white">
                 <tr>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-shark-700 uppercase tracking-wider">
+                  <th className="w-1/3 px-6 py-4 text-center text-sm font-bold text-shark-700 uppercase tracking-wider">
                     Rank
                   </th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-shark-700 uppercase tracking-wider">
+                  <th className="w-1/3 px-6 py-4 text-left text-sm font-bold text-shark-700 uppercase tracking-wider pl-16">
                     Volunteer
                   </th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-shark-700 uppercase tracking-wider">
+                  <th className="w-1/3 px-6 py-4 text-center text-sm font-bold text-shark-700 uppercase tracking-wider">
                     Reward Points
                   </th>
                 </tr>
@@ -138,7 +129,7 @@ const LeaderboardPage = () => {
                   <React.Fragment key={volunteer.id}>
                     <tr className="bg-[#fbfbfb] hover:bg-verdant-50 transition-colors">
                       <td className="px-6 py-5 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center space-x-3">
+                        <div className="flex items-center justify-center">
                           <span
                             className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRankBadgeColor(
                               volunteer.rank
@@ -146,11 +137,23 @@ const LeaderboardPage = () => {
                           >
                             {volunteer.rank}
                           </span>
-                          {getRankIcon(volunteer.rank)}
                         </div>
                       </td>
-                      <td className="px-6 py-5 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center">
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="flex items-center space-x-6">
+                          <div className="w-10 h-10 bg-verdant-100 rounded-full flex items-center justify-center overflow-hidden">
+                            {volunteer.profilePictureUrl ? (
+                              <img
+                                src={volunteer.profilePictureUrl}
+                                alt={volunteer.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-verdant-700 font-medium text-sm">
+                                {getInitials(volunteer.name)}
+                              </span>
+                            )}
+                          </div>
                           <div className="text-base font-medium text-shark-950">
                             {volunteer.name}
                           </div>
