@@ -16,21 +16,26 @@ export function arrayToDate(arr: number[]): Date {
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
   }
-
   export function calculateMetrics(posts: Post[]) {
-    const startOfThisMonth = new Date();
-    startOfThisMonth.setDate(1);
-    startOfThisMonth.setHours(0, 0, 0, 0);
-  
+    // Get the most recent month that has posts
+    const sortedDates = posts
+      .map(p => new Date(p.createdAt))
+      .sort((a, b) => b.getTime() - a.getTime());
+    
+    const mostRecentDate = sortedDates[0] || new Date();
+    const startOfThisMonth = new Date(mostRecentDate.getFullYear(), mostRecentDate.getMonth(), 1);
     const startOfLastMonth = new Date(startOfThisMonth);
     startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1);
   
-    const thisMonthPosts = posts.filter(p => new Date(p.createdAt) >= startOfThisMonth);
-    const lastMonthPosts = posts.filter(
-      p =>
-        new Date(p.createdAt) >= startOfLastMonth &&
-        new Date(p.createdAt) < startOfThisMonth
-    );
+    const thisMonthPosts = posts.filter(p => {
+      const postDate = new Date(p.createdAt);
+      return postDate >= startOfThisMonth && postDate < new Date(startOfThisMonth.getFullYear(), startOfThisMonth.getMonth() + 1, 1);
+    });
+    
+    const lastMonthPosts = posts.filter(p => {
+      const postDate = new Date(p.createdAt);
+      return postDate >= startOfLastMonth && postDate < startOfThisMonth;
+    });
   
     const thisMonthCount = thisMonthPosts.length;
     const lastMonthCount = lastMonthPosts.length;

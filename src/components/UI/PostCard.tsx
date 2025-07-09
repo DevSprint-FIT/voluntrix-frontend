@@ -3,9 +3,12 @@ import { MoreHorizontal, Heart, MessageSquare, SquareArrowOutUpRight, SendHorizo
 import ConfirmationModal from "./ConfirmationModal";
 import { getUserReaction, reactToPost, removeReaction, getReactionsForPost } from "@/services/reactionService";
 import ShareModal from "./ShareModal";
+import { addComment, getCommentsForPost, deleteComment } from "@/services/commentService";
+import { getTimeAgoFromDate } from "@/services/utils";
 
 interface PostCardProps {
   user: string;
+  username: string;
   institute: string;
   timeAgo: string;
   followers: number;
@@ -30,6 +33,7 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({
   user,
+  username,
   institute,
   timeAgo,
   followers,
@@ -52,6 +56,14 @@ const PostCard: React.FC<PostCardProps> = ({
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [comments, setComments] = useState<any[]>([]);
+  const [showComments, setShowComments] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [openCommentMenuId, setOpenCommentMenuId] = useState<number | null>(null);
+
+
+
 
   const handleDeleteClick = () => {
     setShowMenu(false);
@@ -86,6 +98,30 @@ const PostCard: React.FC<PostCardProps> = ({
     setShowShareModal(false);
     
   };
+
+  const handleCommentSubmit = async () => {
+  const username = "IEEESLIT"
+  const userType = "ORGANIZATION";
+  const content = commentText;
+
+     try {
+       await addComment(postId, username, userType, commentText);
+       setCommentText(""); // Clear input
+     } catch (error) {
+       console.error("Error adding comment:", error);
+    }
+   };
+
+  const handleCommentDelete = async (commentId: number) => {
+     try {
+     await deleteComment(commentId);
+     setComments((prevComments) => prevComments.filter(c => c.id !== commentId));
+    } catch (err) {
+    console.error("Error deleting comment:", err);
+   }
+  };
+
+
   
   useEffect(() => {
     const fetchReactionsAndUserReaction = async () => {
@@ -158,11 +194,11 @@ const PostCard: React.FC<PostCardProps> = ({
           <div className="bg-gray-200 w-10 h-10 rounded-full" />
         )}
         <div>
-          <p className="font-semibold">
+          <p className="font-semibold font-secondary text-shark-950">
             {user}
             <span> {institute}</span>
           </p>
-          <div className="text-sm text-shark-400 flex flex-col">
+          <div className="text-sm text-shark-500 flex flex-col">
             <span>{followers} followers</span>
             <span>{timeAgo}</span>
           </div>
@@ -181,7 +217,7 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Like count display */}
-      <div className="text-sm text-gray-600 mt-2">
+      <div className="text-sm text-shark-600 mt-2">
       {likeCount} {likeCount === 1 ? "person likes this" : "people like this"}
       </div>
 
@@ -189,20 +225,37 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Like */}
       <div className="flex items-center justify-around text-sm text-gray-600 border-t mt-4 pt-2">
         <button onClick={toggleLike}
-        className="flex items-center gap-1 text-sm text-shark-600 hover:text-red-500"
+        className="flex items-center gap-1 text-sm text-shark-600 hover:text-shark-950"
         >
           <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-shark-400"}`}/>
           <span>Like</span>
         </button>
 
         {/* Comment */}
-        <button className="flex items-center gap-1 hover:text-verdant-500">
-          <MessageSquare className="w-5 h-5" />
-          <span>Comment</span>
-        </button>
+        <button
+           className="flex items-center gap-1 hover:text-shark-950"
+           onClick={async () => {
+           if (!showComments) {
+            setLoadingComments(true);
+            try {
+              const fetchedComments = await getCommentsForPost(postId);
+              setComments(fetchedComments);
+           } catch (err) {
+              console.error("Error fetching comments in component:", err);
+           } finally {
+               setLoadingComments(false);
+           }
+        }
+        setShowComments((prev) => !prev);
+        }}
+     >
+        <MessageSquare className="w-5 h-5" />
+        <span>Comment</span>
+      </button>
+
 
         {/* Share */}
-        <button className="flex items-center gap-1 hover:text-verdant-500"
+        <button className="flex items-center gap-1 hover:text-shark-950"
          onClick={() => setShowShareModal(true)}
         >
           < SquareArrowOutUpRight className="w-5 h-5"/>
@@ -210,17 +263,84 @@ const PostCard: React.FC<PostCardProps> = ({
         </button>
       </div>
 
-      {/* Comment Input Section */}
-      <div className="mt-4 border-t pt-3">
-        <div className="flex gap-6 items-center">
-          <input 
-              type="text"
-              placeholder="Write a comment..."
-              className="flex-1 border rounded-full px-4 py-1 h-10 text-sm bg-shark-50 focus:outline-none"
-          />
-          <SendHorizonal />
-        </div>
+        {/* Comment Input Section - ALWAYS VISIBLE */}
+<div className="mt-4 border-t pt-3">
+  <div className="flex gap-6 items-center">
+    <input 
+      type="text"
+      placeholder="Write a comment..."
+      className="flex-1 border rounded-full px-4 py-1 h-10 text-sm bg-shark-50 focus:outline-none"
+      value={commentText}
+      onChange={(e) => setCommentText(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleCommentSubmit();
+        }
+      }}
+    />
+    <button onClick={handleCommentSubmit} aria-label="Send comment">
+      <SendHorizonal />
+    </button>
+  </div>
+
+  {/* Comment List - toggle with showComments */}
+  {showComments && (
+    <div className="mt-4 space-y-3 text-sm">
+      {loadingComments ? (
+        <p className="text-gray-500">Loading comments...</p>
+      ) : comments.length === 0 ? (
+        <p className="text-gray-500">No comments yet.</p>
+      ) : (
+        comments.map((comment) => (
+  <div key={comment.id} className="flex flex-col">
+    <div className="flex items-start gap-3">
+      {/* Profile Image Placeholder */}
+      <div className="w-8 h-8 rounded-full bg-shark-100 shrink-0" />
+
+      {/* Comment Bubble */}
+      <div className="bg-[#FBFBFB] px-4 py-2 rounded-2xl max-w-[95%] relative pr-10">
+        <p className="font-semibold text-sm mb-0.5">{comment.commenterName}</p>
+        <p className="text-sm">{comment.content}</p>
+
+        {/* 3 dots button */}
+        <button
+          className="absolute top-1 right-1 p-1 hover:bg-gray-200 rounded-full"
+          onClick={() => setOpenCommentMenuId(openCommentMenuId === comment.id ? null : comment.id)}
+          aria-label="Open comment options"
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+
+        {/* Dropdown menu */}
+        {openCommentMenuId === comment.id && (
+          <div className="absolute -top-5 left-full ml-2 bg-white border rounded-md shadow-sm">
+            <button
+              className="block px-6 py-2 text-red-600 hover:text-red-500 w-full text-right rounded"
+              onClick={() => {
+                handleCommentDelete(comment.id);
+                setOpenCommentMenuId(null);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
+    </div>
+
+    {/* Timestamp under the comment bubble */}
+    <p className="text-xs text-gray-400 ml-11 mt-1">
+      {getTimeAgoFromDate(new Date(comment.createdAt))}
+    </p>
+  </div>
+        ))
+      )}
+    </div>
+  )}
+</div>
+
+
 
       <ShareModal
           isOpen={showShareModal}
