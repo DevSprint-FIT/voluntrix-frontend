@@ -55,6 +55,47 @@ export class WorkspaceTaskService {
     };
   }
 
+  // Method to submit a task with resource URL
+  static async submitTask(
+    taskId: string,
+    resourceUrl: string
+  ): Promise<boolean> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/tasks/${taskId}`, {
+      //   method: 'PATCH',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     resourceUrl: resourceUrl,
+      //     taskStatus: 'IN_PROGRESS',
+      //     taskSubmittedDate: new Date().toISOString(),
+      //   }),
+      // });
+      // return response.ok;
+
+      // Simulate success/failure for demo
+      const success = Math.random() > 0.2; // 80% success rate for demo
+
+      if (success) {
+        console.log(
+          `Task ${taskId} submitted successfully with URL: ${resourceUrl}`
+        );
+        console.log(`Task status changed to IN_PROGRESS`);
+        console.log(`Task submitted date: ${new Date().toISOString()}`);
+      }
+
+      return success;
+    } catch (error) {
+      console.error("Error submitting task:", error);
+      return false;
+    }
+  }
+
   static async getTasks(): Promise<TaskData[]> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));

@@ -16,6 +16,7 @@ import {
   CompletedTask,
 } from "@/services/volunteerWorkspaceTaskService";
 import Table, { Column } from "@/components/UI/Table";
+import TaskSubmissionModal from "@/components/UI/TaskSubmissionModal";
 
 const TasksPage = () => {
   const [taskStats, setTaskStats] = useState<TaskStats>({
@@ -28,6 +29,10 @@ const TasksPage = () => {
   const [tasksInReview, setTasksInReview] = useState<TaskInReview[]>([]);
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
   const [tablesLoading, setTablesLoading] = useState(true);
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<ToDoTask | null>(null);
 
   useEffect(() => {
     const fetchTaskStats = async () => {
@@ -121,9 +126,48 @@ const TasksPage = () => {
 
   // Helper function to handle task submission
   const handleTaskSubmission = (taskId: string) => {
-    // In a real app, this would open a modal or navigate to a submission page
-    console.log(`Submitting task with ID: ${taskId}`);
-    // You can implement the submission logic here
+    const task = toDoTasks.find(t => t.taskId === taskId);
+    if (task) {
+      setSelectedTask(task);
+      setIsModalOpen(true);
+    }
+  };
+
+  // Function to handle modal submission
+  const handleModalSubmit = async (taskId: string, resourceUrl: string): Promise<boolean> => {
+    try {
+      const success = await WorkspaceTaskService.submitTask(taskId, resourceUrl);
+      
+      if (success) {
+        // Remove task from TO_DO list (it's now IN_PROGRESS)
+        setToDoTasks(prevTasks => prevTasks.filter(task => task.taskId !== taskId));
+        
+        // Refresh table data to reflect changes
+        const [toDo, inReview, completed] = await Promise.all([
+          WorkspaceTaskService.getToDoTasks(),
+          WorkspaceTaskService.getTasksInReview(),
+          WorkspaceTaskService.getCompletedTasks(),
+        ]);
+        setToDoTasks(toDo);
+        setTasksInReview(inReview);
+        setCompletedTasks(completed);
+        
+        // Update stats
+        const stats = await WorkspaceTaskService.getTaskStats();
+        setTaskStats(stats);
+      }
+      
+      return success;
+    } catch (error) {
+      console.error('Error in task submission:', error);
+      return false;
+    }
+  };
+
+  // Function to close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
   };
 
   // Table configurations
@@ -334,6 +378,15 @@ const TasksPage = () => {
           )}
         </div>
       </div>
+
+      {/* Task Submission Modal */}
+      <TaskSubmissionModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        taskId={selectedTask?.taskId || ''}
+        taskDescription={selectedTask?.description || ''}
+        onSubmit={handleModalSubmit}
+      />
     </div>
   );
 };
