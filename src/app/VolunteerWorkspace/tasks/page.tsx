@@ -111,9 +111,9 @@ const TasksPage = () => {
       case "MEDIUM":
         return "bg-yellow-100 text-yellow-800";
       case "HARD":
-        return "bg-red-100 text-red-800";
+        return "bg-orange-100 text-orange-800";
       case "EXTREME":
-        return "bg-purple-100 text-purple-800";
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -155,7 +155,7 @@ const TasksPage = () => {
       cell: (value) => (
         <button
           onClick={() => handleTaskSubmission(value as string)}
-          className="bg-verdant-600 hover:bg-verdant-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          className="rounded-full bg-verdant-600 text-white font-primary tracking-wider text-sm px-4 py-2 hover:bg-verdant-700 transition-colors"
         >
           Submit
         </button>
@@ -255,7 +255,7 @@ const TasksPage = () => {
       </div>
 
       {/* Task Stats Cards */}
-      <div className="px-6 pt-1">
+      <div className="px-6 pt-0">
         <div className="flex gap-8 mb-8 justify-start">
           <TaskStatusCard
             count={taskStats.totalTasksDue}
@@ -282,10 +282,10 @@ const TasksPage = () => {
       </div>
 
       {/* Tables Section */}
-      <div className="px-6 space-y-8">
+      <div className="px-6 space-y-20 mt-20">
         {/* To-Do Tasks Table */}
         <div>
-          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-1">
             To-Do Tasks
           </h2>
           <p className="text-shark-600 mb-4 font-secondary">
@@ -302,7 +302,7 @@ const TasksPage = () => {
 
         {/* Tasks in Review Table */}
         <div>
-          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-1">
             Tasks in Review
           </h2>
           <p className="text-shark-600 mb-4 font-secondary">
@@ -319,7 +319,7 @@ const TasksPage = () => {
 
         {/* Completed Tasks Table */}
         <div>
-          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-1">
             Completed and Reviewed Tasks
           </h2>
           <p className="text-shark-600 mb-4 font-secondary">
