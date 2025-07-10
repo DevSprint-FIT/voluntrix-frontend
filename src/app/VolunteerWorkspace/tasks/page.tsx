@@ -104,8 +104,8 @@ const TasksPage = () => {
   };
 
   // Helper function to get difficulty badge color
-  const getDifficultyBadgeColor = (difficulty: string) => {
-    switch (difficulty) {
+  const getDifficultyBadgeColor = (taskDifficulty: string) => {
+    switch (taskDifficulty) {
       case "EASY":
         return "bg-green-100 text-green-800";
       case "MEDIUM":
@@ -134,7 +134,7 @@ const TasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -151,7 +151,7 @@ const TasksPage = () => {
     },
     {
       header: "Action",
-      accessor: "id",
+      accessor: "taskId",
       cell: (value) => (
         <button
           onClick={() => handleTaskSubmission(value as string)}
@@ -170,7 +170,7 @@ const TasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -183,7 +183,7 @@ const TasksPage = () => {
     },
     {
       header: "Submitted Date",
-      accessor: "submittedDate",
+      accessor: "taskSubmittedDate",
     },
     {
       header: "Resource URL",
@@ -209,7 +209,7 @@ const TasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -222,15 +222,15 @@ const TasksPage = () => {
     },
     {
       header: "Submitted Date",
-      accessor: "submittedDate",
+      accessor: "taskSubmittedDate",
     },
     {
       header: "Reviewed Date",
-      accessor: "reviewedDate",
+      accessor: "taskReviewedDate",
     },
     {
       header: "Reward Points",
-      accessor: "rewardPoints",
+      accessor: "taskRewardPoints",
       cell: (value) => (
         <span className="text-verdant-600 font-semibold">{value} pts</span>
       ),

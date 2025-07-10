@@ -19,27 +19,27 @@ export interface TaskData {
 
 // New interfaces for the tables
 export interface ToDoTask {
-  id: string;
+  taskId: string;
   description: string;
-  difficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
   dueDate: string;
 }
 
 export interface TaskInReview {
-  id: string;
+  taskId: string;
   description: string;
-  difficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  submittedDate: string;
+  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskSubmittedDate: string;
   resourceUrl: string;
 }
 
 export interface CompletedTask {
-  id: string;
+  taskId: string;
   description: string;
-  difficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  submittedDate: string;
-  reviewedDate: string;
-  rewardPoints: number;
+  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskSubmittedDate: string;
+  taskReviewedDate: string;
+  taskRewardPoints: number;
 }
 
 export class WorkspaceTaskService {
@@ -93,30 +93,31 @@ export class WorkspaceTaskService {
   // New methods for the tables
   static async getToDoTasks(): Promise<ToDoTask[]> {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    
+
     return [
       {
-        id: "1",
+        taskId: "1",
         description: "Set up registration booth for event volunteers",
-        difficulty: "MEDIUM",
+        taskDifficulty: "MEDIUM",
         dueDate: "2025-07-20",
       },
       {
-        id: "2",
+        taskId: "2",
         description: "Prepare welcome packets and orientation materials",
-        difficulty: "EASY",
+        taskDifficulty: "EASY",
         dueDate: "2025-07-22",
       },
       {
-        id: "3",
+        taskId: "3",
         description: "Coordinate with catering team for meal arrangements",
-        difficulty: "HARD",
+        taskDifficulty: "HARD",
         dueDate: "2025-07-25",
       },
       {
-        id: "4",
-        description: "Organize complex multi-day event logistics and emergency protocols",
-        difficulty: "EXTREME",
+        taskId: "4",
+        description:
+          "Organize complex multi-day event logistics and emergency protocols",
+        taskDifficulty: "EXTREME",
         dueDate: "2025-07-30",
       },
     ];
@@ -124,27 +125,27 @@ export class WorkspaceTaskService {
 
   static async getTasksInReview(): Promise<TaskInReview[]> {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    
+
     return [
       {
-        id: "1",
+        taskId: "1",
         description: "Design event promotional materials",
-        difficulty: "MEDIUM",
-        submittedDate: "2025-07-15",
+        taskDifficulty: "MEDIUM",
+        taskSubmittedDate: "2025-07-15",
         resourceUrl: "https://drive.google.com/file/example1",
       },
       {
-        id: "2",
+        taskId: "2",
         description: "Create volunteer training presentation",
-        difficulty: "HARD",
-        submittedDate: "2025-07-16",
+        taskDifficulty: "HARD",
+        taskSubmittedDate: "2025-07-16",
         resourceUrl: "https://docs.google.com/presentation/example2",
       },
       {
-        id: "3",
+        taskId: "3",
         description: "Develop comprehensive crisis management system",
-        difficulty: "EXTREME",
-        submittedDate: "2025-07-14",
+        taskDifficulty: "EXTREME",
+        taskSubmittedDate: "2025-07-14",
         resourceUrl: "https://github.com/example/crisis-management",
       },
     ];
@@ -152,39 +153,39 @@ export class WorkspaceTaskService {
 
   static async getCompletedTasks(): Promise<CompletedTask[]> {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    
+
     return [
       {
-        id: "1",
+        taskId: "1",
         description: "Organize volunteer database and contact information",
-        difficulty: "EASY",
-        submittedDate: "2025-07-10",
-        reviewedDate: "2025-07-12",
-        rewardPoints: 50,
+        taskDifficulty: "EASY",
+        taskSubmittedDate: "2025-07-10",
+        taskReviewedDate: "2025-07-12",
+        taskRewardPoints: 50,
       },
       {
-        id: "2",
+        taskId: "2",
         description: "Conduct venue safety inspection and report",
-        difficulty: "MEDIUM",
-        submittedDate: "2025-07-11",
-        reviewedDate: "2025-07-13",
-        rewardPoints: 75,
+        taskDifficulty: "MEDIUM",
+        taskSubmittedDate: "2025-07-11",
+        taskReviewedDate: "2025-07-13",
+        taskRewardPoints: 75,
       },
       {
-        id: "3",
+        taskId: "3",
         description: "Develop emergency response protocol",
-        difficulty: "HARD",
-        submittedDate: "2025-07-08",
-        reviewedDate: "2025-07-10",
-        rewardPoints: 100,
+        taskDifficulty: "HARD",
+        taskSubmittedDate: "2025-07-08",
+        taskReviewedDate: "2025-07-10",
+        taskRewardPoints: 100,
       },
       {
-        id: "4",
+        taskId: "4",
         description: "Design and implement full event management system",
-        difficulty: "EXTREME",
-        submittedDate: "2025-07-05",
-        reviewedDate: "2025-07-07",
-        rewardPoints: 150,
+        taskDifficulty: "EXTREME",
+        taskSubmittedDate: "2025-07-05",
+        taskReviewedDate: "2025-07-07",
+        taskRewardPoints: 150,
       },
     ];
   }
