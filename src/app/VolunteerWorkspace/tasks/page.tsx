@@ -1,11 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ClipboardList, Clock, Eye, CheckCircle } from "lucide-react";
+import {
+  ClipboardList,
+  Clock,
+  Eye,
+  CheckCircle,
+  ExternalLink,
+} from "lucide-react";
 import {
   WorkspaceTaskService,
   TaskStats,
+  ToDoTask,
+  TaskInReview,
+  CompletedTask,
 } from "@/services/volunteerWorkspaceTaskService";
+import Table, { Column } from "@/components/UI/Table";
 
 const TasksPage = () => {
   const [taskStats, setTaskStats] = useState<TaskStats>({
@@ -14,6 +24,10 @@ const TasksPage = () => {
     totalTasksCompleted: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [toDoTasks, setToDoTasks] = useState<ToDoTask[]>([]);
+  const [tasksInReview, setTasksInReview] = useState<TaskInReview[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
+  const [tablesLoading, setTablesLoading] = useState(true);
 
   useEffect(() => {
     const fetchTaskStats = async () => {
@@ -28,7 +42,26 @@ const TasksPage = () => {
       }
     };
 
+    const fetchTableData = async () => {
+      try {
+        setTablesLoading(true);
+        const [toDo, inReview, completed] = await Promise.all([
+          WorkspaceTaskService.getToDoTasks(),
+          WorkspaceTaskService.getTasksInReview(),
+          WorkspaceTaskService.getCompletedTasks(),
+        ]);
+        setToDoTasks(toDo);
+        setTasksInReview(inReview);
+        setCompletedTasks(completed);
+      } catch (error) {
+        console.error("Error fetching table data:", error);
+      } finally {
+        setTablesLoading(false);
+      }
+    };
+
     fetchTaskStats();
+    fetchTableData();
   }, []);
 
   const TaskStatusCard = ({
@@ -69,6 +102,140 @@ const TasksPage = () => {
       </div>
     );
   };
+
+  // Helper function to get difficulty badge color
+  const getDifficultyBadgeColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "EASY":
+        return "bg-green-100 text-green-800";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800";
+      case "HARD":
+        return "bg-red-100 text-red-800";
+      case "EXTREME":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Helper function to handle task submission
+  const handleTaskSubmission = (taskId: string) => {
+    // In a real app, this would open a modal or navigate to a submission page
+    console.log(`Submitting task with ID: ${taskId}`);
+    // You can implement the submission logic here
+  };
+
+  // Table configurations
+  const toDoTaskColumns: Column<ToDoTask>[] = [
+    {
+      header: "Task Description",
+      accessor: "description",
+    },
+    {
+      header: "Difficulty",
+      accessor: "difficulty",
+      cell: (value) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
+            value as string
+          )}`}
+        >
+          {value}
+        </span>
+      ),
+    },
+    {
+      header: "Due Date",
+      accessor: "dueDate",
+    },
+    {
+      header: "Action",
+      accessor: "id",
+      cell: (value) => (
+        <button
+          onClick={() => handleTaskSubmission(value as string)}
+          className="bg-verdant-600 hover:bg-verdant-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          Submit
+        </button>
+      ),
+    },
+  ];
+
+  const tasksInReviewColumns: Column<TaskInReview>[] = [
+    {
+      header: "Task Description",
+      accessor: "description",
+    },
+    {
+      header: "Difficulty",
+      accessor: "difficulty",
+      cell: (value) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
+            value as string
+          )}`}
+        >
+          {value}
+        </span>
+      ),
+    },
+    {
+      header: "Submitted Date",
+      accessor: "submittedDate",
+    },
+    {
+      header: "Resource URL",
+      accessor: "resourceUrl",
+      cell: (value) => (
+        <a
+          href={value as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+        >
+          <ExternalLink size={16} />
+          View Submission
+        </a>
+      ),
+    },
+  ];
+
+  const completedTaskColumns: Column<CompletedTask>[] = [
+    {
+      header: "Task Description",
+      accessor: "description",
+    },
+    {
+      header: "Difficulty",
+      accessor: "difficulty",
+      cell: (value) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
+            value as string
+          )}`}
+        >
+          {value}
+        </span>
+      ),
+    },
+    {
+      header: "Submitted Date",
+      accessor: "submittedDate",
+    },
+    {
+      header: "Reviewed Date",
+      accessor: "reviewedDate",
+    },
+    {
+      header: "Reward Points",
+      accessor: "rewardPoints",
+      cell: (value) => (
+        <span className="text-verdant-600 font-semibold">{value} pts</span>
+      ),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -111,6 +278,60 @@ const TasksPage = () => {
             subtext="Successfully completed tasks"
             icon={CheckCircle}
           />
+        </div>
+      </div>
+
+      {/* Tables Section */}
+      <div className="px-6 space-y-8">
+        {/* To-Do Tasks Table */}
+        <div>
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+            To-Do Tasks
+          </h2>
+          <p className="text-shark-600 mb-4 font-secondary">
+            Pending tasks that need to be completed
+          </p>
+          {tablesLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-shark-600">Loading tasks...</div>
+            </div>
+          ) : (
+            <Table columns={toDoTaskColumns} data={toDoTasks} />
+          )}
+        </div>
+
+        {/* Tasks in Review Table */}
+        <div>
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+            Tasks in Review
+          </h2>
+          <p className="text-shark-600 mb-4 font-secondary">
+            Submitted tasks awaiting review
+          </p>
+          {tablesLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-shark-600">Loading tasks...</div>
+            </div>
+          ) : (
+            <Table columns={tasksInReviewColumns} data={tasksInReview} />
+          )}
+        </div>
+
+        {/* Completed Tasks Table */}
+        <div>
+          <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-4">
+            Completed and Reviewed Tasks
+          </h2>
+          <p className="text-shark-600 mb-4 font-secondary">
+            Successfully completed and reviewed tasks with rewards
+          </p>
+          {tablesLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-shark-600">Loading tasks...</div>
+            </div>
+          ) : (
+            <Table columns={completedTaskColumns} data={completedTasks} />
+          )}
         </div>
       </div>
     </div>
