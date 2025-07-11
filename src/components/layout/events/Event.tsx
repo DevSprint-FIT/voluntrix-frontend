@@ -1,9 +1,10 @@
 'use client';
 
-import { Button, Progress } from '@heroui/react';
+import { Button, Progress, useDisclosure } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { EventType } from '@/types/EventType';
+import VolunteerApplication from '@/components/UI/VolunteerApplication';
 
 interface Sponsor {
   sponsorships: string[];
@@ -42,6 +43,12 @@ export default function Event({
       hour12: true,
     }).format(date); // Output: "10:00 AM"
   };
+
+  const {
+    isOpen: isFormOpen,
+    onOpen: openFormModal,
+    onOpenChange: onFormChange,
+  } = useDisclosure();
 
   return (
     <div className="w-full flex items-start justify-center mb-[88px]">
@@ -142,11 +149,16 @@ export default function Event({
                 );
               })()}
               <Button
+                onPress={openFormModal}
                 variant="shadow"
                 className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
               >
                 Volunteer Now
               </Button>
+              <VolunteerApplication
+                isFormOpen={isFormOpen}
+                onFormChange={onFormChange}
+              />
             </div>
           </div>
         </div>
