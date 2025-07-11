@@ -15,21 +15,23 @@ import {
 } from '@heroui/react';
 import Link from 'next/link';
 
+interface VolunteerApplicationProps {
+  isFormOpen: boolean;
+  onFormChange: (open: boolean) => void;
+}
+
 const options = [
   { key: 'design', label: 'Design' },
   { key: 'editorial', label: 'Editorial' },
   { key: 'program', label: 'Program' },
 ];
 
-export default function VolunteerApplication() {
+export default function VolunteerApplication({
+  isFormOpen,
+  onFormChange,
+}: VolunteerApplicationProps) {
   const [area, setArea] = useState<string | null>(null);
   const [isAgree, setIsAgree] = useState<boolean>(false);
-
-  const {
-    isOpen: isFormOpen,
-    onOpen: openFormModal,
-    onOpenChange: onFormChange,
-  } = useDisclosure();
 
   const {
     isOpen: isSuccessOpen,
@@ -47,7 +49,6 @@ export default function VolunteerApplication() {
 
   return (
     <>
-      <Button onPress={openFormModal}>Open Modal</Button>
       <Modal isOpen={isFormOpen} onOpenChange={onFormChange}>
         <ModalContent className="px-4">
           {(onClose) => (
@@ -160,7 +161,7 @@ export default function VolunteerApplication() {
         </ModalContent>
       </Modal>
       <Modal isOpen={isSuccessOpen} onOpenChange={onSuccessChange}>
-        <ModalContent className="py-8">
+        <ModalContent className="pt-8 pb-10 px-4">
           {
             <>
               <ModalBody className="flex flex-col justify-center items-center gap-1">
@@ -170,13 +171,12 @@ export default function VolunteerApplication() {
                   height={56}
                   alt="success"
                 />
-                <div className="mt-4 text-center font-bold font-primary text-shark-900 text-3xl">
-                  Your Application Is Pending!
+                <div className="mt-4 text-center font-bold font-primary text-shark-900 text-2xl">
+                  Review in Progress
                 </div>
                 <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
-                  Thank you for applying to be a volunteer! Your application is
-                  currently under review. You will receive a notification once
-                  the event host approves or declines your application.
+                  Thanks for applying! Your application is under review.
+                  You&apos;ll be notified once it&apos;s approved or declined.
                 </div>
               </ModalBody>
             </>
