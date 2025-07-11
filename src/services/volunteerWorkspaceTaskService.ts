@@ -49,9 +49,9 @@ export class WorkspaceTaskService {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     return {
-      totalTasksDue: 12,
-      totalTasksPendingReview: 8,
-      totalTasksCompleted: 45,
+      totalTasksDue: 2,
+      totalTasksPendingReview: 1,
+      totalTasksCompleted: 3,
     };
   }
 
