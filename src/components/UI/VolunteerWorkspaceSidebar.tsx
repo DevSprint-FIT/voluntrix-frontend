@@ -32,7 +32,7 @@ const VolunteerWorkspaceSidebar = () => {
       name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: "/workspace/notifications",
+      href: "/VolunteerWorkspace/notifications",
     },
   ];
 
