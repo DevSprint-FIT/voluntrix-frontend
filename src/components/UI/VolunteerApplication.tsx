@@ -24,16 +24,31 @@ const options = [
 export default function VolunteerApplication() {
   const [area, setArea] = useState<string | null>(null);
   const [isAgree, setIsAgree] = useState<boolean>(false);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const {
+    isOpen: isFormOpen,
+    onOpen: openFormModal,
+    onOpenChange: onFormChange,
+  } = useDisclosure();
+
+  const {
+    isOpen: isSuccessOpen,
+    onOpen: openSuccessModal,
+    onOpenChange: onSuccessChange,
+  } = useDisclosure();
+
+  const [reason, setReason] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setArea(e.target.value);
   };
 
+  const isFormValid = Boolean(area && reason.trim() && isAgree);
+
   return (
     <>
-      <Button onPress={onOpen}>Open Modal</Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Button onPress={openFormModal}>Open Modal</Button>
+      <Modal isOpen={isFormOpen} onOpenChange={onFormChange}>
         <ModalContent className="px-4">
           {(onClose) => (
             <>
@@ -49,7 +64,7 @@ export default function VolunteerApplication() {
               <ModalBody>
                 <div className="flex flex-col gap-[14px]">
                   <div className="space-y-3 font-medium text-shark-800 text-[1rem] font-secondary">
-                    <p className="font-bold font-primary text-shark-950">
+                    <p className="font-medium font-primary text-shark-950">
                       Which area would you like to contribute to?
                     </p>
                     <Select
@@ -76,12 +91,12 @@ export default function VolunteerApplication() {
                     </Select>
                   </div>
                   <div className="space-y-3 font-medium text-shark-800 text-[1rem] font-secondary">
-                    <p className="font-bold font-primary text-[1rem] text-shark-950">
+                    <p className="font-medium font-primary text-[1rem] text-shark-950">
                       Why do you want to be a volunteer for this event?
                     </p>
                     <textarea
-                      name=""
-                      id=""
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
                       className="rounded-[5px] border-[2px] border-shark-800 h-[110px] w-full p-2 resize-none"
                     />
                   </div>
@@ -121,14 +136,51 @@ export default function VolunteerApplication() {
               <ModalFooter>
                 <Button
                   variant="shadow"
-                  className="bg-shark-950 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
-                  onPress={onClose}
+                  disabled={!isFormValid}
+                  className={`bg-shark-950 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px] 
+              ${!isFormValid && 'opacity-40 cursor-not-allowed'}`}
+                  onPress={() => {
+                    if (!isFormValid) return;
+
+                    // 👉 TODO: send data to your API here
+                    // await fetch(...)
+
+                    setArea(null);
+                    setReason('');
+                    setIsAgree(false);
+                    onClose();
+                    openSuccessModal();
+                  }}
                 >
                   Submit
                 </Button>
               </ModalFooter>
             </>
           )}
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isSuccessOpen} onOpenChange={onSuccessChange}>
+        <ModalContent className="py-8">
+          {
+            <>
+              <ModalBody className="flex flex-col justify-center items-center gap-1">
+                <Image
+                  src={'/icons/tick-circle.svg'}
+                  width={56}
+                  height={56}
+                  alt="success"
+                />
+                <div className="mt-4 text-center font-bold font-primary text-shark-900 text-3xl">
+                  Your Application Is Pending!
+                </div>
+                <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
+                  Thank you for applying to be a volunteer! Your application is
+                  currently under review. You will receive a notification once
+                  the event host approves or declines your application.
+                </div>
+              </ModalBody>
+            </>
+          }
         </ModalContent>
       </Modal>
     </>
