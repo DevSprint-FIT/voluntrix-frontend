@@ -24,8 +24,13 @@ export default function Navbar() {
     return () => trigger.kill();
   }, []);
 
+
   const login = () => {
-    router.push("/TestPage");
+    router.push("/auth/login");
+  };
+
+  const signup = () => {
+    router.push("/auth/signup");
   };
 
   return (
@@ -63,7 +68,7 @@ export default function Navbar() {
           <Button onPress={login} variant="light" className="text-md text-shark-950 font-primary border-0 tracking-[1px] font-medium px-4 py-2 rounded-[20px]">
             Login
           </Button>
-          <Button variant="shadow" className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]">Sign Up</Button>
+          <Button onPress={signup} variant="shadow" className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]">Sign Up</Button>
         </div>
       </div>
     </nav>
