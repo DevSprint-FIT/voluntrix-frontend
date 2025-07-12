@@ -124,16 +124,32 @@ const PublicFeedPage = () => {
   }, [username, userType]);
 
   const handleLike = async (postId: number, liked: boolean) => {
-    try {
-      if (liked) {
-        await removeReaction(postId, userId, userType);
-      } else {
-        await reactToPost({ socialFeedId: postId, userId, userType });
-      }
-    } catch (error) {
-      console.error("Error toggling like:", error);
+  try {
+    if (liked) {
+      await removeReaction(postId, userId, userType);
+      // Update local state - decrease like count
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, likes: (post.likes || 0) - 1 }
+            : post
+        )
+      );
+    } else {
+      await reactToPost({ socialFeedId: postId, userId, userType });
+      // Update local state - increase like count
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, likes: (post.likes || 0) + 1 }
+            : post
+        )
+      );
     }
-  };
+  } catch (error) {
+    console.error("Error toggling like:", error);
+  }
+};
 
   return (
     <>
@@ -165,7 +181,6 @@ const PublicFeedPage = () => {
               impressions={post.impressions}
               timeAgo={post.timeAgo}
               isPublicView={true}
-              onLike={handleLike}
               userId={userId}
               userType={userType}
               handleShareClick={handleShareClick}
