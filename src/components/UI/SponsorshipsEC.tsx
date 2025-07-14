@@ -22,6 +22,7 @@ export default function SponsorshipsEC() {
           Sponsorship
           <input
             type="text"
+            placeholder="Enter shponsorship name"
             className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[300px] placeholder:text-shark-300"
           />
         </label>
@@ -53,11 +54,21 @@ export default function SponsorshipsEC() {
           </div>
         </label>
       </div>
-      <div className="mt-2 font-primary font-medium text-shark-950 text-[20px]">
+      <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
+        Upload Sponsorships Proposal
+        <input
+          type="file"
+          accept="image/*"
+          // onChange={(e) => setFile(e.target.files?.[0] || null)}
+          required
+          className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
+        />
+      </label>
+      <div className="mt-4 font-primary font-medium text-shark-950 text-[20px]">
         Donations
       </div>
       <label className="flex gap-4 items-center font-secondary font-medium text-shark-950 text-[15px]">
-        Enable donations
+        Enable Donations
         <Switch
           isSelected={isDonationEnabled}
           onValueChange={setIsDonationEnabled}
@@ -74,6 +85,7 @@ export default function SponsorshipsEC() {
               <input
                 type="text"
                 className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[200px] placeholder:text-shark-300"
+                placeholder="Enter donation goal"
               />
               <Button
                 variant="shadow"
