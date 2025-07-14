@@ -94,25 +94,32 @@ export const eventLeaderboardService = {
   processVolunteerLeaderboardData(
     participants: LeaderboardParticipant[]
   ): ProcessedLeaderboardEntry[] {
-    // Convert participants to processed entries
+    // Convert participants to processed entries (data is already sorted from backend)
     const entries: ProcessedLeaderboardEntry[] = participants.map(
       (participant, index) => ({
         id: `volunteer-${index}`,
         name: `${participant.firstName} ${participant.lastName}`,
         eventRewardPoints: participant.eventRewardPoints,
         profilePictureUrl: participant.profilePictureUrl,
-        rank: 0, // Will be set after sorting
+        rank: 0, // Will be set based on points
         isEventHost: false,
       })
     );
 
-    // Sort by reward points (descending) and assign ranks
-    entries.sort((a, b) => b.eventRewardPoints - a.eventRewardPoints);
+    // Assign ranks handling ties properly
+    let currentRank = 1;
+    for (let i = 0; i < entries.length; i++) {
+      if (
+        i > 0 &&
+        entries[i].eventRewardPoints < entries[i - 1].eventRewardPoints
+      ) {
+        // Points are different, update rank to current position + 1
+        currentRank = i + 1;
+      }
+      entries[i].rank = currentRank;
+    }
 
-    return entries.map((entry, index) => ({
-      ...entry,
-      rank: index + 1,
-    }));
+    return entries;
   },
 
   /**
