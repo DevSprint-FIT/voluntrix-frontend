@@ -13,25 +13,24 @@ interface SponsorshipBenefit {
   description: string;
 }
 
-
-
 const SponsorshipModal: React.FC<{ 
   isOpen: boolean;
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
   const [selectedPackage, setSelectedPackage] = useState<string | null>('platinum');
     const [sponsorships, setSponsorships] = useState<SponsorshipPackage[]>([]);
-    //SponsorshipBenefit
+
+
     const [sponsorshipBenefits, setSponsorshipBenefits] = useState<SponsorshipBenefit[]>([]);
 
   useEffect(() => {
-    const SponerShipGold=async () => {
+    const SponsorShipGold=async () => {
         const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/sponsorships');
         const data = await response.json();
         setSponsorshipBenefits(data);
         console.log(data);
     }
-    SponerShipGold();
+    SponsorShipGold();
 }
 , []);
 
