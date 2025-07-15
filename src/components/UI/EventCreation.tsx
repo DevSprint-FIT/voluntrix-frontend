@@ -16,6 +16,25 @@ import BasicInfoEC from './BasicInfoEC';
 import OrganizationEC from './OrganizationEC';
 import SponsorshipsEC from './SponsorshipsEC';
 import ReviewEC from './ReviewEC';
+import { EventCreateData } from '@/types/EventCreateData';
+
+const blankEvent: EventCreateData = {
+  eventTitle: '',
+  eventDescription: '',
+  eventLocation: '',
+  eventStartDate: '',
+  eventEndDate: '',
+  eventTime: '',
+  eventImageUrl: '',
+  eventType: '',
+  eventVisibility: '',
+  eventStatus: '',
+  sponsorshipEnabled: false,
+  donationEnabled: false,
+  categories: [],
+  eventHostId: 0,
+  organizationId: null,
+};
 
 export default function EventCreation() {
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -23,28 +42,34 @@ export default function EventCreation() {
   const [step, setStep] = useState(1);
   const [isStep1Valid, setValid] = useState(false);
   const progress = step * 25;
+  const [eventData, setEventData] = useState<EventCreateData>(
+    blankEvent
+  );
 
   const resetWizard = () => {
     setStep(1);
     setValid(false);
+    setEventData(blankEvent);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
-      setConfirmOpen(true);
+      setConfirmOpen();
       return;
     }
     setWizardOpen(true);
   };
 
   const discardAndClose = () => {
-    setConfirmOpen(false);
+    setConfirmOpen();
     setWizardOpen(false);
   };
 
   const next = () => setStep((s) => Math.min(s + 1, 4));
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
+  const updateEventData = (changes: Partial<EventCreateData>) =>
+    setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
   return (
     <>
       <Button onPress={() => setWizardOpen(true)}>Open Modal</Button>
@@ -100,7 +125,13 @@ export default function EventCreation() {
                 />
               </ModalHeader>
               <ModalBody>
-                {step === 1 && <BasicInfoEC onValidityChange={setValid} />}
+                {step === 1 && (
+                  <BasicInfoEC
+                    data={eventData}
+                    onChange={updateEventData}
+                    onValidityChange={setValid}
+                  />
+                )}
                 {step === 2 && <OrganizationEC />}
                 {step === 3 && <SponsorshipsEC />}
                 {step === 4 && <ReviewEC />}
@@ -144,7 +175,7 @@ export default function EventCreation() {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  onPress={() => setConfirmOpen(false)}
+                  onPress={() => setConfirmOpen()}
                   className="bg-shark-700 text-white text-[15px] font-primary px-4 py-2 rounded-xl"
                 >
                   Cancel
