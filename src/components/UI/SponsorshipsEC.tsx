@@ -1,113 +1,183 @@
+'use client';
+
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
 
+const formatRs = (n: number) =>
+  `Rs. ${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+type Tier = { id: string; name: string; amount: number };
+
 export default function SponsorshipsEC() {
-  const [isDonationEnabled, setIsDonationEnabled] = useState(false);
+  const [tiers, setTiers] = useState<Tier[]>([]);
+  const [tierName, setTierName] = useState('');
+  const [tierAmount, setTierAmount] = useState('');
+
+  const addTier = () => {
+    const amt = Number(tierAmount);
+    if (!tierName.trim() || !amt) return;
+    setTiers((t) => [
+      ...t,
+      { id: crypto.randomUUID(), name: tierName.trim(), amount: amt },
+    ]);
+    setTierName('');
+    setTierAmount('');
+  };
+
+  const removeTier = (id: string) =>
+    setTiers((t) => t.filter((tier) => tier.id !== id));
+
+  const [donEnabled, setDonEnabled] = useState(false);
+  const [donInput, setDonInput] = useState('');
+  const [donGoal, setDonGoal] = useState<number | null>(null);
+
+  const setGoal = () => {
+    const amt = Number(donInput);
+    if (!amt) return;
+    setDonGoal(amt);
+    setDonInput('');
+  };
+
+  const [proposalMessage, setProposalmessage] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
   return (
     <>
       <div className="mt-2 font-primary font-medium text-shark-950 text-[20px]">
         Sponsorships
       </div>
-      <div className="flex items-center gap-8 font-secondary font-medium text-shark-950 text-[16px]">
-        <p>Gold Partner</p>
-        <p>Rs. 150, 000</p>
-        <div className="cursor-pointer">
-          <Image src={'/icons/close.svg'} width={12} height={12} alt="close" />
+
+      {tiers.map((tier) => (
+        <div
+          key={tier.id}
+          className="flex items-center gap-3 font-secondary font-medium text-[16px]"
+        >
+          <p className="text-shark-950">{tier.name}</p>
+          <p className="text-shark-800">{formatRs(tier.amount)}</p>
+          <Image
+            src="/icons/close.svg"
+            width={12}
+            height={12}
+            alt="remove"
+            className="cursor-pointer"
+            onClick={() => removeTier(tier.id)}
+          />
         </div>
-      </div>
+      ))}
+
       <div className="flex gap-4">
-        <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
+        <label className="flex flex-col font-secondary font-medium text-[15px]">
           Sponsorship
           <input
             type="text"
-            placeholder="Enter shponsorship name"
-            className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[300px] placeholder:text-shark-300"
+            value={tierName}
+            onChange={(e) => setTierName(e.target.value)}
+            placeholder="Enter sponsorship name"
+            className="border-[2px] border-shark-300 pl-2 py-1 rounded-lg w-[300px]"
           />
         </label>
-        <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
+
+        <label className="flex flex-col font-secondary font-medium text-[15px]">
           Amount
           <div className="flex gap-4">
             <input
               type="number"
+              min="1"
+              value={tierAmount}
+              onChange={(e) => setTierAmount(e.target.value)}
               placeholder="Enter amount"
               className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[200px] placeholder:text-shark-300"
             />
+
             <Button
               variant="shadow"
-              // disabled={!isFormValid}
-              className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
-              onPress={() => {
-                // if (!isFormValid) return;
-                // 👉 TODO: send data to your API here
-                // await fetch(...)
-                // setArea(null);
-                // setReason('');
-                // setIsAgree(false);
-                // onClose();
-                // openSuccessModal();
-              }}
+              isDisabled={!tierName.trim() || !Number(tierAmount)}
+              className="bg-verdant-600 text-white px-6 py-2 rounded-lg h-9"
+              onPress={addTier}
             >
               Add
             </Button>
           </div>
         </label>
       </div>
-      <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-        Upload Sponsorships Proposal
+      <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
+        Upload Sponsorship Proposal (Maximum image size is 100 MB)
         <input
           type="file"
-          accept="image/*"
-          // onChange={(e) => setFile(e.target.files?.[0] || null)}
-          required
+          accept="application/pdf,image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            const maxSize = 100 * 1024 * 1024; // 100 MB
+
+            if (file) {
+              if (file.size > maxSize) {
+                setProposalmessage(
+                  'File size exceeds 100 MB. Please upload a smaller image.'
+                );
+                e.target.value = '';
+                setFile(null);
+              } else {
+                setProposalmessage('');
+                setFile(file);
+              }
+            }
+          }}
           className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
         />
+        {proposalMessage && (
+          <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
+            {proposalMessage}
+          </div>
+        )}
       </label>
-      <div className="mt-4 font-primary font-medium text-shark-950 text-[20px]">
+      <div className="mt-4 flex gap-4 items-center font-primary font-medium text-shark-950 text-[20px]">
         Donations
-      </div>
-      <label className="flex gap-4 items-center font-secondary font-medium text-shark-950 text-[15px]">
-        Enable Donations
         <Switch
-          isSelected={isDonationEnabled}
-          onValueChange={setIsDonationEnabled}
-          defaultSelected
+          isSelected={donEnabled}
+          onValueChange={setDonEnabled}
           color="success"
           size="sm"
         />
-      </label>
-      {isDonationEnabled && (
-        <div>
+      </div>
+      {donEnabled && (
+        <>
           <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
             Amount
             <div className="flex gap-4">
               <input
-                type="text"
+                type="number"
+                min="1"
+                value={donInput}
+                onChange={(e) => setDonInput(e.target.value)}
                 className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[200px] placeholder:text-shark-300"
                 placeholder="Enter donation goal"
               />
               <Button
                 variant="shadow"
+                isDisabled={!Number(donInput)}
                 className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
+                onPress={setGoal}
               >
                 Add
               </Button>
             </div>
           </label>
-          <div className="flex mt-4 items-center gap-2 font-secondary font-medium text-shark-950 text-[16px]">
-            <p>Donation goal is set to</p>
-            <p>Rs.150, 000</p>
-            <div className="ml-4 cursor-pointer">
+          {donGoal !== null && (
+            <div className="flex items-center gap-2 font-secondary font-medium text-[16px]">
+              <p className="text-shark-950">Donation goal is set to</p>
+              <p className="text-shark-800">{formatRs(donGoal)}</p>
               <Image
-                src={'/icons/close.svg'}
+                src="/icons/close.svg"
                 width={12}
                 height={12}
-                alt="close"
+                alt="remove-goal"
+                className="cursor-pointer"
+                onClick={() => setDonGoal(null)}
               />
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </>
   );
