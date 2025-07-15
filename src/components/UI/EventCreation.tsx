@@ -18,27 +18,46 @@ import SponsorshipsEC from './SponsorshipsEC';
 import ReviewEC from './ReviewEC';
 
 export default function EventCreation() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
   const [step, setStep] = useState(1);
+  const [isStep1Valid, setValid] = useState(false);
   const progress = step * 25;
 
-  const [isStep1Valid, setIsStep1Valid] = useState(false);
+  const resetWizard = () => {
+    setStep(1);
+    setValid(false);
+  };
 
-  const handleNext = () => setStep((s) => Math.min(s + 1, 4));
-  const handleBack = () => setStep((s) => Math.max(s - 1, 1));
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setConfirmOpen(true);
+      return;
+    }
+    setWizardOpen(true);
+  };
+
+  const discardAndClose = () => {
+    setConfirmOpen(false);
+    setWizardOpen(false);
+  };
+
+  const next = () => setStep((s) => Math.min(s + 1, 4));
+  const back = () => setStep((s) => Math.max(s - 1, 1));
+
   return (
     <>
-      <Button onPress={onOpen}>Open Modal</Button>
+      <Button onPress={() => setWizardOpen(true)}>Open Modal</Button>
       <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        isOpen={wizardOpen}
+        onOpenChange={handleOpenChange}
+        onClose={resetWizard}
         size="4xl"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
       >
         <ModalContent className="px-10">
-          {(onClose) => (
+          {() => (
             <>
               <ModalHeader className="flex flex-col items-center gap-1">
                 <div className="mt-2 text-shark-950 font-primary font-medium text-[28px]">
@@ -81,9 +100,7 @@ export default function EventCreation() {
                 />
               </ModalHeader>
               <ModalBody>
-                {step === 1 && (
-                  <BasicInfoEC onValidityChange={setIsStep1Valid} />
-                )}
+                {step === 1 && <BasicInfoEC onValidityChange={setValid} />}
                 {step === 2 && <OrganizationEC />}
                 {step === 3 && <SponsorshipsEC />}
                 {step === 4 && <ReviewEC />}
@@ -91,17 +108,52 @@ export default function EventCreation() {
               <ModalFooter className="pt-0">
                 <Button
                   isDisabled={step === 1}
-                  onPress={handleBack}
+                  onPress={back}
                   className="bg-shark-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
                 >
                   Back
                 </Button>
                 <Button
                   isDisabled={step === 1 && !isStep1Valid}
-                  onPress={() => (step === 4 ? onClose() : handleNext())}
+                  onPress={() => (step === 4 ? setWizardOpen(false) : next())}
                   className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
                 >
                   {step === 4 ? 'Finish' : 'Next'}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        size="md"
+        isDismissable={false}
+      >
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader className="font-primary font-medium text-shark-950 text-[22px]">
+                Unsaved Changes
+              </ModalHeader>
+              <ModalBody className="py-0 font-secondary font-normal text-shark-950 text-[15px]">
+                Your event setup isn&apos;t complete. If you exit now, all
+                unsaved progress will be lost. Would you like to discard your
+                changes or continue editing?
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  onPress={() => setConfirmOpen(false)}
+                  className="bg-shark-700 text-white text-[15px] font-primary px-4 py-2 rounded-xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onPress={discardAndClose}
+                  className="bg-red-600 text-white text-[15px] font-primary px-4 py-2 rounded-xl"
+                >
+                  Discard
                 </Button>
               </ModalFooter>
             </>
