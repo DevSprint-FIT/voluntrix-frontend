@@ -33,7 +33,7 @@ const Sidebar = () => {
 
   const menuItems: MenuItem[] = [
     { name: 'Home', icon: Home, href: '/' },
-    { name: 'Dashboard', icon: BarChart, href: '/dashboard' },
+    { name: 'Dashboard', icon: BarChart, href: '/Organization/dashboard' },
     { name: 'Profile', icon: User, href: '/Organization/profile' },
     { name: 'Events', icon: Calendar, href: '/Organization/events/active' },
     { name: 'Notifications', icon: Bell, badge: notificationCount, href: '/Organization/notifications' },
