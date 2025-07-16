@@ -17,6 +17,7 @@ import OrganizationEC from './OrganizationEC';
 import SponsorshipsEC from './SponsorshipsEC';
 import ReviewEC from './ReviewEC';
 import { EventCreateData } from '@/types/EventCreateData';
+import { OrganizationTitles } from '@/types/OrganizationTitles';
 
 const blankEvent: EventCreateData = {
   eventTitle: '',
@@ -42,14 +43,19 @@ export default function EventCreation() {
   const [step, setStep] = useState(1);
   const [isStep1Valid, setValid] = useState(false);
   const progress = step * 25;
-  const [eventData, setEventData] = useState<EventCreateData>(
-    blankEvent
+  const [eventData, setEventData] = useState<EventCreateData>(blankEvent);
+  const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
+    null
   );
+
+  // const buildPreviewPayload = (data: EventCreateData) => ({
+  //   ...data,
+  //   categories: data.categories.map((id) => ({ categoryId: id })),
+  // });
 
   const resetWizard = () => {
     setStep(1);
     setValid(false);
-    setEventData(blankEvent);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -61,6 +67,7 @@ export default function EventCreation() {
   };
 
   const discardAndClose = () => {
+    setEventData(blankEvent);
     setConfirmOpen();
     setWizardOpen(false);
   };
@@ -132,7 +139,12 @@ export default function EventCreation() {
                     onValidityChange={setValid}
                   />
                 )}
-                {step === 2 && <OrganizationEC />}
+                {step === 2 && (
+                  <OrganizationEC
+                    selectedOrg={selectedOrg}
+                    setSelectedOrg={setSelectedOrg}
+                  />
+                )}
                 {step === 3 && <SponsorshipsEC />}
                 {step === 4 && <ReviewEC />}
               </ModalBody>
