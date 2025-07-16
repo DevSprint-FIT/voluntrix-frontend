@@ -163,17 +163,17 @@ const EventHostTasksPage = () => {
     }
   };
 
-  // Helper function to get category badge color
+  // Helper function to get category badge color using system colors
   const getCategoryBadgeColor = (category: string) => {
     switch (category) {
       case "DESIGN":
-        return "bg-purple-100 text-purple-800";
+        return "bg-verdant-100 text-verdant-800";
       case "EDITORIAL":
-        return "bg-blue-100 text-blue-800";
+        return "bg-verdant-200 text-verdant-900";
       case "LOGISTICS":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-shark-100 text-shark-800";
       case "PROGRAMMING":
-        return "bg-cyan-100 text-cyan-800";
+        return "bg-shark-200 text-shark-900";
       default:
         return "bg-gray-100 text-gray-800";
     }
