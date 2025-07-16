@@ -57,7 +57,7 @@ const EventHostTasksPage = () => {
       description: "Create promotional banners for social media",
       assignee: "John Doe",
       submittedDate: "2025-07-23",
-      category: "Marketing",
+      category: "DESIGN",
       difficulty: "MEDIUM",
     },
     {
@@ -65,7 +65,7 @@ const EventHostTasksPage = () => {
       description: "Setup registration booth equipment",
       assignee: "Jane Smith",
       submittedDate: "2025-07-22",
-      category: "Setup",
+      category: "LOGISTICS",
       difficulty: "EASY",
     },
   ];
@@ -77,7 +77,7 @@ const EventHostTasksPage = () => {
       description: "Coordinate with catering vendors",
       assignee: "Mike Johnson",
       dueDate: "2025-07-28",
-      category: "Catering",
+      category: "LOGISTICS",
       difficulty: "HARD",
     },
     {
@@ -85,7 +85,7 @@ const EventHostTasksPage = () => {
       description: "Prepare volunteer welcome packets",
       assignee: "Sarah Wilson",
       dueDate: "2025-07-26",
-      category: "Volunteer Management",
+      category: "EDITORIAL",
       difficulty: "EASY",
     },
   ];
@@ -98,7 +98,7 @@ const EventHostTasksPage = () => {
       assignee: "Alex Brown",
       submittedDate: "2025-07-20",
       reviewedDate: "2025-07-21",
-      category: "Design",
+      category: "DESIGN",
       difficulty: "MEDIUM",
       rewardPoints: 150,
     },
@@ -108,7 +108,7 @@ const EventHostTasksPage = () => {
       assignee: "Emily Davis",
       submittedDate: "2025-07-18",
       reviewedDate: "2025-07-19",
-      category: "Logistics",
+      category: "PROGRAMMING",
       difficulty: "HARD",
       rewardPoints: 200,
     },
@@ -165,15 +165,18 @@ const EventHostTasksPage = () => {
 
   // Helper function to get category badge color
   const getCategoryBadgeColor = (category: string) => {
-    const colors = [
-      "bg-blue-100 text-blue-800",
-      "bg-purple-100 text-purple-800",
-      "bg-pink-100 text-pink-800",
-      "bg-indigo-100 text-indigo-800",
-      "bg-teal-100 text-teal-800",
-    ];
-    const hash = category.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-    return colors[hash % colors.length];
+    switch (category) {
+      case "DESIGN":
+        return "bg-purple-100 text-purple-800";
+      case "EDITORIAL":
+        return "bg-blue-100 text-blue-800";
+      case "LOGISTICS":
+        return "bg-indigo-100 text-indigo-800";
+      case "PROGRAMMING":
+        return "bg-cyan-100 text-cyan-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   // Placeholder functions for approve/reject actions
@@ -231,17 +234,17 @@ const EventHostTasksPage = () => {
       header: "Actions",
       accessor: "taskId",
       cell: (value) => (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => handleApproveTask(value as string)}
-            className="rounded-full bg-green-600 text-white p-2 hover:bg-green-700 transition-colors"
+            className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
             title="Approve Task"
           >
             <Check size={16} />
           </button>
           <button
             onClick={() => handleRejectTask(value as string)}
-            className="rounded-full bg-red-600 text-white p-2 hover:bg-red-700 transition-colors"
+            className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
             title="Reject Task"
           >
             <X size={16} />
@@ -383,19 +386,19 @@ const EventHostTasksPage = () => {
         <div className="flex gap-8 mb-8 justify-start">
           <TaskStatusCard
             count={taskStats.totalTasksPendingReview}
-            label="Tasks Pending Review"
+            label="Total Tasks Pending Review"
             subtext="Tasks awaiting approval"
             icon={Eye}
           />
           <TaskStatusCard
             count={taskStats.totalTasksToBeCompleted}
-            label="Tasks To Be Completed"
+            label="Total Tasks Due"
             subtext="Assigned pending tasks"
             icon={Clock}
           />
           <TaskStatusCard
             count={taskStats.totalTasksCompleted}
-            label="Completed & Reviewed"
+            label="Total Tasks Completed"
             subtext="Successfully finished tasks"
             icon={CheckCircle}
           />
@@ -412,7 +415,10 @@ const EventHostTasksPage = () => {
           <p className="text-shark-600 mb-4 font-secondary">
             Submitted tasks requiring your review and approval
           </p>
-          <Table columns={tasksPendingReviewColumns} data={tasksPendingReview} />
+          <Table
+            columns={tasksPendingReviewColumns}
+            data={tasksPendingReview}
+          />
         </div>
 
         {/* Tasks To Be Completed Table */}
@@ -423,7 +429,10 @@ const EventHostTasksPage = () => {
           <p className="text-shark-600 mb-4 font-secondary">
             Assigned tasks that are currently in progress or pending
           </p>
-          <Table columns={tasksToBeCompletedColumns} data={tasksToBeCompleted} />
+          <Table
+            columns={tasksToBeCompletedColumns}
+            data={tasksToBeCompleted}
+          />
         </div>
 
         {/* Completed and Reviewed Tasks Table */}
