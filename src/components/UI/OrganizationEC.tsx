@@ -25,14 +25,29 @@ export default function OrganizationEC() {
   const containerRef = useRef<HTMLLabelElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch organizations on mount
   useEffect(() => {
     const getOrganizationTitles = async () => {
       try {
         const organizations = await fetchOrganizationTitles();
-        const validOrganizations = organizations.filter(
-          (org: OrganizationTitles) => org.name && org.id !== undefined
-        );
+        const validOrganizations = organizations
+          .filter(
+            (org: {
+              organizationName: string;
+              organizationId: number;
+              organizationLogoUrl?: string;
+            }) => org.organizationName && org.organizationId !== undefined
+          )
+          .map(
+            (org: {
+              organizationName: string;
+              organizationId: number;
+              organizationLogoUrl?: string;
+            }) => ({
+              id: org.organizationId,
+              name: org.organizationName,
+              logoUrl: org.organizationLogoUrl,
+            })
+          );
         setOrganizationTitles(validOrganizations);
       } catch (error) {
         console.error('Failed to fetch organization titles:', error);
@@ -42,7 +57,6 @@ export default function OrganizationEC() {
     getOrganizationTitles();
   }, []);
 
-  // Handle debounced search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -58,7 +72,6 @@ export default function OrganizationEC() {
     }, 200);
   }, [query, organizationTitles]);
 
-  // Hide dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -109,7 +122,6 @@ export default function OrganizationEC() {
             onPress={() => {
               if (selectedOrg) {
                 console.log('Inviting:', selectedOrg);
-                // Handle invite logic
               }
             }}
             className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
@@ -118,14 +130,14 @@ export default function OrganizationEC() {
           </Button>
         </div>
         {showDropdown && results.length > 0 && (
-          <div className="absolute top-[70px] left-0 w-[350px] bg-white border border-shark-200 rounded-lg shadow-lg z-20 max-h-56 overflow-y-auto">
+          <div className="absolute top-[70px] left-0 w-[350px] max-h-[120px] bg-white border-[2px] border-shark-200 rounded-lg shadow-lg z-20 overflow-y-auto">
             {results.map((org) => (
               <div
                 key={org.id}
                 onClick={() => {
                   setSelectedOrg(org);
-                  setQuery(org.name);
-                  setShowDropdown(false);
+                  setQuery('');
+                  setTimeout(() => setShowDropdown(false), 50);
                 }}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-shark-100 cursor-pointer"
               >
@@ -142,7 +154,13 @@ export default function OrganizationEC() {
       </label>
 
       {selectedOrg && (
-        <div className="flex items-center gap-2 bg-shark-100 px-3 py-1 rounded-full mt-2 w-fit">
+        <div className="flex items-center gap-2 bg-shark-50 px-3 py-2 rounded-[20px] w-fit">
+          <Image
+            src={'/images/DummyOrganization.svg'} //selectedOrg.logoUrl
+            width={24}
+            height={24}
+            alt="remove"
+          />
           <span className="text-[15px] text-shark-950">{selectedOrg.name}</span>
           <Image
             src="/icons/close.svg"
@@ -158,7 +176,7 @@ export default function OrganizationEC() {
         </div>
       )}
 
-      <p className="mt-2 font-secondary text-shark-950 text-[13px]">
+      <p className="mt-2 mb-2 font-secondary text-shark-950 text-[13px]">
         *Once you invite an organization to the event, they will be notified to
         review the event details. The organization will then either accept or
         decline the invitation based on their evaluation.
