@@ -9,7 +9,6 @@ export default function RewardLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
 
   const buttons = [
-    { label: "Earn", path: "/Reward/earn" },
     { label: "Redeem", path: "/Reward/redeem" },
     { label: "Status", path: "/Reward/status" },
   ];
