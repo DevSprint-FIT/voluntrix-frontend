@@ -50,11 +50,6 @@ export default function EventCreation() {
     null
   );
 
-  // const buildPreviewPayload = (data: EventCreateData) => ({
-  //   ...data,
-  //   categories: data.categories.map((id) => ({ categoryId: id })),
-  // });
-
   const resetWizard = () => {
     setStep(1);
     setStep1Valid(false);
@@ -83,22 +78,19 @@ export default function EventCreation() {
   const handleFinish = async () => {
     const rawCategories = eventData.categories;
 
-    // Convert to array if it's a keyed object
     const categoryArray: { categoryId: number }[] = Array.isArray(rawCategories)
       ? rawCategories as { categoryId: number }[]
       : Object.values(rawCategories) as { categoryId: number }[];
 
-    // Ensure time is in HH:mm:ss format
     let eventTime = eventData.eventTime;
     if (eventTime && eventTime.length === 5) {
-      // If it's in "HH:mm", add ":00"
       eventTime += ':00';
     }
 
     const payload = {
       ...eventData,
       eventTime,
-      eventStatus: 'DRAFT', // if needed for backend
+      eventStatus: 'DRAFT',
       categories: categoryArray.map((cat) => ({
         categoryId: cat.categoryId,
       })),
