@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from '@/services/ImageUploadService';
 import { EventCreateData } from '@/types/EventCreateData';
 import { Select, SelectItem } from '@heroui/react';
 import { useState, useEffect } from 'react';
@@ -168,7 +169,7 @@ export default function BasicInfoEC({
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => {
+          onChange={async (e) => {
             const file = e.target.files?.[0];
             const maxSize = 100 * 1024 * 1024;
 
@@ -178,11 +179,16 @@ export default function BasicInfoEC({
                   'File size exceeds 100 MB. Please upload a smaller image.'
                 );
               } else {
-                setImageMessage('');
-                // You can upload the file and get a URL here
-                // Then store the URL in eventImageUrl
-                const imageUrl = URL.createObjectURL(file);
-                onChange({ eventImageUrl: imageUrl });
+                setImageMessage('Uploading...');
+                try {
+                  const uploadedUrl = await uploadToCloudinary(file);
+                  onChange({ eventImageUrl: uploadedUrl });
+                  setImageMessage(
+                    'Image uploaded successfully. ' + uploadedUrl
+                  );
+                } catch {
+                  setImageMessage('Upload failed. Please try again.');
+                }
               }
             }
           }}
