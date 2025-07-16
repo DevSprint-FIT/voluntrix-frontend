@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import Table, { Column } from "@/components/UI/Table";
+import CreateTaskModal, { TaskFormData } from "@/components/UI/CreateTaskModal";
 
 // Types for different task states
 interface TaskPendingReview {
@@ -43,6 +44,9 @@ interface CompletedTask {
 }
 
 const EventHostTasksPage = () => {
+  // Modal state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // Dummy task stats
   const taskStats = {
     totalTasksPendingReview: 3,
@@ -348,8 +352,38 @@ const EventHostTasksPage = () => {
   ];
 
   const handleCreateTask = () => {
-    console.log("Opening create task modal");
-    // TODO: Implement modal opening functionality
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateTaskSubmit = async (
+    taskData: TaskFormData
+  ): Promise<boolean> => {
+    try {
+      // TODO: Replace with actual API call
+      console.log("Creating task with data:", taskData);
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Simulate success/failure (for demo purposes, always succeed)
+      const success = true; // Math.random() > 0.3; // 70% success rate for demo
+
+      if (success) {
+        // TODO: Refresh the task lists after successful creation
+        console.log("Task created successfully");
+        return true;
+      } else {
+        console.log("Task creation failed");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error creating task:", error);
+      return false;
+    }
+  };
+
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
   };
 
   return (
@@ -446,6 +480,13 @@ const EventHostTasksPage = () => {
           <Table columns={completedTasksColumns} data={completedTasks} />
         </div>
       </div>
+
+      {/* Create Task Modal */}
+      <CreateTaskModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSubmit={handleCreateTaskSubmit}
+      />
     </div>
   );
 };
