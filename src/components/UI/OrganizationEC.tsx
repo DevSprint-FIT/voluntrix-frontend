@@ -1,160 +1,163 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Spinner } from '@heroui/react';
+import { useState, useEffect, useRef } from 'react';
+import { Button } from '@heroui/react';
 import Image from 'next/image';
+import { fetchOrganizationTitles } from '@/services/organizationService';
 
-type Org = {
-  id: string;
+type OrganizationTitles = {
+  id: number;
   name: string;
-  logoUrl: string;
+  logoUrl?: string;
 };
-
-const DEBOUNCE_MS = 300;
 
 export default function OrganizationEC() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Org[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<OrganizationTitles[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [organizationTitles, setOrganizationTitles] = useState<
+    OrganizationTitles[]
+  >([]);
+  const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
+    null
+  );
 
-  const [selected, setSelected] = useState<Org[]>([]);
+  const containerRef = useRef<HTMLLabelElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const debounceRef = useRef<NodeJS.Timeout>();
-  const fetchSuggestions = useCallback(async (q: string) => {
-    if (!q.trim()) {
-      setResults([]);
-      return;
-    }
-    try {
-      setLoading(true);
-      const r = await fetch(
-        `/api/organizations?search=${encodeURIComponent(q)}`
-      );
-      const data: Org[] = await r.json();
-      setResults(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  // Fetch organizations on mount
+  useEffect(() => {
+    const getOrganizationTitles = async () => {
+      try {
+        const organizations = await fetchOrganizationTitles();
+        const validOrganizations = organizations.filter(
+          (org: OrganizationTitles) => org.name && org.id !== undefined
+        );
+        setOrganizationTitles(validOrganizations);
+      } catch (error) {
+        console.error('Failed to fetch organization titles:', error);
+      }
+    };
+
+    getOrganizationTitles();
   }, []);
 
+  // Handle debounced search
   useEffect(() => {
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(
-      () => fetchSuggestions(query),
-      DEBOUNCE_MS
-    );
-  }, [query, fetchSuggestions]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-  const addOrg = (org: Org) => {
-    if (selected.some((o) => o.id === org.id)) return;
-    setSelected((s) => [...s, org]);
-    setQuery('');
-    setResults([]);
-    setShowDropdown(false);
-  };
+    debounceRef.current = setTimeout(() => {
+      if (query.trim()) {
+        const filtered = organizationTitles.filter((org) =>
+          org.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setResults(filtered);
+      } else {
+        setResults([]);
+      }
+    }, 200);
+  }, [query, organizationTitles]);
 
-  const removeOrg = (id: string) => {
-    setSelected((s) => s.filter((o) => o.id !== id));
-  };
+  // Hide dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
       <div className="mt-2 font-primary font-medium text-shark-950 text-[20px]">
         Organizations
       </div>
-      <label className="flex flex-col font-secondary font-medium text-[15px] text-shark-950 relative">
+
+      <label
+        ref={containerRef}
+        className="flex flex-col font-secondary font-medium text-[15px] text-shark-950 relative"
+      >
         Select your organization
         <div className="flex gap-4">
           <input
             type="text"
             value={query}
-            onFocus={() => query && setShowDropdown(true)}
+            onFocus={() => setShowDropdown(true)}
             onChange={(e) => {
               setQuery(e.target.value);
               setShowDropdown(true);
             }}
-            placeholder="Search organizations..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                setShowDropdown(false);
+              }
+            }}
+            autoComplete="off"
+            aria-label="Search for organizations"
+            placeholder="Search for organizations by name"
             className="border-[2px] border-shark-300 pl-2 py-1 rounded-lg w-[350px] text-shark-950 placeholder:text-shark-300"
           />
           <Button
             variant="shadow"
-            isDisabled={!query.trim()}
-            onPress={() =>
-              addOrg({
-                id: crypto.randomUUID(),
-                name: query.trim(),
-                logoUrl: '/images/defaultOrg.svg',
-              })
-            }
+            isDisabled={!selectedOrg}
+            onPress={() => {
+              if (selectedOrg) {
+                console.log('Inviting:', selectedOrg);
+                // Handle invite logic
+              }
+            }}
             className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
           >
             Invite
           </Button>
         </div>
-        {showDropdown && (
+        {showDropdown && results.length > 0 && (
           <div className="absolute top-[70px] left-0 w-[350px] bg-white border border-shark-200 rounded-lg shadow-lg z-20 max-h-56 overflow-y-auto">
-            {loading && (
-              <div className="flex items-center justify-center py-4">
-                <Spinner size="sm" color="success" />
+            {results.map((org) => (
+              <div
+                key={org.id}
+                onClick={() => {
+                  setSelectedOrg(org);
+                  setQuery(org.name);
+                  setShowDropdown(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-shark-100 cursor-pointer"
+              >
+                <span className="text-[14px] text-shark-950">{org.name}</span>
               </div>
-            )}
-
-            {!loading && results.length === 0 && (
-              <div className="py-3 px-4 text-shark-700 text-sm">
-                No organizations found
-              </div>
-            )}
-
-            {!loading &&
-              results.map((org) => (
-                <div
-                  key={org.id}
-                  onClick={() => addOrg(org)}
-                  className="flex items-center gap-2 px-4 py-2 hover:bg-shark-100 cursor-pointer"
-                >
-                  <Image
-                    src={org.logoUrl || '/images/defaultOrg.svg'}
-                    width={20}
-                    height={20}
-                    alt={org.name}
-                    className="rounded-full"
-                  />
-                  <span className="text-[14px] text-shark-950">{org.name}</span>
-                </div>
-              ))}
+            ))}
+          </div>
+        )}
+        {showDropdown && results.length === 0 && query.trim() && (
+          <div className="absolute top-[70px] left-0 w-[350px] bg-white border border-shark-200 rounded-lg shadow-lg z-20 p-2 text-[14px] text-shark-500">
+            No results found
           </div>
         )}
       </label>
-      {selected.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-3">
-          {selected.map((org) => (
-            <div
-              key={org.id}
-              className="flex items-center gap-2 bg-shark-100 px-3 py-1 rounded-full"
-            >
-              <Image
-                src={org.logoUrl}
-                width={24}
-                height={24}
-                alt={org.name}
-                className="rounded-full"
-              />
-              <span className="text-[15px] text-shark-950">{org.name}</span>
-              <Image
-                src="/icons/close.svg"
-                width={12}
-                height={12}
-                alt="remove"
-                className="cursor-pointer"
-                onClick={() => removeOrg(org.id)}
-              />
-            </div>
-          ))}
+
+      {selectedOrg && (
+        <div className="flex items-center gap-2 bg-shark-100 px-3 py-1 rounded-full mt-2 w-fit">
+          <span className="text-[15px] text-shark-950">{selectedOrg.name}</span>
+          <Image
+            src="/icons/close.svg"
+            width={12}
+            height={12}
+            alt="remove"
+            className="cursor-pointer"
+            onClick={() => {
+              setSelectedOrg(null);
+              setQuery('');
+            }}
+          />
         </div>
       )}
+
       <p className="mt-2 font-secondary text-shark-950 text-[13px]">
         *Once you invite an organization to the event, they will be notified to
         review the event details. The organization will then either accept or
