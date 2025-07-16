@@ -4,23 +4,25 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@heroui/react';
 import Image from 'next/image';
 import { fetchOrganizationTitles } from '@/services/organizationService';
+import { OrganizationTitles } from '@/types/OrganizationTitles';
 
-type OrganizationTitles = {
-  id: number;
-  name: string;
-  logoUrl?: string;
-};
+interface OrganizationECProps {
+  selectedOrg: OrganizationTitles | null;
+  setSelectedOrg: React.Dispatch<
+    React.SetStateAction<OrganizationTitles | null>
+  >;
+}
 
-export default function OrganizationEC() {
+export default function OrganizationEC({
+  selectedOrg,
+  setSelectedOrg,
+}: OrganizationECProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<OrganizationTitles[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [organizationTitles, setOrganizationTitles] = useState<
     OrganizationTitles[]
   >([]);
-  const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
-    null
-  );
 
   const containerRef = useRef<HTMLLabelElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -121,7 +123,7 @@ export default function OrganizationEC() {
             isDisabled={!selectedOrg}
             onPress={() => {
               if (selectedOrg) {
-                console.log('Inviting:', selectedOrg);
+                // console.log('Inviting:', selectedOrg);
               }
             }}
             className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
