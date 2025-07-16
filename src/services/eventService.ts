@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { EventType } from '@/types/EventType';
+import { EventCreateData } from '@/types/EventCreateData';
 
 export const fetchEventById = async (id: number): Promise<EventType> => {
   try {
@@ -55,6 +56,27 @@ export const fetchEventTitles = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching event:', error);
+    throw error;
+  }
+};
+
+export const createEvent = async (eventData: EventCreateData) => {
+  const token = localStorage.getItem('token'); // authentication token
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8080/api/public/events',
+      eventData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating event:', error);
     throw error;
   }
 };
