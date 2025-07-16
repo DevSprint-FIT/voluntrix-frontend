@@ -9,6 +9,7 @@ import {
   Button,
   useDisclosure,
   Progress,
+  Spinner,
 } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -49,10 +50,14 @@ export default function EventCreation() {
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
     null
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetWizard = () => {
+    setEventData(blankEvent);
+    setSelectedOrg(null);
     setStep(1);
     setStep1Valid(false);
+    setStep2Valid(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -64,7 +69,7 @@ export default function EventCreation() {
   };
 
   const discardAndClose = () => {
-    setEventData(blankEvent);
+    resetWizard();
     setConfirmOpen();
     setWizardOpen(false);
   };
@@ -76,11 +81,12 @@ export default function EventCreation() {
     setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
 
   const handleFinish = async () => {
+    setIsSubmitting(true);
     const rawCategories = eventData.categories;
 
     const categoryArray: { categoryId: number }[] = Array.isArray(rawCategories)
-      ? rawCategories as { categoryId: number }[]
-      : Object.values(rawCategories) as { categoryId: number }[];
+      ? (rawCategories as { categoryId: number }[])
+      : (Object.values(rawCategories) as { categoryId: number }[]);
 
     let eventTime = eventData.eventTime;
     if (eventTime && eventTime.length === 5) {
@@ -108,6 +114,8 @@ export default function EventCreation() {
       resetWizard();
     } catch (err) {
       console.error('Failed to create event:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -117,7 +125,6 @@ export default function EventCreation() {
       <Modal
         isOpen={wizardOpen}
         onOpenChange={handleOpenChange}
-        onClose={resetWizard}
         size="4xl"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
@@ -196,7 +203,8 @@ export default function EventCreation() {
                 <Button
                   isDisabled={
                     (step === 1 && !isStep1Valid) ||
-                    (step === 2 && !isStep2Valid)
+                    (step === 2 && !isStep2Valid) ||
+                    (step === 4 && isSubmitting)
                   }
                   onPress={() => {
                     if (step === 4) {
@@ -207,7 +215,18 @@ export default function EventCreation() {
                   }}
                   className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
                 >
-                  {step === 4 ? 'Finish' : 'Next'}
+                  {step === 4 ? (
+                    isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner size="sm" color="white" />
+                        Finish
+                      </span>
+                    ) : (
+                      'Finish'
+                    )
+                  ) : (
+                    'Next'
+                  )}
                 </Button>
               </ModalFooter>
             </>
