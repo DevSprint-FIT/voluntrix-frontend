@@ -1,15 +1,21 @@
 'use client';
 
+import { EventCreateData } from '@/types/EventCreateData';
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
+
+interface Props {
+  data: EventCreateData;
+  onChange: (changes: Partial<EventCreateData>) => void;
+}
 
 const formatRs = (n: number) =>
   `Rs. ${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
 type Tier = { id: string; name: string; amount: number };
 
-export default function SponsorshipsEC() {
+export default function SponsorshipsEC({ data, onChange }: Props) {
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [tierName, setTierName] = useState('');
   const [tierAmount, setTierAmount] = useState('');
@@ -28,7 +34,6 @@ export default function SponsorshipsEC() {
   const removeTier = (id: string) =>
     setTiers((t) => t.filter((tier) => tier.id !== id));
 
-  const [donEnabled, setDonEnabled] = useState(false);
   const [donInput, setDonInput] = useState('');
   const [donGoal, setDonGoal] = useState<number | null>(null);
 
@@ -44,103 +49,113 @@ export default function SponsorshipsEC() {
 
   return (
     <>
-      <div className="mt-2 font-primary font-medium text-shark-950 text-[20px]">
+      <div className="mt-2 flex gap-4 font-primary font-medium text-shark-950 text-[20px]">
         Sponsorships
-      </div>
-
-      {tiers.map((tier) => (
-        <div
-          key={tier.id}
-          className="flex items-center gap-3 font-secondary font-medium text-[16px]"
-        >
-          <p className="text-shark-950">{tier.name}</p>
-          <p className="text-shark-800">{formatRs(tier.amount)}</p>
-          <Image
-            src="/icons/close.svg"
-            width={12}
-            height={12}
-            alt="remove"
-            className="cursor-pointer"
-            onClick={() => removeTier(tier.id)}
-          />
-        </div>
-      ))}
-
-      <div className="flex gap-4">
-        <label className="flex flex-col font-secondary font-medium text-[15px]">
-          Sponsorship
-          <input
-            type="text"
-            value={tierName}
-            onChange={(e) => setTierName(e.target.value)}
-            placeholder="Enter sponsorship name"
-            className="border-[2px] border-shark-300 pl-2 py-1 rounded-lg w-[300px]"
-          />
-        </label>
-
-        <label className="flex flex-col font-secondary font-medium text-[15px]">
-          Amount
-          <div className="flex gap-4">
-            <input
-              type="number"
-              min="1"
-              value={tierAmount}
-              onChange={(e) => setTierAmount(e.target.value)}
-              placeholder="Enter amount"
-              className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[200px] placeholder:text-shark-300"
-            />
-
-            <Button
-              variant="shadow"
-              isDisabled={!tierName.trim() || !Number(tierAmount)}
-              className="bg-verdant-600 text-white px-6 py-2 rounded-lg h-9"
-              onPress={addTier}
-            >
-              Add
-            </Button>
-          </div>
-        </label>
-      </div>
-      <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-        Upload Sponsorship Proposal (Maximum image size is 100 MB)
-        <input
-          type="file"
-          accept="application/pdf,image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            const maxSize = 100 * 1024 * 1024; // 100 MB
-
-            if (file) {
-              if (file.size > maxSize) {
-                setProposalmessage(
-                  'File size exceeds 100 MB. Please upload a smaller image.'
-                );
-                e.target.value = '';
-                setFile(null);
-              } else {
-                setProposalmessage('');
-                setFile(file);
-              }
-            }
-          }}
-          className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
-        />
-        {proposalMessage && (
-          <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
-            {proposalMessage}
-          </div>
-        )}
-      </label>
-      <div className="mt-4 flex gap-4 items-center font-primary font-medium text-shark-950 text-[20px]">
-        Donations
         <Switch
-          isSelected={donEnabled}
-          onValueChange={setDonEnabled}
+          isSelected={data.sponsorshipEnabled}
+          onValueChange={(val) => onChange({ sponsorshipEnabled: val })}
           color="success"
           size="sm"
         />
       </div>
-      {donEnabled && (
+      <fieldset
+        disabled={!data.sponsorshipEnabled}
+        className={!data.sponsorshipEnabled ? 'opacity-50 pointer-events-none' : ''}
+      >
+        {tiers.map((tier) => (
+          <div
+            key={tier.id}
+            className="flex items-center gap-3 font-secondary font-medium text-[16px]"
+          >
+            <p className="text-shark-950">{tier.name}</p>
+            <p className="text-shark-800">{formatRs(tier.amount)}</p>
+            <Image
+              src="/icons/close.svg"
+              width={12}
+              height={12}
+              alt="remove"
+              className="cursor-pointer"
+              onClick={() => removeTier(tier.id)}
+            />
+          </div>
+        ))}
+
+        <div className="flex gap-4">
+          <label className="flex flex-col font-secondary font-medium text-[15px]">
+            Sponsorship
+            <input
+              type="text"
+              value={tierName}
+              onChange={(e) => setTierName(e.target.value)}
+              placeholder="Enter sponsorship name"
+              className="border-[2px] border-shark-300 pl-2 py-1 rounded-lg w-[300px]"
+            />
+          </label>
+
+          <label className="flex flex-col font-secondary font-medium text-[15px]">
+            Amount
+            <div className="flex gap-4">
+              <input
+                type="number"
+                min="1"
+                value={tierAmount}
+                onChange={(e) => setTierAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[200px] placeholder:text-shark-300"
+              />
+
+              <Button
+                variant="shadow"
+                isDisabled={!tierName.trim() || !Number(tierAmount)}
+                className="bg-verdant-600 text-white px-6 py-2 rounded-lg h-9"
+                onPress={addTier}
+              >
+                Add
+              </Button>
+            </div>
+          </label>
+        </div>
+        <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
+          Upload Sponsorship Proposal (Maximum image size is 100 MB)
+          <input
+            type="file"
+            accept="application/pdf,image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              const maxSize = 100 * 1024 * 1024; // 100 MB
+
+              if (file) {
+                if (file.size > maxSize) {
+                  setProposalmessage(
+                    'File size exceeds 100 MB. Please upload a smaller image.'
+                  );
+                  e.target.value = '';
+                  setFile(null);
+                } else {
+                  setProposalmessage('');
+                  setFile(file);
+                }
+              }
+            }}
+            className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
+          />
+          {proposalMessage && (
+            <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
+              {proposalMessage}
+            </div>
+          )}
+        </label>
+      </fieldset>
+      <div className="mt-4 flex gap-4 items-center font-primary font-medium text-shark-950 text-[20px]">
+        Donations
+        <Switch
+          isSelected={data.donationEnabled}
+          onValueChange={(val) => onChange({ donationEnabled: val })}
+          color="success"
+          size="sm"
+        />
+      </div>
+      {data.donationEnabled && (
         <>
           <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
             Amount

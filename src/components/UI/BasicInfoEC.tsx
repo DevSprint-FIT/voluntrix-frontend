@@ -10,6 +10,11 @@ interface Props {
 }
 
 const eventTypes = [
+  { key: 'ONLINE', label: 'Online' },
+  { key: 'ONSITE', label: 'Onsite' },
+];
+
+const eventVisibilities = [
   { key: 'PRIVATE', label: 'Private' },
   { key: 'PUBLIC', label: 'Public' },
 ];
@@ -28,6 +33,7 @@ export default function BasicInfoEC({
   onValidityChange,
 }: Props) {
   const [imageMessage, setImageMessage] = useState('');
+  const [dateWarning, setDateWarning] = useState('');
 
   useEffect(() => {
     const valid =
@@ -35,11 +41,26 @@ export default function BasicInfoEC({
       data.eventLocation.trim() &&
       data.eventDescription.trim() &&
       data.eventType &&
+      data.eventVisibility &&
       data.eventStartDate &&
-      data.eventImageUrl;
+      data.eventEndDate &&
+      data.eventTime &&
+      data.eventImageUrl &&
+      data.categories.length > 0 &&
+      data.eventStartDate <= data.eventEndDate;
+
+    if (
+      data.eventStartDate &&
+      data.eventEndDate &&
+      data.eventStartDate > data.eventEndDate
+    ) {
+      setDateWarning('End date should not be before start date.');
+    } else {
+      setDateWarning('');
+    }
 
     onValidityChange(!!valid);
-  }, [data, onValidityChange]);
+  }, [data, onValidityChange, setDateWarning]);
 
   const handleCategoryChange = (
     category: { categoryId: number; categoryName: string },
@@ -55,7 +76,7 @@ export default function BasicInfoEC({
     <div className="flex flex-col">
       <div className="flex justify-between">
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Event Title*
+          Event Title
           <input
             type="text"
             className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[350px] placeholder:text-shark-300"
@@ -65,7 +86,7 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Event Location*
+          Event Location
           <input
             type="text"
             className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[350px] placeholder:text-shark-300"
@@ -77,7 +98,7 @@ export default function BasicInfoEC({
       </div>
       <div className="flex flex-col mt-2">
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          Event Description*
+          Event Description
           <textarea
             value={data.eventDescription}
             onChange={(e) => onChange({ eventDescription: e.target.value })}
@@ -91,33 +112,8 @@ export default function BasicInfoEC({
         </div>
       </div>
       <div className="flex gap-8 mt-2">
-        <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          Event Type*
-          <Select
-            placeholder="Select type"
-            variant="bordered"
-            size="sm"
-            value={data.eventType || ''}
-            onChange={(e) => onChange({ eventType: e.target.value })}
-            className="w-[170px] rounded-2xl text-shark-300 border-shark-300"
-            classNames={{
-              base: 'border-shark-300',
-              trigger: 'border-shark-300',
-            }}
-          >
-            {eventTypes.map((t) => (
-              <SelectItem
-                key={t.key}
-                value={t.key}
-                className="font-medium text-shark-800 font-secondary text-[15px]"
-              >
-                {t.label}
-              </SelectItem>
-            ))}
-          </Select>
-        </label>
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Start Date*
+          Start Date
           <input
             type="date"
             className="w-[141px] h-8 border-2 border-shark-300 rounded-lg text-shark-300"
@@ -143,7 +139,62 @@ export default function BasicInfoEC({
             onChange={(e) => onChange({ eventTime: e.target.value })}
           />
         </label>
+        <label className="font-secondary font-medium text-shark-950 text-[15px]">
+          Event Visibility
+          <Select
+            placeholder="Select type"
+            variant="bordered"
+            size="sm"
+            value={data.eventVisibility || ''}
+            onChange={(e) => onChange({ eventVisibility: e.target.value })}
+            className="w-[120px] rounded-2xl text-shark-300 border-shark-300"
+            classNames={{
+              base: 'border-shark-300',
+              trigger: 'border-shark-300',
+            }}
+          >
+            {eventVisibilities.map((t) => (
+              <SelectItem
+                key={t.key}
+                value={t.key}
+                className="font-medium text-shark-800 font-secondary text-[15px]"
+              >
+                {t.label}
+              </SelectItem>
+            ))}
+          </Select>
+        </label>
+        <label className="font-secondary font-medium text-shark-950 text-[15px]">
+          Event Type
+          <Select
+            placeholder="Select type"
+            variant="bordered"
+            size="sm"
+            value={data.eventType || ''}
+            onChange={(e) => onChange({ eventType: e.target.value })}
+            className="w-[120px] rounded-2xl text-shark-300 border-shark-300"
+            classNames={{
+              base: 'border-shark-300',
+              trigger: 'border-shark-300',
+            }}
+          >
+            {eventTypes.map((t) => (
+              <SelectItem
+                key={t.key}
+                value={t.key}
+                className="font-medium text-shark-800 font-secondary text-[15px]"
+              >
+                {t.label}
+              </SelectItem>
+            ))}
+          </Select>
+        </label>
       </div>
+      {dateWarning && (
+        <div className="text-[13px] text-red-600 mt-1 font- font-secondary">
+          {dateWarning}
+        </div>
+      )}
       <div className="mt-3 font-secondary font-medium text-shark-950 text-[15px]">
         Event Category
       </div>
@@ -165,7 +216,7 @@ export default function BasicInfoEC({
         ))}
       </div>
       <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-        Upload Event Image* (Maximum image size is 100 MB)
+        Upload Event Image (Maximum image size is 100 MB)
         <input
           type="file"
           accept="image/*"
@@ -183,9 +234,7 @@ export default function BasicInfoEC({
                 try {
                   const uploadedUrl = await uploadToCloudinary(file);
                   onChange({ eventImageUrl: uploadedUrl });
-                  setImageMessage(
-                    'Image uploaded successfully. ' + uploadedUrl
-                  );
+                  setImageMessage('Image uploaded successfully.');
                 } catch {
                   setImageMessage('Upload failed. Please try again.');
                 }
@@ -195,7 +244,7 @@ export default function BasicInfoEC({
           className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
         />
         {imageMessage && (
-          <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
+          <div className="mt-1 text-shark-600 text-[13px] font-secondary font-normal">
             {imageMessage}
           </div>
         )}

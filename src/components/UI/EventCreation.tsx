@@ -18,6 +18,7 @@ import SponsorshipsEC from './SponsorshipsEC';
 import ReviewEC from './ReviewEC';
 import { EventCreateData } from '@/types/EventCreateData';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
+import { createEvent } from '@/services/eventService';
 
 const blankEvent: EventCreateData = {
   eventTitle: '',
@@ -29,19 +30,20 @@ const blankEvent: EventCreateData = {
   eventImageUrl: '',
   eventType: '',
   eventVisibility: '',
-  eventStatus: '',
+  eventStatus: 'PENDING',
   sponsorshipEnabled: false,
   donationEnabled: false,
   categories: [],
-  eventHostId: 0,
-  organizationId: null,
+  eventHostId: 1,
+  organizationId: 1,
 };
 
 export default function EventCreation() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
   const [step, setStep] = useState(1);
-  const [isStep1Valid, setValid] = useState(false);
+  const [isStep1Valid, setStep1Valid] = useState(false);
+  const [isStep2Valid, setStep2Valid] = useState(false);
   const progress = step * 25;
   const [eventData, setEventData] = useState<EventCreateData>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
@@ -55,7 +57,7 @@ export default function EventCreation() {
 
   const resetWizard = () => {
     setStep(1);
-    setValid(false);
+    setStep1Valid(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -77,6 +79,46 @@ export default function EventCreation() {
 
   const updateEventData = (changes: Partial<EventCreateData>) =>
     setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
+
+  const handleFinish = async () => {
+    const rawCategories = eventData.categories;
+
+    // Convert to array if it's a keyed object
+    const categoryArray: { categoryId: number }[] = Array.isArray(rawCategories)
+      ? rawCategories as { categoryId: number }[]
+      : Object.values(rawCategories) as { categoryId: number }[];
+
+    // Ensure time is in HH:mm:ss format
+    let eventTime = eventData.eventTime;
+    if (eventTime && eventTime.length === 5) {
+      // If it's in "HH:mm", add ":00"
+      eventTime += ':00';
+    }
+
+    const payload = {
+      ...eventData,
+      eventTime,
+      eventStatus: 'DRAFT', // if needed for backend
+      categories: categoryArray.map((cat) => ({
+        categoryId: cat.categoryId,
+      })),
+    };
+
+    console.log(
+      'Final payload sent to backend:',
+      JSON.stringify(payload, null, 2)
+    );
+
+    try {
+      const createdEvent = await createEvent(payload);
+      console.log('Event created successfully:', createdEvent);
+      setWizardOpen(false);
+      resetWizard();
+    } catch (err) {
+      console.error('Failed to create event:', err);
+    }
+  };
+
   return (
     <>
       <Button onPress={() => setWizardOpen(true)}>Open Modal</Button>
@@ -136,16 +178,19 @@ export default function EventCreation() {
                   <BasicInfoEC
                     data={eventData}
                     onChange={updateEventData}
-                    onValidityChange={setValid}
+                    onValidityChange={setStep1Valid}
                   />
                 )}
                 {step === 2 && (
                   <OrganizationEC
                     selectedOrg={selectedOrg}
                     setSelectedOrg={setSelectedOrg}
+                    onValidityChange={setStep2Valid}
                   />
                 )}
-                {step === 3 && <SponsorshipsEC />}
+                {step === 3 && (
+                  <SponsorshipsEC data={eventData} onChange={updateEventData} />
+                )}
                 {step === 4 && <ReviewEC />}
               </ModalBody>
               <ModalFooter className="pt-0">
@@ -157,9 +202,18 @@ export default function EventCreation() {
                   Back
                 </Button>
                 <Button
-                  isDisabled={step === 1 && !isStep1Valid}
-                  onPress={() => (step === 4 ? setWizardOpen(false) : next())}
-                  className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
+                  isDisabled={
+                    (step === 1 && !isStep1Valid) ||
+                    (step === 2 && !isStep2Valid)
+                  }
+                  onPress={() => {
+                    if (step === 4) {
+                      handleFinish();
+                    } else {
+                      next();
+                    }
+                  }}
+                  className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
                 >
                   {step === 4 ? 'Finish' : 'Next'}
                 </Button>
