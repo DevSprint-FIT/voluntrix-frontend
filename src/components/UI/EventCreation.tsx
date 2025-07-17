@@ -20,6 +20,7 @@ import ReviewEC from './ReviewEC';
 import { EventCreateType } from '@/types/EventCreateType';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 import { createEvent } from '@/services/eventService';
+import { createEventInvitation } from '@/services/eventInvitationService';
 
 const blankEvent: EventCreateType = {
   eventTitle: '',
@@ -43,7 +44,6 @@ export default function EventCreation() {
   const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
-  const [isStep2Valid, setStep2Valid] = useState(false);
   const progress = step * 25;
   const [eventData, setEventData] = useState<EventCreateType>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
@@ -56,7 +56,6 @@ export default function EventCreation() {
     setSelectedOrg(null);
     setStep(1);
     setStep1Valid(false);
-    setStep2Valid(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -109,10 +108,21 @@ export default function EventCreation() {
     try {
       const createdEvent = await createEvent(payload);
       console.log('Event created successfully:', createdEvent);
+
+      const eventId = createdEvent?.eventId;
+      const organizationId = selectedOrg?.id;
+
+      if (eventId && organizationId) {
+        await createEventInvitation(eventId, organizationId);
+        console.log('Event invitation sent successfully');
+      } else {
+        console.log('No organization selected, skipping invitation creation.');
+      }
+
       setWizardOpen(false);
       resetWizard();
     } catch (err) {
-      console.error('Failed to create event:', err);
+      console.error('Failed to create event or send invitation:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -183,7 +193,6 @@ export default function EventCreation() {
                   <OrganizationEC
                     selectedOrg={selectedOrg}
                     setSelectedOrg={setSelectedOrg}
-                    onValidityChange={setStep2Valid}
                   />
                 )}
                 {step === 3 && (
@@ -202,7 +211,6 @@ export default function EventCreation() {
                 <Button
                   isDisabled={
                     (step === 1 && !isStep1Valid) ||
-                    (step === 2 && !isStep2Valid) ||
                     (step === 4 && isSubmitting)
                   }
                   onPress={() => {
