@@ -1,4 +1,4 @@
-import { uploadToCloudinary } from '@/services/ImageUploadService';
+import { uploadToCloudinary } from '@/services/imageUploadService';
 import { EventCreateType } from '@/types/EventCreateType';
 import { Select, SelectItem } from '@heroui/react';
 import { useState, useEffect } from 'react';
