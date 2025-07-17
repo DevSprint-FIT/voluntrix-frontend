@@ -42,6 +42,8 @@ const blankEvent: EventCreateType = {
 export default function EventCreation() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
+  const { isOpen: isSuccessOpen, onOpenChange: setSuccessOpen } =
+    useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
   const progress = step * 25;
@@ -50,6 +52,9 @@ export default function EventCreation() {
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionType, setSubmissionType] = useState<
+    'CREATED' | 'PENDING' | null
+  >(null);
 
   const resetWizard = () => {
     setEventData(blankEvent);
@@ -115,11 +120,14 @@ export default function EventCreation() {
       if (eventId && organizationId) {
         await createEventInvitation(eventId, organizationId);
         console.log('Event invitation sent successfully');
+        setSubmissionType('PENDING');
       } else {
         console.log('No organization selected, skipping invitation creation.');
+        setSubmissionType('CREATED');
       }
 
       setWizardOpen(false);
+      setSuccessOpen();
       resetWizard();
     } catch (err) {
       console.error('Failed to create event or send invitation:', err);
@@ -273,6 +281,47 @@ export default function EventCreation() {
               </ModalFooter>
             </>
           )}
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isSuccessOpen} onOpenChange={setSuccessOpen}>
+        <ModalContent className="pt-8 pb-10 px-4">
+          <>
+            <ModalBody className="flex flex-col justify-center items-center gap-1">
+              {submissionType === 'CREATED' ? (
+                <>
+                  <Image
+                    src={'/icons/tick-circle.svg'}
+                    width={56}
+                    height={56}
+                    alt="success"
+                  />
+                  <div className="mt-4 text-center font-bold font-primary text-shark-900 text-2xl">
+                    Event Created Successfully
+                  </div>
+                  <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
+                    Your event has been created. You can now manage it in your
+                    dashboard.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Image
+                    src={'/icons/tick-circle.svg'}
+                    width={56}
+                    height={56}
+                    alt="success"
+                  />
+                  <div className="mt-4 text-center font-bold font-primary text-shark-900 text-2xl">
+                    Review in Progress
+                  </div>
+                  <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
+                    Thanks for applying! Your application is under review.
+                    You&apos;ll be notified once it&apos;s approved or declined.
+                  </div>
+                </>
+              )}
+            </ModalBody>
+          </>
         </ModalContent>
       </Modal>
     </>
