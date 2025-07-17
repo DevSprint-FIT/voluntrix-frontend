@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle, AlertCircle, Calendar } from "lucide-react";
+import { X, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@heroui/button";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -106,23 +108,21 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     }));
   };
 
-  const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Convert from datetime-local format to the required format
-    if (value) {
-      const date = new Date(value);
-      const isoString = date.toISOString();
+  const handleDateChange = (date: any) => {
+    if (date) {
+      // Convert HeroUI date to ISO string
+      const jsDate = new Date(date.year, date.month - 1, date.day);
+      const isoString = jsDate.toISOString();
       handleInputChange("dueDate", isoString);
     } else {
       handleInputChange("dueDate", "");
     }
   };
 
-  const formatDateTimeForInput = (isoString: string) => {
-    if (!isoString) return "";
+  const formatDateForDatePicker = (isoString: string) => {
+    if (!isoString) return null;
     const date = new Date(isoString);
-    // Format for datetime-local input (YYYY-MM-DDTHH:MM)
-    return date.toISOString().slice(0, 16);
+    return parseDate(date.toISOString().slice(0, 10));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -232,7 +232,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   handleInputChange("description", e.target.value)
                 }
                 placeholder="Description can be up to 500 characters"
-                className="w-full px-4 py-3 border border-shark-200 rounded-xl focus:ring-2 focus:ring-verdant-500 focus:border-transparent resize-none font-secondary"
+                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 resize-none font-secondary"
                 rows={4}
                 maxLength={500}
                 required
@@ -252,7 +252,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 onChange={(e) =>
                   handleInputChange("difficulty", e.target.value)
                 }
-                className="w-full px-4 py-3 border border-shark-200 rounded-xl focus:ring-2 focus:ring-verdant-500 focus:border-transparent font-secondary"
+                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
                 required
               >
                 <option value="">Select difficulty level</option>
@@ -272,7 +272,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               <select
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
-                className="w-full px-4 py-3 border border-shark-200 rounded-xl focus:ring-2 focus:ring-verdant-500 focus:border-transparent font-secondary"
+                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
                 required
               >
                 <option value="">Select task category</option>
@@ -292,7 +292,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               <select
                 value={formData.assignee}
                 onChange={(e) => handleInputChange("assignee", e.target.value)}
-                className="w-full px-4 py-3 border border-shark-200 rounded-xl focus:ring-2 focus:ring-verdant-500 focus:border-transparent font-secondary"
+                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
                 required
               >
                 <option value="">Select assignee</option>
@@ -307,21 +307,24 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             {/* Due Date */}
             <div>
               <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Due Date & Time
+                Due Date
               </label>
-              <div className="relative">
-                <input
-                  type="datetime-local"
-                  value={formatDateTimeForInput(formData.dueDate)}
-                  onChange={handleDateTimeChange}
-                  className="w-full px-4 py-3 border border-shark-200 rounded-xl focus:ring-2 focus:ring-verdant-500 focus:border-transparent font-secondary"
-                  required
-                />
-                <Calendar
-                  className="absolute right-3 top-3 text-shark-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
+              <DatePicker
+                value={formatDateForDatePicker(formData.dueDate)}
+                onChange={handleDateChange}
+                className="w-full"
+                classNames={{
+                  base: "w-full",
+                  inputWrapper:
+                    "border-2 border-shark-200 hover:border-shark-300 group-data-[focus=true]:border-verdant-500 h-12 rounded-xl",
+                  input: "text-shark-700 font-secondary",
+                  selectorButton: "text-shark-500 hover:text-verdant-600",
+                }}
+                color="success"
+                variant="bordered"
+                isRequired
+                showMonthAndYearPickers
+              />
             </div>
 
             {/* Submit Buttons */}
