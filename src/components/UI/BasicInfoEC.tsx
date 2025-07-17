@@ -60,7 +60,15 @@ export default function BasicInfoEC({
     }
 
     onValidityChange(!!valid);
-  }, [data, onValidityChange, setDateWarning]);
+  }, [data, onValidityChange]);
+
+  useEffect(() => {
+    if (data.eventImageUrl) {
+      setImageMessage('✓ Image uploaded and saved');
+    } else {
+      setImageMessage('');
+    }
+  }, [data.eventImageUrl]);
 
   const handleCategoryChange = (
     category: { categoryId: number; categoryName: string },
@@ -145,8 +153,11 @@ export default function BasicInfoEC({
             placeholder="Select type"
             variant="bordered"
             size="sm"
-            value={data.eventVisibility || ''}
-            onChange={(e) => onChange({ eventVisibility: e.target.value })}
+            selectedKeys={data.eventVisibility ? [data.eventVisibility] : []}
+            onSelectionChange={(keys) => {
+              const selectedValue = Array.from(keys)[0] as string;
+              onChange({ eventVisibility: selectedValue });
+            }}
             className="w-[120px] rounded-2xl text-shark-300 border-shark-300"
             classNames={{
               base: 'border-shark-300',
@@ -170,8 +181,11 @@ export default function BasicInfoEC({
             placeholder="Select type"
             variant="bordered"
             size="sm"
-            value={data.eventType || ''}
-            onChange={(e) => onChange({ eventType: e.target.value })}
+            selectedKeys={data.eventType ? [data.eventType] : []}
+            onSelectionChange={(keys) => {
+              const selectedValue = Array.from(keys)[0] as string;
+              onChange({ eventType: selectedValue });
+            }}
             className="w-[120px] rounded-2xl text-shark-300 border-shark-300"
             classNames={{
               base: 'border-shark-300',
@@ -191,7 +205,7 @@ export default function BasicInfoEC({
         </label>
       </div>
       {dateWarning && (
-        <div className="text-[13px] text-red-600 mt-1 font- font-secondary">
+        <div className="text-[13px] text-red-600 mt-1 font-secondary">
           {dateWarning}
         </div>
       )}
@@ -234,7 +248,7 @@ export default function BasicInfoEC({
                 try {
                   const uploadedUrl = await uploadToCloudinary(file);
                   onChange({ eventImageUrl: uploadedUrl });
-                  setImageMessage('Image uploaded successfully.');
+                  setImageMessage('✓ Image uploaded and saved');
                 } catch {
                   setImageMessage('Upload failed. Please try again.');
                 }
@@ -244,7 +258,7 @@ export default function BasicInfoEC({
           className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
         />
         {imageMessage && (
-          <div className="mt-1 text-shark-600 text-[13px] font-secondary font-normal">
+          <div className="mt-1 text-verdant-600 text-[13px] font-secondary font-normal">
             {imageMessage}
           </div>
         )}
