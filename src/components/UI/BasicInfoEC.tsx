@@ -1,11 +1,11 @@
 import { uploadToCloudinary } from '@/services/ImageUploadService';
-import { EventCreateData } from '@/types/EventCreateData';
+import { EventCreateType } from '@/types/EventCreateType';
 import { Select, SelectItem } from '@heroui/react';
 import { useState, useEffect } from 'react';
 
 interface Props {
-  data: EventCreateData;
-  onChange: (changes: Partial<EventCreateData>) => void;
+  data: EventCreateType;
+  onChange: (changes: Partial<EventCreateType>) => void;
   onValidityChange: (valid: boolean) => void;
 }
 
