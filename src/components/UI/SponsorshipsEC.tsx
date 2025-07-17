@@ -1,13 +1,13 @@
 'use client';
 
-import { EventCreateData } from '@/types/EventCreateData';
+import { EventCreateType } from '@/types/EventCreateType';
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
 
 interface Props {
-  data: EventCreateData;
-  onChange: (changes: Partial<EventCreateData>) => void;
+  data: EventCreateType;
+  onChange: (changes: Partial<EventCreateType>) => void;
 }
 
 const formatRs = (n: number) =>
@@ -60,7 +60,9 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
       </div>
       <fieldset
         disabled={!data.sponsorshipEnabled}
-        className={!data.sponsorshipEnabled ? 'opacity-50 pointer-events-none' : ''}
+        className={
+          !data.sponsorshipEnabled ? 'opacity-50 pointer-events-none' : ''
+        }
       >
         {tiers.map((tier) => (
           <div
