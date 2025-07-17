@@ -11,13 +11,11 @@ interface OrganizationECProps {
   setSelectedOrg: React.Dispatch<
     React.SetStateAction<OrganizationTitles | null>
   >;
-  onValidityChange?: (valid: boolean) => void;
 }
 
 export default function OrganizationEC({
   selectedOrg,
   setSelectedOrg,
-  onValidityChange,
 }: OrganizationECProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<OrganizationTitles[]>([]);
@@ -89,12 +87,12 @@ export default function OrganizationEC({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const valid = !!selectedOrg;
-    if (onValidityChange) {
-      onValidityChange(valid);
-    }
-  }, [selectedOrg, onValidityChange]);
+  // useEffect(() => {
+  //   const valid = !!selectedOrg;
+  //   if (onValidityChange) {
+  //     onValidityChange(valid);
+  //   }
+  // }, [selectedOrg, onValidityChange]);
 
   return (
     <>
