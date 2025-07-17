@@ -1,4 +1,4 @@
-export interface EventCreateData {
+export interface EventCreateType {
   eventTitle: string;
   eventDescription: string;
   eventLocation: string;
@@ -13,5 +13,4 @@ export interface EventCreateData {
   donationEnabled: boolean;
   categories: { categoryId: number }[];
   eventHostId: number;
-  organizationId: number | null;
 }
