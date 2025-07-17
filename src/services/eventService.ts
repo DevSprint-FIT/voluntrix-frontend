@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { EventType } from '@/types/EventType';
-import { EventCreateData } from '@/types/EventCreateData';
+import { EventCreateType } from '@/types/EventCreateType';
 
 export const fetchEventById = async (id: number): Promise<EventType> => {
   try {
@@ -60,7 +60,7 @@ export const fetchEventTitles = async () => {
   }
 };
 
-export const createEvent = async (eventData: EventCreateData) => {
+export const createEvent = async (eventData: EventCreateType) => {
   const token = localStorage.getItem('token'); // authentication token
 
   try {
