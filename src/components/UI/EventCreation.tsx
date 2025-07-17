@@ -17,11 +17,11 @@ import BasicInfoEC from './BasicInfoEC';
 import OrganizationEC from './OrganizationEC';
 import SponsorshipsEC from './SponsorshipsEC';
 import ReviewEC from './ReviewEC';
-import { EventCreateData } from '@/types/EventCreateData';
+import { EventCreateType } from '@/types/EventCreateType';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 import { createEvent } from '@/services/eventService';
 
-const blankEvent: EventCreateData = {
+const blankEvent: EventCreateType = {
   eventTitle: '',
   eventDescription: '',
   eventLocation: '',
@@ -36,7 +36,6 @@ const blankEvent: EventCreateData = {
   donationEnabled: false,
   categories: [],
   eventHostId: 1,
-  organizationId: 1,
 };
 
 export default function EventCreation() {
@@ -46,7 +45,7 @@ export default function EventCreation() {
   const [isStep1Valid, setStep1Valid] = useState(false);
   const [isStep2Valid, setStep2Valid] = useState(false);
   const progress = step * 25;
-  const [eventData, setEventData] = useState<EventCreateData>(blankEvent);
+  const [eventData, setEventData] = useState<EventCreateType>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
     null
   );
@@ -77,7 +76,7 @@ export default function EventCreation() {
   const next = () => setStep((s) => Math.min(s + 1, 4));
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
-  const updateEventData = (changes: Partial<EventCreateData>) =>
+  const updateEventData = (changes: Partial<EventCreateType>) =>
     setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
 
   const handleFinish = async () => {
