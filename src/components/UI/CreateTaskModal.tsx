@@ -111,7 +111,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const handleDateChange = (date: any) => {
     if (date) {
       // Convert HeroUI date to ISO string
-      const jsDate = new Date(date.year, date.month - 1, date.day);
+      // Note: HeroUI date object has 1-based months, JavaScript Date has 0-based months
+      const jsDate = new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
       const isoString = jsDate.toISOString();
       handleInputChange("dueDate", isoString);
     } else {
@@ -122,7 +123,23 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const formatDateForDatePicker = (isoString: string) => {
     if (!isoString) return null;
     const date = new Date(isoString);
-    return parseDate(date.toISOString().slice(0, 10));
+    // Ensure we're getting the correct date components in local time
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const dateString = `${year}-${month}-${day}`;
+    return parseDate(dateString);
+  };
+
+  // Get tomorrow's date as the minimum selectable date
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const year = tomorrow.getFullYear();
+    const month = (tomorrow.getMonth() + 1).toString().padStart(2, "0");
+    const day = tomorrow.getDate().toString().padStart(2, "0");
+    const dateString = `${year}-${month}-${day}`;
+    return parseDate(dateString);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -154,6 +171,20 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       setNotificationType("error");
       setNotificationTitle("Validation Error");
       setNotificationMessage("All fields are required.");
+      setShowNotification(true);
+      return;
+    }
+
+    // Validate that due date is not in the past
+    const selectedDate = new Date(formData.dueDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to beginning of day
+    selectedDate.setHours(0, 0, 0, 0); // Reset time to beginning of day
+
+    if (selectedDate <= today) {
+      setNotificationType("error");
+      setNotificationTitle("Invalid Due Date");
+      setNotificationMessage("Due date must be at least one day from today.");
       setShowNotification(true);
       return;
     }
@@ -312,6 +343,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               <DatePicker
                 value={formatDateForDatePicker(formData.dueDate)}
                 onChange={handleDateChange}
+                minValue={getTomorrowDate()}
                 className="w-full"
                 classNames={{
                   base: "w-full",
@@ -324,6 +356,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 variant="bordered"
                 isRequired
                 showMonthAndYearPickers
+                description="Due date must be at least one day from today"
               />
             </div>
 
