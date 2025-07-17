@@ -77,8 +77,21 @@ export default function EventCreation() {
     setWizardOpen(false);
   };
 
-  const next = () => setStep((s) => Math.min(s + 1, 4));
-  const back = () => setStep((s) => Math.max(s - 1, 1));
+  const next = () => {
+    if (step === 2 && !selectedOrg) {
+      setStep(4);
+    } else {
+      setStep((s) => Math.min(s + 1, 4));
+    }
+  };
+
+  const back = () => {
+    if (step === 4 && !selectedOrg) {
+      setStep(2);
+    } else {
+      setStep((s) => Math.max(s - 1, 1));
+    }
+  };
 
   const updateEventData = (changes: Partial<EventCreateType>) =>
     setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
