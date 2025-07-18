@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Copy } from "lucide-react";
 import { FaFacebook, FaWhatsapp, FaLinkedin, FaInstagram } from "react-icons/fa"; 
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 
 interface ShareModalProps {
   isOpen: boolean;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import uploadImage from "@/utils/uploadImage";
 import { Image as ImageIcon, Pencil } from "lucide-react";
 import {Textarea} from "@heroui/react";
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 
 interface PostModalProps {
   onClose: () => void;
@@ -83,7 +83,8 @@ const PostModal: React.FC<PostModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-shark-950 bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-lg w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-lg relative">
+      <div className="bg-white p-8 rounded-lg w-full max-w-xl max-h-[85vh] overflow-y-auto shadow-lg relative">
+
         <button
           onClick={onClose}
           className="absolute top-3 right-6 text-shark-500 hover:text-shark-700"
@@ -116,8 +117,9 @@ const PostModal: React.FC<PostModalProps> = ({
            value={content}
            onChange={(e) => setContent(e.target.value)}
            placeholder="What do you want to talk about?"
-           minRows={7}
-           className="w-full h-30 mb-3 " 
+           minRows={4}
+           maxRows={6}
+           className="w-full  mb-16 " 
         />
 
 
@@ -136,10 +138,11 @@ const PostModal: React.FC<PostModalProps> = ({
            />
         ) : null}
 
-      <label className="cursor-pointer text-shark-600 flex items-center gap-2 self-start">
+      <label className="cursor-pointer text-shark-600 flex items-center gap-2 self-start pt-6">
          {previewImage ? (
         <>
         <Pencil size={18} />
+        <span className="text-sm">Change Media</span>
         </>
       ) : (
       <>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 import { X } from "lucide-react";
 
 interface ConfirmationModalProps {
