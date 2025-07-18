@@ -171,7 +171,7 @@ const EventVolunteersPage = () => {
       header: "Actions",
       accessor: "id",
       cell: (value) => (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <button
             onClick={() => handleApproveApplication(value as string)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
@@ -202,10 +202,10 @@ const EventVolunteersPage = () => {
   }) => (
     <button
       onClick={() => setActiveTab(tabKey)}
-      className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+      className={`px-6 py-3 font-bold text-base font-secondary border-b-2 transition-colors ${
         activeTab === tabKey
           ? "text-verdant-600 border-verdant-600 bg-verdant-50"
-          : "text-shark-600 border-transparent hover:text-verdant-600 hover:border-verdant-300"
+          : "text-shark-700 border-transparent hover:text-verdant-600 hover:border-verdant-600"
       }`}
     >
       {label} ({count})
@@ -232,7 +232,7 @@ const EventVolunteersPage = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="px-6 mb-6">
+      <div className="px-6 mb-14">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8">
             <TabButton
