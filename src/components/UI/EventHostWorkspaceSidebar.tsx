@@ -33,9 +33,9 @@ const EventHostWorkspaceSidebar = () => {
   const menuItems: MenuItem[] = [
     { name: "Tasks", icon: ListTodo, href: "/EventHostWorkspace/tasks" },
     {
-      name: "Applications",
+      name: "Volunteers",
       icon: Users,
-      href: "/EventHostWorkspace/applications",
+      href: "/EventHostWorkspace/volunteers",
     },
     {
       name: "Sponsorships",
