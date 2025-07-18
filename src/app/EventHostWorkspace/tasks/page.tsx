@@ -238,7 +238,7 @@ const EventHostTasksPage = () => {
       header: "Actions",
       accessor: "taskId",
       cell: (value) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-6">
           <button
             onClick={() => handleApproveTask(value as string)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
