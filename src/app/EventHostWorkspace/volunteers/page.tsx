@@ -39,17 +39,17 @@ const EventVolunteersPage = () => {
           {
             id: "1",
             volunteer: "John Smith",
-            contributionArea: "Event Setup",
+            contributionArea: "LOGISTICS",
           },
           {
             id: "2",
             volunteer: "Sarah Johnson",
-            contributionArea: "Registration",
+            contributionArea: "EDITORIAL",
           },
           {
             id: "3",
             volunteer: "Michael Brown",
-            contributionArea: "Technical Support",
+            contributionArea: "PROGRAMMING",
           },
         ];
 
@@ -58,21 +58,21 @@ const EventVolunteersPage = () => {
           {
             id: "1",
             volunteer: "Emily Davis",
-            contributionArea: "Marketing",
+            contributionArea: "DESIGN",
             description:
               "I have 3 years of experience in digital marketing and social media management. I would love to help promote this event.",
           },
           {
             id: "2",
             volunteer: "Alex Wilson",
-            contributionArea: "Photography",
+            contributionArea: "DESIGN",
             description:
               "Professional photographer with experience in event coverage. I can capture high-quality photos throughout the event.",
           },
           {
             id: "3",
             volunteer: "Jessica Garcia",
-            contributionArea: "Catering Support",
+            contributionArea: "LOGISTICS",
             description:
               "I have worked in hospitality for 5 years and can assist with food service and guest relations during the event.",
           },
@@ -101,21 +101,17 @@ const EventVolunteersPage = () => {
     // TODO: Implement rejection logic
   };
 
-  // Helper function to get contribution area badge color
-  const getContributionAreaBadgeColor = (area: string) => {
-    switch (area.toLowerCase()) {
-      case "event setup":
-        return "bg-blue-100 text-blue-800";
-      case "registration":
-        return "bg-green-100 text-green-800";
-      case "technical support":
-        return "bg-purple-100 text-purple-800";
-      case "marketing":
-        return "bg-pink-100 text-pink-800";
-      case "photography":
-        return "bg-orange-100 text-orange-800";
-      case "catering support":
-        return "bg-yellow-100 text-yellow-800";
+  // Helper function to get category badge color using system colors
+  const getCategoryBadgeColor = (category: string) => {
+    switch (category) {
+      case "DESIGN":
+        return "bg-verdant-100 text-verdant-800";
+      case "EDITORIAL":
+        return "bg-verdant-200 text-verdant-900";
+      case "LOGISTICS":
+        return "bg-shark-100 text-shark-800";
+      case "PROGRAMMING":
+        return "bg-shark-200 text-shark-900";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -132,7 +128,7 @@ const EventVolunteersPage = () => {
       accessor: "contributionArea",
       cell: (value) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getContributionAreaBadgeColor(
+          className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
             value as string
           )}`}
         >
@@ -152,7 +148,7 @@ const EventVolunteersPage = () => {
       accessor: "contributionArea",
       cell: (value) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getContributionAreaBadgeColor(
+          className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
             value as string
           )}`}
         >
