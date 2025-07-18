@@ -18,8 +18,8 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
     // Temporary hardcoded authentication
     const validCredentials = [
       { username: 'Nuraj', password: '123', userId: 'nuraj123' },
-      { username: 'John', password: '123', userId: 'john123' },
-      { username: 'Jane', password: '123', userId: 'jane123' }
+      { username: 'Sanidi', password: '123', userId: 'sanidi123' },
+      { username: 'Harindu', password: '123', userId: 'harindu123' }
     ];
 
     const user = validCredentials.find(
@@ -37,7 +37,7 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-[#25d366] mb-6">
+        <h2 className="text-2xl font-bold text-center text-[#029972] mb-6">
           Chat Login
         </h2>
 
@@ -80,7 +80,7 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
 
           <button
             type="submit"
-            className="w-full bg-[#25d366] text-white py-2 px-4 rounded-md hover:bg-[#1fa855] transition-colors"
+            className="w-full bg-[#029972] text-white py-2 px-4 rounded-md hover:bg-[#0a6e55] transition-colors"
           >
             Login
           </button>

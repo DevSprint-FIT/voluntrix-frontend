@@ -342,8 +342,8 @@ export default function ChatInterface() {
     
     // Using hardcoded data for now since the backend is not ready
     const allUsers = [
-      { userId: 'john123', username: 'John', lastMessage: 'Hey there!', timestamp: new Date().toISOString() },
-      { userId: 'jane123', username: 'Jane', lastMessage: 'Hello!', timestamp: new Date().toISOString() },
+      { userId: 'sanidi123', username: 'Sanidi', lastMessage: 'Hey there!', timestamp: new Date().toISOString() },
+      { userId: 'harindu123', username: 'Harindu', lastMessage: 'Hello!', timestamp: new Date().toISOString() },
       { userId: 'nuraj123', username: 'Nuraj', lastMessage: 'Welcome to the chat!', timestamp: new Date().toISOString() }
     ];
 
@@ -619,7 +619,7 @@ export default function ChatInterface() {
               <button
                 onClick={sendMessage}
                 disabled={!isConnected || !selectedUser}
-                className="px-6 py-2 bg-[#25d366] text-white rounded-full disabled:opacity-50"
+                className="px-6 py-2 bg-[#029972] text-white rounded-full disabled:opacity-50"
               >
                 Send
               </button>
