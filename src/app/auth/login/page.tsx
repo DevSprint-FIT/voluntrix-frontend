@@ -81,7 +81,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center p-8 relative">
       <Link 
         href="/"
-        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-200 rounded-[20px] text-shark-600 hover:text-verdant-600 hover:border-verdant-300 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
+        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
       >
         <Image 
           src="/icons/arrow-back.svg" 

@@ -1,18 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
 
-type UserRole = "VOLUNTEER" | "ORGANIZATION" | "SPONSOR";
-
 interface SignupFormData {
-  role: UserRole | "";
   name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -22,8 +20,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<SignupFormData>({
-    role: "",
     name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -39,12 +37,12 @@ export default function SignupPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.role) {
-      newErrors.role = "Please select your role";
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
     }
     
-    if (!formData.name.trim()) {
-      newErrors.name = formData.role === "ORGANIZATION" ? "Organization name is required" : "Full name is required";
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
     }
     
     if (!formData.email.trim()) {
@@ -65,7 +63,8 @@ export default function SignupPage() {
 
   const handleGoogleSignup = () => {
     setIsLoading(true);
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    // After Google OAuth, redirect to role selection
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google?redirect_uri=/auth/role-selection';
   };
 
   const handleSubmit = async () => {
@@ -77,12 +76,12 @@ export default function SignupPage() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role as "VOLUNTEER" | "ORGANIZATION" | "SPONSOR",
+        role: "VOLUNTEER", // Default role, will be selected later
       });
       
       if (result.success) {
-        // Redirect to dashboard or success page
-        router.push('/dashboard');
+        // Redirect to role selection
+        router.push('/auth/role-selection');
       } else {
         setErrors({ general: result.message });
       }
@@ -98,7 +97,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center p-8 relative">
       <Link 
         href="/"
-        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-200 rounded-[20px] text-shark-600 hover:text-verdant-600 hover:border-verdant-300 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
+        className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm"
       >
         <Image 
           src="/icons/arrow-back.svg" 
@@ -134,47 +133,36 @@ export default function SignupPage() {
             </div>
           )}
 
-            {/* Role Selection */}
-            <Select
-              label="I am signing up as a"
-              placeholder="Select your role"
-              value={formData.role}
-              onChange={(e) => handleInputChange("role", e.target.value)}
-              isInvalid={!!errors.role}
-              errorMessage={errors.role}
-              size="lg"
-              classNames={{
-                trigger: "font-primary py-3",
-                label: "font-secondary text-shark-500 text-sm font-normal",
-                value: "font-primary text-shark-900",
-              }}
-            >
-              <SelectItem key="VOLUNTEER" value="VOLUNTEER" className="font-primary">
-                Volunteer
-              </SelectItem>
-              <SelectItem key="ORGANIZATION" value="ORGANIZATION" className="font-primary">
-                Organization
-              </SelectItem>
-              <SelectItem key="SPONSOR" value="SPONSOR" className="font-primary">
-                Sponsor
-              </SelectItem>
-            </Select>
+          {/* Form Fields */}
+          <Input
+            label="Full Name"
+            placeholder="Enter your full name"
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            isInvalid={!!errors.name}
+            errorMessage={errors.name}
+            size="lg"
+            classNames={{
+              input: "font-primary text-shark-900",
+              label: "font-secondary text-shark-500 text-sm font-normal",
+              inputWrapper: "py-3",
+            }}
+          />
 
-            {/* Form Fields */}
-            <Input
-              label={formData.role === "ORGANIZATION" ? "Organization Name" : "Full Name"}
-              placeholder={formData.role === "ORGANIZATION" ? "Enter organization name" : "Enter your full name"}
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isInvalid={!!errors.name}
-              errorMessage={errors.name}
-              size="lg"
-              classNames={{
-                input: "font-primary text-shark-900",
-                label: "font-secondary text-shark-500 text-sm font-normal",
-                inputWrapper: "py-3",
-              }}
-            />
+          <Input
+            label="Username"
+            placeholder="Choose a username"
+            value={formData.username}
+            onChange={(e) => handleInputChange("username", e.target.value)}
+            isInvalid={!!errors.username}
+            errorMessage={errors.username}
+            size="lg"
+            classNames={{
+              input: "font-primary text-shark-900",
+              label: "font-secondary text-shark-500 text-sm font-normal",
+              inputWrapper: "py-3",
+            }}
+          />
 
             <Input
               label="Email Address"
@@ -187,7 +175,7 @@ export default function SignupPage() {
               size="lg"
               classNames={{
                 input: "font-primary text-shark-900",
-                label: "font-secondary text-shark-500 text-sm font-medium",
+                label: "font-secondary text-shark-500 text-sm font-normal",
                 inputWrapper: "py-3",
               }}
             />
@@ -203,7 +191,7 @@ export default function SignupPage() {
               size="lg"
               classNames={{
                 input: "font-primary text-shark-900",
-                label: "font-secondary text-shark-500 text-sm font-medium",
+                label: "font-secondary text-shark-500 text-sm font-normal",
                 inputWrapper: "py-3",
               }}
               endContent={
