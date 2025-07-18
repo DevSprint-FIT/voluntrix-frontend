@@ -116,6 +116,11 @@ const SponsorshipsPage = () => {
     // TODO: Implement chat functionality
   };
 
+  const handleOpenSponsorChat = () => {
+    console.log("Opening sponsor chat");
+    // TODO: Implement sponsor chat functionality - to be integrated later
+  };
+
   // Table configurations
   const sponsorshipRequestColumns: Column<SponsorshipRequest>[] = [
     {
@@ -147,7 +152,7 @@ const SponsorshipsPage = () => {
       header: "Actions",
       accessor: "id",
       cell: (value, row) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-6">
           <button
             onClick={() => handleApprove(value as string)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
@@ -163,19 +168,6 @@ const SponsorshipsPage = () => {
             <X size={16} />
           </button>
         </div>
-      ),
-    },
-    {
-      header: "Chat",
-      accessor: "id",
-      cell: (value) => (
-        <button
-          onClick={() => handleChat(value as string, "request")}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-verdant-100 text-verdant-700 hover:bg-verdant-200 transition-colors text-sm font-medium"
-        >
-          <MessageCircle size={16} />
-          Chat
-        </button>
       ),
     },
   ];
@@ -206,19 +198,6 @@ const SponsorshipsPage = () => {
         </span>
       ),
     },
-    {
-      header: "Chat",
-      accessor: "id",
-      cell: (value) => (
-        <button
-          onClick={() => handleChat(value as string, "sponsorship")}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-verdant-100 text-verdant-700 hover:bg-verdant-200 transition-colors text-sm font-medium"
-        >
-          <MessageCircle size={16} />
-          Chat
-        </button>
-      ),
-    },
   ];
 
   return (
@@ -226,15 +205,27 @@ const SponsorshipsPage = () => {
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
-          <div className="flex items-center space-x-3">
-            <HandCoins className="h-8 w-8 text-verdant-600" />
-            <h1 className="text-3xl font-bold text-shark-950 font-secondary">
-              Sponsorships
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <HandCoins className="h-8 w-8 text-verdant-600" />
+              <div>
+                <h1 className="text-3xl font-bold text-shark-950 font-secondary">
+                  Sponsorships
+                </h1>
+                <p className="text-shark-600 mt-2 font-secondary">
+                  Manage sponsorship requests and current event sponsors
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleOpenSponsorChat}
+              className="flex items-center gap-3 px-6 py-3 rounded-full bg-verdant-600 text-white hover:bg-verdant-700 transition-colors font-medium"
+              title="Chat with Sponsors"
+            >
+              <MessageCircle size={20} />
+              Chat with Sponsors
+            </button>
           </div>
-          <p className="text-shark-600 mt-2 font-secondary">
-            Manage sponsorship requests and current event sponsors
-          </p>
         </div>
       </div>
 
