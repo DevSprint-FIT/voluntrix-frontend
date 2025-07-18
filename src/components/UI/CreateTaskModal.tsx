@@ -356,7 +356,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 variant="bordered"
                 isRequired
                 showMonthAndYearPickers
-                description="Due date must be at least one day from today"
               />
             </div>
 
