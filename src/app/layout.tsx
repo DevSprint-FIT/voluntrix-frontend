@@ -1,16 +1,19 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Providers } from "./providers";
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
+import Navbar from '@/components/UI/Navbar';
+import FooterSection from '@/components/layout/FooterSection';
+import GoToTop from '@/components/UI/GoToTop';
 
 export const metadata: Metadata = {
-  title: "Voluntrix",
-  description: "Join, organize, and support volunteer events effortlessly.",
-  keywords: ["volunteering", "events", "community", "nonprofits"],
+  title: 'Voluntrix',
+  description: 'Join, organize, and support volunteer events effortlessly.',
+  keywords: ['volunteering', 'events', 'community', 'nonprofits'],
   openGraph: {
-    title: "Voluntrix",
-    description: "Empowering volunteers and organizations worldwide.",
-    url: "https://voluntrix-preview.vercel.app/",
-    type: "website",
+    title: 'Voluntrix',
+    description: 'Empowering volunteers and organizations worldwide.',
+    url: 'https://voluntrix-preview.vercel.app/',
+    type: 'website',
   },
 };
 
@@ -24,7 +27,12 @@ export default function DashboardLayout({
       <body suppressHydrationWarning>
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
-        <Providers>{children}</Providers>
+        <main>
+          <Navbar />
+          <Providers>{children}</Providers>
+          <FooterSection />
+          <GoToTop />
+        </main>
       </body>
     </html>
   );
