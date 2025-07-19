@@ -54,7 +54,7 @@ export default function VolunteerToHostModal({
       <ModalContent className="px-8">
         {(onClose) => (
           <>
-            <ModalHeader className="flex flex-col items-center gap-2">
+            <ModalHeader className="flex flex-col items-center gap-2 pt-5">
               <div className="text-3xl font-bold text-shark-950 font-primary">
                 Ready to Lead the Change?
               </div>
@@ -89,7 +89,7 @@ export default function VolunteerToHostModal({
                   </CardBody>
                 </Card>
                 <div>
-                  <div className="text-xl font-semibold text-shark-950 font-primary mb-4">
+                  <div className="text-xl font-semibold text-shark-950 font-primary mb-3">
                     Your Host Benefits & Opportunities
                   </div>
                   <ul className="space-y-2">
@@ -97,7 +97,10 @@ export default function VolunteerToHostModal({
                       <li key={index} className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-verdant-600 rounded-full mt-2 flex-shrink-0"></div>
                         <p className="text-shark-700 font-secondary">
-                          {benefit}
+                          <span className="font-medium text-shark-950">
+                            {benefit.split(' - ')[0]}
+                          </span>{' '}
+                          - {benefit.split(' - ')[1]}
                         </p>
                       </li>
                     ))}
@@ -120,7 +123,7 @@ export default function VolunteerToHostModal({
                   onPress={handleConfirm}
                   className="bg-gradient-to-r from-verdant-600 to-verdant-700 text-white px-6 py-3 font-semibold rounded-[20px] shadow-lg hover:shadow-xl"
                 >
-                  {isConfirming ? 'Processing...' : 'Make Me a Host'}
+                  Make Me a Host
                 </Button>
               </div>
             </ModalFooter>
