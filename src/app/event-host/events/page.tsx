@@ -5,9 +5,10 @@ import Image from 'next/image';
 import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
+import { a } from 'framer-motion/client';
 
 export default function HostEvents() {
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
@@ -37,10 +38,45 @@ export default function HostEvents() {
   ];
 
   const tabs = [
-    { id: 'active', label: 'Active Events', active: true },
+    { id: 'all', label: 'All Events', active: true },
+    { id: 'active', label: 'Active Events', active: false },
     { id: 'applied', label: 'Applied Events', active: false },
     { id: 'completed', label: 'Completed Events', active: false },
   ];
+
+  function formatDate(dateString: string) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? 'st'
+        : day % 10 === 2 && day !== 12
+        ? 'nd'
+        : day % 10 === 3 && day !== 13
+        ? 'rd'
+        : 'th';
+
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day.toString().padStart(2, '0')}${suffix} ${month} ${year}`;
+  }
+
+  function getStatusStyles(status: string) {
+    switch (status.toUpperCase()) {
+      case 'DRAFT':
+        return 'bg-gray-200 text-gray-800'; // Neutral, work-in-progress
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-700'; // Awaiting approval
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-700'; // Ongoing event
+      case 'COMPLETE':
+        return 'bg-blue-100 text-blue-700'; // Successfully finished
+      case 'DENIED':
+        return 'bg-red-100 text-red-700'; // Rejected or not approved
+      default:
+        return 'bg-gray-100 text-gray-700'; // Fallback
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,19 +145,21 @@ export default function HostEvents() {
         {/* Events Table */}
         <div>
           <div className="px-6 py-4">
-            <h2 className="text-xl font-bold text-shark-900">Active Events</h2>
+            <h2 className="text-2xl font-bold text-shark-900">
+              {tabs.find(tab => tab.id === activeTab)?.label}
+            </h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="border-b border-shark-200">
-                <tr className="text-left text-md font-normal font-secondary text-shark-600 tracking-wider">
+                <tr className="text-left text-md font-normal font-secondary text-shark-700 tracking-wider">
                   <th className="px-6 py-3">Event Name</th>
                   <th className="px-6 py-3">Start Date</th>
                   <th className="px-6 py-3">End Date</th>
                   <th className="px-6 py-3">Location</th>
                   <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3">No of Contributions</th>
+                  <th className="px-6 py-3">No of Volunteers</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -139,17 +177,22 @@ export default function HostEvents() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                        {event.eventStartDate}
+                        {formatDate(event.eventStartDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                        {event.eventEndDate}
+                        {formatDate(event.eventEndDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
                         {event.eventLocation}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full">
-                          {event.eventStatus}
+                        <span
+                          className={`inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full ${getStatusStyles(
+                            event.eventStatus
+                          )}`}
+                        >
+                          {event.eventStatus.charAt(0).toUpperCase() +
+                            event.eventStatus.slice(1).toLowerCase()}
                         </span>
                       </td>
                       <td className="text-center px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900 rounded-r-lg">
