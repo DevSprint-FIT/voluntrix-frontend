@@ -117,9 +117,14 @@ const PostModal: React.FC<PostModalProps> = ({
            value={content}
            onChange={(e) => setContent(e.target.value)}
            placeholder="What do you want to talk about?"
-           minRows={4}
+           minRows={2}
            maxRows={6}
-           className="w-full  mb-16 " 
+           variant="flat"
+           classNames={{
+              input: "focus:ring-0 focus:outline-none !border-0 focus:!border-0",
+              inputWrapper: "!border-0 focus:!border-0 !shadow-none data-[focus=true]:!border-0 data-[hover=true]:!border-0"
+      }}
+           className="w-full  mb-10 " 
         />
 
 
@@ -128,13 +133,13 @@ const PostModal: React.FC<PostModalProps> = ({
            <video
             src={previewImage}
             controls
-            className="w-full max-w-md max-h-[300px] rounded-lg object-contain mx-auto"
+            className="w-full max-w-md max-h-[28rem] rounded-lg object-contain mx-auto"
            />
          ) : previewImage ? (
           <img
             src={previewImage}
             alt="Preview"
-            className="w-full max-w-md max-h-[300px] rounded-lg object-contain mx-auto"
+            className="w-full max-w-md max-h-[28rem] rounded-lg object-contain mx-auto"
            />
         ) : null}
 
