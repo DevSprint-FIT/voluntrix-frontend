@@ -5,15 +5,47 @@ import Image from 'next/image';
 import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
-import { a } from 'framer-motion/client';
 
 export default function HostEvents() {
   const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [eventCounts, setEventCounts] = useState({
+    active: 0,
+    pending: 0,
+    completed: 0,
+  });
+
   useEffect(() => {
     const getEvents = async () => {
-      setEvents(await fetchEventByHostId(3)); // Replace with actual host ID
+      try {
+        setLoading(true);
+        const data = await fetchEventByHostId(3); // Replace with actual host ID
+        setEvents(data);
+
+        const counts = {
+          active: data.filter((e) => e.eventStatus.toUpperCase() === 'ACTIVE')
+            .length,
+          pending: data.filter((e) => e.eventStatus.toUpperCase() === 'PENDING')
+            .length,
+          completed: data.filter(
+            (e) => e.eventStatus.toUpperCase() === 'COMPLETE'
+          ).length,
+        };
+
+        setEventCounts(counts);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to fetch events. Please try again.'
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
     getEvents();
@@ -22,20 +54,29 @@ export default function HostEvents() {
   const statsCards = [
     {
       title: 'Active Events',
-      count: '24',
+      count: eventCounts.active.toString(),
       subtitle: 'Currently ongoing',
     },
     {
       title: 'Applied Events',
-      count: '12',
+      count: eventCounts.pending.toString(),
       subtitle: 'Pending Approvals',
     },
     {
       title: 'Completed Events',
-      count: '156',
+      count: eventCounts.completed.toString(),
       subtitle: 'Total completed',
     },
   ];
+
+  const filteredEvents = events.filter((event) => {
+    const status = event.eventStatus.toUpperCase();
+    if (activeTab === 'all') return true;
+    if (activeTab === 'active') return status === 'ACTIVE';
+    if (activeTab === 'applied') return status === 'PENDING';
+    if (activeTab === 'completed') return status === 'COMPLETE';
+    return false;
+  });
 
   const tabs = [
     { id: 'all', label: 'All Events', active: true },
@@ -76,6 +117,32 @@ export default function HostEvents() {
       default:
         return 'bg-gray-100 text-gray-700'; // Fallback
     }
+  }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
+          <p className="text-[#B0B0B0] font-secondary">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screenflex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4 font-secondary">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-secondary"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -136,6 +203,12 @@ export default function HostEvents() {
                   }`}
                 >
                   {tab.label}
+
+                  {tab.id === 'all' && (
+                    <span className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-verdant-600 rounded-full">
+                      {events.length}
+                    </span>
+                  )}
                 </button>
               ))}
             </nav>
@@ -144,9 +217,9 @@ export default function HostEvents() {
 
         {/* Events Table */}
         <div>
-          <div className="px-6 py-4">
+          <div className="px-6 py-5">
             <h2 className="text-2xl font-bold text-shark-900">
-              {tabs.find(tab => tab.id === activeTab)?.label}
+              {tabs.find((tab) => tab.id === activeTab)?.label}
             </h2>
           </div>
 
@@ -163,43 +236,40 @@ export default function HostEvents() {
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {events &&
-                  events.map((event) => (
-                    <tr
-                      key={event.eventId}
-                      className="hover:bg-shark-50 space-y-4 cursor-pointer"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
-                        <div>
-                          <div className="text-md font-primary font-medium text-shark-900">
-                            {event.eventTitle}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                        {formatDate(event.eventStartDate)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                        {formatDate(event.eventEndDate)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                        {event.eventLocation}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full ${getStatusStyles(
-                            event.eventStatus
-                          )}`}
-                        >
-                          {event.eventStatus.charAt(0).toUpperCase() +
-                            event.eventStatus.slice(1).toLowerCase()}
-                        </span>
-                      </td>
-                      <td className="text-center px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900 rounded-r-lg">
-                        {event.volunteerCount}
-                      </td>
-                    </tr>
-                  ))}
+                {filteredEvents.map((event) => (
+                  <tr
+                    key={event.eventId}
+                    className="hover:bg-shark-50 space-y-4 cursor-pointer"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
+                      <div className="text-md font-primary font-medium text-shark-900">
+                        {event.eventTitle}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                      {formatDate(event.eventStartDate)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                      {formatDate(event.eventEndDate)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                      {event.eventLocation}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full ${getStatusStyles(
+                          event.eventStatus
+                        )}`}
+                      >
+                        {event.eventStatus.charAt(0).toUpperCase() +
+                          event.eventStatus.slice(1).toLowerCase()}
+                      </span>
+                    </td>
+                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900 rounded-r-lg">
+                      {event.volunteerCount}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
