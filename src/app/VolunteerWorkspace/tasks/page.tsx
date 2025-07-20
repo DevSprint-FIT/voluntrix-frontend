@@ -265,12 +265,19 @@ const TasksPage = () => {
       ),
     },
     {
-      header: "Submitted Date",
-      accessor: "taskSubmittedDate",
-    },
-    {
-      header: "Reviewed Date",
-      accessor: "taskReviewedDate",
+      header: "Resource URL",
+      accessor: "resourceUrl",
+      cell: (value) => (
+        <a
+          href={value as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+        >
+          <ExternalLink size={16} />
+          View Submission
+        </a>
+      ),
     },
     {
       header: "Reward Points",

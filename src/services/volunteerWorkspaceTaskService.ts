@@ -37,9 +37,8 @@ export interface CompletedTask {
   taskId: string;
   description: string;
   taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskSubmittedDate: string;
-  taskReviewedDate: string;
   taskRewardPoints: number;
+  resourceUrl: string;
 }
 
 export class WorkspaceTaskService {
@@ -200,33 +199,31 @@ export class WorkspaceTaskService {
         taskId: "1",
         description: "Organize volunteer database and contact information",
         taskDifficulty: "EASY",
-        taskSubmittedDate: "2025-07-10",
-        taskReviewedDate: "2025-07-12",
         taskRewardPoints: 50,
+        resourceUrl:
+          "https://docs.google.com/spreadsheets/d/1volunteer-db/edit",
       },
       {
         taskId: "2",
         description: "Conduct venue safety inspection and report",
         taskDifficulty: "MEDIUM",
-        taskSubmittedDate: "2025-07-11",
-        taskReviewedDate: "2025-07-13",
         taskRewardPoints: 75,
+        resourceUrl: "https://drive.google.com/file/d/1safety-report/view",
       },
       {
         taskId: "3",
         description: "Develop emergency response protocol",
         taskDifficulty: "HARD",
-        taskSubmittedDate: "2025-07-08",
-        taskReviewedDate: "2025-07-10",
         taskRewardPoints: 100,
+        resourceUrl:
+          "https://docs.google.com/document/d/1emergency-protocol/edit",
       },
       {
         taskId: "4",
         description: "Design and implement full event management system",
         taskDifficulty: "EXTREME",
-        taskSubmittedDate: "2025-07-05",
-        taskReviewedDate: "2025-07-07",
         taskRewardPoints: 150,
+        resourceUrl: "https://github.com/example/event-management-system",
       },
     ];
   }
