@@ -9,6 +9,7 @@ import {
   Plus,
   Check,
   X,
+  ExternalLink,
 } from "lucide-react";
 import Table, { Column } from "@/components/UI/Table";
 import CreateTaskModal, { TaskFormData } from "@/components/UI/CreateTaskModal";
@@ -18,9 +19,9 @@ interface TaskPendingReview {
   taskId: string;
   description: string;
   assignee: string;
-  submittedDate: string;
   category: string;
   difficulty: string;
+  resourceUrl: string;
 }
 
 interface TaskToBeCompleted {
@@ -36,11 +37,10 @@ interface CompletedTask {
   taskId: string;
   description: string;
   assignee: string;
-  submittedDate: string;
-  reviewedDate: string;
   category: string;
   difficulty: string;
   rewardPoints: number;
+  resourceUrl: string;
 }
 
 const EventHostTasksPage = () => {
@@ -60,17 +60,17 @@ const EventHostTasksPage = () => {
       taskId: "1",
       description: "Create promotional banners for social media",
       assignee: "John Doe",
-      submittedDate: "2025-07-23",
       category: "DESIGN",
       difficulty: "MEDIUM",
+      resourceUrl: "https://drive.google.com/file/d/1example/view",
     },
     {
       taskId: "2",
       description: "Setup registration booth equipment",
       assignee: "Jane Smith",
-      submittedDate: "2025-07-22",
       category: "LOGISTICS",
       difficulty: "EASY",
+      resourceUrl: "https://docs.google.com/document/d/1example/edit",
     },
   ];
 
@@ -100,21 +100,19 @@ const EventHostTasksPage = () => {
       taskId: "5",
       description: "Design event program booklet",
       assignee: "Alex Brown",
-      submittedDate: "2025-07-20",
-      reviewedDate: "2025-07-21",
       category: "DESIGN",
       difficulty: "MEDIUM",
       rewardPoints: 150,
+      resourceUrl: "https://drive.google.com/file/d/1booklet/view",
     },
     {
       taskId: "6",
       description: "Book venue and confirm logistics",
       assignee: "Emily Davis",
-      submittedDate: "2025-07-18",
-      reviewedDate: "2025-07-19",
       category: "PROGRAMMING",
       difficulty: "HARD",
       rewardPoints: 200,
+      resourceUrl: "https://docs.google.com/spreadsheet/d/1venue/edit",
     },
   ];
 
@@ -205,10 +203,6 @@ const EventHostTasksPage = () => {
       accessor: "assignee",
     },
     {
-      header: "Submitted Date",
-      accessor: "submittedDate",
-    },
-    {
       header: "Category",
       accessor: "category",
       cell: (value) => (
@@ -232,6 +226,21 @@ const EventHostTasksPage = () => {
         >
           {value}
         </span>
+      ),
+    },
+    {
+      header: "Resource URL",
+      accessor: "resourceUrl",
+      cell: (value) => (
+        <a
+          href={value as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+        >
+          <ExternalLink size={16} />
+          View Submission
+        </a>
       ),
     },
     {
@@ -309,14 +318,6 @@ const EventHostTasksPage = () => {
       accessor: "assignee",
     },
     {
-      header: "Submitted Date",
-      accessor: "submittedDate",
-    },
-    {
-      header: "Reviewed Date",
-      accessor: "reviewedDate",
-    },
-    {
       header: "Category",
       accessor: "category",
       cell: (value) => (
@@ -340,6 +341,21 @@ const EventHostTasksPage = () => {
         >
           {value}
         </span>
+      ),
+    },
+    {
+      header: "Resource URL",
+      accessor: "resourceUrl",
+      cell: (value) => (
+        <a
+          href={value as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+        >
+          <ExternalLink size={16} />
+          View Submission
+        </a>
       ),
     },
     {
