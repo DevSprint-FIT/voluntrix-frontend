@@ -23,8 +23,10 @@ export default function HostEvents() {
     const getEvents = async () => {
       try {
         setLoading(true);
-        const data = await fetchEventByHostId(3); // Replace with actual host ID
-        setEvents(data);
+        const data = await fetchEventByHostId(2); // Replace with actual host ID
+        console.log('Fetched data:', JSON.stringify(data, null, 2));
+
+        setEvents(Array.isArray(data) ? data : []);
 
         const counts = {
           active: data.filter((e) => e.eventStatus.toUpperCase() === 'ACTIVE')
@@ -69,14 +71,16 @@ export default function HostEvents() {
     },
   ];
 
-  const filteredEvents = events.filter((event) => {
-    const status = event.eventStatus.toUpperCase();
-    if (activeTab === 'all') return true;
-    if (activeTab === 'active') return status === 'ACTIVE';
-    if (activeTab === 'applied') return status === 'PENDING';
-    if (activeTab === 'completed') return status === 'COMPLETE';
-    return false;
-  });
+  const filteredEvents = Array.isArray(events)
+    ? events.filter((event) => {
+        const status = event.eventStatus.toUpperCase();
+        if (activeTab === 'all') return true;
+        if (activeTab === 'active') return status === 'ACTIVE';
+        if (activeTab === 'applied') return status === 'PENDING';
+        if (activeTab === 'completed') return status === 'COMPLETE';
+        return false;
+      })
+    : [];
 
   const tabs = [
     { id: 'all', label: 'All Events', active: true },
@@ -118,6 +122,7 @@ export default function HostEvents() {
         return 'bg-gray-100 text-gray-700'; // Fallback
     }
   }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -131,12 +136,12 @@ export default function HostEvents() {
 
   if (error) {
     return (
-      <div className="min-h-screenflex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4 font-secondary">Error: {error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-secondary"
+            className="px-4 py-2 bg-verdant-600 text-white rounded-md hover:bg-verdant-700 transition-colors font-secondary"
           >
             Retry
           </button>
@@ -236,40 +241,61 @@ export default function HostEvents() {
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {filteredEvents.map((event) => (
-                  <tr
-                    key={event.eventId}
-                    className="hover:bg-shark-50 space-y-4 cursor-pointer"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
-                      <div className="text-md font-primary font-medium text-shark-900">
-                        {event.eventTitle}
+                {filteredEvents.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                        {activeTab === 'all' && events.length === 0 ? (
+                          <>
+                            <p className="text-shark-500 font-secondary text-lg">
+                              Create your first event to get started.
+                            </p>
+                            <EventCreation />
+                          </>
+                        ) : (
+                          <p className="text-shark-500 font-secondary text-lg">
+                            No events found.
+                          </p>
+                        )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                      {formatDate(event.eventStartDate)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                      {formatDate(event.eventEndDate)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
-                      {event.eventLocation}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full ${getStatusStyles(
-                          event.eventStatus
-                        )}`}
-                      >
-                        {event.eventStatus.charAt(0).toUpperCase() +
-                          event.eventStatus.slice(1).toLowerCase()}
-                      </span>
-                    </td>
-                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900 rounded-r-lg">
-                      {event.volunteerCount}
-                    </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredEvents.map((event) => (
+                    <tr
+                      key={event.eventId}
+                      className="hover:bg-shark-50 space-y-4 cursor-pointer"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
+                        <div className="text-md font-primary font-medium text-shark-900">
+                          {event.eventTitle}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                        {formatDate(event.eventStartDate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                        {formatDate(event.eventEndDate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900">
+                        {event.eventLocation}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-2 py-1 text-sm font-primary font-semibold rounded-full ${getStatusStyles(
+                            event.eventStatus
+                          )}`}
+                        >
+                          {event.eventStatus.charAt(0).toUpperCase() +
+                            event.eventStatus.slice(1).toLowerCase()}
+                        </span>
+                      </td>
+                      <td className="text-center px-6 py-4 whitespace-nowrap text-sm font-primary text-shark-900 rounded-r-lg">
+                        {event.volunteerCount}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
