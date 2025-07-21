@@ -44,7 +44,7 @@ const TaskSubmissionModal: React.FC<TaskSubmissionModalProps> = ({
         setErrorMessage("File size must be less than 10MB");
         return;
       }
-      
+
       setSelectedFile(file);
       setResourceUrl(""); // Clear URL input when file is selected
       setErrorMessage(""); // Clear any previous errors
@@ -64,7 +64,10 @@ const TaskSubmissionModal: React.FC<TaskSubmissionModalProps> = ({
       setSubmitStatus("idle");
     } catch (error) {
       console.error("File upload failed:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to upload file. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to upload file. Please try again.";
       setErrorMessage(errorMessage);
     } finally {
       setIsUploading(false);
