@@ -80,3 +80,21 @@ export const createEvent = async (eventData: EventCreateType) => {
     throw error;
   }
 };
+
+export const fetchEventByHostId = async (id: number): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      `http://localhost:8080/api/public/events/host/${id}`
+    );
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.warn('Unexpected response format:', data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Failed to fetch events:', error);
+    return [];
+  }
+};
