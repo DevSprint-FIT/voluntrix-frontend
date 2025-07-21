@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ClipboardList,
   Clock,
@@ -13,10 +13,19 @@ import {
 } from "lucide-react";
 import Table, { Column } from "@/components/UI/Table";
 import CreateTaskModal, { TaskFormData } from "@/components/UI/CreateTaskModal";
+import TaskApprovalModal from "@/components/UI/TaskApprovalModal";
+import TaskRejectionModal from "@/components/UI/TaskRejectionModal";
+import TaskActionResultModal from "@/components/UI/TaskActionResultModal";
+import {
+  hostWorkspaceTaskService,
+  TaskDTO,
+  TaskStatusCount,
+  TaskCreateDTO,
+} from "@/services/hostWorkspaceTaskService";
 
 // Types for different task states
 interface TaskPendingReview {
-  taskId: string;
+  taskId: number;
   description: string;
   assignee: string;
   category: string;
@@ -25,7 +34,7 @@ interface TaskPendingReview {
 }
 
 interface TaskToBeCompleted {
-  taskId: string;
+  taskId: number;
   description: string;
   assignee: string;
   dueDate: string;
@@ -34,7 +43,7 @@ interface TaskToBeCompleted {
 }
 
 interface CompletedTask {
-  taskId: string;
+  taskId: number;
   description: string;
   assignee: string;
   category: string;
@@ -44,77 +53,114 @@ interface CompletedTask {
 }
 
 const EventHostTasksPage = () => {
-  // Modal state
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // Event ID - using 1 for now as specified
+  const eventId = 1;
 
-  // Dummy task stats
-  const taskStats = {
-    totalTasksPendingReview: 3,
-    totalTasksToBeCompleted: 5,
-    totalTasksCompleted: 8,
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+
+  // Task action states
+  const [selectedTask, setSelectedTask] = useState<TaskDTO | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [resultModal, setResultModal] = useState<{
+    type: "success" | "error";
+    title: string;
+    message: string;
+  }>({ type: "success", title: "", message: "" });
+
+  // Data states
+  const [taskStats, setTaskStats] = useState<TaskStatusCount>({
+    IN_PROGRESS: 0,
+    TO_DO: 0,
+    DONE: 0,
+  });
+  const [tasksPendingReview, setTasksPendingReview] = useState<TaskDTO[]>([]);
+  const [tasksToBeCompleted, setTasksToBeCompleted] = useState<TaskDTO[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<TaskDTO[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load initial data
+  useEffect(() => {
+    loadAllTaskData();
+  }, []);
+
+  const loadAllTaskData = async () => {
+    setIsLoading(true);
+    try {
+      await Promise.all([
+        loadTaskStats(),
+        loadTasksPendingReview(),
+        loadTasksToBeCompleted(),
+        loadCompletedTasks(),
+      ]);
+    } catch (error) {
+      console.error("Error loading task data:", error);
+      showResultModal(
+        "error",
+        "Loading Error",
+        "Failed to load task data. Please refresh the page."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Dummy data for tasks pending review
-  const tasksPendingReview: TaskPendingReview[] = [
-    {
-      taskId: "1",
-      description: "Create promotional banners for social media",
-      assignee: "John Doe",
-      category: "DESIGN",
-      difficulty: "MEDIUM",
-      resourceUrl: "https://drive.google.com/file/d/1example/view",
-    },
-    {
-      taskId: "2",
-      description: "Setup registration booth equipment",
-      assignee: "Jane Smith",
-      category: "LOGISTICS",
-      difficulty: "EASY",
-      resourceUrl: "https://docs.google.com/document/d/1example/edit",
-    },
-  ];
+  const loadTaskStats = async () => {
+    try {
+      const stats = await hostWorkspaceTaskService.getTaskStatusCounts(eventId);
+      setTaskStats(stats);
+    } catch (error) {
+      console.error("Error loading task stats:", error);
+    }
+  };
 
-  // Dummy data for tasks to be completed
-  const tasksToBeCompleted: TaskToBeCompleted[] = [
-    {
-      taskId: "3",
-      description: "Coordinate with catering vendors",
-      assignee: "Mike Johnson",
-      dueDate: "2025-07-28",
-      category: "LOGISTICS",
-      difficulty: "HARD",
-    },
-    {
-      taskId: "4",
-      description: "Prepare volunteer welcome packets",
-      assignee: "Sarah Wilson",
-      dueDate: "2025-07-26",
-      category: "EDITORIAL",
-      difficulty: "EASY",
-    },
-  ];
+  const loadTasksPendingReview = async () => {
+    try {
+      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
+        eventId,
+        "IN_PROGRESS"
+      );
+      setTasksPendingReview(tasks);
+    } catch (error) {
+      console.error("Error loading tasks pending review:", error);
+    }
+  };
 
-  // Dummy data for completed tasks
-  const completedTasks: CompletedTask[] = [
-    {
-      taskId: "5",
-      description: "Design event program booklet",
-      assignee: "Alex Brown",
-      category: "DESIGN",
-      difficulty: "MEDIUM",
-      rewardPoints: 150,
-      resourceUrl: "https://drive.google.com/file/d/1booklet/view",
-    },
-    {
-      taskId: "6",
-      description: "Book venue and confirm logistics",
-      assignee: "Emily Davis",
-      category: "PROGRAMMING",
-      difficulty: "HARD",
-      rewardPoints: 200,
-      resourceUrl: "https://docs.google.com/spreadsheet/d/1venue/edit",
-    },
-  ];
+  const loadTasksToBeCompleted = async () => {
+    try {
+      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
+        eventId,
+        "TO_DO"
+      );
+      setTasksToBeCompleted(tasks);
+    } catch (error) {
+      console.error("Error loading tasks to be completed:", error);
+    }
+  };
+
+  const loadCompletedTasks = async () => {
+    try {
+      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
+        eventId,
+        "DONE"
+      );
+      setCompletedTasks(tasks);
+    } catch (error) {
+      console.error("Error loading completed tasks:", error);
+    }
+  };
+
+  const showResultModal = (
+    type: "success" | "error",
+    title: string,
+    message: string
+  ) => {
+    setResultModal({ type, title, message });
+    setIsResultModalOpen(true);
+  };
 
   const TaskStatusCard = ({
     count,
@@ -181,30 +227,91 @@ const EventHostTasksPage = () => {
     }
   };
 
-  // Placeholder functions for approve/reject actions
-  const handleApproveTask = (taskId: string) => {
-    console.log(`Approving task: ${taskId}`);
-    // TODO: Implement approve functionality
+  // Task approval/rejection handlers
+  const handleApproveTask = (task: TaskDTO) => {
+    setSelectedTask(task);
+    setIsApprovalModalOpen(true);
   };
 
-  const handleRejectTask = (taskId: string) => {
-    console.log(`Rejecting task: ${taskId}`);
-    // TODO: Implement reject functionality
+  const handleRejectTask = (task: TaskDTO) => {
+    setSelectedTask(task);
+    setIsRejectionModalOpen(true);
+  };
+
+  const confirmApproveTask = async () => {
+    if (!selectedTask) return;
+
+    setIsProcessing(true);
+    try {
+      await hostWorkspaceTaskService.approveTask(selectedTask.taskId);
+      showResultModal(
+        "success",
+        "Task Approved",
+        "Task has been successfully approved and marked as completed."
+      );
+      setIsApprovalModalOpen(false);
+      setSelectedTask(null);
+      // Refresh data
+      await loadAllTaskData();
+    } catch (error) {
+      console.error("Error approving task:", error);
+      showResultModal(
+        "error",
+        "Approval Failed",
+        "Failed to approve task. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const confirmRejectTask = async (
+    updatedDescription: string,
+    updatedDueDate: string
+  ) => {
+    if (!selectedTask) return;
+
+    setIsProcessing(true);
+    try {
+      await hostWorkspaceTaskService.rejectTask(
+        selectedTask.taskId,
+        updatedDescription,
+        updatedDueDate
+      );
+      showResultModal(
+        "success",
+        "Task Revision Requested",
+        "Task has been sent back for revision with your feedback."
+      );
+      setIsRejectionModalOpen(false);
+      setSelectedTask(null);
+      // Refresh data
+      await loadAllTaskData();
+    } catch (error) {
+      console.error("Error rejecting task:", error);
+      showResultModal(
+        "error",
+        "Rejection Failed",
+        "Failed to process task revision. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Table configurations
-  const tasksPendingReviewColumns: Column<TaskPendingReview>[] = [
+  const tasksPendingReviewColumns: Column<TaskDTO>[] = [
     {
       header: "Task Description",
       accessor: "description",
     },
     {
       header: "Assignee",
-      accessor: "assignee",
+      accessor: "assigneeUsername",
     },
     {
       header: "Category",
-      accessor: "category",
+      accessor: "taskCategory",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
@@ -217,7 +324,7 @@ const EventHostTasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -231,32 +338,35 @@ const EventHostTasksPage = () => {
     {
       header: "Resource URL",
       accessor: "resourceUrl",
-      cell: (value) => (
-        <a
-          href={value as string}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
-        >
-          <ExternalLink size={16} />
-          View Submission
-        </a>
-      ),
+      cell: (value, row) =>
+        value ? (
+          <a
+            href={value as string}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+          >
+            <ExternalLink size={16} />
+            View Submission
+          </a>
+        ) : (
+          <span className="text-gray-400">No submission</span>
+        ),
     },
     {
       header: "Actions",
       accessor: "taskId",
-      cell: (value) => (
+      cell: (value, row) => (
         <div className="flex items-center gap-6">
           <button
-            onClick={() => handleApproveTask(value as string)}
+            onClick={() => handleApproveTask(row as TaskDTO)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
             title="Approve Task"
           >
             <Check size={16} />
           </button>
           <button
-            onClick={() => handleRejectTask(value as string)}
+            onClick={() => handleRejectTask(row as TaskDTO)}
             className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
             title="Reject Task"
           >
@@ -267,14 +377,14 @@ const EventHostTasksPage = () => {
     },
   ];
 
-  const tasksToBeCompletedColumns: Column<TaskToBeCompleted>[] = [
+  const tasksToBeCompletedColumns: Column<TaskDTO>[] = [
     {
       header: "Task Description",
       accessor: "description",
     },
     {
       header: "Assignee",
-      accessor: "assignee",
+      accessor: "assigneeUsername",
     },
     {
       header: "Due Date",
@@ -282,7 +392,7 @@ const EventHostTasksPage = () => {
     },
     {
       header: "Category",
-      accessor: "category",
+      accessor: "taskCategory",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
@@ -295,7 +405,7 @@ const EventHostTasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -308,18 +418,18 @@ const EventHostTasksPage = () => {
     },
   ];
 
-  const completedTasksColumns: Column<CompletedTask>[] = [
+  const completedTasksColumns: Column<TaskDTO>[] = [
     {
       header: "Task Description",
       accessor: "description",
     },
     {
       header: "Assignee",
-      accessor: "assignee",
+      accessor: "assigneeUsername",
     },
     {
       header: "Category",
-      accessor: "category",
+      accessor: "taskCategory",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
@@ -332,7 +442,7 @@ const EventHostTasksPage = () => {
     },
     {
       header: "Difficulty",
-      accessor: "difficulty",
+      accessor: "taskDifficulty",
       cell: (value) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
@@ -346,21 +456,24 @@ const EventHostTasksPage = () => {
     {
       header: "Resource URL",
       accessor: "resourceUrl",
-      cell: (value) => (
-        <a
-          href={value as string}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
-        >
-          <ExternalLink size={16} />
-          View Submission
-        </a>
-      ),
+      cell: (value) =>
+        value ? (
+          <a
+            href={value as string}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+          >
+            <ExternalLink size={16} />
+            View Submission
+          </a>
+        ) : (
+          <span className="text-gray-400">No submission</span>
+        ),
     },
     {
       header: "Reward Points",
-      accessor: "rewardPoints",
+      accessor: "taskRewardPoints",
       cell: (value) => (
         <span className="text-verdant-600 font-semibold">{value} pts</span>
       ),
@@ -375,23 +488,21 @@ const EventHostTasksPage = () => {
     taskData: TaskFormData
   ): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call
-      console.log("Creating task with data:", taskData);
+      const createData: TaskCreateDTO = {
+        description: taskData.description,
+        dueDate: taskData.dueDate, // Already in YYYY-MM-DD format
+        taskDifficulty: taskData.difficulty,
+        taskCategory: taskData.category,
+        assigneeId: taskData.assigneeId,
+        eventId: eventId,
+      };
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await hostWorkspaceTaskService.createTask(createData);
 
-      // Simulate success/failure (for demo purposes, always succeed)
-      const success = true; // Math.random() > 0.3; // 70% success rate for demo
+      // Refresh data after successful creation
+      await loadAllTaskData();
 
-      if (success) {
-        // TODO: Refresh the task lists after successful creation
-        console.log("Task created successfully");
-        return true;
-      } else {
-        console.log("Task creation failed");
-        return false;
-      }
+      return true;
     } catch (error) {
       console.error("Error creating task:", error);
       return false;
@@ -401,6 +512,17 @@ const EventHostTasksPage = () => {
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-600 mx-auto mb-4"></div>
+          <p className="text-shark-600 font-secondary">Loading task data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -435,19 +557,19 @@ const EventHostTasksPage = () => {
       <div className="px-6 pt-0">
         <div className="flex gap-8 mb-8 justify-start">
           <TaskStatusCard
-            count={taskStats.totalTasksPendingReview}
+            count={taskStats.IN_PROGRESS}
             label="Total Tasks Pending Review"
             subtext="Tasks awaiting approval"
             icon={Eye}
           />
           <TaskStatusCard
-            count={taskStats.totalTasksToBeCompleted}
+            count={taskStats.TO_DO}
             label="Total Tasks Due"
             subtext="Assigned pending tasks"
             icon={Clock}
           />
           <TaskStatusCard
-            count={taskStats.totalTasksCompleted}
+            count={taskStats.DONE}
             label="Total Tasks Completed"
             subtext="Successfully finished tasks"
             icon={CheckCircle}
@@ -502,6 +624,35 @@ const EventHostTasksPage = () => {
         isOpen={isCreateModalOpen}
         onClose={handleCloseCreateModal}
         onSubmit={handleCreateTaskSubmit}
+        eventId={eventId}
+      />
+
+      {/* Task Approval Modal */}
+      <TaskApprovalModal
+        isOpen={isApprovalModalOpen}
+        onClose={() => setIsApprovalModalOpen(false)}
+        onConfirm={confirmApproveTask}
+        taskDescription={selectedTask?.description || ""}
+        isLoading={isProcessing}
+      />
+
+      {/* Task Rejection Modal */}
+      <TaskRejectionModal
+        isOpen={isRejectionModalOpen}
+        onClose={() => setIsRejectionModalOpen(false)}
+        onConfirm={confirmRejectTask}
+        taskDescription={selectedTask?.description || ""}
+        currentDueDate={selectedTask?.dueDate || ""}
+        isLoading={isProcessing}
+      />
+
+      {/* Result Modal */}
+      <TaskActionResultModal
+        isOpen={isResultModalOpen}
+        onClose={() => setIsResultModalOpen(false)}
+        type={resultModal.type}
+        title={resultModal.title}
+        message={resultModal.message}
       />
     </div>
   );
