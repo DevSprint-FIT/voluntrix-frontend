@@ -12,3 +12,16 @@ export const fetchOrganizationTitles = async () => {
     throw error;
   }
 };
+
+export const fetchOrganizationById = async (id: number) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/organizations/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching organization by ID:', error);
+    throw error;
+  }
+};
