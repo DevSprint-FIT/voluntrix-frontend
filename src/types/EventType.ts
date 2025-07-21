@@ -14,5 +14,6 @@ export type EventType = {
   sponsorshipEnabled: boolean;
   donationEnabled: boolean;
   categories: { categoryId: number; categoryName: string }[];
-  organizer: string;
+  eventHostId: number;
+  organizationId: number;
 };
