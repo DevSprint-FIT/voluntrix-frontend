@@ -9,7 +9,6 @@ import {
   Button,
   useDisclosure,
   Progress,
-  Spinner,
 } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -151,7 +150,12 @@ export default function EventCreation() {
 
   return (
     <>
-      <Button onPress={() => setWizardOpen(true)}>Open Modal</Button>
+      <Button
+        onPress={() => setWizardOpen(true)}
+        className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
+      >
+        Create Event
+      </Button>
       <Modal
         isOpen={wizardOpen}
         onOpenChange={handleOpenChange}
@@ -230,6 +234,7 @@ export default function EventCreation() {
                   Back
                 </Button>
                 <Button
+                  isLoading={isSubmitting}
                   isDisabled={
                     (step === 1 && !isStep1Valid) ||
                     (step === 4 && isSubmitting)
@@ -243,18 +248,7 @@ export default function EventCreation() {
                   }}
                   className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
                 >
-                  {step === 4 ? (
-                    isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <Spinner size="sm" color="white" />
-                        Finish
-                      </span>
-                    ) : (
-                      'Finish'
-                    )
-                  ) : (
-                    'Next'
-                  )}
+                  {step === 4 ? 'Finish' : 'Next'}
                 </Button>
               </ModalFooter>
             </>
