@@ -21,6 +21,7 @@ export type CompletedEvent = {
 };
 
 export type AppliedEvent = {
+  applicationId: number; // Added this field for deletion
   eventName: string;
   eventType: EventType;
   contributionArea: ContributionArea;
@@ -84,6 +85,25 @@ export const getVolunteerAppliedEvents = async (
     return data as AppliedEvent[];
   } catch (error) {
     console.error("Error fetching volunteer applied events:", error);
+    throw error;
+  }
+};
+
+// Delete an event application
+export const deleteEventApplication = async (
+  applicationId: number
+): Promise<void> => {
+  try {
+    const url = `http://localhost:8080/api/public/event-applications/${applicationId}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to cancel application: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error cancelling event application:", error);
     throw error;
   }
 };
