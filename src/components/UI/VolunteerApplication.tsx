@@ -14,24 +14,37 @@ import {
   SelectItem,
 } from '@heroui/react';
 import Link from 'next/link';
+import { CreateEventApplication } from '@/services/eventApplicationService';
 
 interface VolunteerApplicationProps {
   isFormOpen: boolean;
   onFormChange: (open: boolean) => void;
+  eventId: number;
 }
 
 const options = [
   { key: 'design', label: 'Design' },
   { key: 'editorial', label: 'Editorial' },
+  { key: 'logistics', label: 'Logistics' },
   { key: 'program', label: 'Program' },
 ];
 
 export default function VolunteerApplication({
   isFormOpen,
   onFormChange,
+  eventId,
 }: VolunteerApplicationProps) {
   const [area, setArea] = useState<string | null>(null);
   const [isAgree, setIsAgree] = useState<boolean>(false);
+
+  const {
+    isOpen: isErrorOpen,
+    onOpen: openErrorModal,
+    onOpenChange: onErrorChange,
+  } = useDisclosure();
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     isOpen: isSuccessOpen,
@@ -46,6 +59,43 @@ export default function VolunteerApplication({
   };
 
   const isFormValid = Boolean(area && reason.trim() && isAgree);
+
+  const handleSubmit = async (onClose: () => void) => {
+    if (!isFormValid) return;
+
+    setIsLoading(true);
+
+    try {
+      await CreateEventApplication({
+        eventId: eventId,
+        volunteerId: 1, // Replace with actual volunteer ID
+        description: reason,
+        contributionArea: area?.toUpperCase() as
+          | 'DESIGN'
+          | 'EDITORIAL'
+          | 'LOGISTICS'
+          | 'PROGRAM'
+          | string,
+        applicationStatus: 'PENDING',
+      });
+
+      setArea(null);
+      setReason('');
+      setIsAgree(false);
+      onClose();
+      openSuccessModal();
+    } catch (error) {
+      console.error('Submission error:', error);
+      setErrorMessage(
+        error?.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+      onClose();
+      openErrorModal();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -83,7 +133,6 @@ export default function VolunteerApplication({
                       {options.map((option) => (
                         <SelectItem
                           key={option.key}
-                          value={option.key}
                           className="font-medium text-shark-800 font-secondary"
                         >
                           {option.label}
@@ -137,21 +186,11 @@ export default function VolunteerApplication({
               <ModalFooter>
                 <Button
                   variant="shadow"
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || isLoading}
+                  isLoading={isLoading}
                   className={`bg-shark-950 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px] 
-              ${!isFormValid && 'opacity-40 cursor-not-allowed'}`}
-                  onPress={() => {
-                    if (!isFormValid) return;
-
-                    // 👉 TODO: send data to your API here
-                    // await fetch(...)
-
-                    setArea(null);
-                    setReason('');
-                    setIsAgree(false);
-                    onClose();
-                    openSuccessModal();
-                  }}
+                    ${(!isFormValid || isLoading) && 'opacity-40 cursor-not-allowed'}`}
+                  onPress={() => handleSubmit(onClose)}
                 >
                   Submit
                 </Button>
@@ -181,6 +220,26 @@ export default function VolunteerApplication({
               </ModalBody>
             </>
           }
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isErrorOpen} onOpenChange={onErrorChange}>
+        <ModalContent className="pt-8 pb-10 px-4">
+          <>
+            <ModalBody className="flex flex-col justify-center items-center gap-1">
+              <Image
+                src={'/icons/error-circle.svg'}
+                width={56}
+                height={56}
+                alt="error"
+              />
+              <div className="mt-4 text-center font-bold font-primary text-red-600 text-2xl">
+                Submission Failed
+              </div>
+              <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
+                {errorMessage}
+              </div>
+            </ModalBody>
+          </>
         </ModalContent>
       </Modal>
     </>
