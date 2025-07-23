@@ -58,18 +58,50 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api/public";
 
 class HostWorkspaceTaskService {
+  // Enhanced error handling method
+  private async handleApiResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+      try {
+        // Try to get error details from response body
+        const errorData = await response.text();
+        if (errorData) {
+          try {
+            const parsedError = JSON.parse(errorData);
+            errorMessage =
+              parsedError.message || parsedError.error || errorMessage;
+          } catch {
+            // If not JSON, use the text as error message
+            errorMessage = errorData;
+          }
+        }
+      } catch {
+        // If we can't read the response body, use the default message
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const text = await response.text();
+    if (!text) {
+      throw new Error("Empty response from server");
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON response from server");
+    }
+  }
+
   // Get task status counts for an event
   async getTaskStatusCounts(eventId: number): Promise<TaskStatusCount> {
     try {
       const response = await fetch(
         `${API_BASE_URL}/tasks/event/${eventId}/status-count`
       );
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch task status counts: ${response.statusText}`
-        );
-      }
-      return await response.json();
+      return await this.handleApiResponse<TaskStatusCount>(response);
     } catch (error) {
       console.error("Error fetching task status counts:", error);
       throw error;
@@ -85,10 +117,7 @@ class HostWorkspaceTaskService {
       const response = await fetch(
         `${API_BASE_URL}/tasks/event/${eventId}?taskStatus=${taskStatus}`
       );
-      if (!response.ok) {
-        throw new Error(`Failed to fetch tasks: ${response.statusText}`);
-      }
-      return await response.json();
+      return await this.handleApiResponse<TaskDTO[]>(response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       throw error;
@@ -103,12 +132,9 @@ class HostWorkspaceTaskService {
       const response = await fetch(
         `${API_BASE_URL}/participations/event/${eventId}/available`
       );
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch available volunteers: ${response.statusText}`
-        );
-      }
-      return await response.json();
+      return await this.handleApiResponse<VolunteerEventParticipationDTO[]>(
+        response
+      );
     } catch (error) {
       console.error("Error fetching available volunteers:", error);
       throw error;
@@ -126,11 +152,7 @@ class HostWorkspaceTaskService {
         body: JSON.stringify(taskData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to create task: ${response.statusText}`);
-      }
-
-      return await response.json();
+      return await this.handleApiResponse<TaskDTO>(response);
     } catch (error) {
       console.error("Error creating task:", error);
       throw error;
@@ -143,6 +165,8 @@ class HostWorkspaceTaskService {
     updateData: TaskUpdateDTO
   ): Promise<TaskDTO> {
     try {
+      console.log("Updating task with data:", updateData); // Debug log
+
       const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
         method: "PATCH",
         headers: {
@@ -151,24 +175,35 @@ class HostWorkspaceTaskService {
         body: JSON.stringify(updateData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to update task: ${response.statusText}`);
-      }
-
-      return await response.json();
+      return await this.handleApiResponse<TaskDTO>(response);
     } catch (error) {
       console.error("Error updating task:", error);
       throw error;
     }
   }
 
+  // Format current date-time for backend (UTC format)
+  private getCurrentDateTime(): string {
+    const now = new Date();
+    // Format as yyyy-MM-ddTHH:mm:ss (without timezone info)
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  }
+
   // Approve task (change status from IN_PROGRESS to DONE)
   async approveTask(taskId: number): Promise<TaskDTO> {
     const updateData: TaskUpdateDTO = {
       taskStatus: "DONE",
-      taskReviewedDate: new Date().toISOString(), // Current local time in ISO format
+      taskReviewedDate: this.getCurrentDateTime(),
     };
 
+    console.log("Approving task with data:", updateData); // Debug log
     return this.updateTask(taskId, updateData);
   }
 
@@ -182,9 +217,10 @@ class HostWorkspaceTaskService {
       taskStatus: "TO_DO",
       description: updatedDescription,
       dueDate: updatedDueDate,
-      taskReviewedDate: new Date().toISOString(), // Current local time in ISO format
+      taskReviewedDate: this.getCurrentDateTime(),
     };
 
+    console.log("Rejecting task with data:", updateData); // Debug log
     return this.updateTask(taskId, updateData);
   }
 
