@@ -226,7 +226,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     }
 
     setIsSubmitting(true);
-    setSubmitStatus({ type: "submitting", message: "Creating task..." });
+    setSubmitStatus({
+      type: "submitting",
+      message: "Creating task successfully...",
+    });
 
     try {
       const success = await onSubmit(formData);
@@ -249,12 +252,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         setTimeout(() => {
           setSubmitStatus({ type: "idle", message: "" });
           onClose();
-        }, 2000);
+        }, 5000);
       } else {
         setSubmitStatus({ type: "error", message: "Failed to create task" });
         setTimeout(() => {
           setSubmitStatus({ type: "idle", message: "" });
-        }, 3000);
+        }, 5000);
       }
     } catch (error) {
       setSubmitStatus({
