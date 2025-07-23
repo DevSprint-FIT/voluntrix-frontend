@@ -243,7 +243,10 @@ const EventHostTasksPage = () => {
 
     setIsProcessing(true);
     try {
+      console.log("Approving task:", selectedTask.taskId);
+
       await hostWorkspaceTaskService.approveTask(selectedTask.taskId);
+
       showResultModal(
         "success",
         "Task Approved",
@@ -251,14 +254,20 @@ const EventHostTasksPage = () => {
       );
       setIsApprovalModalOpen(false);
       setSelectedTask(null);
+
       // Refresh data
       await loadAllTaskData();
     } catch (error) {
       console.error("Error approving task:", error);
+
+      // Get more detailed error message
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+
       showResultModal(
         "error",
         "Approval Failed",
-        "Failed to approve task. Please try again."
+        `Failed to approve task: ${errorMessage}`
       );
     } finally {
       setIsProcessing(false);
@@ -273,11 +282,17 @@ const EventHostTasksPage = () => {
 
     setIsProcessing(true);
     try {
+      console.log("Rejecting task:", selectedTask.taskId, {
+        updatedDescription,
+        updatedDueDate,
+      });
+
       await hostWorkspaceTaskService.rejectTask(
         selectedTask.taskId,
         updatedDescription,
         updatedDueDate
       );
+
       showResultModal(
         "success",
         "Task Revision Requested",
@@ -285,14 +300,20 @@ const EventHostTasksPage = () => {
       );
       setIsRejectionModalOpen(false);
       setSelectedTask(null);
+
       // Refresh data
       await loadAllTaskData();
     } catch (error) {
       console.error("Error rejecting task:", error);
+
+      // Get more detailed error message
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+
       showResultModal(
         "error",
         "Rejection Failed",
-        "Failed to process task revision. Please try again."
+        `Failed to process task revision: ${errorMessage}`
       );
     } finally {
       setIsProcessing(false);
