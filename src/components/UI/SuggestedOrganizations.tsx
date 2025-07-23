@@ -1,7 +1,63 @@
 import { useEffect, useState } from "react";
 import { getAllOrganizations, getFollowedOrganizationIds, followOrganization } from "@/services/publicSocialFeedService";
 import { PublicFeedOrganizationDetails } from "@/services/types";
+import { X, CheckCircle, AlertCircle } from "lucide-react";
+import { Button } from "@heroui/react";
 
+// Modal Component
+const NotificationModal = ({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  type: "success" | "error";
+  title: string;
+  message: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl w-full max-w-md mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            {type === "success" ? (
+              <CheckCircle className="text-verdant-600" size={24} />
+            ) : (
+              <AlertCircle className="text-red-600" size={24} />
+            )}
+            <h2 className="text-lg font-semibold font-secondary text-gray-900">
+              {title}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <p className="text-gray-600 font-secondary mb-6">{message}</p>
+        <div className="flex justify-end">
+          <Button
+            onPress={onClose}
+            className={`rounded-full font-primary tracking-wide text-base ${
+              type === "success"
+                ? "bg-verdant-600 text-white"
+                : "bg-red-600 text-white"
+            }`}
+          >
+            OK
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface Props {
   volunteerId: number;
@@ -9,6 +65,12 @@ interface Props {
 
 export default function SuggestedOrganizations({ volunteerId }: Props) {
   const [unfollowedOrgs, setUnfollowedOrgs] = useState<PublicFeedOrganizationDetails[]>([]);
+
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"success" | "error">("success");
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -26,10 +88,25 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
     try {
       await followOrganization(volunteerId, orgId);
       setUnfollowedOrgs(prev => prev.filter(org => org.id !== orgId));
+
+      // Show success modal
+      setModalType("success");
+      setModalTitle("Successfully Followed");
+      setModalMessage("You are now following this organization.");
+      setModalOpen(true);
     } catch (error) {
-      alert("Failed to follow organization");
+      console.error("Failed to follow organization:", error);
+      // Show error modal
+      setModalType("error");
+      setModalTitle("Follow Failed");
+      setModalMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to follow organization. Please try again. "
+      );
+      setModalOpen(true);
     }
-  }
+  };
 
   return (
     <div className="p-3 border-none rounded-xl  w-full bg-[#FBFBFB] mt-1">
@@ -61,6 +138,13 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
           ))}
         </ul>
       )}
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+      />
     </div>
   );
 }

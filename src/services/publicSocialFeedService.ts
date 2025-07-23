@@ -34,9 +34,9 @@ export async function getVolunteerDetails(username: string): Promise<PublicFeedV
     if (!res.ok) throw new Error("Failed to fetch volunteer data");
 
     const data = await res.json();
-    const { firstName, lastName, institute, about } = data;
+    const { firstName, lastName, institute, about, imageUrl } = data;
 
-    return { firstName, lastName, institute, about };
+    return { firstName, lastName, institute, about, imageUrl };
   } catch (error) {
     console.error("Error fetching volunteer data:", error);
     return null;

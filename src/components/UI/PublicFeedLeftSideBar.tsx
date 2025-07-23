@@ -11,12 +11,12 @@ interface ProfileCardProps {
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profileImageUrl, name, institute, about, isVerified }) => {
   return (
-    <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 w-full max-w-sm text-center  ml-10 mt-1 ">
+    <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 w-full max-w-sm text-center  ml-10 mt-1">
       <div className="flex flex-col items-center space-y-4">
         <img
-          src={profileImageUrl || "/default-profile.png"}
+          src={profileImageUrl || "/images/default-profile.jpg"}
           alt="Profile"
-          className="w-28 h-28 rounded-full object-cover border-2 border-shark-200"
+          className="w-28 h-28 rounded-full object-cover  border-shark-200"
         />
         <div className="flex items-center justify-center gap-1">
           <h2 className="text-2xl font-secondary font-semibold">

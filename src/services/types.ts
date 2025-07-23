@@ -63,5 +63,6 @@ export interface PublicFeedVolunteerDetails{
   lastName: string;
   institute: string;
   about: string;
+  imageUrl?: string;
 }
 

@@ -45,9 +45,9 @@ const PublicFeedPage = () => {
       sharesGrowth: "0%",
     });
 
-  const userId = 1;    // 3
-  const userType:   "ORGANIZATION" = "ORGANIZATION";   //  "VOLUNTEER" = "VOLUNTEER"  
- const username = "IEEESLIT";   //  marie
+  const userId = 1;    // 6
+  const userType:   "ORGANIZATION" = "ORGANIZATION";   //      "VOLUNTEER" = "VOLUNTEER"
+ const username = "IEEESLIT";   //   shanu123
 
  const handleShareClick = async (postId: number) => {
   try {
@@ -93,7 +93,7 @@ const PublicFeedPage = () => {
               name: `${volunteerData.firstName} ${volunteerData.lastName}`,
               institute: volunteerData.institute,
               about: volunteerData.about,
-              profileImageUrl: undefined, 
+              profileImageUrl: volunteerData.imageUrl,  
               isVerified: undefined,
             })
           }
@@ -162,7 +162,7 @@ const PublicFeedPage = () => {
       </aside>
 
       {/* Main Feed */}
-      <main className= "w-[50%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl">
+      <main className= "w-[48%] space-y-4 bg-[#FBFBFB] p-6 rounded-xl -ml-4">
         {posts.length === 0 ? (
           <p>No posts available.</p>
         ) : (
