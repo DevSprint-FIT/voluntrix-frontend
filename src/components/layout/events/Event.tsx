@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { EventType } from '@/types/EventType';
 import VolunteerApplication from '@/components/UI/VolunteerApplication';
+import { OrganizationType } from '@/types/OrganizationType';
 
 interface Sponsor {
   sponsorships: string[];
@@ -13,9 +14,11 @@ interface Sponsor {
 export default function Event({
   event,
   sponsor,
+  organization,
 }: {
   event: EventType;
   sponsor: Sponsor;
+  organization: OrganizationType | null;
 }) {
   const [isSaved, setIsSaved] = useState(false);
   const [value] = useState(40);
@@ -80,18 +83,23 @@ export default function Event({
                     />
                   </button>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <Image
-                    src={'/images/DummyOrganization.svg'}
-                    className="rounded-full"
-                    width={40}
-                    height={40}
-                    alt="organiztion"
-                  />
-                  <p className="text-shark-800 font-medium text-2xl text-wrap">
-                    By {event.organizer}
-                  </p>
-                </div>
+                {organization && (
+                  <div className="flex gap-2 items-center">
+                    {organization.imageUrl && (
+                      <Image
+                        src={organization.imageUrl}
+                        className="rounded-full"
+                        width={40}
+                        height={40}
+                        alt="organization"
+                        unoptimized
+                      />
+                    )}
+                    <p className="text-shark-800 font-medium text-2xl text-wrap">
+                      By {organization.name}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-6">
                 <div className="flex gap-2 items-center">
