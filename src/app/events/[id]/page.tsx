@@ -8,7 +8,9 @@ import EventSkeleton from '@/components/UI/EventSkeleton';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/eventService';
 import { EventType } from '@/types/EventType';
+import { OrganizationType } from '@/types/OrganizationType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
+import { fetchOrganizationById } from '@/services/organizationService';
 
 const sponsorData = {
   sponsorships: [
@@ -30,6 +32,9 @@ export default function EventPage({
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [organization, setOrganization] = useState<OrganizationType | null>(
+    null
+  );
 
   useEffect(() => {
     if (isNaN(eventId)) {
@@ -38,15 +43,39 @@ export default function EventPage({
       return;
     }
 
-    const getEvent = async () => {
+    const getEventAndOrganization = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const eventData = await fetchEventById(eventId);
-        if (eventData) {
-          setEvent(eventData);
-        } else {
+
+        if (!eventData) {
           setError('Event not found');
+          return;
+        }
+
+        setEvent(eventData);
+
+        if (
+          eventData.organizationId !== null &&
+          eventData.organizationId !== undefined
+        ) {
+          const orgId = eventData.organizationId;
+          try {
+            const orgData = await fetchOrganizationById(orgId);
+            if (!orgData) {
+              setError('Organization not found');
+              return;
+            }
+            setOrganization(orgData);
+          } catch (orgErr) {
+            if (orgErr instanceof Error) {
+              setError(orgErr.message);
+            } else {
+              setError('Organization fetch failed.');
+            }
+          }
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -59,7 +88,7 @@ export default function EventPage({
       }
     };
 
-    getEvent();
+    getEventAndOrganization();
   }, [eventId]);
 
   return (
@@ -74,7 +103,11 @@ export default function EventPage({
         </div>
       ) : event ? (
         <>
-          <Event event={event} sponsor={sponsorData} />
+          <Event
+            event={event}
+            sponsor={sponsorData}
+            organization={organization}
+          />
           <EventSection
             title="Based on your browsing history"
             subTitle="Based on searches and preferences"
