@@ -166,6 +166,7 @@ export default function Event({
               <VolunteerApplication
                 isFormOpen={isFormOpen}
                 onFormChange={onFormChange}
+                eventId={event.eventId}
               />
             </div>
           </div>
