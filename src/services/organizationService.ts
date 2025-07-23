@@ -14,7 +14,9 @@ export const fetchOrganizationTitles = async () => {
   }
 };
 
-export const fetchOrganizationById = async (id: number): Promise<OrganizationType> => {
+export const fetchOrganizationById = async (
+  id: number
+): Promise<OrganizationType> => {
   try {
     const response = await axios.get(
       `http://localhost:8080/api/public/organizations/${id}`

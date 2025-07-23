@@ -11,10 +11,10 @@ export default function EventsPage() {
         title={'Trending events'}
         subTitle={'Based on your current location, and community engagement'}
       />
-      <EventSection
+      {/* <EventSection
         title={'Based on your browsing history'}
         subTitle={'Based on searches and prefernces'}
-      />
+      /> */}
     </div>
   );
 }

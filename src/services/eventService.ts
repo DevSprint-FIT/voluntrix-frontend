@@ -98,3 +98,15 @@ export const fetchEventByHostId = async (id: number): Promise<EventType[]> => {
     return [];
   }
 };
+
+export const fetchAllEvents = async (): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/events'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    throw error;
+  }
+};

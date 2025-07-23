@@ -106,14 +106,18 @@ export default function EventCard({ event }: { event: EventType }) {
                     />
                   </button>
                 </div>
-                {organization && (
-                  <p
-                    className="text-shark-900 font-medium text-md text-wrap"
-                    style={{ marginTop: '-10px' }}
-                  >
-                    By {organization.name}
-                  </p>
-                )}
+                <p
+                  className="text-shark-900 font-medium text-md text-wrap"
+                  style={{ marginTop: '-10px' }}
+                >
+                  By {event.organizationId}
+                </p>
+                {/* {organization && (<p
+                  className="text-shark-900 font-medium text-md text-wrap"
+                  style={{ marginTop: '-10px' }}
+                >
+                  By {organization.name}
+                </p>)} */}
                 {!event.donationEnabled && (
                   <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
                     {event.eventDescription}
