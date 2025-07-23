@@ -20,7 +20,7 @@ export const fetchFilteredEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/filter',
+      'http://localhost:8080/api/public/events/filter-with-org',
       { params }
     );
 
@@ -36,7 +36,7 @@ export const fetchSearchedEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/search',
+      'http://localhost:8080/api/public/events/search-with-org',
       { params: { query: searchText } }
     );
 

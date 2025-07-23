@@ -15,5 +15,7 @@ export type EventType = {
   donationEnabled: boolean;
   categories: { categoryId: number; categoryName: string }[];
   eventHostId: number;
-  organizationId: number;
+  organizationId: number | null;
+  organizationName: string | null;
+  organizationImageUrl: string | null;
 };
