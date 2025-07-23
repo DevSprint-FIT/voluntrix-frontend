@@ -1,15 +1,20 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Progress } from '@heroui/progress';
 import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
+import { fetchOrganizationById } from '@/services/organizationService';
+import { OrganizationType } from '@/types/OrganizationType';
 
 export default function EventCard({ event }: { event: EventType }) {
   const [isSaved, setIsSaved] = useState(false);
   const [value] = useState(50);
+  const [organization, setOrganization] = useState<OrganizationType | null>(
+    null
+  );
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
@@ -40,6 +45,29 @@ export default function EventCard({ event }: { event: EventType }) {
   const handleNavigate = () => {
     router.push(`/events/${event.eventId}`);
   };
+
+  useEffect(() => {
+    const getOrganization = async () => {
+      if (event.organizationId !== null && event.organizationId !== undefined) {
+        const orgId = event.organizationId;
+        try {
+          const orgData = await fetchOrganizationById(orgId);
+          if (!orgData) {
+            console.log('Organization not found');
+            return;
+          }
+          setOrganization(orgData);
+        } catch (orgErr) {
+          if (orgErr instanceof Error) {
+            console.log(orgErr.message);
+          } else {
+            console.log('Organization fetch failed.');
+          }
+        }
+      }
+    };
+    getOrganization();
+  }, [event.organizationId]);
 
   return (
     <div className="w-[310px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
@@ -78,12 +106,14 @@ export default function EventCard({ event }: { event: EventType }) {
                     />
                   </button>
                 </div>
-                <p
-                  className="text-shark-900 font-medium text-md text-wrap"
-                  style={{ marginTop: '-10px' }}
-                >
-                  By {event.organizer}
-                </p>
+                {organization && (
+                  <p
+                    className="text-shark-900 font-medium text-md text-wrap"
+                    style={{ marginTop: '-10px' }}
+                  >
+                    By {organization.name}
+                  </p>
+                )}
                 {!event.donationEnabled && (
                   <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
                     {event.eventDescription}
