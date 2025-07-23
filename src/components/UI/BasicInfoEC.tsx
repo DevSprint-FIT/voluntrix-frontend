@@ -1,8 +1,8 @@
-import { uploadToCloudinary } from '@/services/imageUploadService';
+import { uploadToCloudinary } from '@/services/ImageUploadService';
 import { EventCreateType } from '@/types/EventCreateType';
-import { Select, SelectItem } from '@heroui/react';
+import { Select, SelectItem, Tooltip } from '@heroui/react';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
-
 interface Props {
   data: EventCreateType;
   onChange: (changes: Partial<EventCreateType>) => void;
@@ -148,7 +148,20 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          Event Visibility
+          <div className="flex gap-3 items-center">
+            Event Visibility
+            <Tooltip
+              placement="bottom"
+              content="Private events must have an organization"
+            >
+              <Image
+                src="/icons/info-circle.svg"
+                alt="Info"
+                width={12}
+                height={12}
+              />
+            </Tooltip>
+          </div>
           <Select
             placeholder="Select type"
             variant="bordered"
@@ -167,7 +180,6 @@ export default function BasicInfoEC({
             {eventVisibilities.map((t) => (
               <SelectItem
                 key={t.key}
-                value={t.key}
                 className="font-medium text-shark-800 font-secondary text-[15px]"
               >
                 {t.label}
@@ -195,7 +207,6 @@ export default function BasicInfoEC({
             {eventTypes.map((t) => (
               <SelectItem
                 key={t.key}
-                value={t.key}
                 className="font-medium text-shark-800 font-secondary text-[15px]"
               >
                 {t.label}

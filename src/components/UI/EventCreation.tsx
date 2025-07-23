@@ -45,6 +45,7 @@ export default function EventCreation() {
     useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
+  // const [isStep2Valid, setStep2Valid] = useState(false);
   const progress = step * 25;
   const [eventData, setEventData] = useState<EventCreateType>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
@@ -54,6 +55,8 @@ export default function EventCreation() {
   const [submissionType, setSubmissionType] = useState<
     'CREATED' | 'PENDING' | null
   >(null);
+  const isStep2Invalid =
+    step === 2 && eventData.eventVisibility === 'PRIVATE' && !selectedOrg;
 
   const resetWizard = () => {
     setEventData(blankEvent);
@@ -77,11 +80,23 @@ export default function EventCreation() {
   };
 
   const next = () => {
-    if (step === 2 && !selectedOrg) {
-      setStep(4);
-    } else {
-      setStep((s) => Math.min(s + 1, 4));
+    if (step === 2) {
+      const isPrivate = eventData.eventVisibility === 'PRIVATE';
+      const isPublic = eventData.eventVisibility === 'PUBLIC';
+
+      if (!selectedOrg) {
+        if (isPrivate) {
+          return;
+        }
+        if (isPublic) {
+          setStep(4);
+          return;
+        }
+      }
+      setStep(3);
+      return;
     }
+    setStep((s) => Math.min(s + 1, 4));
   };
 
   const back = () => {
@@ -237,7 +252,8 @@ export default function EventCreation() {
                   isLoading={isSubmitting}
                   isDisabled={
                     (step === 1 && !isStep1Valid) ||
-                    (step === 4 && isSubmitting)
+                    (step === 4 && isSubmitting) ||
+                    (step === 2 && isStep2Invalid)
                   }
                   onPress={() => {
                     if (step === 4) {
