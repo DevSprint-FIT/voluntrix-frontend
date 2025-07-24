@@ -13,4 +13,5 @@ export interface EventCreateType {
   donationEnabled: boolean;
   categories: { categoryId: number }[];
   eventHostId: number;
+  organizationId: number | null;
 }

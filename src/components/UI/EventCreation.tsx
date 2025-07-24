@@ -36,6 +36,7 @@ const blankEvent: EventCreateType = {
   donationEnabled: false,
   categories: [],
   eventHostId: 1,
+  organizationId: null,
 };
 
 export default function EventCreation() {
@@ -127,6 +128,7 @@ export default function EventCreation() {
       ...eventData,
       eventTime,
       eventStatus: 'DRAFT',
+      organizationId: selectedOrg?.id ?? null,
       categories: categoryArray.map((cat) => ({
         categoryId: cat.categoryId,
       })),
