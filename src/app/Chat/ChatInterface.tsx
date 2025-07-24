@@ -76,7 +76,7 @@ export default function ChatInterface() {
       const response = await fetch('http://localhost:8080/api/public/chat/online-users');
       if (response.ok) {
         const users = await response.json();
-        const onlineUserIds = new Set(users.map((user: any) => user.userId as string));
+        const onlineUserIds: Set<string> = new Set<string>(users.map((user: any) => user.userId as string));
         setOnlineUsers(onlineUserIds);
         console.log('Online users updated:', onlineUserIds);
       }
