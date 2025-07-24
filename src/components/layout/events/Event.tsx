@@ -58,12 +58,14 @@ export default function Event({
       <div className="w-[1200px] flex flex-col items-center justify-start">
         <div className="mt-14 flex gap-20">
           <div className="w-[522px] flex items-center justify-end">
-            <Image
-              src={'/images/DummyEvent2.png'}
-              width={495}
-              height={369}
-              alt="event image"
-            />
+            <div className='w-[495px] h-[369px] relative overflow-hidden'>
+              <Image
+                src={event.eventImageUrl} //'/images/DummyEvent2.png'
+                width={495}
+                height={369}
+                alt="event image"
+              />
+            </div>
           </div>
           <div className="flex justify-start w-[545px]">
             <div className="flex flex-col items-start gap-5">

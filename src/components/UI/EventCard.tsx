@@ -46,7 +46,7 @@ export default function EventCard({ event }: { event: EventType }) {
         <>
           <div className="h-[165px] relative overflow-hidden">
             <Image
-              src={'/images/DummyEvent2.png'} // want to add actual image url
+              src={event.eventImageUrl} // '/images/DummyEvent2.png' want to add actual image url
               className="rounded-t-[10px] transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
               width={310}
               height={165}
