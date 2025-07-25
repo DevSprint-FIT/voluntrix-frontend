@@ -197,7 +197,7 @@ export default function Event({
                 height={40}
                 alt="document"
               />
-              <div className="felx flex-col">
+              <div className="flex flex-col">
                 <p className="font-medium text-shark-950 text-md">
                   Sponsorship-proposal
                 </p>
