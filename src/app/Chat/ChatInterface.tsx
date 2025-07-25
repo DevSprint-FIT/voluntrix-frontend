@@ -202,7 +202,7 @@ export default function ChatInterface() {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
+        <div className="bg-verdant-600 text-white p-4 flex justify-between items-center">
           <h2 className="text-xl font-bold">Chat Room</h2>
           <div className="flex items-center space-x-2">
             <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-300' : 'bg-red-500'}`} />
@@ -267,7 +267,7 @@ export default function ChatInterface() {
             <button
               type="submit"
               disabled={!isConnected || !messageInput.trim()}
-              className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-2 bg-verdant-600 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Send
             </button>
