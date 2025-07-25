@@ -25,7 +25,7 @@ export const fetchFilteredEvents = async (
 
     return response.data;
   } catch (error) {
-    console.error('Error fetching event:', error);
+    console.error('Error fetching filtered events:', error);
     throw error;
   }
 };
