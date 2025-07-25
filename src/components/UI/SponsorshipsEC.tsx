@@ -64,25 +64,7 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
           !data.sponsorshipEnabled ? 'opacity-50 pointer-events-none' : ''
         }
       >
-        {tiers.map((tier) => (
-          <div
-            key={tier.id}
-            className="flex items-center gap-3 font-secondary font-medium text-[16px]"
-          >
-            <p className="text-shark-950">{tier.name}</p>
-            <p className="text-shark-800">{formatRs(tier.amount)}</p>
-            <Image
-              src="/icons/close.svg"
-              width={12}
-              height={12}
-              alt="remove"
-              className="cursor-pointer"
-              onClick={() => removeTier(tier.id)}
-            />
-          </div>
-        ))}
-
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-1">
           <label className="flex flex-col font-secondary font-medium text-[15px]">
             Sponsorship
             <input
@@ -117,6 +99,23 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
             </div>
           </label>
         </div>
+        {tiers.map((tier) => (
+          <div
+            key={tier.id}
+            className="flex items-center gap-3 font-secondary font-medium text-[16px] mb-1"
+          >
+            <p className="text-shark-950">{tier.name}</p>
+            <p className="text-shark-800">{formatRs(tier.amount)}</p>
+            <Image
+              src="/icons/close.svg"
+              width={12}
+              height={12}
+              alt="remove"
+              className="cursor-pointer"
+              onClick={() => removeTier(tier.id)}
+            />
+          </div>
+        ))}
         <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
           Upload Sponsorship Proposal (Maximum image size is 100 MB)
           <input
