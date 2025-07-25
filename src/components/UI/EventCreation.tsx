@@ -35,6 +35,8 @@ const blankEvent: EventCreateType = {
   eventStatus: 'PENDING',
   sponsorshipEnabled: false,
   donationEnabled: false,
+  sponsorshipProposalUrl: null,
+  donationGoal: null,
   categories: [],
   eventHostId: 1,
   organizationId: null,
@@ -54,6 +56,7 @@ export default function EventCreation() {
   const { isOpen: isErrorOpen, onOpenChange: setErrorOpen } = useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
+  const [isStep3Valid, setStep3Valid] = useState(false);
   const progress = step * 25;
   const [eventData, setEventData] = useState<EventCreateType>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
@@ -69,6 +72,8 @@ export default function EventCreation() {
 
   const isStep2Invalid =
     step === 2 && eventData.eventVisibility === 'PRIVATE' && !selectedOrg;
+
+  const isStep3Invalid = step === 3 && !isStep3Valid;
 
   const resetWizard = () => {
     setEventData(blankEvent);
@@ -309,6 +314,7 @@ export default function EventCreation() {
                     onChange={updateEventData}
                     tiers={sponsorshipTiers}
                     setTiers={setSponsorshipTiers}
+                    onValidityChange={setStep3Valid}
                   />
                 )}
                 {step === 4 && <ReviewEC />}
@@ -325,8 +331,9 @@ export default function EventCreation() {
                   isLoading={isSubmitting}
                   isDisabled={
                     (step === 1 && !isStep1Valid) ||
-                    (step === 4 && isSubmitting) ||
-                    (step === 2 && isStep2Invalid)
+                    (step === 2 && isStep2Invalid) ||
+                    (step === 3 && isStep3Invalid) ||
+                    (step === 4 && isSubmitting)
                   }
                   onPress={() => {
                     if (step === 4) {

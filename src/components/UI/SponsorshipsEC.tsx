@@ -3,7 +3,8 @@
 import { EventCreateType } from '@/types/EventCreateType';
 import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { uploadToCloudinary } from '@/services/ImageUploadService';
 
 export type Tier = {
   id: string;
@@ -16,6 +17,7 @@ interface Props {
   onChange: (changes: Partial<EventCreateType>) => void;
   tiers: Tier[];
   setTiers: React.Dispatch<React.SetStateAction<Tier[]>>;
+  onValidityChange: (valid: boolean) => void;
 }
 
 const formatRs = (n: number) =>
@@ -26,6 +28,7 @@ export default function SponsorshipsEC({
   onChange,
   tiers,
   setTiers,
+  onValidityChange,
 }: Props) {
   const [tierName, setTierName] = useState('');
   const [tierAmount, setTierAmount] = useState('');
@@ -44,18 +47,52 @@ export default function SponsorshipsEC({
   const removeTier = (id: string) =>
     setTiers((t) => t.filter((tier) => tier.id !== id));
 
-  const [donInput, setDonInput] = useState('');
-  const [donGoal, setDonGoal] = useState<number | null>(null);
+  const [donInput, setDonInput] = useState(
+    data.donationGoal ? data.donationGoal.toString() : ''
+  );
 
   const setGoal = () => {
     const amt = Number(donInput);
     if (!amt) return;
-    setDonGoal(amt);
+    onChange({ donationGoal: amt });
+    setDonInput('');
+  };
+
+  const removeGoal = () => {
+    onChange({ donationGoal: null });
     setDonInput('');
   };
 
   const [proposalMessage, setProposalmessage] = useState('');
   const [file, setFile] = useState<File | null>(null);
+
+  // Validation logic
+  useEffect(() => {
+    const sponsorshipValid =
+      !data.sponsorshipEnabled ||
+      (tiers.length > 0 && !!data.sponsorshipProposalUrl);
+
+    const donationValid =
+      !data.donationEnabled ||
+      (data.donationGoal !== null && data.donationGoal > 0);
+
+    const isValid = Boolean(sponsorshipValid && donationValid);
+    onValidityChange(isValid);
+  }, [
+    data.sponsorshipEnabled,
+    data.donationEnabled,
+    data.sponsorshipProposalUrl,
+    data.donationGoal,
+    tiers.length,
+    onValidityChange,
+  ]);
+
+  // Set initial file state if proposal URL exists
+  useEffect(() => {
+    if (data.sponsorshipProposalUrl) {
+      setProposalmessage('✓ Proposal uploaded and saved');
+    }
+  }, [data.sponsorshipProposalUrl]);
 
   return (
     <>
@@ -63,7 +100,16 @@ export default function SponsorshipsEC({
         Sponsorships
         <Switch
           isSelected={data.sponsorshipEnabled}
-          onValueChange={(val) => onChange({ sponsorshipEnabled: val })}
+          onValueChange={(val) => {
+            onChange({ sponsorshipEnabled: val });
+            if (!val) {
+              // Clear sponsorship data when disabled
+              onChange({ sponsorshipProposalUrl: null });
+              setTiers([]);
+              setProposalmessage('');
+              setFile(null);
+            }
+          }}
           color="success"
           size="sm"
         />
@@ -135,11 +181,11 @@ export default function SponsorshipsEC({
         )}
 
         <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Upload Sponsorship Proposal (Maximum file size is 100 MB)
+          Upload Sponsorship Proposal (Maximum file size is 100 MB) *
           <input
             type="file"
             accept="application/pdf,image/*"
-            onChange={(e) => {
+            onChange={async (e) => {
               const file = e.target.files?.[0];
               const maxSize = 100 * 1024 * 1024; // 100 MB
 
@@ -151,15 +197,32 @@ export default function SponsorshipsEC({
                   e.target.value = '';
                   setFile(null);
                 } else {
-                  setProposalmessage('');
-                  setFile(file);
+                  setProposalmessage('Uploading...');
+                  try {
+                    const uploadedUrl = await uploadToCloudinary(file);
+                    onChange({ sponsorshipProposalUrl: uploadedUrl });
+                    setProposalmessage('✓ Proposal uploaded and saved');
+                    setFile(file);
+                  } catch {
+                    setProposalmessage('Upload failed. Please try again.');
+                    setFile(null);
+                  }
                 }
               }
             }}
             className="mt-1 file:text-[15px] text-[14px] text-shark-950 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:font-medium file:text-shark-950 file:border-0 file:bg-shark-200"
           />
           {proposalMessage && (
-            <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
+            <div
+              className={`mt-1 text-[13px] font-secondary font-normal ${
+                proposalMessage.includes('✓')
+                  ? 'text-green-600'
+                  : proposalMessage.includes('failed') ||
+                    proposalMessage.includes('exceeds')
+                  ? 'text-red-600'
+                  : 'text-blue-600'
+              }`}
+            >
               {proposalMessage}
             </div>
           )}
@@ -169,12 +232,32 @@ export default function SponsorshipsEC({
             </div>
           )}
         </label>
+
+        {/* Validation messages */}
+        {data.sponsorshipEnabled && tiers.length === 0 && (
+          <div className="mt-2 text-red-600 text-[13px] font-secondary font-normal">
+            Please add at least one sponsorship tier.
+          </div>
+        )}
+        {data.sponsorshipEnabled && !data.sponsorshipProposalUrl && (
+          <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
+            Please upload a sponsorship proposal.
+          </div>
+        )}
       </fieldset>
+
       <div className="mt-4 flex gap-4 items-center font-primary font-medium text-shark-950 text-[20px]">
         Donations
         <Switch
           isSelected={data.donationEnabled}
-          onValueChange={(val) => onChange({ donationEnabled: val })}
+          onValueChange={(val) => {
+            onChange({ donationEnabled: val });
+            if (!val) {
+              // Clear donation data when disabled
+              onChange({ donationGoal: null });
+              setDonInput('');
+            }
+          }}
           color="success"
           size="sm"
         />
@@ -182,7 +265,7 @@ export default function SponsorshipsEC({
       {data.donationEnabled && (
         <>
           <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-            Amount
+            Donation Goal *
             <div className="flex gap-4">
               <input
                 type="number"
@@ -198,22 +281,27 @@ export default function SponsorshipsEC({
                 className="bg-verdant-600 text-white text-[15px] font-primary px-6 py-2 rounded-lg tracking-[1px] h-9"
                 onPress={setGoal}
               >
-                Add
+                Set Goal
               </Button>
             </div>
           </label>
-          {donGoal !== null && (
-            <div className="flex items-center gap-2 font-secondary font-medium text-[16px]">
+          {data.donationGoal !== null && (
+            <div className="flex items-center gap-2 font-secondary font-medium text-[16px] mt-2">
               <p className="text-shark-950">Donation goal is set to</p>
-              <p className="text-shark-800">{formatRs(donGoal)}</p>
+              <p className="text-shark-800">{formatRs(data.donationGoal)}</p>
               <Image
                 src="/icons/close.svg"
                 width={12}
                 height={12}
                 alt="remove-goal"
                 className="cursor-pointer"
-                onClick={() => setDonGoal(null)}
+                onClick={removeGoal}
               />
+            </div>
+          )}
+          {data.donationEnabled && data.donationGoal === null && (
+            <div className="mt-2 text-red-600 text-[13px] font-secondary font-normal">
+              Please set a donation goal.
             </div>
           )}
         </>
