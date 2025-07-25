@@ -8,9 +8,7 @@ import EventSkeleton from '@/components/UI/EventSkeleton';
 import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/eventService';
 import { EventType } from '@/types/EventType';
-import { OrganizationType } from '@/types/OrganizationType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
-import { fetchOrganizationById } from '@/services/organizationService';
 import { fetchSponsorshipsByEvent } from '@/services/sponsorshipService';
 
 export default function EventPage({
@@ -24,9 +22,6 @@ export default function EventPage({
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [organization, setOrganization] = useState<OrganizationType | null>(
-    null
-  );
   const [sponsorships, setSponsorships] = useState<string[]>([]);
 
   useEffect(() => {
@@ -36,7 +31,7 @@ export default function EventPage({
       return;
     }
 
-    const getEventAndOrganization = async () => {
+    const getEventAndSponsorships = async () => {
       setLoading(true);
       setError(null);
 
@@ -50,27 +45,6 @@ export default function EventPage({
 
         setEvent(eventData);
 
-        if (
-          eventData.organizationId !== null &&
-          eventData.organizationId !== undefined
-        ) {
-          try {
-            const orgData = await fetchOrganizationById(
-              eventData.organizationId
-            );
-            if (!orgData) {
-              setError('Organization not found');
-              return;
-            }
-            setOrganization(orgData);
-          } catch (orgErr) {
-            if (orgErr instanceof Error) {
-              setError(orgErr.message);
-            } else {
-              setError('Organization fetch failed.');
-            }
-          }
-        }
         if (eventData.sponsorshipEnabled) {
           try {
             const sponsorshipData = await fetchSponsorshipsByEvent(eventId);
@@ -94,7 +68,7 @@ export default function EventPage({
       }
     };
 
-    getEventAndOrganization();
+    getEventAndSponsorships();
   }, [eventId]);
 
   return (
@@ -112,7 +86,6 @@ export default function EventPage({
           <Event
             event={event}
             sponsor={{ sponsorships }}
-            organization={organization}
           />
           <EventSection
             title="Based on your browsing history"

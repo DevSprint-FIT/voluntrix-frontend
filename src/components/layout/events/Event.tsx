@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { EventType } from '@/types/EventType';
 import VolunteerApplication from '@/components/UI/VolunteerApplication';
-import { OrganizationType } from '@/types/OrganizationType';
 
 interface Sponsor {
   sponsorships: string[];
@@ -14,11 +13,9 @@ interface Sponsor {
 export default function Event({
   event,
   sponsor,
-  organization,
 }: {
   event: EventType;
   sponsor: Sponsor;
-  organization: OrganizationType | null;
 }) {
   const [isSaved, setIsSaved] = useState(false);
 
@@ -84,11 +81,11 @@ export default function Event({
                     />
                   </button>
                 </div>
-                {organization && (
+                {event.organizationId !== null && (
                   <div className="flex gap-2 items-center">
-                    {organization.imageUrl && (
+                    {event.organizationImageUrl && (
                       <Image
-                        src={organization.imageUrl}
+                        src={event.organizationImageUrl}
                         className="rounded-full"
                         width={40}
                         height={40}
@@ -97,7 +94,7 @@ export default function Event({
                       />
                     )}
                     <p className="text-shark-800 font-medium text-2xl text-wrap">
-                      By {organization.name}
+                      By {event.organizationName}
                     </p>
                   </div>
                 )}
@@ -179,19 +176,17 @@ export default function Event({
                 Sponsorships
               </p>
               <p className="w-[690px] text-shark-950 text-[16px] font-normal text-left text-wrap">
-                Excepteur efficient emerging, minim veniam anim aute carefully
-                curated Ginza conversation exquisite perfect nostrud nisi
-                intricate Content. Qui international first-class nulla ut.
-                Punctual adipisicing, essential lovely queen tempor eiusmod
-                irure. Excepteur...
+                Empower our mission by becoming a valued sponsor. Your support
+                helps us create a greater impact through meaningful
+                partnerships.
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 {sponsor.sponsorships.map((tag, index) => (
                   <div
                     key={index}
-                    className="flex h-[22px] px-2 justify-center items-center rounded-[4px] bg-[#E7E7E7]"
+                    className="flex justify-center items-center rounded-[4px] bg-[#E7E7E7]"
                   >
-                    <p className="text-[12px] font-primary font-bold text-shark-600">
+                    <p className="text-[14px] font-primary px-3 py-1 font-bold text-shark-600 capitalize">
                       {tag}
                     </p>
                   </div>
@@ -235,11 +230,8 @@ export default function Event({
                   Donations
                 </p>
                 <p className="text-shark-950 text-[16px] font-normal text-left text-wrap">
-                  Excepteur efficient emerging, minim veniam anim aute carefully
-                  curated Ginza conversation exquisite perfect nostrud nisi
-                  intricate Content. Qui international first-class nulla ut.
-                  Punctual adipisicing, essential lovely queen tempor eiusmod
-                  irure. Excepteur...
+                  Every contribution counts. Help us reach our goal and drive
+                  positive change. Your donation makes a real difference.
                 </p>
                 <div className="w-[380px] flex gap-1 justify-center items-center flex-col">
                   <Progress
@@ -258,7 +250,7 @@ export default function Event({
                       to complete
                     </div>
                     <div className="text-shark-300">
-                      Goal Rs.<span>{event.donationGoal}</span>
+                      Goal Rs. <span>{event.donationGoal}</span>
                     </div>
                   </div>
                 </div>
