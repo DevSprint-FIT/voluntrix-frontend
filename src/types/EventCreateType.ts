@@ -11,6 +11,8 @@ export interface EventCreateType {
   eventStatus: string;
   sponsorshipEnabled: boolean;
   donationEnabled: boolean;
+  sponsorshipProposalUrl: string | null;
+  donationGoal: number | null;
   categories: { categoryId: number }[];
   eventHostId: number;
   organizationId: number | null;
