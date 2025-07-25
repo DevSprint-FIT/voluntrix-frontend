@@ -86,7 +86,7 @@ export default function Event({
                     className="rounded-full"
                     width={40}
                     height={40}
-                    alt="organiztion"
+                    alt="organization"
                   />
                   <p className="text-shark-800 font-medium text-2xl text-wrap">
                     By {event.organizer}
