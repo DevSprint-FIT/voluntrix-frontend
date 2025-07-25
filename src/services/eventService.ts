@@ -5,7 +5,7 @@ import { EventCreateType } from '@/types/EventCreateType';
 export const fetchEventById = async (id: number): Promise<EventType> => {
   try {
     const response = await axios.get<EventType>(
-      `http://localhost:8080/api/public/events/${id}`
+      `http://localhost:8080/api/public/events/with-org/${id}`
     );
 
     return response.data;

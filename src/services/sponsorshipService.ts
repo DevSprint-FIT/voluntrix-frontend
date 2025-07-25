@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SponsorshipType } from '@/types/SponsorshipType';
 
-export const CreateSponsorships = async (data: SponsorshipType) => {
+export const createSponsorships = async (data: SponsorshipType) => {
   const token = localStorage.getItem('token'); // authentication token
 
   try {
@@ -20,6 +20,19 @@ export const CreateSponsorships = async (data: SponsorshipType) => {
     return response.data;
   } catch (error) {
     console.error('Error creating sponsorship:', error);
+    throw error;
+  }
+};
+
+export const fetchSponsorshipsByEvent = async (eventId: number): Promise<SponsorshipType[]> => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/sponsorships/event/${eventId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching sponsorships by event:', error);
     throw error;
   }
 };
