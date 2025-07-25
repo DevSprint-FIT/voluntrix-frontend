@@ -176,7 +176,7 @@ export default function Event({
         <div className="w-[1150px] flex gap-10 mt-20 justify-start">
           <div className="w-[719px] flex flex-col gap-7 justify-start">
             <p className="text-4xl font-secondary font-medium text-shark-950">
-              Spornsorships
+              Sponsorships
             </p>
             <p className="w-[690px] text-shark-950 text-[16px] font-normal text-left text-wrap">
               Excepteur efficient emerging, minim veniam anim aute carefully
@@ -208,7 +208,7 @@ export default function Event({
                 height={40}
                 alt="document"
               />
-              <div className="felx flex-col">
+              <div className="flex flex-col">
                 <p className="font-medium text-shark-950 text-md">
                   Sponsorship-proposal
                 </p>

@@ -13,7 +13,7 @@ export default function EventsPage() {
       />
       {/* <EventSection
         title={'Based on your browsing history'}
-        subTitle={'Based on searches and prefernces'}
+        subTitle={'Based on searches and preferences'}
       /> */}
     </div>
   );

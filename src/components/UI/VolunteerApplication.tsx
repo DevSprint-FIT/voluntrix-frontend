@@ -152,7 +152,7 @@ export default function VolunteerApplication({
                   </div>
                   <div className="flex gap-2 items-start">
                     <div
-                      className="curser-pointer"
+                      className="cursor-pointer"
                       onClick={() => setIsAgree((prev) => !prev)}
                     >
                       {!isAgree ? (
