@@ -216,34 +216,17 @@ export default function SponsorshipsEC({
             <div
               className={`mt-1 text-[13px] font-secondary font-normal ${
                 proposalMessage.includes('✓')
-                  ? 'text-green-600'
+                  ? 'text-verdant-600'
                   : proposalMessage.includes('failed') ||
                     proposalMessage.includes('exceeds')
                   ? 'text-red-600'
-                  : 'text-blue-600'
+                  : 'text-verdant-600'
               }`}
             >
               {proposalMessage}
             </div>
-          )}
-          {file && (
-            <div className="mt-1 text-green-600 text-[13px] font-secondary font-normal">
-              Selected file: {file.name}
-            </div>
-          )}
+          )}          
         </label>
-
-        {/* Validation messages */}
-        {data.sponsorshipEnabled && tiers.length === 0 && (
-          <div className="mt-2 text-red-600 text-[13px] font-secondary font-normal">
-            Please add at least one sponsorship tier.
-          </div>
-        )}
-        {data.sponsorshipEnabled && !data.sponsorshipProposalUrl && (
-          <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
-            Please upload a sponsorship proposal.
-          </div>
-        )}
       </fieldset>
 
       <div className="mt-4 flex gap-4 items-center font-primary font-medium text-shark-950 text-[20px]">
@@ -297,11 +280,6 @@ export default function SponsorshipsEC({
                 className="cursor-pointer"
                 onClick={removeGoal}
               />
-            </div>
-          )}
-          {data.donationEnabled && data.donationGoal === null && (
-            <div className="mt-2 text-red-600 text-[13px] font-secondary font-normal">
-              Please set a donation goal.
             </div>
           )}
         </>
