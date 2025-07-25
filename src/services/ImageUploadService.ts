@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function uploadToCloudinary(file: File): Promise<string> {
   const cloudName = 'drbmpcktx';
   const uploadPreset = 'event_images';
@@ -6,11 +8,10 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   formData.append('file', file);
   formData.append('upload_preset', uploadPreset);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-    method: 'POST',
-    body: formData,
-  });
+  const res = await axios.post(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    formData
+  );
 
-  const data = await res.json();
-  return data.secure_url;
+  return res.data.secure_url;
 }
