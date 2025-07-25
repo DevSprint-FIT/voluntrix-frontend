@@ -18,8 +18,6 @@ const SponsorshipModal: React.FC<{
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
   const [selectedPackage, setSelectedPackage] = useState<string | null>('platinum');
-    const [sponsorships, setSponsorships] = useState<SponsorshipPackage[]>([]);
-
 
     const [sponsorshipBenefits, setSponsorshipBenefits] = useState<SponsorshipBenefit[]>([]);
 
