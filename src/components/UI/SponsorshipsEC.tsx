@@ -111,7 +111,7 @@ export default function SponsorshipsEC({
         </div>
         {tiers.length > 0 && (
           <div className="mb-4">
-            <h4 className="font-secondary font-medium text-shark-950 text-[16px] mb-2">
+            <h4 className="font-secondary font-medium text-shark-950 text-[16px] mb-1">
               Sponsorship Tiers:
             </h4>
             {tiers.map((tier) => (

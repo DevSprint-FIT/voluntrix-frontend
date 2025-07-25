@@ -40,7 +40,6 @@ const blankEvent: EventCreateType = {
   organizationId: null,
 };
 
-
 export type Tier = {
   id: string;
   name: string;
@@ -52,6 +51,7 @@ export default function EventCreation() {
   const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
   const { isOpen: isSuccessOpen, onOpenChange: setSuccessOpen } =
     useDisclosure();
+  const { isOpen: isErrorOpen, onOpenChange: setErrorOpen } = useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
   const progress = step * 25;
@@ -64,6 +64,7 @@ export default function EventCreation() {
     'CREATED' | 'PENDING' | null
   >(null);
 
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [sponsorshipTiers, setSponsorshipTiers] = useState<Tier[]>([]);
 
   const isStep2Invalid =
@@ -75,6 +76,7 @@ export default function EventCreation() {
     setSponsorshipTiers([]);
     setStep(1);
     setStep1Valid(false);
+    setErrorMessage('');
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -194,6 +196,8 @@ export default function EventCreation() {
           console.log('Sponsorships created successfully');
         } catch (sponsorshipError) {
           console.error('Failed to create sponsorships:', sponsorshipError);
+          // Note: We don't throw here to avoid blocking the success flow
+          // The event was created successfully even if sponsorships failed
         }
       }
 
@@ -202,6 +206,26 @@ export default function EventCreation() {
       resetWizard();
     } catch (err) {
       console.error('Failed to create event or send invitation:', err);
+
+      let message =
+        'An unexpected error occurred while creating your event. Please try again.';
+
+      if (err instanceof Error) {
+        if (err.message.includes('network')) {
+          message =
+            'Network error occurred. Please check your connection and try again.';
+        } else if (err.message.includes('validation')) {
+          message = 'Please check your event details and try again.';
+        } else if (err.message.includes('unauthorized')) {
+          message =
+            'You are not authorized to perform this action. Please log in and try again.';
+        }
+      }
+
+      setErrorMessage(message);
+      setWizardOpen(false);
+      setErrorOpen();
+      resetWizard();
     } finally {
       setIsSubmitting(false);
     }
@@ -392,6 +416,26 @@ export default function EventCreation() {
                   </div>
                 </>
               )}
+            </ModalBody>
+          </>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isErrorOpen} onOpenChange={setErrorOpen}>
+        <ModalContent className="pt-8 pb-10 px-4">
+          <>
+            <ModalBody className="flex flex-col justify-center items-center gap-1">
+              <Image
+                src={'/icons/error-circle.svg'}
+                width={56}
+                height={56}
+                alt="error"
+              />
+              <div className="mt-4 text-center font-bold font-primary text-red-600 text-2xl">
+                Submission Failed
+              </div>
+              <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
+                {errorMessage}
+              </div>
             </ModalBody>
           </>
         </ModalContent>
