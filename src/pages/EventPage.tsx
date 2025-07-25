@@ -54,7 +54,7 @@ export default function EventPage(/*{ params }: { params: { eventId: number } }*
       {loading ? (
         <EventSkeleton />
       ) : error ? (
-        <div className="text-center w-full py-10 text-red-500"></div>
+        <div className="text-center w-full py-10 text-red-500">{error}</div>
       ) : event ? (
         <Event event={event} sponsor={sponsorData} />
       ) : null}
