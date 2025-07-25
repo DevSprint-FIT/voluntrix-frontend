@@ -20,6 +20,7 @@ import { EventCreateType } from '@/types/EventCreateType';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 import { createEvent } from '@/services/eventService';
 import { createEventInvitation } from '@/services/eventInvitationService';
+import { CreateSponsorships } from '@/services/sponsorshipService';
 
 const blankEvent: EventCreateType = {
   eventTitle: '',
@@ -39,6 +40,13 @@ const blankEvent: EventCreateType = {
   organizationId: null,
 };
 
+
+export type Tier = {
+  id: string;
+  name: string;
+  amount: number;
+};
+
 export default function EventCreation() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const { isOpen: confirmOpen, onOpenChange: setConfirmOpen } = useDisclosure();
@@ -46,7 +54,6 @@ export default function EventCreation() {
     useDisclosure();
   const [step, setStep] = useState(1);
   const [isStep1Valid, setStep1Valid] = useState(false);
-  // const [isStep2Valid, setStep2Valid] = useState(false);
   const progress = step * 25;
   const [eventData, setEventData] = useState<EventCreateType>(blankEvent);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationTitles | null>(
@@ -56,12 +63,16 @@ export default function EventCreation() {
   const [submissionType, setSubmissionType] = useState<
     'CREATED' | 'PENDING' | null
   >(null);
+
+  const [sponsorshipTiers, setSponsorshipTiers] = useState<Tier[]>([]);
+
   const isStep2Invalid =
     step === 2 && eventData.eventVisibility === 'PRIVATE' && !selectedOrg;
 
   const resetWizard = () => {
     setEventData(blankEvent);
     setSelectedOrg(null);
+    setSponsorshipTiers([]);
     setStep(1);
     setStep1Valid(false);
   };
@@ -111,6 +122,24 @@ export default function EventCreation() {
   const updateEventData = (changes: Partial<EventCreateType>) =>
     setEventData((prev) => ({ ...(prev ?? blankEvent), ...changes }));
 
+  const createEventSponsorships = async (eventId: number, tiers: Tier[]) => {
+    const sponsorshipPromises = tiers.map((tier) =>
+      CreateSponsorships({
+        sponsorshipName: tier.name,
+        sponsorshipAmount: tier.amount,
+        eventId: eventId,
+      })
+    );
+
+    try {
+      await Promise.all(sponsorshipPromises);
+      console.log('All sponsorships created successfully');
+    } catch (error) {
+      console.error('Error creating some sponsorships:', error);
+      throw error;
+    }
+  };
+
   const handleFinish = async () => {
     setIsSubmitting(true);
     const rawCategories = eventData.categories;
@@ -153,6 +182,19 @@ export default function EventCreation() {
       } else {
         console.log('No organization selected, skipping invitation creation.');
         setSubmissionType('CREATED');
+      }
+
+      if (
+        eventData.sponsorshipEnabled &&
+        sponsorshipTiers.length > 0 &&
+        eventId
+      ) {
+        try {
+          await createEventSponsorships(eventId, sponsorshipTiers);
+          console.log('Sponsorships created successfully');
+        } catch (sponsorshipError) {
+          console.error('Failed to create sponsorships:', sponsorshipError);
+        }
       }
 
       setWizardOpen(false);
@@ -238,7 +280,12 @@ export default function EventCreation() {
                   />
                 )}
                 {step === 3 && (
-                  <SponsorshipsEC data={eventData} onChange={updateEventData} />
+                  <SponsorshipsEC
+                    data={eventData}
+                    onChange={updateEventData}
+                    tiers={sponsorshipTiers}
+                    setTiers={setSponsorshipTiers}
+                  />
                 )}
                 {step === 4 && <ReviewEC />}
               </ModalBody>

@@ -5,18 +5,28 @@ import { Button, Switch } from '@heroui/react';
 import Image from 'next/image';
 import { useState } from 'react';
 
+export type Tier = {
+  id: string;
+  name: string;
+  amount: number;
+};
+
 interface Props {
   data: EventCreateType;
   onChange: (changes: Partial<EventCreateType>) => void;
+  tiers: Tier[];
+  setTiers: React.Dispatch<React.SetStateAction<Tier[]>>;
 }
 
 const formatRs = (n: number) =>
   `Rs. ${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
-type Tier = { id: string; name: string; amount: number };
-
-export default function SponsorshipsEC({ data, onChange }: Props) {
-  const [tiers, setTiers] = useState<Tier[]>([]);
+export default function SponsorshipsEC({
+  data,
+  onChange,
+  tiers,
+  setTiers,
+}: Props) {
   const [tierName, setTierName] = useState('');
   const [tierAmount, setTierAmount] = useState('');
 
@@ -99,25 +109,33 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
             </div>
           </label>
         </div>
-        {tiers.map((tier) => (
-          <div
-            key={tier.id}
-            className="flex items-center gap-3 font-secondary font-medium text-[16px] mb-1"
-          >
-            <p className="text-shark-950">{tier.name}</p>
-            <p className="text-shark-800">{formatRs(tier.amount)}</p>
-            <Image
-              src="/icons/close.svg"
-              width={12}
-              height={12}
-              alt="remove"
-              className="cursor-pointer"
-              onClick={() => removeTier(tier.id)}
-            />
+        {tiers.length > 0 && (
+          <div className="mb-4">
+            <h4 className="font-secondary font-medium text-shark-950 text-[16px] mb-2">
+              Sponsorship Tiers:
+            </h4>
+            {tiers.map((tier) => (
+              <div
+                key={tier.id}
+                className="flex items-center gap-3 font-secondary font-medium text-[16px] mb-1"
+              >
+                <p className="text-shark-950">{tier.name}</p>
+                <p className="text-shark-800">{formatRs(tier.amount)}</p>
+                <Image
+                  src="/icons/close.svg"
+                  width={12}
+                  height={12}
+                  alt="remove"
+                  className="cursor-pointer hover:opacity-70"
+                  onClick={() => removeTier(tier.id)}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+
         <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Upload Sponsorship Proposal (Maximum image size is 100 MB)
+          Upload Sponsorship Proposal (Maximum file size is 100 MB)
           <input
             type="file"
             accept="application/pdf,image/*"
@@ -128,7 +146,7 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
               if (file) {
                 if (file.size > maxSize) {
                   setProposalmessage(
-                    'File size exceeds 100 MB. Please upload a smaller image.'
+                    'File size exceeds 100 MB. Please upload a smaller file.'
                   );
                   e.target.value = '';
                   setFile(null);
@@ -143,6 +161,11 @@ export default function SponsorshipsEC({ data, onChange }: Props) {
           {proposalMessage && (
             <div className="mt-1 text-red-600 text-[13px] font-secondary font-normal">
               {proposalMessage}
+            </div>
+          )}
+          {file && (
+            <div className="mt-1 text-green-600 text-[13px] font-secondary font-normal">
+              Selected file: {file.name}
             </div>
           )}
         </label>
