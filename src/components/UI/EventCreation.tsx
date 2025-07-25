@@ -20,7 +20,8 @@ import { EventCreateType } from '@/types/EventCreateType';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 import { createEvent } from '@/services/eventService';
 import { createEventInvitation } from '@/services/eventInvitationService';
-import { CreateSponsorships } from '@/services/sponsorshipService';
+import { createSponsorships } from '@/services/sponsorshipService';
+import { SponsorshipCreateType } from '@/types/SponsorshipCreateType';
 
 const blankEvent: EventCreateType = {
   eventTitle: '',
@@ -131,11 +132,11 @@ export default function EventCreation() {
 
   const createEventSponsorships = async (eventId: number, tiers: Tier[]) => {
     const sponsorshipPromises = tiers.map((tier) =>
-      CreateSponsorships({
-        sponsorshipName: tier.name,
-        sponsorshipAmount: tier.amount,
-        eventId: eventId,
-      })
+      createSponsorships({
+      sponsorshipName: tier.name,
+      sponsorshipAmount: tier.amount,
+      eventId: eventId,
+      } as SponsorshipCreateType)
     );
 
     try {
