@@ -11,15 +11,7 @@ import { EventType } from '@/types/EventType';
 import { OrganizationType } from '@/types/OrganizationType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
 import { fetchOrganizationById } from '@/services/organizationService';
-
-const sponsorData = {
-  sponsorships: [
-    'Title Partner',
-    'Platinum Partner',
-    'Gold Partner',
-    'Silver Partner',
-  ],
-};
+import { fetchSponsorshipsByEvent } from '@/services/sponsorshipService';
 
 export default function EventPage({
   params,
@@ -35,6 +27,7 @@ export default function EventPage({
   const [organization, setOrganization] = useState<OrganizationType | null>(
     null
   );
+  const [sponsorships, setSponsorships] = useState<string[]>([]);
 
   useEffect(() => {
     if (isNaN(eventId)) {
@@ -61,9 +54,10 @@ export default function EventPage({
           eventData.organizationId !== null &&
           eventData.organizationId !== undefined
         ) {
-          const orgId = eventData.organizationId;
           try {
-            const orgData = await fetchOrganizationById(orgId);
+            const orgData = await fetchOrganizationById(
+              eventData.organizationId
+            );
             if (!orgData) {
               setError('Organization not found');
               return;
@@ -75,6 +69,18 @@ export default function EventPage({
             } else {
               setError('Organization fetch failed.');
             }
+          }
+        }
+        if (eventData.sponsorshipEnabled) {
+          try {
+            const sponsorshipData = await fetchSponsorshipsByEvent(eventId);
+            const sponsorshipNames = sponsorshipData.map(
+              (s) => s.sponsorshipName
+            );
+            setSponsorships(sponsorshipNames);
+          } catch (sponsErr) {
+            console.error('Failed to fetch sponsorships:', sponsErr);
+            setSponsorships([]);
           }
         }
       } catch (err: unknown) {
@@ -105,7 +111,7 @@ export default function EventPage({
         <>
           <Event
             event={event}
-            sponsor={sponsorData}
+            sponsor={{ sponsorships }}
             organization={organization}
           />
           <EventSection
