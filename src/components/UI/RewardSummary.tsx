@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMedal, FaGift, FaFire } from 'react-icons/fa';
+import { FaMedal, FaGift } from 'react-icons/fa';
 import { fetchVolunteerRewardStats } from '@/services/rewardService';
 
 export default function RewardSummary() {
