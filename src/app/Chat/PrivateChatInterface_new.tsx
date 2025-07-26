@@ -73,7 +73,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
     try {
       console.log('Creating/getting private room for:', user1, 'and', user2);
       
-      const response = await fetch('http://localhost:8081/api/private-chat/create-room', {
+      const response = await fetch('http://localhost:8081/api/private-chat/room', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

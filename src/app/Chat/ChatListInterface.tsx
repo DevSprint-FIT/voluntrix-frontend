@@ -85,7 +85,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto border-x border-gray-200">
+    <div className="h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="bg-green-600 text-white p-4">
         <div className="flex items-center justify-between mb-4">
