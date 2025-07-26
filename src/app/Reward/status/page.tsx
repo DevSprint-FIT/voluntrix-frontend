@@ -84,7 +84,7 @@ export default function RewardStatus() {
               <div className="w-48 h-4 bg-shark-50 rounded animate-pulse" />
             ) : (
               <div className="text-base text-shark-400">
-                {Math.max(nextLevelPoints - currentPoints, 0)} points until Level {level + 1} this month
+                {Math.max(nextLevelPoints - currentPoints, 0)} points until Level {level + 1} 
               </div>
             )}
           </div>
