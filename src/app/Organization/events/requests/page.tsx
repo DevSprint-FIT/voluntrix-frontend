@@ -6,12 +6,22 @@ import Table, { Column } from "@/components/UI/Table";
 import { Event, Volunteer, getEventsByOrgId, updateEventStatus, getAllVolunteers } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
+import ConfirmationModal from "@/components/UI/ConfirmationModal";
 
 export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [volunteers, setVolunteers] = useState<Map<number, Volunteer>>(new Map());
   const [loading, setLoading] = useState(true);
   const [updatingEventId, setUpdatingEventId] = useState<number | null>(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{
+    eventId: number;
+    status: "ACTIVE" | "DENIED";
+    title: string;
+    message: string;
+    buttonText: string;
+    buttonClass: string;
+  } | null>(null);
 
   const orgId = 1; 
 
@@ -36,13 +46,47 @@ export default function EventRequestsPage() {
     fetchData();
   }, []);
 
-  const handleStatusUpdate = async (eventId: number, newStatus: "ACTIVE" | "DENIED") => {
+  const openConfirmationModal = (eventId: number, newStatus: "ACTIVE" | "DENIED") => {
+    const isAccepting = newStatus === "ACTIVE";
+    
+    setConfirmAction({
+      eventId,
+      status: newStatus,
+      title: isAccepting ? "Accept Event Request" : "Reject Event Request",
+      message: isAccepting 
+        ? "Are you sure you want to accept this event request? Once accepted, the event will be activated and managed under your organization."
+        : "Are you sure you want to reject this event request? This action cannot be undone.",
+      buttonText: isAccepting ? "Accept" : "Reject",
+      buttonClass: isAccepting 
+        ? "bg-verdant-500 hover:bg-verdant-600 text-white" 
+        : "bg-red-500 hover:bg-red-600 text-white"
+    });
+    
+    setConfirmModalOpen(true);
+  };
+  
+  const handleConfirm = async () => {
+    if (!confirmAction) return;
+    
+    const { eventId, status } = confirmAction;
+    setConfirmModalOpen(false);
     setUpdatingEventId(eventId);
+    
     try {
-      console.log(`Updating event ${eventId} to status: ${newStatus}`);
+      console.log(`Updating event ${eventId} to status: ${status}`);
       
-      const updatedEvent = await updateEventStatus(eventId, newStatus);
-      console.log('Update successful:', updatedEvent);
+      console.log(`Before API call - Event ID: ${eventId}, Target Status: ${status}`);
+      
+      const updatedEvent = await updateEventStatus(eventId, status);
+      
+      // Log response details
+      console.log('Update successful. Response:', updatedEvent);
+      console.log(`After API call - Event ID: ${eventId}, Status in response: ${updatedEvent.eventStatus}`);
+      
+      // Verify response status is as expected
+      if (updatedEvent.eventStatus !== status) {
+        console.warn(`Warning: Expected status ${status} but got ${updatedEvent.eventStatus}`);
+      }
       
       // Remove the updated event from the list since it's no longer PENDING
       setEvents(prevEvents => {
@@ -50,14 +94,18 @@ export default function EventRequestsPage() {
         console.log(`Removed event ${eventId} from list. Remaining events:`, newEvents.length);
         return newEvents;
       });
-      
-
     } catch (error) {
       console.error("Failed to update event status:", error);
-      alert(`Failed to ${newStatus === 'ACTIVE' ? 'accept' : 'reject'} event. Please try again.`);
+      alert(`Failed to ${status === 'ACTIVE' ? 'accept' : 'reject'} event. Please try again.`);
     } finally {
       setUpdatingEventId(null);
+      setConfirmAction(null);
     }
+  };
+  
+  const handleCancel = () => {
+    setConfirmModalOpen(false);
+    setConfirmAction(null);
   };
 
   const VolunteerInfo = ({ eventHostId }: { eventHostId: number }) => {
@@ -145,7 +193,7 @@ export default function EventRequestsPage() {
             className={`rounded-md bg-verdant-100 p-2 cursor-pointer hover:bg-verdant-200 disabled:opacity-50 disabled:cursor-not-allowed ${
               updatingEventId === row.eventId ? 'opacity-50' : ''
             }`}
-            onClick={() => handleStatusUpdate(row.eventId, "ACTIVE")}
+            onClick={() => openConfirmationModal(row.eventId, "ACTIVE")}
             disabled={updatingEventId === row.eventId}
             title="Accept Event"
           >
@@ -161,7 +209,7 @@ export default function EventRequestsPage() {
             className={`rounded-md bg-red-100 p-2 cursor-pointer hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed ${
               updatingEventId === row.eventId ? 'opacity-50' : ''
             }`}
-            onClick={() => handleStatusUpdate(row.eventId, "DENIED")}
+            onClick={() => openConfirmationModal(row.eventId, "DENIED")}
             disabled={updatingEventId === row.eventId}
             title="Reject Event"
           >
@@ -189,6 +237,19 @@ export default function EventRequestsPage() {
         </div>
       ) : (
         <Table columns={columns} data={events} />
+      )}
+      
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <ConfirmationModal
+          isOpen={confirmModalOpen}
+          title={confirmAction.title}
+          message={confirmAction.message}
+          confirmButtonText={confirmAction.buttonText}
+          confirmButtonClass={confirmAction.buttonClass}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
       )}
     </div>
   );

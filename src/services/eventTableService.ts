@@ -49,14 +49,19 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
     console.log(`Making PATCH request to: ${url}`);
     console.log(`Request body:`, { eventStatus: status });
     
+    // Create request body with explicit property and value
+    const requestBody = {
+      eventStatus: status
+    };
+    
+    console.log(`Stringified body: ${JSON.stringify(requestBody)}`);
+    
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        eventStatus: status
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     console.log(`Response status: ${response.status}`);
