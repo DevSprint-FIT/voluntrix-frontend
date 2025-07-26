@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { EventApplicationCreateType } from '@/types/EventApplicationType';
+import { EventApplicationCreateType } from '@/types/EventApplicationCreateType';
+import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
 
 export const CreateEventApplication = async (
   data: EventApplicationCreateType
@@ -19,6 +20,20 @@ export const CreateEventApplication = async (
     return response.data;
   } catch (error) {
     console.error('Error submitting application:', error);
+    throw error;
+  }
+};
+
+export const getEventApplicAndVol = async (eventId: number): Promise<EventApplicAndVolType[]> => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/event-applications/event/volunteers/${eventId}`
+    );
+
+    console.log('Fetched event applications successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event applications:', error);
     throw error;
   }
 };
