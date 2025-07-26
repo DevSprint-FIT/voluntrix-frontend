@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Check, X } from 'lucide-react';
 import Table, { Column } from '@/components/UI/Table';
-import { getEventApplicAndVol } from '@/services/eventApplicationService';
+import {
+  getEventApplicAndVol,
+  updateEventApplicationStatus,
+} from '@/services/eventApplicationService';
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
 
 const EventVolunteersPage = () => {
@@ -27,9 +30,10 @@ const EventVolunteersPage = () => {
           52
         ); // Replace with dynamic eventId
         console.log('Fetched volunteer data:', response);
-        
-        const volunteers: EventApplicAndVolType[] = response
-          .filter((item) => item.applicationStatus === 'APPROVED');
+
+        const volunteers: EventApplicAndVolType[] = response.filter(
+          (item) => item.applicationStatus === 'APPROVED'
+        );
 
         const applications: EventApplicAndVolType[] = response.filter(
           (item) => item.applicationStatus === 'PENDING'
@@ -47,15 +51,46 @@ const EventVolunteersPage = () => {
     fetchData();
   }, []);
 
-  // Action handlers
-  const handleApproveApplication = (id: string) => {
+  const handleApproveApplication = async (id: number) => {
     console.log('Approved volunteer application:', id);
-    // TODO: Implement approval logic
+    try {
+      await updateEventApplicationStatus(id, 'APPROVED');
+
+      setVolunteerApplications((prevApplications) => {
+        const approvedApp = prevApplications.find((app) => app.id === id);
+        const updatedApplications = prevApplications.filter(
+          (app) => app.id !== id
+        );
+
+        if (approvedApp) {
+          setEventVolunteers((prevVolunteers) => {
+            const exists = prevVolunteers.some(
+              (vol) => vol.id === approvedApp.id
+            );
+            if (exists) return prevVolunteers;
+
+            return [
+              ...prevVolunteers,
+              { ...approvedApp, applicationStatus: 'APPROVED' },
+            ];
+          });
+        }
+
+        return updatedApplications;
+      });
+    } catch (error) {
+      console.error('Error approving application:', error);
+    }
   };
 
-  const handleRejectApplication = (id: string) => {
+  const handleRejectApplication = async (id: number) => {
     console.log('Rejected volunteer application:', id);
-    // TODO: Implement rejection logic
+    try {
+      await updateEventApplicationStatus(id, 'REJECTED');
+      setVolunteerApplications((prev) => prev.filter((app) => app.id !== id));
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+    }
   };
 
   const getCategoryBadgeColor = (category: string) => {
@@ -129,14 +164,14 @@ const EventVolunteersPage = () => {
       cell: (value) => (
         <div className="flex items-center gap-6">
           <button
-            onClick={() => handleApproveApplication(value as string)}
+            onClick={() => handleApproveApplication(value as number)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
             title="Approve Application"
           >
             <Check size={16} />
           </button>
           <button
-            onClick={() => handleRejectApplication(value as string)}
+            onClick={() => handleRejectApplication(value as number)}
             className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
             title="Reject Application"
           >
