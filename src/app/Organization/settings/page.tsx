@@ -229,29 +229,6 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Phone Verification Section */}
-      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-        <h2 className="font-secondary font-semibold text-xl mb-2">Phone Verification</h2>
-        <div className="mb-4 text-shark-700">
-          {organization?.isVerified ? (
-            "Your account is verified."
-          ) : organization !== null ? (
-            "Your account is not verified. Verifying your account with a phone number allows you to do more on Voluntrix, and helps prevent spam and other abuse."
-          ) : (
-            <div className="h-4 w-full max-w-md bg-shark-100 rounded animate-pulse"></div>
-          )}
-        </div>
-
-        {organization && !organization.isVerified && (
-          <Button
-            onPress={() => setIsModalOpen(true)}
-            className="rounded-full bg-shark-950 text-shark-50 font-primary"
-          >
-            Phone verify
-          </Button>
-        )}
-      </div>
-
       {/* Danger Zone Section */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
         <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">Danger Zone</h2>
