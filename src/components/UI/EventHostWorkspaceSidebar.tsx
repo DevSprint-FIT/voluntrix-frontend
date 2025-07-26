@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from "react";
 import {
-  Home,
-  BarChart,
-  User,
-  Calendar,
+  ListTodo,
+  Trophy,
   Bell,
-  Send,
-  Settings,
-  LogOut,
+  ArrowLeft,
   LucideIcon,
+  FileText,
+  Users,
+  DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -21,9 +20,9 @@ interface MenuItem {
   badge?: number;
 }
 
-const Sidebar = () => {
+const EventHostWorkspaceSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>("Home");
+  const [selectedItem, setSelectedItem] = useState<string>("Tasks");
 
   useEffect(() => {
     setTimeout(() => {
@@ -32,31 +31,50 @@ const Sidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Home", icon: Home, href: "/" },
-    { name: "Dashboard", icon: BarChart, href: "/Organization/dashboard" },
-    { name: "Profile", icon: User, href: "/Organization/profile" },
-    { name: "Events", icon: Calendar, href: "/Organization/events/active" },
+    { name: "Tasks", icon: ListTodo, href: "/EventHostWorkspace/tasks" },
+    {
+      name: "Volunteers",
+      icon: Users,
+      href: "/EventHostWorkspace/volunteers",
+    },
+    {
+      name: "Sponsorships",
+      icon: DollarSign,
+      href: "/EventHostWorkspace/sponsorships",
+    },
+    {
+      name: "Leaderboard",
+      icon: Trophy,
+      href: "/EventHostWorkspace/leaderboard",
+    },
+    {
+      name: "Documents",
+      icon: FileText,
+      href: "/EventHostWorkspace/documents",
+    },
     {
       name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: "/Organization/notifications",
+      href: "/EventHostWorkspace/notifications",
     },
-    { name: "Social Feed", icon: Send, href: "/Organization/feed" },
-    { name: "Settings", icon: Settings, href: "/Organization/settings" },
   ];
 
   return (
-    <div className="h-screen w-60 bg-[#f8fefc] border-r  py-6 flex flex-col justify-between fixed">
+    <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       {/* Logo */}
       <div>
-        <div className="mb-8 flex justify-center">
-          <img src="/images/logo.svg" alt="Logo" className="h-18 w-18 mr-6" />
+        <div className="mb-16 mt-4 flex justify-center">
+          <img
+            src="/images/workspaceLogo.svg"
+            alt="Workspace Logo"
+            className="h-18 w-18 ml-[-10px]"
+          />
         </div>
 
         {/* Navigation */}
         <nav>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-8">
             {menuItems.map((item) => {
               const isActive = selectedItem === item.name;
 
@@ -64,7 +82,7 @@ const Sidebar = () => {
                 <Link key={item.name} href={item.href || "#"}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
-                    className={`w-full cursor-pointer text-left flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 relative ${
+                    className={`w-full cursor-pointer text-left flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 relative ${
                       isActive ? "text-verdant-700 font-semibold" : ""
                     }`}
                   >
@@ -80,13 +98,13 @@ const Sidebar = () => {
                     </div>
 
                     {typeof item.badge === "number" && item.badge > 0 && (
-                      <span className="text-xs bg-verdant-100 text-shark-950  px-1 mr-4 rounded-md">
+                      <span className="text-xs bg-verdant-100 text-shark-950 px-1.5 rounded-md">
                         {item.badge}
                       </span>
                     )}
 
                     {isActive && (
-                      <span className="absolute right-0 top-0 h-full w-1 bg-verdant-700 rounded-full " />
+                      <span className="absolute right-0 top-0 h-full w-1 bg-verdant-700 rounded-l-md" />
                     )}
                   </div>
                 </Link>
@@ -96,17 +114,15 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      {/* Logout */}
+      {/* Back Button */}
       <div>
         <button
-          onClick={() => setSelectedItem("Logout")}
-          className="flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
+          onClick={() => setSelectedItem("Back")}
+          className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
-            <LogOut className="h-5 w-5" />
-            <span className="font-secondary font-medium text-shark-950">
-              Logout
-            </span>
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-primary">Back</span>
           </div>
         </button>
       </div>
@@ -114,4 +130,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default EventHostWorkspaceSidebar;

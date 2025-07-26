@@ -35,10 +35,10 @@ const VolunteerSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Home', icon: Home, href: '/' },
-    { name: 'Dashboard', icon: BarChart, href: '/Volunteer/dashboard' },
-    { name: 'Profile', icon: User, href: '/Volunteer/profile' },
-    { name: 'Events', icon: Calendar, href: '/Volunteer/events' },
+    { name: "Home", icon: Home, href: "/" },
+    { name: "Dashboard", icon: BarChart, href: "/Volunteer/dashboard" },
+    { name: "Profile", icon: User, href: "/Volunteer/profile" },
+    { name: "Events", icon: Calendar, href: "/Volunteer/events/active" },
     {
       name: 'Notifications',
       icon: Bell,
@@ -116,8 +116,8 @@ const VolunteerSidebar = () => {
       {/* Logout */}
       <div>
         <button
-          onClick={() => setSelectedItem('Logout')}
-          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-shark-50 group text-sm text-shark-950 w-full text-left"
+          onClick={() => setSelectedItem("Logout")}
+          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
             <LogOut className="h-5 w-5" />

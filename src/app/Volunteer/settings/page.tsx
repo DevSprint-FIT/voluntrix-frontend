@@ -150,16 +150,15 @@ const SettingsPage = () => {
 
   if (loading) {
     return (
-      <div className="p-5">
+      <div className="p-5 h-screen">
         <span className="text-shark-300">Volunteer / Settings</span>
         <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">
           Settings
         </h1>
-        <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-          <div className="animate-pulse">
-            <div className="h-6 bg-shark-100 rounded mb-4"></div>
-            <div className="h-4 bg-shark-100 rounded mb-2"></div>
-            <div className="h-4 bg-shark-100 rounded"></div>
+        <div className="flex items-center justify-center h-full -mt-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-700"></div>
+            <p className="text-shark-700 font-secondary">Loading settings...</p>
           </div>
         </div>
       </div>
