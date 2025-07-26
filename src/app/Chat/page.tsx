@@ -2,13 +2,9 @@
 
 import dynamic from 'next/dynamic';
 
-// Dynamically import the PrivateChatInterface component with SSR disabled
-const PrivateChatInterface = dynamic(() => import('./PrivateChatInterface'), { ssr: false });
+// Dynamically import the ChatController component with SSR disabled
+const ChatController = dynamic(() => import('./ChatController'), { ssr: false });
 
 export default function ChatPage() {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <PrivateChatInterface />
-    </div>
-  );
+  return <ChatController />;
 }

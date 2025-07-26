@@ -1,34 +1,39 @@
 import { useEffect, useState, useRef } from 'react';
 import SockJS from 'sockjs-client';
-import { Stomp, CompatClient } from '@stomp/stompjs';
+import { Stomp } from '@stomp/stompjs';
 
 interface Message {
-  senderId?: string;
-  senderName?: string;
-  sender: string; // Keep for backward compatibility
+  id?: string;
+  senderId: string;
+  receiverId: string;
+  senderName: string;
   content: string;
-  type: 'JOIN' | 'LEAVE' | 'CHAT' | 'SYSTEM';
-  timestamp?: string;
+  type: 'CHAT' | 'JOIN' | 'LEAVE';
+  timestamp: string;
+  status?: 'SENT' | 'DELIVERED' | 'READ';
 }
 
-interface HistoryMessage {
-  senderName?: string;
-  sender?: string;
-  senderId?: string;
-  content: string;
-  type?: string;
-  timestamp?: string;
+interface User {
+  userId: string;
+  userName: string;
+  handle: string;
+  email: string;
+  userType: string;
+  isOnline: boolean;
 }
 
-interface StompFrame {
-  body: string;
+interface Conversation {
+  [key: string]: Message[];
 }
 
 export default function ChatInterface() {
-  const [stompClient, setStompClient] = useState<CompatClient | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null); // Add consistent userId state
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [stompClient, setStompClient] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [conversations, setConversations] = useState<Conversation>({});
   const [messageInput, setMessageInput] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isUsernameSet, setIsUsernameSet] = useState(false);
@@ -36,70 +41,65 @@ export default function ChatInterface() {
   const [connectionError, setConnectionError] = useState('');
   const messageAreaRef = useRef<HTMLUListElement>(null);
 
-  // Helper function to generate consistent userId from username
-  const generateUserId = (username: string): string => {
-    // Create a consistent ID based on username, not timestamp
-    // This ensures the same user gets the same ID when they reconnect
-    const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    return `user_${cleanUsername}`;
-  };
-
   const colors: string[] = [
     '#2196F3', '#32c787', '#00BCD4', '#ff5652',
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
   ];
 
-  const getAvatarColor = (messageSender: string): string => {
+  const getAvatarColor = (name: string): string => {
     let hash = 0;
-    for (let i = 0; i < messageSender.length; i++) {
-      hash = 31 * hash + messageSender.charCodeAt(i);
+    for (let i = 0; i < name.length; i++) {
+      hash = 31 * hash + name.charCodeAt(i);
     }
     const index = Math.abs(hash % colors.length);
     return colors[index];
   };
 
-  const loadChatHistory = async (userName: string) => {
+  const loadAllUsers = async () => {
     try {
-      console.log('Loading chat history for user:', userName);
-      
-      // Try to load user-specific history first
-      const userResponse = await fetch(`http://localhost:8081/api/public/chat/user-history/${encodeURIComponent(userName)}?limit=50`);
-      if (userResponse.ok) {
-        const userHistory = await userResponse.json();
-        if (userHistory.length > 0) {
-          console.log('Loaded user-specific chat history:', userHistory);
-          
-          const formattedMessages = userHistory.map((msg: HistoryMessage) => ({
-            sender: msg.senderName || msg.sender,
-            senderName: msg.senderName,
-            senderId: msg.senderId,
-            content: msg.content,
-            type: msg.type || 'CHAT',
-            timestamp: msg.timestamp
-          }));
-          
-          setMessages(formattedMessages);
-          return;
-        }
+      console.log('Loading all users...');
+      const response = await fetch('http://localhost:8080/api/public/chat/all-users');
+      if (response.ok) {
+        const users = await response.json();
+        console.log('Loaded all users:', users);
+        setAllUsers(users);
+      } else {
+        console.warn('Failed to load users:', response.status);
       }
-      
-      // Fallback to public history
-      const response = await fetch('http://localhost:8081/api/public/chat/public-history?limit=50');
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  };
+
+  const loadOnlineUsers = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/public/chat/online-users');
+      if (response.ok) {
+        const users = await response.json();
+        const onlineUserIds: Set<string> = new Set<string>(users.map((user: any) => user.userId as string));
+        setOnlineUsers(onlineUserIds);
+        console.log('Online users updated:', onlineUserIds);
+      }
+    } catch (error) {
+      console.error('Error loading online users:', error);
+    }
+  };
+
+  const loadChatHistory = async (user1: string, user2: string) => {
+    try {
+      console.log(`Loading chat history between ${user1} and ${user2}...`);
+      const response = await fetch(
+        `http://localhost:8080/api/public/chat/history?user1=${encodeURIComponent(user1)}&user2=${encodeURIComponent(user2)}`
+      );
       if (response.ok) {
         const history = await response.json();
-        console.log('Loaded public chat history:', history);
+        console.log('Loaded chat history:', history);
         
-        // Convert backend format to frontend format
-        const formattedMessages = history.map((msg: HistoryMessage) => ({
-          sender: msg.senderName || msg.sender,
-          senderName: msg.senderName,
-          senderId: msg.senderId,
-          content: msg.content,
-          type: msg.type || 'CHAT',
-          timestamp: msg.timestamp
+        const conversationKey = getConversationKey(user1, user2);
+        setConversations(prev => ({
+          ...prev,
+          [conversationKey]: history
         }));
-        
-        setMessages(formattedMessages);
       } else {
         console.warn('Failed to load chat history:', response.status);
       }
@@ -108,21 +108,26 @@ export default function ChatInterface() {
     }
   };
 
-  const connect = async (event: React.FormEvent) => {
+  const getConversationKey = (user1: string, user2: string): string => {
+    return [user1, user2].sort().join('_');
+  };
+
+  const connect = (event: React.FormEvent) => {
     event.preventDefault();
 
     const name = usernameInput.trim();
     if (name) {
-      setUsername(name);
+      const userId = 'user_' + Date.now();
+      setCurrentUser(userId);
+      setCurrentUserName(name);
       setIsUsernameSet(true);
       setConnectionError('Connecting...');
 
-      console.log('Attempting to connect to WebSocket at http://localhost:8081/ws');
+      console.log('Attempting to connect to WebSocket at http://localhost:8080/ws');
       
       try {
-        const socket = new SockJS('http://localhost:8081/ws');
+        const socket = new SockJS('http://localhost:8080/ws');
         
-        // Add socket event listeners for debugging
         socket.onopen = () => console.log('SockJS connection opened');
         socket.onclose = (event) => {
           console.log('SockJS connection closed:', event);
@@ -135,41 +140,37 @@ export default function ChatInterface() {
         };
 
         const client = Stomp.over(() => socket);
-
-        // Add debug logging
         client.debug = (str: string) => console.log('STOMP Debug:', str);
-
         setStompClient(client);
 
         client.connect({}, 
-          // Success callback
           async () => {
             console.log('WebSocket Connected successfully');
             setIsConnected(true);
             setConnectionError('');
 
-            // Create a consistent userId based on username (for persistence)
-            const consistentUserId = generateUserId(name);
-            setUserId(consistentUserId);
+            // Load all users and online users
+            await loadAllUsers();
+            await loadOnlineUsers();
 
-            // Load chat history first using the username
-            await loadChatHistory(name);
+            // Subscribe to private messages for this user
+            client.subscribe(`/user/${userId}/queue/messages`, onPrivateMessageReceived);
+            
+            // Subscribe to user status updates
+            client.subscribe('/topic/user-status', onUserStatusUpdate);
 
-            // Subscribe to public messages
-            client.subscribe('/topic/public', onMessageReceived);
-
+            // Notify server that user joined
             client.send(
               "/app/chat.addUser",
               {},
               JSON.stringify({ 
-                senderId: consistentUserId,
+                senderId: userId,
                 senderName: name, 
                 type: 'JOIN' 
               })
             );
           },
-          // Error callback
-          (error: Error) => {
+          (error: any) => {
             console.error('STOMP Connection error:', error);
             setConnectionError('Failed to connect to chat server');
             setIsConnected(false);
@@ -187,27 +188,42 @@ export default function ChatInterface() {
 
     const messageContent = messageInput.trim();
 
-    if (messageContent && stompClient && username && userId) {
-      const chatMessage = {
-        senderId: userId, // Use the consistent userId instead of generating new one
-        senderName: username,
-        content: messageInput,
+    if (messageContent && stompClient && currentUser && currentUserName && selectedUser) {
+      const chatMessage: Message = {
+        senderId: currentUser,
+        receiverId: selectedUser.userId,
+        senderName: currentUserName,
+        content: messageContent,
         type: 'CHAT',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        status: 'SENT'
       };
 
-      console.log('Sending public message:', chatMessage);
-      stompClient.send("/app/chat.sendPublicMessage", {}, JSON.stringify(chatMessage));
+      console.log('Sending private message:', chatMessage);
+      stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+      
+      // Add message to local conversation immediately
+      const conversationKey = getConversationKey(currentUser, selectedUser.userId);
+      setConversations(prev => ({
+        ...prev,
+        [conversationKey]: [...(prev[conversationKey] || []), chatMessage]
+      }));
+      
       setMessageInput('');
     }
   };
 
-  const onMessageReceived = (payload: StompFrame) => {
+  const onPrivateMessageReceived = (payload: any) => {
     const message: Message = JSON.parse(payload.body);
+    console.log('Private message received:', message);
     
-    setMessages(prev => [...prev, message]);
+    const conversationKey = getConversationKey(message.senderId, message.receiverId);
+    setConversations(prev => ({
+      ...prev,
+      [conversationKey]: [...(prev[conversationKey] || []), message]
+    }));
 
-    // Scroll to bottom after messages update
+    // Scroll to bottom after message update
     setTimeout(() => {
       if (messageAreaRef.current) {
         messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
@@ -215,14 +231,55 @@ export default function ChatInterface() {
     }, 100);
   };
 
+  const onUserStatusUpdate = (payload: any) => {
+    const statusUpdate = JSON.parse(payload.body);
+    console.log('User status update:', statusUpdate);
+    
+    if (statusUpdate.type === 'USER_ONLINE') {
+      setOnlineUsers(prev => new Set([...prev, statusUpdate.userId]));
+    } else if (statusUpdate.type === 'USER_OFFLINE') {
+      setOnlineUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(statusUpdate.userId);
+        return newSet;
+      });
+    }
+  };
+
+  const selectUser = async (user: User) => {
+    setSelectedUser(user);
+    if (currentUser) {
+      await loadChatHistory(currentUser, user.userId);
+    }
+  };
+
+  // Update online users periodically
+  useEffect(() => {
+    if (isConnected) {
+      const interval = setInterval(() => {
+        loadOnlineUsers();
+      }, 30000); // Update every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isConnected]);
+
+  // Scroll to bottom when conversation changes
+  useEffect(() => {
+    setTimeout(() => {
+      if (messageAreaRef.current) {
+        messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
+      }
+    }, 100);
+  }, [selectedUser, conversations]);
+
   if (!isUsernameSet) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-            Join Private Chat
+            Join Chat
           </h1>
-          
           <form onSubmit={connect} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -238,20 +295,9 @@ export default function ChatInterface() {
                 required
               />
             </div>
-            
-            {connectionError && (
-              <div className={`p-3 rounded-md text-sm ${
-                connectionError.includes('Failed') 
-                  ? 'bg-red-50 text-red-700 border border-red-200' 
-                  : 'bg-blue-50 text-blue-700 border border-blue-200'
-              }`}>
-                {connectionError}
-              </div>
-            )}
-            
             <button
               type="submit"
-              className="w-full py-2 px-4 rounded-md transition-colors bg-blue-500 text-white hover:bg-blue-600"
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
             >
               Join Chat
             </button>
@@ -261,99 +307,167 @@ export default function ChatInterface() {
     );
   }
 
+  const currentConversation = selectedUser && currentUser ? 
+    conversations[getConversationKey(currentUser, selectedUser.userId)] || [] : [];
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold">Private Chat Session</h2>
-            <div className="text-sm opacity-90">
-              Connected as {username}
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-300' : 'bg-red-500'}`} />
-            <span className="text-sm">
-              {isConnected ? 'Connected' : connectionError || 'Disconnected'}
-            </span>
-          </div>
-        </div>
-
-        <div className="h-96 overflow-y-auto p-4 bg-gray-50">
-          {/* Privacy Notice */}
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="text-xs text-green-700">
-              🔒 <strong>Private Session:</strong> Only the 2 users who participate in a conversation can see those messages. 
-              If you rejoin, you&apos;ll see your previous conversations. New users who join after others leave will start fresh sessions 
-              and cannot see previous conversations for privacy protection.
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex">
+        {/* Users Sidebar */}
+        <div className="w-1/3 border-r border-gray-200 flex flex-col">
+          <div className="bg-blue-500 text-white p-4">
+            <h2 className="text-lg font-bold">Users</h2>
+            <div className="flex items-center space-x-2 mt-2">
+              <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-300' : 'bg-red-500'}`} />
+              <span className="text-sm">
+                {isConnected ? 'Connected' : connectionError || 'Disconnected'}
+              </span>
             </div>
           </div>
           
-          <ul ref={messageAreaRef} className="space-y-3">
-            {messages.map((message, index) => {
-              // Handle both old and new message formats
-              const displayName = message.senderName || message.sender;
-              const messageType = message.type;
-              
-              return (
-                <li key={index}>
-                  {messageType === 'JOIN' || messageType === 'LEAVE' ? (
-                    <div className="text-center">
-                      <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
-                        {displayName} {messageType === 'JOIN' ? 'joined!' : 'left!'}
-                      </span>
+          <div className="flex-1 overflow-y-auto">
+            {allUsers.map((user) => (
+              <div
+                key={user.userId}
+                onClick={() => selectUser(user)}
+                className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
+                  selectedUser?.userId === user.userId ? 'bg-blue-50 border-blue-200' : ''
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                      style={{ backgroundColor: getAvatarColor(user.userName) }}
+                    >
+                      {user.userName[0].toUpperCase()}
                     </div>
-                  ) : messageType === 'SYSTEM' ? (
-                    <div className="text-center my-4">
-                      <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg text-xs inline-block">
-                        ℹ️ {message.content}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-start space-x-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                        style={{ backgroundColor: getAvatarColor(displayName) }}
-                      >
-                        {displayName[0].toUpperCase()}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-gray-800">{displayName}</span>
-                          {message.timestamp && (
-                            <span className="text-xs text-gray-500">
-                              {new Date(message.timestamp).toLocaleTimeString()}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-gray-700 mt-1">{message.content}</p>
-                      </div>
-                    </div>
+                    <div
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        onlineUsers.has(user.userId) ? 'bg-green-500' : 'bg-gray-400'
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user.userName}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      @{user.handle}
+                    </p>
+                    <p className="text-xs text-gray-400 capitalize">
+                      {user.userType}
+                    </p>
+                  </div>
+                  {onlineUsers.has(user.userId) && (
+                    <div className="text-xs text-green-600 font-medium">Online</div>
                   )}
-                </li>
-              );
-            })}
-          </ul>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="p-4 bg-white border-t border-gray-200">
-          <form onSubmit={sendMessage} className="flex space-x-2">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              disabled={!isConnected}
-            />
-            <button
-              type="submit"
-              disabled={!isConnected || !messageInput.trim()}
-              className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Send
-            </button>
-          </form>
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {selectedUser ? (
+            <>
+              {/* Chat Header */}
+              <div className="bg-white border-b border-gray-200 p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                      style={{ backgroundColor: getAvatarColor(selectedUser.userName) }}
+                    >
+                      {selectedUser.userName[0].toUpperCase()}
+                    </div>
+                    <div
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        onlineUsers.has(selectedUser.userId) ? 'bg-green-500' : 'bg-gray-400'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{selectedUser.userName}</h3>
+                    <p className="text-sm text-gray-500">
+                      {onlineUsers.has(selectedUser.userId) ? 'Online' : 'Offline'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                <ul ref={messageAreaRef} className="space-y-3">
+                  {currentConversation.map((message, index) => {
+                    const isMyMessage = message.senderId === currentUser;
+                    
+                    return (
+                      <li key={index} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          isMyMessage 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-white text-gray-800 border border-gray-200'
+                        }`}>
+                          {!isMyMessage && (
+                            <p className="text-xs text-gray-500 mb-1">{message.senderName}</p>
+                          )}
+                          <p className="text-sm">{message.content}</p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className={`text-xs ${isMyMessage ? 'text-blue-100' : 'text-gray-400'}`}>
+                              {new Date(message.timestamp).toLocaleTimeString([], { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
+                            {isMyMessage && message.status && (
+                              <span className="text-xs text-blue-100 ml-2">
+                                {message.status === 'SENT' && '✓'}
+                                {message.status === 'DELIVERED' && '✓✓'}
+                                {message.status === 'READ' && '✓✓'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Message Input */}
+              <div className="p-4 bg-white border-t border-gray-200">
+                <form onSubmit={sendMessage} className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder={`Message ${selectedUser.userName}...`}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    disabled={!isConnected}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!isConnected || !messageInput.trim()}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Send
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-gray-400 text-2xl">💬</span>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
+                <p className="text-gray-500">Choose a user from the sidebar to start chatting</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
