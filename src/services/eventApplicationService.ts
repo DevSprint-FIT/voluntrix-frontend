@@ -44,7 +44,7 @@ export const updateEventApplicationStatus = async (
   applicationId: number,
   applicationStatus: 'APPROVED' | 'REJECTED'
 ) => {
-  const token = localStorage.getItem('token'); // authentication token
+  // const token = localStorage.getItem('token'); // authentication token
 
   try {
     const response = await axios.patch(
@@ -52,7 +52,7 @@ export const updateEventApplicationStatus = async (
       { applicationStatus },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
