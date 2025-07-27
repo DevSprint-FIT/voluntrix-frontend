@@ -6,6 +6,9 @@ interface ChatUser {
   timestamp?: string;
   unreadCount?: number;
   isOnline?: boolean;
+  companyName?: string;
+  fullName?: string;
+  userType?: 'conversation' | 'sponsor';
 }
 
 interface ChatListProps {
@@ -16,11 +19,13 @@ interface ChatListProps {
 
 export default function ChatListInterface({ currentUser, onSelectUser, onLogout }: ChatListProps) {
   const [availableUsers, setAvailableUsers] = useState<ChatUser[]>([]);
+  const [allSponsors, setAllSponsors] = useState<ChatUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddChat, setShowAddChat] = useState(false);
   const [newChatUser, setNewChatUser] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'conversations' | 'sponsors'>('conversations');
 
   // Fetch available users and recent chats from backend
   useEffect(() => {
@@ -46,7 +51,8 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
               lastMessage: conv.lastMessage?.content || 'No messages yet',
               timestamp: conv.lastMessage?.timestamp ? formatRelativeTime(conv.lastMessage.timestamp) : '',
               unreadCount: conv.unreadCount || 0,
-              isOnline: Math.random() > 0.5 // TODO: Implement real online status
+              isOnline: Math.random() > 0.5, // TODO: Implement real online status
+              userType: 'conversation' as const
             };
           });
         }
@@ -59,28 +65,32 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
               lastMessage: "Available for new conversations",
               timestamp: 'Online',
               unreadCount: 0,
-              isOnline: true
+              isOnline: true,
+              userType: 'conversation' as const
             },
             {
               username: 'Alice Johnson',
               lastMessage: "Ready to help with volunteering",
               timestamp: 'Online',
               unreadCount: 0,
-              isOnline: true
+              isOnline: true,
+              userType: 'conversation' as const
             },
             {
               username: 'Bob Smith',
               lastMessage: "Looking for sponsors",
               timestamp: 'Online',
               unreadCount: 0,
-              isOnline: true
+              isOnline: true,
+              userType: 'conversation' as const
             },
             {
               username: 'Carol White',
               lastMessage: "Community organizer",
               timestamp: 'Online',
               unreadCount: 0,
-              isOnline: false
+              isOnline: false,
+              userType: 'conversation' as const
             }
           ];
           
@@ -89,6 +99,28 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
         }
         
         setAvailableUsers(recentChats);
+
+        // Fetch all sponsors
+        const sponsorsResponse = await fetch('http://localhost:8081/api/private-chat/sponsors');
+        
+        if (sponsorsResponse.ok) {
+          const sponsors = await sponsorsResponse.json();
+          
+          // Transform sponsors to ChatUser format
+          const sponsorUsers = sponsors.map((sponsor: any) => ({
+            username: sponsor.username,
+            fullName: sponsor.firstName + ' ' + sponsor.lastName,
+            lastMessage: sponsor.bio || 'Available for sponsorship discussions',
+            timestamp: sponsor.isOnline ? 'Online' : 'Offline',
+            unreadCount: 0,
+            isOnline: sponsor.isOnline,
+            companyName: sponsor.companyName,
+            userType: 'sponsor' as const
+          }));
+          
+          setAllSponsors(sponsorUsers);
+        }
+        
       } catch (error) {
         console.error('Error fetching users and chats:', error);
         setError('Failed to load conversations');
@@ -100,7 +132,8 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
             lastMessage: "Available for conversations",
             timestamp: 'Online',
             unreadCount: 0,
-            isOnline: true
+            isOnline: true,
+            userType: 'conversation' as const
           }
         ].filter(user => user.username !== currentUser);
         
@@ -131,8 +164,11 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
     return date.toLocaleDateString();
   };
 
-  const filteredUsers = availableUsers.filter(user =>
-    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const currentUsers = activeTab === 'conversations' ? availableUsers : allSponsors;
+  const filteredUsers = currentUsers.filter(user =>
+    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (user.fullName && user.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (user.companyName && user.companyName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleStartNewChat = () => {
@@ -158,14 +194,14 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-white flex flex-col">
       {/* Header */}
-      <div className="bg-shark-900 text-white p-4">
+      <div className="bg-black text-white p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <button 
               onClick={onLogout}
-              className="text-white hover:bg-green-700 p-1 rounded"
+              className="text-white hover:bg-gray-800 p-1 rounded"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -178,7 +214,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
           </div>
           <button 
             onClick={() => setShowAddChat(true)}
-            className="bg-green-700 hover:bg-green-800 p-2 rounded-full"
+            className="bg-green-500 hover:bg-green-600 p-2 rounded-full"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -188,10 +224,24 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
 
         {/* Tabs */}
         <div className="flex space-x-6">
-          <button className="bg-green-800 text-white px-4 py-2 rounded-full text-sm font-medium">
+          <button 
+            onClick={() => setActiveTab('conversations')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'conversations' 
+                ? 'bg-green-500 text-white' 
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
             Available Sponsors
           </button>
-          <button className="text-green-100 hover:text-white text-sm font-medium">
+          <button 
+            onClick={() => setActiveTab('sponsors')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'sponsors' 
+                ? 'bg-green-500 text-white' 
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
             All Sponsors
           </button>
         </div>
@@ -205,10 +255,10 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
           </svg>
           <input
             type="text"
-            placeholder="Search conversations..."
+            placeholder={activeTab === 'conversations' ? "Search conversations..." : "Search sponsors..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
           />
         </div>
       </div>
@@ -227,7 +277,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Conversations</h3>
+            <h3 className="text-lg font-medium text-black mb-2">Error Loading Conversations</h3>
             <p className="text-gray-500 text-sm mb-4">{error}</p>
             <button 
               onClick={() => window.location.reload()}
@@ -243,14 +293,23 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations yet</h3>
-            <p className="text-gray-500 text-sm mb-4">Start a new conversation to begin chatting</p>
-            <button 
-              onClick={() => setShowAddChat(true)}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-            >
-              Start New Chat
-            </button>
+            <h3 className="text-lg font-medium text-black mb-2">
+              {activeTab === 'conversations' ? 'No conversations yet' : 'No sponsors found'}
+            </h3>
+            <p className="text-gray-500 text-sm mb-4">
+              {activeTab === 'conversations' 
+                ? 'Start a new conversation to begin chatting' 
+                : 'Try adjusting your search criteria'
+              }
+            </p>
+            {activeTab === 'conversations' && (
+              <button 
+                onClick={() => setShowAddChat(true)}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Start New Chat
+              </button>
+            )}
           </div>
         ) : (
           filteredUsers.map((user, index) => (
@@ -263,9 +322,12 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
               <div className="relative">
                 <div 
                   className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
-                  style={{ backgroundColor: getAvatarColor(user.username) }}
+                  style={{ backgroundColor: getAvatarColor(user.userType === 'sponsor' && user.fullName ? user.fullName : user.username) }}
                 >
-                  {user.username[0].toUpperCase()}
+                  {user.userType === 'sponsor' && user.fullName 
+                    ? user.fullName[0].toUpperCase() 
+                    : user.username[0].toUpperCase()
+                  }
                 </div>
                 {user.isOnline && (
                   <div className="absolute -bottom-0 -right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -275,9 +337,16 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
               {/* Chat Info */}
               <div className="flex-1 ml-3 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-medium text-gray-900 truncate">
-                    {user.username}
-                  </h3>
+                  <div className="flex flex-col min-w-0">
+                    <h3 className="text-base font-medium text-black truncate">
+                      {user.userType === 'sponsor' && user.fullName ? user.fullName : user.username}
+                    </h3>
+                    {user.userType === 'sponsor' && user.companyName && (
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.companyName}
+                      </p>
+                    )}
+                  </div>
                   <span className="text-xs text-gray-500 ml-2">
                     {user.timestamp}
                   </span>
