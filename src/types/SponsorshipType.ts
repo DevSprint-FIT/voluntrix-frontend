@@ -1,6 +1,8 @@
 export type SponsorshipType = {
   sponsorshipId: number;
-  sponsorshipName: string;
-  sponsorshipAmount: number;
+  type: string;
+  price: number;
+  benefits: string;
   eventId: number;
+  available: boolean;
 };
