@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
-import Navbar from '@/components/UI/Navbar';
-import FooterSection from '@/components/layout/FooterSection';
-import GoToTop from '@/components/UI/GoToTop';
 
 export const metadata: Metadata = {
   title: 'Voluntrix',
