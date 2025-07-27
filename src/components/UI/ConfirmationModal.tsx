@@ -1,4 +1,6 @@
-import React from 'react';
+import React from "react";
+import { Button } from "@heroui/react";
+import { X } from "lucide-react";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmButtonClass = "bg-verdant-500 hover:bg-verdant-600 text-white",
   onConfirm,
   onCancel
+
 }) => {
   if (!isOpen) return null;
 
