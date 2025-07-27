@@ -10,6 +10,7 @@ export type Tier = {
   id: string;
   name: string;
   amount: number;
+  benefits: string;
 };
 
 interface Props {
@@ -32,16 +33,23 @@ export default function SponsorshipsEC({
 }: Props) {
   const [tierName, setTierName] = useState('');
   const [tierAmount, setTierAmount] = useState('');
+  const [tierBenefits, setTierBenefits] = useState('');
 
   const addTier = () => {
     const amt = Number(tierAmount);
     if (!tierName.trim() || !amt) return;
     setTiers((t) => [
       ...t,
-      { id: crypto.randomUUID(), name: tierName.trim(), amount: amt },
+      {
+        id: crypto.randomUUID(),
+        name: tierName.trim(),
+        amount: amt,
+        benefits: tierBenefits.trim(),
+      },
     ]);
     setTierName('');
     setTierAmount('');
+    setTierBenefits('');
   };
 
   const removeTier = (id: string) =>
@@ -146,7 +154,7 @@ export default function SponsorshipsEC({
 
               <Button
                 variant="shadow"
-                isDisabled={!tierName.trim() || !Number(tierAmount)}
+                isDisabled={!tierName.trim() || !Number(tierAmount) || !tierBenefits}
                 className="bg-verdant-600 text-white px-6 py-2 rounded-lg h-9"
                 onPress={addTier}
               >
@@ -155,6 +163,16 @@ export default function SponsorshipsEC({
             </div>
           </label>
         </div>
+        <label className="font-secondary font-medium text-shark-950 text-[15px] flex flex-col mb-2">
+          Benefits
+          <textarea
+            value={tierBenefits}
+            onChange={(e) => setTierBenefits(e.target.value)}
+            maxLength={200}
+            placeholder="Enter Sponsorship Benefits"
+            className="resize-none border-[2px] border-shark-300 text-shark-950 pl-2 pt-1 rounded-lg w-[516px] placeholder:text-shark-300 h-[50px]"
+          />
+        </label>
         {tiers.length > 0 && (
           <div className="mb-4">
             <h4 className="font-secondary font-medium text-shark-950 text-[16px] mb-1">
@@ -225,7 +243,7 @@ export default function SponsorshipsEC({
             >
               {proposalMessage}
             </div>
-          )}          
+          )}
         </label>
       </fieldset>
 

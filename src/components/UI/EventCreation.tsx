@@ -47,6 +47,7 @@ export type Tier = {
   id: string;
   name: string;
   amount: number;
+  benefits: string;
 };
 
 export default function EventCreation() {
@@ -133,9 +134,10 @@ export default function EventCreation() {
   const createEventSponsorships = async (eventId: number, tiers: Tier[]) => {
     const sponsorshipPromises = tiers.map((tier) =>
       createSponsorships({
-      sponsorshipName: tier.name,
-      sponsorshipAmount: tier.amount,
-      eventId: eventId,
+        type: tier.name,
+        price: tier.amount,
+        benefits: tier.benefits,
+        eventId: eventId,
       } as SponsorshipCreateType)
     );
 
