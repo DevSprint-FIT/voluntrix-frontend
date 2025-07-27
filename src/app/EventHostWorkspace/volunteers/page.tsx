@@ -8,6 +8,7 @@ import {
   updateEventApplicationStatus,
 } from '@/services/eventApplicationService';
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
+import { createVolunteerEventParticipation } from '@/services/volunteerEventParticipationService';
 
 const EventVolunteersPage = () => {
   const [activeTab, setActiveTab] = useState<'volunteers' | 'applications'>(
@@ -55,6 +56,20 @@ const EventVolunteersPage = () => {
     console.log('Approved volunteer application:', id);
     try {
       await updateEventApplicationStatus(id, 'APPROVED');
+
+      const approvedApp = volunteerApplications.find((app) => app.id === id);
+      console.log('Payload to backend:', {
+        eventId: approvedApp?.eventId,
+        volunteerId: approvedApp?.volunteerId,
+        contributionArea: approvedApp?.contributionArea,
+      });
+      if (approvedApp) {
+        await createVolunteerEventParticipation(
+          approvedApp.eventId,
+          approvedApp.volunteerId,
+          approvedApp.contributionArea
+        );
+      }
 
       setVolunteerApplications((prevApplications) => {
         const approvedApp = prevApplications.find((app) => app.id === id);
