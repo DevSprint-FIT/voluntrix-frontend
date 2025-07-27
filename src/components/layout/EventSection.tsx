@@ -1,22 +1,39 @@
-"use client";
+'use client';
 
-import EventCard from "../UI/EventCard";
-import Image from "next/image";
+import EventCard from '../UI/EventCard';
+import Image from 'next/image';
+import { EventType } from '@/types/EventType';
+import { useRouter } from 'next/navigation';
 
-const eventData = {
-  imageUrl: "/images/DummyEvent2.png",
-  title: "FIT Future Careers",
-  organizer: "INTECS, UoM",
-  description: "Join us for an exclusive event focused on connecting aspiring professionals with industry leaders. Discover career opportunities, attend workshops, and network with experts to shape your future.",
-  specialTags: ["Private", "Online", "Sponsor"],
-  date: "Nov 20, 2025",
-  venue: "FIT Auditorium",
-  time: "10:00 AM",
-  donationAvailable: false,
+const eventData: EventType = {
+  eventId: 1,
+  eventTitle: 'FIT Future Careers',
+  eventDescription:
+    'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
+  eventLocation: 'FIT Auditorium',
+  eventStartDate: '2025-11-20',
+  eventEndDate: '2025-11-22',
+  eventTime: '10:00:00',
+  eventImageUrl: '/images/DummyEvent2.png',
+  volunteerCount: 0,
+  eventType: 'ONLINE',
+  eventVisibility: 'PRIVATE',
+  eventStatus: 'PENDING',
+  sponsorshipEnabled: true,
+  donationEnabled: false,
+  categories: [
+    { categoryId: 1, categoryName: 'environment' },
+    { categoryId: 3, categoryName: 'technology' },
+  ],
+  organizer: 'INTECS, UoM',
 };
 
 export default function EventSection() {
+  const router = useRouter();
 
+  const handleNavigate = () => {
+    router.push('/events');
+  };
   return (
     <div className="w-full flex items-start justify-center mt-24">
       <div className="w-[1054px] flex flex-col justify-center text-center">
@@ -32,12 +49,20 @@ export default function EventSection() {
           <div className="flex gap-[65px]">
             <EventCard event={eventData} />
           </div>
-          <div className="flex gap-1 justify-end">
+          <div
+            className="flex gap-1 justify-end cursor-pointer"
+            onClick={handleNavigate}
+          >
             <p className="text-verdant-600 font-[500]">Explore More Events</p>
-            <Image src="/icons/arrow-green.svg" width={24} height={24} alt="arrow-green"/>
+            <Image
+              src="/icons/arrow-green.svg"
+              width={24}
+              height={24}
+              alt="arrow-green"
+            />
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
