@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { SponsorshipType } from '@/types/SponsorshipType';
+import { SponsorshipCreateType } from '@/types/SponsorshipCreateType';
 
-export const createSponsorships = async (data: SponsorshipType) => {
-  const token = localStorage.getItem('token'); // authentication token
+export const createSponsorships = async (data: SponsorshipCreateType) => {
+  // const token = localStorage.getItem('token'); // authentication token
 
   try {
     const response = await axios.post(
@@ -10,7 +11,7 @@ export const createSponsorships = async (data: SponsorshipType) => {
       data,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }

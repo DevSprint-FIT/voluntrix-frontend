@@ -4,7 +4,7 @@ export const createEventInvitation = async (
   eventId: number,
   organizationId: number
 ) => {
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
 
   const payload = {
     eventId,
@@ -18,7 +18,7 @@ export const createEventInvitation = async (
       payload,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }

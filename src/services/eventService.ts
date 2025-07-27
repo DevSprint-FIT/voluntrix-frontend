@@ -61,7 +61,7 @@ export const fetchEventTitles = async () => {
 };
 
 export const createEvent = async (eventData: EventCreateType) => {
-  const token = localStorage.getItem('token'); // authentication token
+  // const token = 'mock-token-for-testing'; // authentication token
 
   try {
     const response = await axios.post(
@@ -69,7 +69,7 @@ export const createEvent = async (eventData: EventCreateType) => {
       eventData,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
