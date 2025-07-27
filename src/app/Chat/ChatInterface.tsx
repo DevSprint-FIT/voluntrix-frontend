@@ -193,7 +193,7 @@ export default function ChatInterface() {
         senderName: username,
         content: messageInput,
         type: 'CHAT',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString().slice(0, -1) // Remove 'Z' to match LocalDateTime format
       };
 
       console.log('Sending public message:', chatMessage);
@@ -298,7 +298,8 @@ export default function ChatInterface() {
               return (
                 <li key={index}>
                   {messageType === 'JOIN' || messageType === 'LEAVE' ? (
-                    <div className="text-center"green 3                 <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                    <div className="text-center">
+                      <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
                         {displayName} {messageType === 'JOIN' ? 'joined!' : 'left!'}
                       </span>
                     </div>
@@ -320,8 +321,15 @@ export default function ChatInterface() {
                         <div className="flex items-center space-x-2">
                           <span className="font-semibold text-gray-800">{displayName}</span>
                           {message.timestamp && (
-     shark 500              <span className="text-xs text-gray-500">
-                              {new Date(message.timestamp).toLocaleTimeString()}
+                            <span className="text-xs text-gray-500">
+                              {(() => {
+                                try {
+                                  const date = new Date(message.timestamp);
+                                  return isNaN(date.getTime()) ? 'Now' : date.toLocaleTimeString();
+                                } catch {
+                                  return 'Now';
+                                }
+                              })()}
                             </span>
                           )}
                         </div>
@@ -339,7 +347,7 @@ export default function ChatInterface() {
           <form onSubmit={sendMessage} className="flex space-x-2">
             <input
               type="text"
-              placehoshark"Type a message..."
+              placeholder="Type a message..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
@@ -357,4 +365,4 @@ export default function ChatInterface() {
       </div>
     </div>
   );
-}shark
+}
