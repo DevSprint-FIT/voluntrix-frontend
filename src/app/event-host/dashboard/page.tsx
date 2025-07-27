@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Crown,
   BarChart3,
@@ -8,7 +8,7 @@ import {
   Eye,
   ChevronDown,
   TrendingUp,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -16,19 +16,19 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
-} from "recharts";
+} from 'recharts';
 import {
   volunteerDashboardService,
   DashboardData,
   ContributionData,
-} from "@/services/volunteerDashboardService";
+} from '@/services/volunteerDashboardService';
 
 const StatCard = ({
   title,
   value,
   icon: Icon,
-  color = "text-gray-600",
-  bgColor = "bg-gray-50",
+  color = 'text-gray-600',
+  bgColor = 'bg-gray-50',
 }: {
   title: string;
   value: string;
@@ -55,29 +55,29 @@ const StatCard = ({
 
 const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   const months = [
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-    "Jan",
-    "Feb",
-    "Mar",
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
   ];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Create a grid of weeks
   const weeks = [];
   let currentWeek = [];
 
   // Start from March 1, 2024
-  const startDate = new Date("2024-03-01");
-  const endDate = new Date("2025-03-31");
+  const startDate = new Date('2024-03-01');
+  const endDate = new Date('2025-03-31');
 
   const currentDate = new Date(startDate);
 
@@ -88,7 +88,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   while (currentDate <= endDate) {
-    const dateString = currentDate.toISOString().split("T")[0];
+    const dateString = currentDate.toISOString().split('T')[0];
     const dayData = data.find((d) => d.date === dateString);
     const contributions = dayData ? dayData.contributions : 0;
 
@@ -114,7 +114,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 font-secondary">
-          {volunteerDashboardService.calculateTotalContributions(data)}{" "}
+          {volunteerDashboardService.calculateTotalContributions(data)}{' '}
           contributions in the last year
         </h3>
       </div>
@@ -164,12 +164,12 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
                         ? volunteerDashboardService.getContributionIntensity(
                             day.contributions
                           )
-                        : "bg-transparent"
+                        : 'bg-transparent'
                     }`}
                     title={
                       day
                         ? `${day.contributions} contributions on ${day.date}`
-                        : ""
+                        : ''
                     }
                   />
                 ))}
@@ -197,17 +197,17 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   );
 };
 
-const VolunteerDashboard = () => {
+const EventHostDashboard = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState('2025');
 
   // Using hardcoded values as specified
-  const volunteerId = 1;
-  const username = "anne13";
+  const eventHostId = 1;
+  const username = 'anne13';
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -217,11 +217,11 @@ const VolunteerDashboard = () => {
 
         const data = await volunteerDashboardService.getDashboardData(
           username,
-          volunteerId
+          eventHostId
         );
         setDashboardData(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
       }
@@ -293,13 +293,13 @@ const VolunteerDashboard = () => {
               bgColor="bg-[#ECFDF6]"
             />
             <StatCard
-              title="Total Volunteering"
+              title="Total Events Hosted"
               value={`${dashboardData.totalVolunteeringEvents} Events`}
               icon={BarChart3}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
             />
-            <StatCard
+            {/* <StatCard
               title="Total Donations"
               value={`LKR ${dashboardData.totalDonations.toLocaleString()}`}
               icon={DollarSign}
@@ -312,7 +312,7 @@ const VolunteerDashboard = () => {
               icon={Eye}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
-            />
+            /> */}
           </div>
 
           {/* Contribution Calendar */}
@@ -357,21 +357,21 @@ const VolunteerDashboard = () => {
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 12, fill: "#6B7280" }}
+                    tick={{ fontSize: 12, fill: '#6B7280' }}
                   />
                   <YAxis hide />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#10B981",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
+                      backgroundColor: '#10B981',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: 'white',
                     }}
                     labelStyle={{
-                      color: "white",
+                      color: 'white',
                     }}
                     itemStyle={{
-                      color: "white",
+                      color: 'white',
                     }}
                   />
                   <Line
@@ -379,11 +379,11 @@ const VolunteerDashboard = () => {
                     dataKey="contributions"
                     stroke="#10B981"
                     strokeWidth={3}
-                    dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
+                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
                     activeDot={{
                       r: 6,
-                      fill: "white",
-                      stroke: "#10B981",
+                      fill: 'white',
+                      stroke: '#10B981',
                       strokeWidth: 2,
                     }}
                   />
@@ -397,4 +397,4 @@ const VolunteerDashboard = () => {
   );
 };
 
-export default VolunteerDashboard;
+export default EventHostDashboard;
