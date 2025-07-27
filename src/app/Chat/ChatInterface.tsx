@@ -344,7 +344,7 @@ export default function ChatInterface() {
                     </div>
                     <div
                       className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        onlineUsers.has(user.userId) ? 'bg-green-500' : 'bg-gray-400'
+                        onlineUsers.has(user.userId) ? 'bg-shark-500' : 'bg-gray-400'
                       }`}
                     />
                   </div>
@@ -360,7 +360,7 @@ export default function ChatInterface() {
                     </p>
                   </div>
                   {onlineUsers.has(user.userId) && (
-                    <div className="text-xs text-green-600 font-medium">Online</div>
+                    <div className="text-xs text-shark-600 font-medium">Online</div>
                   )}
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function ChatInterface() {
                     </div>
                     <div
                       className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        onlineUsers.has(selectedUser.userId) ? 'bg-green-500' : 'bg-gray-400'
+                        onlineUsers.has(selectedUser.userId) ? 'bg-shark-500' : 'bg-gray-400'
                       }`}
                     />
                   </div>

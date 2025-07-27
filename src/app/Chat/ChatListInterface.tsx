@@ -19,44 +19,117 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddChat, setShowAddChat] = useState(false);
   const [newChatUser, setNewChatUser] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
-  // Mock data for demonstration - in real app, this would come from your backend
+  // Fetch available users and recent chats from backend
   useEffect(() => {
-    // Simulate loading available users/recent chats
-    const mockUsers: ChatUser[] = [
-      {
-        username: 'Harindu Hadithya',
-        lastMessage: "It's my pleasure and I really love to work with volunteers",
-        timestamp: '05:30 AM',
-        unreadCount: 0,
-        isOnline: true
-      },
-      {
-        username: 'Alice Johnson',
-        lastMessage: 'Hey, how are you doing?',
-        timestamp: '2:15 PM',
-        unreadCount: 2,
-        isOnline: false
-      },
-      {
-        username: 'Bob Smith',
-        lastMessage: 'Thanks for the help!',
-        timestamp: 'Yesterday',
-        unreadCount: 0,
-        isOnline: true
-      },
-      {
-        username: 'Carol White',
-        lastMessage: 'See you tomorrow',
-        timestamp: 'Monday',
-        unreadCount: 1,
-        isOnline: false
+    const fetchUsersAndChats = async () => {
+      if (!currentUser) return;
+      
+      setLoading(true);
+      setError('');
+      
+      try {
+        // Fetch recent conversations for the current user
+        const conversationsResponse = await fetch(`http://localhost:8081/api/private-chat/conversations/${encodeURIComponent(currentUser)}`);
+        
+        let recentChats: ChatUser[] = [];
+        if (conversationsResponse.ok) {
+          const conversations = await conversationsResponse.json();
+          
+          // Transform conversations to ChatUser format
+          recentChats = conversations.map((conv: any) => {
+            const otherUser = conv.user1 === currentUser ? conv.user2 : conv.user1;
+            return {
+              username: otherUser,
+              lastMessage: conv.lastMessage?.content || 'No messages yet',
+              timestamp: conv.lastMessage?.timestamp ? formatRelativeTime(conv.lastMessage.timestamp) : '',
+              unreadCount: conv.unreadCount || 0,
+              isOnline: Math.random() > 0.5 // TODO: Implement real online status
+            };
+          });
+        }
+        
+        // If no recent chats, show some default available users
+        if (recentChats.length === 0) {
+          const defaultUsers: ChatUser[] = [
+            {
+              username: 'Harindu Hadithya',
+              lastMessage: "Available for new conversations",
+              timestamp: 'Online',
+              unreadCount: 0,
+              isOnline: true
+            },
+            {
+              username: 'Alice Johnson',
+              lastMessage: "Ready to help with volunteering",
+              timestamp: 'Online',
+              unreadCount: 0,
+              isOnline: true
+            },
+            {
+              username: 'Bob Smith',
+              lastMessage: "Looking for sponsors",
+              timestamp: 'Online',
+              unreadCount: 0,
+              isOnline: true
+            },
+            {
+              username: 'Carol White',
+              lastMessage: "Community organizer",
+              timestamp: 'Online',
+              unreadCount: 0,
+              isOnline: false
+            }
+          ];
+          
+          // Filter out current user from default users
+          recentChats = defaultUsers.filter(user => user.username !== currentUser);
+        }
+        
+        setAvailableUsers(recentChats);
+      } catch (error) {
+        console.error('Error fetching users and chats:', error);
+        setError('Failed to load conversations');
+        
+        // Fallback to default users on error
+        const fallbackUsers: ChatUser[] = [
+          {
+            username: 'Harindu Hadithya',
+            lastMessage: "Available for conversations",
+            timestamp: 'Online',
+            unreadCount: 0,
+            isOnline: true
+          }
+        ].filter(user => user.username !== currentUser);
+        
+        setAvailableUsers(fallbackUsers);
+      } finally {
+        setLoading(false);
       }
-    ];
-    
-    // Filter out current user
-    setAvailableUsers(mockUsers.filter(user => user.username !== currentUser));
+    };
+
+    fetchUsersAndChats();
   }, [currentUser]);
+
+  // Helper function to format relative time
+  const formatRelativeTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays === 1) return 'Yesterday';
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    
+    return date.toLocaleDateString();
+  };
 
   const filteredUsers = availableUsers.filter(user =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -87,7 +160,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <div className="bg-green-600 text-white p-4">
+      <div className="bg-shark-900 text-white p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <button 
@@ -142,7 +215,28 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
 
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto bg-white">
-        {filteredUsers.length === 0 ? (
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-500 text-sm">Loading conversations...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Conversations</h3>
+            <p className="text-gray-500 text-sm mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
