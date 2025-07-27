@@ -55,17 +55,33 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
         if (conversationsResponse.ok) {
           const conversations = await conversationsResponse.json();
           
-          // Transform conversations to ChatUser format
-          recentChats = conversations.map((conv: any) => {
+          // Transform conversations to ChatUser format and store raw timestamp for sorting
+          const transformedChats = conversations.map((conv: any) => {
             const otherUser = conv.user1 === currentUser ? conv.user2 : conv.user1;
+            const rawTimestamp = conv.lastMessage?.timestamp;
             return {
               username: otherUser,
               lastMessage: conv.lastMessage?.content || 'No messages yet',
-              timestamp: conv.lastMessage?.timestamp ? formatRelativeTime(conv.lastMessage.timestamp) : '',
+              timestamp: rawTimestamp ? formatRelativeTime(rawTimestamp) : '',
               unreadCount: conv.unreadCount || 0,
-              isOnline: Math.random() > 0.5 // TODO: Implement real online status
+              isOnline: Math.random() > 0.5, // TODO: Implement real online status
+              rawTimestamp: rawTimestamp // Keep raw timestamp for sorting
             };
           });
+          
+          // Sort by timestamp (most recent first)
+          transformedChats.sort((a: any, b: any) => {
+            if (!a.rawTimestamp && !b.rawTimestamp) return 0;
+            if (!a.rawTimestamp) return 1;
+            if (!b.rawTimestamp) return -1;
+            
+            const dateA = new Date(a.rawTimestamp);
+            const dateB = new Date(b.rawTimestamp);
+            return dateB.getTime() - dateA.getTime(); // DESC order (most recent first)
+          });
+          
+          // Remove rawTimestamp before setting state
+          recentChats = transformedChats.map(({ rawTimestamp, ...chat }: any) => chat);
         }
         
         // If no recent chats, show some default available users
