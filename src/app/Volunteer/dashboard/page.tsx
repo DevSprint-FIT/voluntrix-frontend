@@ -180,11 +180,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         <div className="flex items-center space-x-2 text-xs text-[#B0B0B0] font-secondary">
           <span>Less</span>
           <div className="flex space-x-1">
-            <div className="w-3 h-3 bg-gray-100 rounded-sm" />
-            <div className="w-3 h-3 bg-green-300 rounded-sm" />
+            <div className="w-3 h-3 bg-gray-200 rounded-sm" />
             <div className="w-3 h-3 bg-green-400 rounded-sm" />
             <div className="w-3 h-3 bg-green-500 rounded-sm" />
             <div className="w-3 h-3 bg-green-600 rounded-sm" />
+            <div className="w-3 h-3 bg-green-700 rounded-sm" />
           </div>
           <span>More</span>
         </div>

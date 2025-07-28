@@ -225,11 +225,11 @@ export const volunteerDashboardService = {
 
   // Get contribution intensity level for styling
   getContributionIntensity(contributions: number): string {
-    if (contributions === 0) return "bg-gray-100";
-    if (contributions === 1) return "bg-green-300";
-    if (contributions === 2) return "bg-green-400";
-    if (contributions === 3) return "bg-green-500";
-    return "bg-green-600";
+    if (contributions === 0) return "bg-gray-200";
+    if (contributions === 1) return "bg-green-400";
+    if (contributions === 2) return "bg-green-500";
+    if (contributions === 3) return "bg-green-600";
+    return "bg-green-700";
   },
 
   // Calculate total contributions for the year
