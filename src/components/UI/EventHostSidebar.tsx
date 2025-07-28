@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BarChart, Calendar, Bell, LogOut, LucideIcon } from 'lucide-react';
+import { BarChart, Calendar, Bell, LogOut, LucideIcon, Home } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 import Image from 'next/image';
@@ -25,6 +25,7 @@ const VolunteerSidebar = ({ hostId }: { hostId: string }) => {
   }, []);
 
   const menuItems: MenuItem[] = [
+    { name: "Home", icon: Home, href: "/" },
     { name: 'Dashboard', icon: BarChart, href: `/event-host/${hostId}/dashboard` },
     // { name: 'Profile', icon: User, href: '/event-host/profile' },
     { name: 'Events', icon: Calendar, href: `/event-host/${hostId}/events` },
