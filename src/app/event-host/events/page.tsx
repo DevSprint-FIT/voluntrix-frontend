@@ -7,11 +7,7 @@ import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
 import { useRouter } from 'next/navigation';
 
-export default function HostEvents({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function HostEvents() {
   const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
@@ -24,9 +20,6 @@ export default function HostEvents({
     completed: 0,
   });
 
-  const resolvedParams = React.use(params);
-  const hostId = Number(resolvedParams.id);
-
   const router = useRouter();
 
   const handleRowClick = (eventId: string) => {
@@ -37,7 +30,7 @@ export default function HostEvents({
     const getEvents = async () => {
       try {
         setLoading(true);
-        const data = await fetchEventByHostId(hostId);
+        const data = await fetchEventByHostId(1); // add host id dynamically
         console.log('Fetched data:', JSON.stringify(data, null, 2));
 
         setEvents(Array.isArray(data) ? data : []);
@@ -65,7 +58,7 @@ export default function HostEvents({
     };
 
     getEvents();
-  }, [hostId]);
+  }, []);
 
   const statsCards = [
     {
