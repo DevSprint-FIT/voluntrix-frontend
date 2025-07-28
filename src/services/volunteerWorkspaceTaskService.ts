@@ -70,10 +70,10 @@ export class WorkspaceTaskService {
   // Helper method to format date
   private static formatDate(dateString: string | null): string {
     if (!dateString) return "No date";
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   }
 
@@ -87,7 +87,9 @@ export class WorkspaceTaskService {
     };
   }
 
-  private static convertToTaskInReview(backendTask: BackendTaskDTO): TaskInReview {
+  private static convertToTaskInReview(
+    backendTask: BackendTaskDTO
+  ): TaskInReview {
     return {
       taskId: backendTask.taskId.toString(),
       description: backendTask.description,
@@ -97,7 +99,9 @@ export class WorkspaceTaskService {
     };
   }
 
-  private static convertToCompletedTask(backendTask: BackendTaskDTO): CompletedTask {
+  private static convertToCompletedTask(
+    backendTask: BackendTaskDTO
+  ): CompletedTask {
     return {
       taskId: backendTask.taskId.toString(),
       description: backendTask.description,
@@ -113,13 +117,13 @@ export class WorkspaceTaskService {
       const response = await fetch(
         `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}/status-count`
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       return {
         totalTasksDue: data.TO_DO || 0,
         totalTasksPendingReview: data.IN_PROGRESS || 0,
@@ -142,13 +146,13 @@ export class WorkspaceTaskService {
       const response = await fetch(
         `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=TO_DO`
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BackendTaskDTO[] = await response.json();
-      return data.map(task => this.convertToToDoTask(task));
+      return data.map((task) => this.convertToToDoTask(task));
     } catch (error) {
       console.error("Error fetching TO_DO tasks:", error);
       return [];
@@ -161,13 +165,13 @@ export class WorkspaceTaskService {
       const response = await fetch(
         `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=IN_PROGRESS`
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BackendTaskDTO[] = await response.json();
-      return data.map(task => this.convertToTaskInReview(task));
+      return data.map((task) => this.convertToTaskInReview(task));
     } catch (error) {
       console.error("Error fetching IN_PROGRESS tasks:", error);
       return [];
@@ -180,13 +184,13 @@ export class WorkspaceTaskService {
       const response = await fetch(
         `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=DONE`
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BackendTaskDTO[] = await response.json();
-      return data.map(task => this.convertToCompletedTask(task));
+      return data.map((task) => this.convertToCompletedTask(task));
     } catch (error) {
       console.error("Error fetching DONE tasks:", error);
       return [];
@@ -201,7 +205,15 @@ export class WorkspaceTaskService {
     try {
       // Use local time for taskSubmittedDate
       const now = new Date();
-      const currentDateTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}T${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+      const currentDateTime = `${now.getFullYear()}-${(now.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}T${now
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
+        .getSeconds()
+        .toString()
+        .padStart(2, "0")}`;
 
       const updateData: TaskUpdateDTO = {
         taskStatus: "IN_PROGRESS",
@@ -210,9 +222,9 @@ export class WorkspaceTaskService {
       };
 
       const response = await fetch(`${this.BASE_URL}/${taskId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updateData),
       });
@@ -221,10 +233,12 @@ export class WorkspaceTaskService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      console.log(`Task ${taskId} submitted successfully with URL: ${resourceUrl}`);
+      console.log(
+        `Task ${taskId} submitted successfully with URL: ${resourceUrl}`
+      );
       console.log(`Task status changed to IN_PROGRESS`);
       console.log(`Task submitted date: ${currentDateTime}`);
-      
+
       return true;
     } catch (error) {
       console.error("Error submitting task:", error);

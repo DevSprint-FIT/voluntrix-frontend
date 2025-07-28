@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Crown,
-  BarChart3,
-  DollarSign,
-  Eye,
-  ChevronDown,
-  TrendingUp,
-} from "lucide-react";
+import { Crown, BarChart3, DollarSign, Eye, TrendingUp } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -55,6 +48,8 @@ const StatCard = ({
 
 const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   const months = [
+    "Jan",
+    "Feb",
     "Mar",
     "Apr",
     "May",
@@ -65,19 +60,16 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
     "Oct",
     "Nov",
     "Dec",
-    "Jan",
-    "Feb",
-    "Mar",
   ];
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Create a grid of weeks
+  // Create a grid of weeks for the year 2025 (Jan to Dec)
   const weeks = [];
   let currentWeek = [];
 
-  // Start from March 1, 2024
-  const startDate = new Date("2024-03-01");
-  const endDate = new Date("2025-03-31");
+  // Start from January 1, 2025
+  const startDate = new Date("2025-01-01");
+  const endDate = new Date("2025-12-31");
 
   const currentDate = new Date(startDate);
 
@@ -107,6 +99,10 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   if (currentWeek.length > 0) {
+    // Fill remaining days of the last week
+    while (currentWeek.length < 7) {
+      currentWeek.push(null);
+    }
     weeks.push(currentWeek);
   }
 
@@ -115,7 +111,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 font-secondary">
           {volunteerDashboardService.calculateTotalContributions(data)}{" "}
-          contributions in the last year
+          Contributions in This Year
         </h3>
       </div>
 
@@ -141,11 +137,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         {/* Month labels and contribution grid */}
         <div className="flex-1">
           {/* Month labels */}
-          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5 px-10">
+          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5">
             {months.map((month, index) => (
               <span
                 key={index}
-                className="text-center flex items-center justify-center"
+                className="text-center flex items-center justify-center flex-1"
               >
                 {month}
               </span>
@@ -153,7 +149,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
           </div>
 
           {/* Contribution grid */}
-          <div className="flex space-x-1.5">
+          <div className="flex space-x-2">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="space-y-1">
                 {week.map((day, dayIndex) => (
@@ -184,11 +180,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         <div className="flex items-center space-x-2 text-xs text-[#B0B0B0] font-secondary">
           <span>Less</span>
           <div className="flex space-x-1">
-            <div className="w-3 h-3 bg-gray-100 rounded-sm" />
-            <div className="w-3 h-3 bg-green-200 rounded-sm" />
-            <div className="w-3 h-3 bg-green-300 rounded-sm" />
+            <div className="w-3 h-3 bg-gray-200 rounded-sm" />
             <div className="w-3 h-3 bg-green-400 rounded-sm" />
             <div className="w-3 h-3 bg-green-500 rounded-sm" />
+            <div className="w-3 h-3 bg-green-600 rounded-sm" />
+            <div className="w-3 h-3 bg-green-700 rounded-sm" />
           </div>
           <span>More</span>
         </div>
@@ -204,6 +200,8 @@ const VolunteerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [totalContributionsFromChart, setTotalContributionsFromChart] =
+    useState(0);
 
   // Using hardcoded values as specified
   const volunteerId = 1;
@@ -220,6 +218,13 @@ const VolunteerDashboard = () => {
           volunteerId
         );
         setDashboardData(data);
+
+        // Calculate total from monthly contributions for the chart
+        const chartTotal = data.monthlyContributions.reduce(
+          (total, month) => total + month.contributions,
+          0
+        );
+        setTotalContributionsFromChart(chartTotal);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -308,7 +313,7 @@ const VolunteerDashboard = () => {
             />
             <StatCard
               title="Total Profile Views"
-              value="1k+"
+              value="250"
               icon={Eye}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
@@ -327,7 +332,6 @@ const VolunteerDashboard = () => {
                 <div className="flex items-center space-x-2">
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 font-secondary">
                     <span>{selectedYear}</span>
-                    <ChevronDown size={16} />
                   </button>
                 </div>
               </div>
@@ -336,15 +340,11 @@ const VolunteerDashboard = () => {
             <div className="mb-6">
               <div>
                 <span className="text-3xl font-bold text-gray-900 font-secondary">
-                  925
+                  LKR {totalContributionsFromChart}
                 </span>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className="text-sm text-[#B0B0B0] font-secondary">
-                    Total Contributions
-                  </span>
-                  <span className="flex items-center text-sm text-green-600 font-medium font-secondary">
-                    <TrendingUp size={16} className="mr-1" />
-                    {volunteerDashboardService.getPercentageChange()}
+                    Total Monthly Donations
                   </span>
                 </div>
               </div>
