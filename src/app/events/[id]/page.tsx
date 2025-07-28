@@ -49,7 +49,7 @@ export default function EventPage({
           try {
             const sponsorshipData = await fetchSponsorshipsByEvent(eventId);
             const sponsorshipNames = sponsorshipData.map(
-              (s) => s.sponsorshipName
+              (s) => s.type
             );
             setSponsorships(sponsorshipNames);
           } catch (sponsErr) {
@@ -83,13 +83,10 @@ export default function EventPage({
         </div>
       ) : event ? (
         <>
-          <Event
-            event={event}
-            sponsor={{ sponsorships }}
-          />
+          <Event event={event} sponsor={{ sponsorships }} />
           <EventSection
-            title="Based on your browsing history"
-            subTitle="Based on searches and preferences"
+            title="Recommended Events for You"
+            subTitle="Upcoming events tailored to your interests and availability."
           />
         </>
       ) : null}

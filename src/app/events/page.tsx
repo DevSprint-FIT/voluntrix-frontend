@@ -8,8 +8,10 @@ export default function EventsPage() {
       <Breadcrumb />
       <HeroSection />
       <EventSection
-        title={'Trending events'}
-        subTitle={'Based on your current location, and community engagement'}
+        title={'Recommended Events for You'}
+        subTitle={
+          'Upcoming events tailored to your interests and availability.'
+        }
       />
       {/* <EventSection
         title={'Based on your browsing history'}
