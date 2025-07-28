@@ -1,5 +1,4 @@
-// Service for workspace task data
-// This will be replaced with actual API calls later
+// Service for workspace task data with backend integration
 
 export interface TaskStats {
   totalTasksDue: number;
@@ -7,17 +6,27 @@ export interface TaskStats {
   totalTasksCompleted: number;
 }
 
-export interface TaskData {
-  id: string;
-  title: string;
+// Backend task response interface
+export interface BackendTaskDTO {
+  taskId: number;
   description: string;
-  status: "due" | "pending_review" | "completed";
-  dueDate: string;
-  assignedTo: string;
-  priority: "low" | "medium" | "high";
+  createdDate: string;
+  updatedDate: string;
+  dueDate: string | null;
+  taskStatus: "TO_DO" | "IN_PROGRESS" | "DONE";
+  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  resourceUrl: string | null;
+  taskSubmittedDate: string | null;
+  assigneeId: number;
+  assigneeUsername: string;
+  eventId: number;
+  eventTitle: string;
+  taskRewardPoints: number;
+  taskReviewedDate: string | null;
 }
 
-// New interfaces for the tables
+// Frontend interfaces for the tables
 export interface ToDoTask {
   taskId: string;
   description: string;
@@ -37,197 +46,189 @@ export interface CompletedTask {
   taskId: string;
   description: string;
   taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskSubmittedDate: string;
-  taskReviewedDate: string;
   taskRewardPoints: number;
+  resourceUrl: string;
+}
+
+// Task update interface for backend
+export interface TaskUpdateDTO {
+  description?: string;
+  dueDate?: string;
+  taskStatus?: "TO_DO" | "IN_PROGRESS" | "DONE";
+  resourceUrl?: string;
+  taskSubmittedDate?: string;
+  assigneeId?: number;
+  taskRewardPoints?: number;
+  taskReviewedDate?: string;
 }
 
 export class WorkspaceTaskService {
-  // Dummy data for now - will be replaced with API calls
-  static async getTaskStats(): Promise<TaskStats> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  private static readonly BASE_URL = "http://localhost:8080/api/public/tasks";
+  private static readonly VOLUNTEER_ID = 1; // Hardcoded for now
+  private static readonly EVENT_ID = 1; // Hardcoded for now
 
+  // Helper method to format date
+  private static formatDate(dateString: string | null): string {
+    if (!dateString) return "No date";
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  // Helper method to convert backend task to frontend task
+  private static convertToToDoTask(backendTask: BackendTaskDTO): ToDoTask {
     return {
-      totalTasksDue: 2,
-      totalTasksPendingReview: 1,
-      totalTasksCompleted: 3,
+      taskId: backendTask.taskId.toString(),
+      description: backendTask.description,
+      taskDifficulty: backendTask.taskDifficulty,
+      dueDate: this.formatDate(backendTask.dueDate),
     };
   }
 
-  // Method to submit a task with resource URL
+  private static convertToTaskInReview(backendTask: BackendTaskDTO): TaskInReview {
+    return {
+      taskId: backendTask.taskId.toString(),
+      description: backendTask.description,
+      taskDifficulty: backendTask.taskDifficulty,
+      taskSubmittedDate: this.formatDate(backendTask.taskSubmittedDate),
+      resourceUrl: backendTask.resourceUrl || "",
+    };
+  }
+
+  private static convertToCompletedTask(backendTask: BackendTaskDTO): CompletedTask {
+    return {
+      taskId: backendTask.taskId.toString(),
+      description: backendTask.description,
+      taskDifficulty: backendTask.taskDifficulty,
+      taskRewardPoints: backendTask.taskRewardPoints,
+      resourceUrl: backendTask.resourceUrl || "",
+    };
+  }
+
+  // Get task stats from backend
+  static async getTaskStats(): Promise<TaskStats> {
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}/status-count`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      return {
+        totalTasksDue: data.TO_DO || 0,
+        totalTasksPendingReview: data.IN_PROGRESS || 0,
+        totalTasksCompleted: data.DONE || 0,
+      };
+    } catch (error) {
+      console.error("Error fetching task stats:", error);
+      // Return default values on error
+      return {
+        totalTasksDue: 0,
+        totalTasksPendingReview: 0,
+        totalTasksCompleted: 0,
+      };
+    }
+  }
+
+  // Get TO_DO tasks from backend
+  static async getToDoTasks(): Promise<ToDoTask[]> {
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=TO_DO`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: BackendTaskDTO[] = await response.json();
+      return data.map(task => this.convertToToDoTask(task));
+    } catch (error) {
+      console.error("Error fetching TO_DO tasks:", error);
+      return [];
+    }
+  }
+
+  // Get IN_PROGRESS tasks from backend
+  static async getTasksInReview(): Promise<TaskInReview[]> {
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=IN_PROGRESS`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: BackendTaskDTO[] = await response.json();
+      return data.map(task => this.convertToTaskInReview(task));
+    } catch (error) {
+      console.error("Error fetching IN_PROGRESS tasks:", error);
+      return [];
+    }
+  }
+
+  // Get DONE tasks from backend
+  static async getCompletedTasks(): Promise<CompletedTask[]> {
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=DONE`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: BackendTaskDTO[] = await response.json();
+      return data.map(task => this.convertToCompletedTask(task));
+    } catch (error) {
+      console.error("Error fetching DONE tasks:", error);
+      return [];
+    }
+  }
+
+  // Submit a task with resource URL and change status to IN_PROGRESS
   static async submitTask(
     taskId: string,
     resourceUrl: string
   ): Promise<boolean> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/tasks/${taskId}`, {
-      //   method: 'PATCH',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     resourceUrl: resourceUrl,
-      //     taskStatus: 'IN_PROGRESS',
-      //     taskSubmittedDate: new Date().toISOString(),
-      //   }),
-      // });
-      // return response.ok;
+      // Use local time for taskSubmittedDate
+      const now = new Date();
+      const currentDateTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}T${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
 
-      // Simulate success/failure for demo
-      const success = Math.random() > 0.2; // 80% success rate for demo
+      const updateData: TaskUpdateDTO = {
+        taskStatus: "IN_PROGRESS",
+        resourceUrl: resourceUrl,
+        taskSubmittedDate: currentDateTime,
+      };
 
-      if (success) {
-        console.log(
-          `Task ${taskId} submitted successfully with URL: ${resourceUrl}`
-        );
-        console.log(`Task status changed to IN_PROGRESS`);
-        console.log(`Task submitted date: ${new Date().toISOString()}`);
+      const response = await fetch(`${this.BASE_URL}/${taskId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return success;
+      console.log(`Task ${taskId} submitted successfully with URL: ${resourceUrl}`);
+      console.log(`Task status changed to IN_PROGRESS`);
+      console.log(`Task submitted date: ${currentDateTime}`);
+      
+      return true;
     } catch (error) {
       console.error("Error submitting task:", error);
       return false;
     }
-  }
-
-  static async getTasks(): Promise<TaskData[]> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return [
-      {
-        id: "1",
-        title: "Set up registration booth",
-        description: "Prepare and organize the registration area for the event",
-        status: "due",
-        dueDate: "2025-07-20",
-        assignedTo: "John Doe",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Prepare welcome packets",
-        description: "Assemble welcome packets for new volunteers",
-        status: "pending_review",
-        dueDate: "2025-07-18",
-        assignedTo: "Jane Smith",
-        priority: "medium",
-      },
-      {
-        id: "3",
-        title: "Coordinate with catering",
-        description: "Finalize catering arrangements for the event",
-        status: "completed",
-        dueDate: "2025-07-15",
-        assignedTo: "Mike Johnson",
-        priority: "high",
-      },
-    ];
-  }
-
-  // New methods for the tables
-  static async getToDoTasks(): Promise<ToDoTask[]> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    return [
-      {
-        taskId: "1",
-        description: "Set up registration booth for event volunteers",
-        taskDifficulty: "MEDIUM",
-        dueDate: "2025-07-20",
-      },
-      {
-        taskId: "2",
-        description: "Prepare welcome packets and orientation materials",
-        taskDifficulty: "EASY",
-        dueDate: "2025-07-22",
-      },
-      {
-        taskId: "3",
-        description: "Coordinate with catering team for meal arrangements",
-        taskDifficulty: "HARD",
-        dueDate: "2025-07-25",
-      },
-      {
-        taskId: "4",
-        description:
-          "Organize complex multi-day event logistics and emergency protocols",
-        taskDifficulty: "EXTREME",
-        dueDate: "2025-07-30",
-      },
-    ];
-  }
-
-  static async getTasksInReview(): Promise<TaskInReview[]> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    return [
-      {
-        taskId: "1",
-        description: "Design event promotional materials",
-        taskDifficulty: "MEDIUM",
-        taskSubmittedDate: "2025-07-15",
-        resourceUrl: "https://drive.google.com/file/example1",
-      },
-      {
-        taskId: "2",
-        description: "Create volunteer training presentation",
-        taskDifficulty: "HARD",
-        taskSubmittedDate: "2025-07-16",
-        resourceUrl: "https://docs.google.com/presentation/example2",
-      },
-      {
-        taskId: "3",
-        description: "Develop comprehensive crisis management system",
-        taskDifficulty: "EXTREME",
-        taskSubmittedDate: "2025-07-14",
-        resourceUrl: "https://github.com/example/crisis-management",
-      },
-    ];
-  }
-
-  static async getCompletedTasks(): Promise<CompletedTask[]> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    return [
-      {
-        taskId: "1",
-        description: "Organize volunteer database and contact information",
-        taskDifficulty: "EASY",
-        taskSubmittedDate: "2025-07-10",
-        taskReviewedDate: "2025-07-12",
-        taskRewardPoints: 50,
-      },
-      {
-        taskId: "2",
-        description: "Conduct venue safety inspection and report",
-        taskDifficulty: "MEDIUM",
-        taskSubmittedDate: "2025-07-11",
-        taskReviewedDate: "2025-07-13",
-        taskRewardPoints: 75,
-      },
-      {
-        taskId: "3",
-        description: "Develop emergency response protocol",
-        taskDifficulty: "HARD",
-        taskSubmittedDate: "2025-07-08",
-        taskReviewedDate: "2025-07-10",
-        taskRewardPoints: 100,
-      },
-      {
-        taskId: "4",
-        description: "Design and implement full event management system",
-        taskDifficulty: "EXTREME",
-        taskSubmittedDate: "2025-07-05",
-        taskReviewedDate: "2025-07-07",
-        taskRewardPoints: 150,
-      },
-    ];
   }
 }

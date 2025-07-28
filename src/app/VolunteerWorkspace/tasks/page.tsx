@@ -17,6 +17,7 @@ import {
 } from "@/services/volunteerWorkspaceTaskService";
 import Table, { Column } from "@/components/UI/Table";
 import TaskSubmissionModal from "@/components/UI/TaskSubmissionModal";
+import Toast from "@/components/UI/Toast";
 
 const TasksPage = () => {
   const [taskStats, setTaskStats] = useState<TaskStats>({
@@ -29,10 +30,43 @@ const TasksPage = () => {
   const [tasksInReview, setTasksInReview] = useState<TaskInReview[]>([]);
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
   const [tablesLoading, setTablesLoading] = useState(true);
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ToDoTask | null>(null);
+
+  // Toast state
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    isVisible: boolean;
+  }>({
+    message: "",
+    type: "success",
+    isVisible: false,
+  });
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({
+      message,
+      type,
+      isVisible: true,
+    });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, isVisible: false }));
+  };
+
+  // Format date to YYYY-MM-DD format (matching EventHostWorkspace formatting)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    // Fix timezone offset issue to show the correct local date
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     const fetchTaskStats = async () => {
@@ -42,6 +76,7 @@ const TasksPage = () => {
         setTaskStats(stats);
       } catch (error) {
         console.error("Error fetching task stats:", error);
+        showToast("Error fetching task statistics.", "error");
       } finally {
         setIsLoading(false);
       }
@@ -60,6 +95,7 @@ const TasksPage = () => {
         setCompletedTasks(completed);
       } catch (error) {
         console.error("Error fetching table data:", error);
+        showToast("Error fetching task data.", "error");
       } finally {
         setTablesLoading(false);
       }
@@ -126,7 +162,7 @@ const TasksPage = () => {
 
   // Helper function to handle task submission
   const handleTaskSubmission = (taskId: string) => {
-    const task = toDoTasks.find(t => t.taskId === taskId);
+    const task = toDoTasks.find((t) => t.taskId === taskId);
     if (task) {
       setSelectedTask(task);
       setIsModalOpen(true);
@@ -134,33 +170,60 @@ const TasksPage = () => {
   };
 
   // Function to handle modal submission
-  const handleModalSubmit = async (taskId: string, resourceUrl: string): Promise<boolean> => {
+  const handleModalSubmit = async (
+    taskId: string,
+    resourceUrl: string
+  ): Promise<boolean> => {
     try {
-      const success = await WorkspaceTaskService.submitTask(taskId, resourceUrl);
-      
+      const success = await WorkspaceTaskService.submitTask(
+        taskId,
+        resourceUrl
+      );
+
       if (success) {
-        // Remove task from TO_DO list (it's now IN_PROGRESS)
-        setToDoTasks(prevTasks => prevTasks.filter(task => task.taskId !== taskId));
-        
-        // Refresh table data to reflect changes
-        const [toDo, inReview, completed] = await Promise.all([
-          WorkspaceTaskService.getToDoTasks(),
-          WorkspaceTaskService.getTasksInReview(),
-          WorkspaceTaskService.getCompletedTasks(),
-        ]);
-        setToDoTasks(toDo);
-        setTasksInReview(inReview);
-        setCompletedTasks(completed);
-        
-        // Update stats
-        const stats = await WorkspaceTaskService.getTaskStats();
-        setTaskStats(stats);
+        showToast(
+          "Task submitted successfully! The task is now in review.",
+          "success"
+        );
+
+        // Refresh all data after successful submission
+        await refreshAllData();
+      } else {
+        showToast("Failed to submit task. Please try again.", "error");
       }
-      
+
       return success;
     } catch (error) {
-      console.error('Error in task submission:', error);
+      console.error("Error in task submission:", error);
+      showToast("An error occurred while submitting the task.", "error");
       return false;
+    }
+  };
+
+  // Function to refresh all data
+  const refreshAllData = async () => {
+    try {
+      setTablesLoading(true);
+      setIsLoading(true);
+
+      // Fetch all data in parallel
+      const [stats, toDo, inReview, completed] = await Promise.all([
+        WorkspaceTaskService.getTaskStats(),
+        WorkspaceTaskService.getToDoTasks(),
+        WorkspaceTaskService.getTasksInReview(),
+        WorkspaceTaskService.getCompletedTasks(),
+      ]);
+
+      setTaskStats(stats);
+      setToDoTasks(toDo);
+      setTasksInReview(inReview);
+      setCompletedTasks(completed);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      showToast("Error refreshing data. Please refresh the page.", "error");
+    } finally {
+      setTablesLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -192,6 +255,7 @@ const TasksPage = () => {
     {
       header: "Due Date",
       accessor: "dueDate",
+      cell: (value) => formatDate(value as string),
     },
     {
       header: "Action",
@@ -228,6 +292,7 @@ const TasksPage = () => {
     {
       header: "Submitted Date",
       accessor: "taskSubmittedDate",
+      cell: (value) => formatDate(value as string),
     },
     {
       header: "Resource URL",
@@ -265,12 +330,19 @@ const TasksPage = () => {
       ),
     },
     {
-      header: "Submitted Date",
-      accessor: "taskSubmittedDate",
-    },
-    {
-      header: "Reviewed Date",
-      accessor: "taskReviewedDate",
+      header: "Resource URL",
+      accessor: "resourceUrl",
+      cell: (value) => (
+        <a
+          href={value as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-verdant-600 hover:text-verdant-700 flex items-center gap-1"
+        >
+          <ExternalLink size={16} />
+          View Submission
+        </a>
+      ),
     },
     {
       header: "Reward Points",
@@ -383,9 +455,17 @@ const TasksPage = () => {
       <TaskSubmissionModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        taskId={selectedTask?.taskId || ''}
-        taskDescription={selectedTask?.description || ''}
+        taskId={selectedTask?.taskId || ""}
+        taskDescription={selectedTask?.description || ""}
         onSubmit={handleModalSubmit}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
       />
     </div>
   );
