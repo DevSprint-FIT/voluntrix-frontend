@@ -14,7 +14,7 @@ interface MenuItem {
   badge?: number;
 }
 
-const VolunteerSidebar = () => {
+const VolunteerSidebar = ({ hostId }: { hostId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>('Home');
 
@@ -25,14 +25,14 @@ const VolunteerSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Dashboard', icon: BarChart, href: '/event-host/dashboard' },
+    { name: 'Dashboard', icon: BarChart, href: `/event-host/${hostId}/dashboard` },
     // { name: 'Profile', icon: User, href: '/event-host/profile' },
-    { name: 'Events', icon: Calendar, href: '/event-host/events' },
+    { name: 'Events', icon: Calendar, href: `/event-host/${hostId}/events` },
     {
       name: 'Notifications',
       icon: Bell,
       badge: notificationCount,
-      href: '/event-host/notifications',
+      href: `/event-host/${hostId}/notifications`,
     },
     // { name: 'Social Feed', icon: Send, href: '/event-host/social-feed' },
     // { name: 'Settings', icon: Settings, href: '/event-host/settings' },

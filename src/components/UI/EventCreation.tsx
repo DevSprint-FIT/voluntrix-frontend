@@ -33,7 +33,7 @@ const blankEvent: EventCreateType = {
   eventImageUrl: '',
   eventType: '',
   eventVisibility: '',
-  eventStatus: 'PENDING',
+  eventStatus: 'COMPLETE',
   sponsorshipEnabled: false,
   donationEnabled: false,
   sponsorshipProposalUrl: null,
@@ -166,7 +166,7 @@ export default function EventCreation() {
     const payload = {
       ...eventData,
       eventTime,
-      eventStatus: 'DRAFT',
+      eventStatus: selectedOrg ? 'PENDING' : 'COMPLETE',
       organizationId: selectedOrg?.id ?? null,
       categories: categoryArray.map((cat) => ({
         categoryId: cat.categoryId,

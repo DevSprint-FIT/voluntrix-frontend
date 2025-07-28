@@ -6,7 +6,7 @@ import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
 
-export default function HostEvents() {
+export default function HostEvents({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
@@ -19,11 +19,13 @@ export default function HostEvents() {
     completed: 0,
   });
 
+  const hostId = Number(params.id);
+
   useEffect(() => {
     const getEvents = async () => {
       try {
         setLoading(true);
-        const data = await fetchEventByHostId(1); // Replace with actual host ID
+        const data = await fetchEventByHostId(hostId);
         console.log('Fetched data:', JSON.stringify(data, null, 2));
 
         setEvents(Array.isArray(data) ? data : []);
@@ -51,7 +53,7 @@ export default function HostEvents() {
     };
 
     getEvents();
-  }, []);
+  }, [hostId]);
 
   const statsCards = [
     {

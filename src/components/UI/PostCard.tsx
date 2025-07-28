@@ -179,6 +179,7 @@ const PostCard: React.FC<PostCardProps> = ({
         isOpen={showConfirmModal}
         title="Confirm Delete"
         message="Are you sure you want to delete this post?"
+        confirmButtonText="Delete"
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={confirmDelete}
       />
