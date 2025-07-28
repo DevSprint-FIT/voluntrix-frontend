@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { EventType } from '@/types/EventType';
 import VolunteerApplication from '@/components/UI/VolunteerApplication';
+import SponsorshipsModal from '@/components/UI/SponsorshipsModal';
+import DonationModal from '@/components/UI/DonationModal';
 
 interface Sponsor {
   sponsorships: string[];
@@ -18,6 +20,8 @@ export default function Event({
   sponsor: Sponsor;
 }) {
   const [isSaved, setIsSaved] = useState(false);
+  const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
+  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
@@ -217,9 +221,16 @@ export default function Event({
               <Button
                 variant="shadow"
                 className="w-[160px] bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
+                onPress={() => setIsSponsorModalOpen(true)}
               >
                 Sponsor Now
               </Button>
+              {isSponsorModalOpen && (
+                <SponsorshipsModal
+                  isOpen={isSponsorModalOpen}
+                  onClose={() => setIsSponsorModalOpen(false)}
+                />
+              )}
             </div>
           )}
           {event.donationEnabled &&
@@ -257,6 +268,7 @@ export default function Event({
                 <Button
                   variant="shadow"
                   className="flex gap-0 w-[160px] bg-verdant-800 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
+                  onPress={() => setIsDonationModalOpen(true)}
                 >
                   Donate Now
                   <Image
@@ -266,6 +278,12 @@ export default function Event({
                     alt="arrow"
                   />
                 </Button>
+                {isDonationModalOpen && (
+                  <DonationModal
+                    open={isDonationModalOpen}
+                    setOpen={setIsDonationModalOpen}
+                  />
+                )}
               </div>
             )}
         </div>
