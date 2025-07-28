@@ -7,8 +7,6 @@ import AboutSection from "@/components/UI/AboutSection";
 import BankInformation from "@/components/UI/BankInformation";
 import ContactInformation from "@/components/UI/ContactInformation";
 import SocialLinks from "@/components/UI/SocialLinks";
-import { Button } from "@heroui/react";
-import { Pencil } from "lucide-react";
 
 const Page = () => {
   const [organizationData, setOrganizationData] = useState<any>(null);

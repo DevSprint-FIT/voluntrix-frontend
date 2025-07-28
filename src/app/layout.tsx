@@ -22,8 +22,6 @@ export default function DashboardLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        {/* Layout UI */}
-        {/* Place children where you want to render a page or nested layout */}
         <main>
           <Providers>{children}</Providers>
         </main>

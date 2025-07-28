@@ -1,5 +1,5 @@
-import Sidebar from "@/components/UI/Sidebar";
-import React from "react";
+import Sidebar from '@/components/UI/Sidebar';
+import React from 'react';
 
 export default function OrganizationLayout({
   children,
