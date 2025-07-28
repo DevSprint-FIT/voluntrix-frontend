@@ -110,3 +110,29 @@ export const fetchAllEvents = async (): Promise<EventType[]> => {
     throw error;
   }
 };
+
+export const fetchLatestEvents = async (): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/events/latest-three'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    throw error;
+  }
+};
+
+export const fetchRecommendedEvents = async (
+  id: number
+): Promise<EventType[]> => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/events/recommended/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    throw error;
+  }
+};

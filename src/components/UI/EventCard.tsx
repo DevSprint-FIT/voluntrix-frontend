@@ -7,19 +7,7 @@ import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 
-interface Event {
-  imageUrl: string;
-  title: string;
-  organizer: string;
-  description: string;
-  specialTags: string[];
-  date: string;
-  venue: string;
-  time?: string;
-  donationAvailable: boolean;
-}
-
-export default function EventCard({event}: {event: Event}) {  
+export default function EventCard({event}: {event: EventType}) {  
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSave = () => {
