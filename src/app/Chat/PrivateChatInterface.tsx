@@ -127,6 +127,16 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
         }));
         
         setMessages(formattedMessages);
+        
+        // Mark messages as read after loading history
+        try {
+          await fetch(`http://localhost:8081/api/private-chat/room/${roomId}/mark-read?username=${encodeURIComponent(username)}`, {
+            method: 'POST'
+          });
+          console.log('Marked messages as read for room:', roomId);
+        } catch (error) {
+          console.error('Error marking messages as read:', error);
+        }
       } else {
         console.warn('Failed to load private room history:', response.status);
       }

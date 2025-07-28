@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import SockJS from 'sockjs-client';
+import { Stomp, CompatClient } from '@stomp/stompjs';
 
 interface ChatUser {
   username: string;
@@ -38,6 +40,8 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   const [newChatUser, setNewChatUser] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [stompClient, setStompClient] = useState<CompatClient | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Fetch available users and recent chats from backend
   const fetchUsersAndChats = async () => {
@@ -153,6 +157,65 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   useEffect(() => {
     fetchUsersAndChats();
   }, [currentUser]);
+
+  // Setup WebSocket connection for real-time updates
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const connectWebSocket = () => {
+      console.log('Setting up real-time updates for chat list...');
+      
+      try {
+        const socket = new SockJS('http://localhost:8081/ws');
+        const client = Stomp.over(() => socket);
+        
+        client.debug = (str: string) => console.log('ChatList STOMP Debug:', str);
+        
+        client.connect({}, 
+          () => {
+            console.log('ChatList WebSocket Connected');
+            setIsConnected(true);
+            setStompClient(client);
+            
+            // Subscribe to all private room updates for this user
+            // This will listen to messages from any room this user is part of
+            client.subscribe(`/topic/chat-updates/${currentUser}`, (payload) => {
+              console.log('Received chat list update:', payload.body);
+              const update = JSON.parse(payload.body);
+              handleChatUpdate(update);
+            });
+          },
+          (error: Error) => {
+            console.error('ChatList WebSocket Connection error:', error);
+            setIsConnected(false);
+          }
+        );
+      } catch (error) {
+        console.error('Failed to setup WebSocket for chat list:', error);
+      }
+    };
+
+    connectWebSocket();
+
+    // Cleanup WebSocket on unmount
+    return () => {
+      if (stompClient) {
+        console.log('Disconnecting ChatList WebSocket...');
+        stompClient.disconnect();
+        setStompClient(null);
+        setIsConnected(false);
+      }
+    };
+  }, [currentUser]);
+
+  // Handle real-time chat updates
+  const handleChatUpdate = (update: any) => {
+    console.log('Processing chat update:', update);
+    
+    // Refresh the conversation list when we receive updates
+    // This ensures the list stays up-to-date with new messages and unread counts
+    fetchUsersAndChats();
+  };
 
   // Helper function to format relative time
   const formatRelativeTime = (timestamp: string) => {
