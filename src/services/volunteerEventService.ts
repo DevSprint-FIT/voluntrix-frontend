@@ -6,6 +6,7 @@ export type ContributionArea =
   | "PROGRAMMING";
 
 export type ActiveEvent = {
+  eventId: number;
   eventName: string;
   startDate: number[]; // [year, month, day]
   endDate: number[]; // [year, month, day]
