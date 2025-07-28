@@ -1,4 +1,6 @@
-const API_BASE_URL = "http://localhost:8080/api/public";
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:8080/api/public';
 
 export interface VolunteerProfile {
   volunteerId: number;
@@ -44,7 +46,7 @@ export const volunteerProfileService = {
   async getVolunteerProfile(username: string): Promise<VolunteerProfile> {
     const response = await fetch(`${API_BASE_URL}/volunteers/${username}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch volunteer profile");
+      throw new Error('Failed to fetch volunteer profile');
     }
     return response.json();
   },
@@ -53,7 +55,7 @@ export const volunteerProfileService = {
   async getFollowedOrganizationIds(volunteerId: number): Promise<number[]> {
     const response = await fetch(`${API_BASE_URL}/follow/${volunteerId}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch followed organizations");
+      throw new Error('Failed to fetch followed organizations');
     }
     return response.json();
   },
@@ -62,7 +64,7 @@ export const volunteerProfileService = {
   async getOrganizationById(id: number): Promise<Organization> {
     const response = await fetch(`${API_BASE_URL}/organizations/${id}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch organization details");
+      throw new Error('Failed to fetch organization details');
     }
     const data: OrganizationResponse = await response.json();
     return data.data;
@@ -85,11 +87,11 @@ export const volunteerProfileService = {
     const response = await fetch(
       `${API_BASE_URL}/follow/${volunteerId}/${organizationId}`,
       {
-        method: "DELETE",
+        method: 'DELETE',
       }
     );
     if (!response.ok) {
-      throw new Error("Failed to unfollow organization");
+      throw new Error('Failed to unfollow organization');
     }
     return response.text();
   },
@@ -99,12 +101,36 @@ export const volunteerProfileService = {
     if (joinedDate.length >= 3) {
       const [year, month, day] = joinedDate;
       const date = new Date(year, month - 1, day);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     }
-    return "Unknown";
+    return 'Unknown';
   },
+};
+
+export const fetchVolunteer = async (
+  username: string
+): Promise<VolunteerProfile> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/volunteers/${username}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching volunteer profile:', error);
+    throw error;
+  }
+};
+
+export const makeEventHost = async (id: number) => {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/volunteers/${id}`, {
+      isEventHost: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error making volunteer an event host:', error);
+    throw error;
+  }
 };

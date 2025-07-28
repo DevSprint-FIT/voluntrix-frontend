@@ -15,6 +15,11 @@ import {
 import Link from 'next/link';
 import { Button, useDisclosure } from '@heroui/react';
 import VolunteerToHostModal from './VolunteerToHostModal';
+import {
+  fetchVolunteer,
+  VolunteerProfile,
+} from '@/services/volunteerProfileService';
+import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -27,6 +32,9 @@ const VolunteerSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>('Home');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [volunteer, setVolunteer] = useState<VolunteerProfile>();
+
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -34,11 +42,23 @@ const VolunteerSidebar = () => {
     }, 500);
   }, []);
 
+  useEffect(() => {
+    const getVolunteerProfile = async ({ username }: { username: string }) => {
+      try {
+        const data = await fetchVolunteer(username);
+        setVolunteer(data);
+      } catch (error) {
+        console.error('Error fetching volunteer profile:', error);
+      }
+    };
+    getVolunteerProfile({ username: 'shanu123' }); // add your logic to get the username dynamically
+  }, []);
+
   const menuItems: MenuItem[] = [
-    { name: "Home", icon: Home, href: "/" },
-    { name: "Dashboard", icon: BarChart, href: "/Volunteer/dashboard" },
-    { name: "Profile", icon: User, href: "/Volunteer/profile" },
-    { name: "Events", icon: Calendar, href: "/Volunteer/events/active" },
+    { name: 'Home', icon: Home, href: '/' },
+    { name: 'Dashboard', icon: BarChart, href: '/Volunteer/dashboard' },
+    { name: 'Profile', icon: User, href: '/Volunteer/profile' },
+    { name: 'Events', icon: Calendar, href: '/Volunteer/events/active' },
     {
       name: 'Notifications',
       icon: Bell,
@@ -102,21 +122,24 @@ const VolunteerSidebar = () => {
           </div>
         </nav>
         <Button
-          onPress={onOpen}
+          onPress={() => {
+            if (volunteer && volunteer.isEventHost) {
+              router.push('/event-host/events');
+            } else {
+              onOpen();
+            }
+          }}
           className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-8"
         >
           Switch to Event Host
         </Button>
-        <VolunteerToHostModal
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-        />
+        <VolunteerToHostModal isOpen={isOpen} onOpenChange={onOpenChange} />
       </div>
 
       {/* Logout */}
       <div>
         <button
-          onClick={() => setSelectedItem("Logout")}
+          onClick={() => setSelectedItem('Logout')}
           className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
