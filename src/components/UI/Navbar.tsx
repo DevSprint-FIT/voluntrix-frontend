@@ -49,7 +49,7 @@ export default function Navbar() {
         >
           <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Features</Link>
           <Link href="/events" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Events</Link>
-          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Event Feed</Link>
+          <Link href="/PublicFeed" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Social Feed</Link>
           <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">Volunteers</Link>
         </div>
 

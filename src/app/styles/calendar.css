@@ -1,4 +1,4 @@
-/* Clean Calendar Styles - Only Essential Rules */
+
 
 /* Basic calendar setup */
 .react-calendar {
@@ -15,6 +15,12 @@
   box-shadow: none !important;
   color: inherit !important;
   font-weight: normal !important;
+  /* Ensure tiles have consistent dimensions */
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Prevent underline on dates */
@@ -25,11 +31,6 @@
 /* Remove red color on weekends */
 .react-calendar__month-view__days__day--weekend {
   color: inherit; /* Use default text color */
-}
-
-/* Keep your event highlight class */
-.highlight-event {
-  @apply bg-blue-500 text-white rounded-full;
 }
 
 /* Remove underlines from all text */
@@ -75,14 +76,6 @@
   font-family: inherit;
 }
 
-/* Highlight event dates with verdant-600 background */
-.react-calendar__tile.highlight-event {
-  background-color: #0cbc8b !important; /* verdant-600 */
-  color: white !important;
-  border-radius: 50px;
-  font-weight: 600;
-}
-
 /* Style for the year dropdown to show years from current to bottom */
 .year-dropdown {
   max-height: 200px;
@@ -107,7 +100,7 @@
   background-color: #f3f4f6;
 }
 
-/* ONLY style for event dates - this is what you want highlighted */
+/* PERFECT CIRCLE for event dates */
 .react-calendar__tile.highlight-event {
   position: relative !important;
 }
@@ -118,11 +111,14 @@
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: 28px !important;
-  height: 28px !important;
+  /* Use the same value for both width and height to ensure perfect circle */
+  width: 32px !important;
+  height: 32px !important;
   background-color: #0cbc8b !important;
   border-radius: 50% !important;
   z-index: 1 !important;
+  /* Prevent any distortion */
+  flex-shrink: 0 !important;
 }
 
 .react-calendar__tile.highlight-event abbr {
@@ -137,6 +133,9 @@
 .react-calendar__tile.highlight-event:focus::before,
 .react-calendar__tile.highlight-event:active::before {
   background-color: #0cbc8b !important;
+  /* Maintain circle dimensions on hover/focus */
+  width: 32px !important;
+  height: 32px !important;
 }
 
 .react-calendar__tile.highlight-event:hover abbr,
