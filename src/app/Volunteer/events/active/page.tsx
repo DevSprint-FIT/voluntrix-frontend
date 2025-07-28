@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Table, { Column } from "@/components/UI/Table";
+import { useEffect, useState } from 'react';
+import Table, { Column } from '@/components/UI/Table';
 import {
   ActiveEvent,
   getVolunteerActiveEvents,
-} from "@/services/volunteerEventService";
-import { Loader2 } from "lucide-react";
+} from '@/services/volunteerEventService';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function ActiveEventsPage() {
   const [events, setEvents] = useState<ActiveEvent[]>([]);
@@ -14,13 +15,20 @@ export default function ActiveEventsPage() {
 
   const volunteerId = 1; // Replace with actual volunteer ID
 
+  const router = useRouter();
+
+  //want event id
+  const handleRowClick = (row: ActiveEvent) => {
+    router.push(`/VolunteerWorkspace/${String(row.eventId)}/tasks`);
+  };
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const data = await getVolunteerActiveEvents(volunteerId);
         setEvents(data);
       } catch (error) {
-        console.error("Failed to load active events", error);
+        console.error('Failed to load active events', error);
       } finally {
         setLoading(false);
       }
@@ -31,42 +39,42 @@ export default function ActiveEventsPage() {
 
   const columns: Column<ActiveEvent>[] = [
     {
-      header: "Event Name",
-      accessor: "eventName",
+      header: 'Event Name',
+      accessor: 'eventName',
     },
     {
-      header: "Start Date",
-      accessor: "startDate",
+      header: 'Start Date',
+      accessor: 'startDate',
       cell: (value) => {
         // Convert array [year, month, day] to readable date
         const dateArray = value as unknown as number[];
         if (Array.isArray(dateArray) && dateArray.length === 3) {
           return `${dateArray[0]}-${String(dateArray[1]).padStart(
             2,
-            "0"
-          )}-${String(dateArray[2]).padStart(2, "0")}`;
+            '0'
+          )}-${String(dateArray[2]).padStart(2, '0')}`;
         }
         return String(value);
       },
     },
     {
-      header: "End Date",
-      accessor: "endDate",
+      header: 'End Date',
+      accessor: 'endDate',
       cell: (value) => {
         // Convert array [year, month, day] to readable date
         const dateArray = value as unknown as number[];
         if (Array.isArray(dateArray) && dateArray.length === 3) {
           return `${dateArray[0]}-${String(dateArray[1]).padStart(
             2,
-            "0"
-          )}-${String(dateArray[2]).padStart(2, "0")}`;
+            '0'
+          )}-${String(dateArray[2]).padStart(2, '0')}`;
         }
         return String(value);
       },
     },
     {
-      header: "Location",
-      accessor: "location",
+      header: 'Location',
+      accessor: 'location',
     },
   ];
 
@@ -78,7 +86,7 @@ export default function ActiveEventsPage() {
           <Loader2 className="h-8 w-8 text-verdant-600 animate-spin" />
         </div>
       ) : (
-        <Table columns={columns} data={events} />
+        <Table columns={columns} data={events} handleRowClick={handleRowClick} />
       )}
     </div>
   );

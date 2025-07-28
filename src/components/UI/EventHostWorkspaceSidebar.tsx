@@ -20,7 +20,7 @@ interface MenuItem {
   badge?: number;
 }
 
-const EventHostWorkspaceSidebar = () => {
+const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
 
@@ -31,32 +31,32 @@ const EventHostWorkspaceSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Tasks", icon: ListTodo, href: "/EventHostWorkspace/tasks" },
+    { name: "Tasks", icon: ListTodo, href: `/EventHostWorkspace/${eventId}/tasks` },
     {
       name: "Volunteers",
       icon: Users,
-      href: "/EventHostWorkspace/volunteers",
+      href: `/EventHostWorkspace/${eventId}/volunteers`,
     },
     {
       name: "Sponsorships",
       icon: DollarSign,
-      href: "/EventHostWorkspace/sponsorships",
+      href: `/EventHostWorkspace/${eventId}/sponsorships`,
     },
     {
       name: "Leaderboard",
       icon: Trophy,
-      href: "/EventHostWorkspace/leaderboard",
+      href: `/EventHostWorkspace/${eventId}/leaderboard`,
     },
     {
       name: "Documents",
       icon: FileText,
-      href: "/EventHostWorkspace/documents",
+      href: `/EventHostWorkspace/${eventId}/documents`,
     },
     {
       name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: "/EventHostWorkspace/notifications",
+      href: `/EventHostWorkspace/${eventId}/notifications`,
     },
   ];
 

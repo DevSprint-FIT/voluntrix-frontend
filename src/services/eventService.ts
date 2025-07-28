@@ -136,3 +136,15 @@ export const fetchRecommendedEvents = async (
     throw error;
   }
 };
+
+export const fetchEventTitlesByHostId = async (hostId: number) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/events/names/${hostId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event titles:', error);
+    throw error;
+  }
+};

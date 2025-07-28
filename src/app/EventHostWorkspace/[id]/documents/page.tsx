@@ -8,7 +8,6 @@ import {
   Trash2,
   Eye,
   Search,
-  FileIcon,
   Filter,
   Clock,
   Calendar,
