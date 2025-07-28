@@ -40,117 +40,117 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
   const [error, setError] = useState<string>('');
 
   // Fetch available users and recent chats from backend
-  useEffect(() => {
-    const fetchUsersAndChats = async () => {
-      if (!currentUser) return;
+  const fetchUsersAndChats = async () => {
+    if (!currentUser) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Fetch recent conversations for the current user
+      const conversationsResponse = await fetch(`http://localhost:8081/api/private-chat/conversations/${encodeURIComponent(currentUser)}`);
       
-      setLoading(true);
-      setError('');
+      let recentChats: ChatUser[] = [];
+      if (conversationsResponse.ok) {
+        const conversations = await conversationsResponse.json();
+        
+        // Transform conversations to ChatUser format and store raw timestamp for sorting
+        const transformedChats = conversations.map((conv: any) => {
+          const otherUser = conv.user1 === currentUser ? conv.user2 : conv.user1;
+          const rawTimestamp = conv.lastMessage?.timestamp;
+          return {
+            username: otherUser,
+            lastMessage: conv.lastMessage?.content || 'No messages yet',
+            timestamp: rawTimestamp ? formatRelativeTime(rawTimestamp) : '',
+            unreadCount: conv.unreadCount || 0,
+            isOnline: Math.random() > 0.5, // TODO: Implement real online status
+            rawTimestamp: rawTimestamp // Keep raw timestamp for sorting
+          };
+        });
+        
+        // Sort by timestamp (most recent first)
+        transformedChats.sort((a: any, b: any) => {
+          if (!a.rawTimestamp && !b.rawTimestamp) return 0;
+          if (!a.rawTimestamp) return 1;
+          if (!b.rawTimestamp) return -1;
+          
+          const dateA = new Date(a.rawTimestamp);
+          const dateB = new Date(b.rawTimestamp);
+          return dateB.getTime() - dateA.getTime(); // DESC order (most recent first)
+        });
+        
+        // Remove rawTimestamp before setting state
+        recentChats = transformedChats.map(({ rawTimestamp, ...chat }: any) => chat);
+      }
       
-      try {
-        // Fetch recent conversations for the current user
-        const conversationsResponse = await fetch(`http://localhost:8081/api/private-chat/conversations/${encodeURIComponent(currentUser)}`);
-        
-        let recentChats: ChatUser[] = [];
-        if (conversationsResponse.ok) {
-          const conversations = await conversationsResponse.json();
-          
-          // Transform conversations to ChatUser format and store raw timestamp for sorting
-          const transformedChats = conversations.map((conv: any) => {
-            const otherUser = conv.user1 === currentUser ? conv.user2 : conv.user1;
-            const rawTimestamp = conv.lastMessage?.timestamp;
-            return {
-              username: otherUser,
-              lastMessage: conv.lastMessage?.content || 'No messages yet',
-              timestamp: rawTimestamp ? formatRelativeTime(rawTimestamp) : '',
-              unreadCount: conv.unreadCount || 0,
-              isOnline: Math.random() > 0.5, // TODO: Implement real online status
-              rawTimestamp: rawTimestamp // Keep raw timestamp for sorting
-            };
-          });
-          
-          // Sort by timestamp (most recent first)
-          transformedChats.sort((a: any, b: any) => {
-            if (!a.rawTimestamp && !b.rawTimestamp) return 0;
-            if (!a.rawTimestamp) return 1;
-            if (!b.rawTimestamp) return -1;
-            
-            const dateA = new Date(a.rawTimestamp);
-            const dateB = new Date(b.rawTimestamp);
-            return dateB.getTime() - dateA.getTime(); // DESC order (most recent first)
-          });
-          
-          // Remove rawTimestamp before setting state
-          recentChats = transformedChats.map(({ rawTimestamp, ...chat }: any) => chat);
-        }
-        
-        // If no recent chats, show some default available users
-        if (recentChats.length === 0) {
-          const defaultUsers: ChatUser[] = [
-            {
-              username: 'Harindu Hadithya',
-              lastMessage: "Available for new conversations",
-              timestamp: 'Online',
-              unreadCount: 0,
-              isOnline: true
-            },
-            {
-              username: 'Alice Johnson',
-              lastMessage: "Ready to help with volunteering",
-              timestamp: 'Online',
-              unreadCount: 0,
-              isOnline: true
-            },
-            {
-              username: 'Bob Smith',
-              lastMessage: "Looking for sponsors",
-              timestamp: 'Online',
-              unreadCount: 0,
-              isOnline: true
-            },
-            {
-              username: 'Carol White',
-              lastMessage: "Community organizer",
-              timestamp: 'Online',
-              unreadCount: 0,
-              isOnline: false
-            }
-          ];
-          
-          // Filter out current user from default users
-          recentChats = defaultUsers.filter(user => user.username !== currentUser);
-        }
-        
-        setAvailableUsers(recentChats);
-
-        // Fetch sponsors
-        const sponsorsResponse = await fetch('http://localhost:8081/api/private-chat/sponsors');
-        if (sponsorsResponse.ok) {
-          const sponsorsData = await sponsorsResponse.json();
-          setSponsors(sponsorsData);
-        }
-
-      } catch (error) {
-        console.error('Error fetching users and chats:', error);
-        setError('Failed to load conversations');
-        
-        // Fallback to default users on error
-        const fallbackUsers: ChatUser[] = [
+      // If no recent chats, show some default available users
+      if (recentChats.length === 0) {
+        const defaultUsers: ChatUser[] = [
           {
             username: 'Harindu Hadithya',
-            lastMessage: "Available for conversations",
+            lastMessage: "Available for new conversations",
             timestamp: 'Online',
             unreadCount: 0,
             isOnline: true
+          },
+          {
+            username: 'Alice Johnson',
+            lastMessage: "Ready to help with volunteering",
+            timestamp: 'Online',
+            unreadCount: 0,
+            isOnline: true
+          },
+          {
+            username: 'Bob Smith',
+            lastMessage: "Looking for sponsors",
+            timestamp: 'Online',
+            unreadCount: 0,
+            isOnline: true
+          },
+          {
+            username: 'Carol White',
+            lastMessage: "Community organizer",
+            timestamp: 'Online',
+            unreadCount: 0,
+            isOnline: false
           }
-        ].filter(user => user.username !== currentUser);
+        ];
         
-        setAvailableUsers(fallbackUsers);
-      } finally {
-        setLoading(false);
+        // Filter out current user from default users
+        recentChats = defaultUsers.filter(user => user.username !== currentUser);
       }
-    };
+      
+      setAvailableUsers(recentChats);
 
+      // Fetch sponsors
+      const sponsorsResponse = await fetch('http://localhost:8081/api/private-chat/sponsors');
+      if (sponsorsResponse.ok) {
+        const sponsorsData = await sponsorsResponse.json();
+        setSponsors(sponsorsData);
+      }
+
+    } catch (error) {
+      console.error('Error fetching users and chats:', error);
+      setError('Failed to load conversations');
+      
+      // Fallback to default users on error
+      const fallbackUsers: ChatUser[] = [
+        {
+          username: 'Harindu Hadithya',
+          lastMessage: "Available for conversations",
+          timestamp: 'Online',
+          unreadCount: 0,
+          isOnline: true
+        }
+      ].filter(user => user.username !== currentUser);
+      
+      setAvailableUsers(fallbackUsers);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsersAndChats();
   }, [currentUser]);
 
@@ -176,11 +176,15 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredSponsors = sponsors.filter(sponsor =>
-    sponsor.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  // Filter out sponsors who already have conversations with the current user
+  const conversationUsernames = new Set(availableUsers.map(user => user.username));
+  const filteredSponsors = sponsors.filter(sponsor => 
+    !conversationUsernames.has(sponsor.username) && // Exclude sponsors with existing conversations
+    sponsor.username !== currentUser && // Exclude current user
+    (sponsor.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     sponsor.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     sponsor.bio.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    sponsor.companyName.toLowerCase().includes(searchQuery.toLowerCase())
+    sponsor.companyName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleStartNewChat = () => {
@@ -190,6 +194,13 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
       setNewChatUser('');
       setShowAddChat(false);
     }
+  };
+
+  // Handle user selection and refresh data to move sponsors from "All Sponsors" to "Available Sponsors"
+  const handleSelectUser = (username: string) => {
+    onSelectUser(username);
+    // Optionally switch to conversations tab when starting a new chat
+    setActiveTab('conversations');
   };
 
   const getAvatarColor = (username: string): string => {
@@ -324,7 +335,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
             filteredUsers.map((user, index) => (
               <div 
                 key={index}
-                onClick={() => onSelectUser(user.username)}
+                onClick={() => handleSelectUser(user.username)}
                 className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
               >
                 {/* Avatar */}
@@ -380,7 +391,7 @@ export default function ChatListInterface({ currentUser, onSelectUser, onLogout 
             filteredSponsors.map((sponsor, index) => (
               <div 
                 key={index}
-                onClick={() => onSelectUser(sponsor.username)}
+                onClick={() => handleSelectUser(sponsor.username)}
                 className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
               >
                 {/* Avatar */}

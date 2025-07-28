@@ -11,6 +11,7 @@ export default function ChatController() {
   const [usernameInput, setUsernameInput] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key to force re-render
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
@@ -50,6 +51,7 @@ export default function ChatController() {
       setChatState('chatList');
       setSelectedUser('');
       setIsAnimating(false);
+      setRefreshKey(prev => prev + 1); // Increment to force refresh
     }, 100);
   };
 
@@ -172,6 +174,7 @@ export default function ChatController() {
           isAnimating ? 'translate-x-full' : 'translate-x-0'
         }`}>
           <ChatListInterface 
+            key={refreshKey} // Add key to force re-render when returning from chat
             currentUser={currentUser}
             onSelectUser={handleSelectUser}
             onLogout={handleLogout}
