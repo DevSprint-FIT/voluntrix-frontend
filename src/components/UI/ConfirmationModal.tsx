@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@heroui/react";
 import { X } from "lucide-react";
 
 interface ConfirmationModalProps {
@@ -32,13 +31,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div className="flex justify-end space-x-4">
           <button 
             onClick={onCancel}
-            className="px-4 py-2 border border-shark-200 rounded-md hover:bg-shark-50"
+            className="px-4 py-2 border border-shark-200 rounded-full hover:bg-shark-50"
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-md ${confirmButtonClass}`}
+            className={`px-4 py-2 rounded-full ${confirmButtonClass}`}
           >
             {confirmButtonText}
           </button>
