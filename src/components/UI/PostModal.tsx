@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import uploadImage from "@/utils/uploadImage";
 import { Image as ImageIcon, Pencil } from "lucide-react";
 import {Textarea} from "@heroui/react";
-import { Button } from "@heroui/react";
+import { Button } from "@heroui/button";
 
 interface PostModalProps {
   onClose: () => void;
@@ -115,16 +115,16 @@ const PostModal: React.FC<PostModalProps> = ({
 
         <Textarea
            value={content}
-           onChange={(e) => setContent(e.target.value)}
+           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
            placeholder="What do you want to talk about?"
-           minRows={2}
-           maxRows={6}
+           minRows={6}
+           maxRows={8}
            variant="flat"
            classNames={{
               input: "focus:ring-0 focus:outline-none !border-0 focus:!border-0",
               inputWrapper: "!border-0 focus:!border-0 !shadow-none data-[focus=true]:!border-0 data-[hover=true]:!border-0"
       }}
-           className="w-full  mb-10 " 
+           className="w-full   " 
         />
 
 
@@ -139,7 +139,7 @@ const PostModal: React.FC<PostModalProps> = ({
           <img
             src={previewImage}
             alt="Preview"
-            className="w-full max-w-md max-h-[28rem] rounded-lg object-contain mx-auto"
+            className="w-full max-w-md max-h-[28rem] rounded-lg object-contain mx-auto pt-2"
            />
         ) : null}
 
@@ -167,7 +167,7 @@ const PostModal: React.FC<PostModalProps> = ({
           <Button
            onPress={handleSubmit}
            disabled={isUploading}
-           className="bg-shark-950 text-white px-4 py-2 rounded-full hover:bg-shark-400"
+           className="bg-shark-950 text-white px-4 py-2 !rounded-full hover:bg-shark-400"
         >
           {isUploading ? "Submitting..." : isEditing ? "Update" : "Post"}
         </Button>

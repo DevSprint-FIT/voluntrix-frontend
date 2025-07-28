@@ -190,13 +190,13 @@ const SettingsPage = () => {
                   <div className="flex gap-2 mt-4">
                     <Button
                       onPress={() => setEditingEmail(false)}
-                      className="rounded-full bg-shark-100 text-shark-900 font-primary"
+                      className="!rounded-full bg-shark-100 text-shark-900 font-primary"
                     >
                       Cancel
                     </Button>
                     <Button
                       onPress={handleSaveEmail}
-                      className="rounded-full bg-shark-950 text-shark-50 font-primary"
+                      className="!rounded-full bg-shark-950 text-shark-50 font-primary"
                     >
                       Save
                     </Button>
@@ -208,7 +208,7 @@ const SettingsPage = () => {
             {!editingEmail && (
               <Button
                 onPress={() => setEditingEmail(true)}
-                className="rounded-full bg-shark-950 text-shark-50 font-primary"
+                className="!rounded-full bg-shark-950 text-shark-50 font-primary"
               >
                 Change email
               </Button>
@@ -235,7 +235,7 @@ const SettingsPage = () => {
         <div className="mb-4 text-shark-700">Permanently delete your account and all data.</div>
         <Button
           onPress={() => setOpen(true)}
-          className="rounded-full bg-red-600 text-shark-50 font-primary"
+          className="!rounded-full bg-red-600 text-shark-50 font-primary"
         >
           Delete Account
         </Button>

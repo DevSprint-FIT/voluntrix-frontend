@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@heroui/react";
+import { Button } from "@heroui/button";
  
 
 interface Button {
@@ -22,7 +22,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({ buttons, onSelect, activeButt
         <Button
           key={btn.label}
           onClick={() => onSelect(btn.label)}
-          className={`px-4 py-2 rounded-full text-base
+          className={`px-4 py-2 !rounded-full text-base
             ${activeButton === btn.label ? "bg-shark-900 text-white" : "text-shark-500 bg-transparent"} 
             transition-colors duration-300`}
         >

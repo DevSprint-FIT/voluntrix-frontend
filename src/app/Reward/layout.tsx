@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 export default function RewardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
 
   const buttons = [
     { label: "Redeem", path: "/Reward/redeem" },
