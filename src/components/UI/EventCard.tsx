@@ -7,21 +7,8 @@ import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 
-interface Event {
-  imageUrl: string;
-  title: string;
-  organizer: string;
-  description: string;
-  specialTags: string[];
-  date: string;
-  venue: string;
-  time?: string;
-  donationAvailable: boolean;
-}
-
-export default function EventCard({event}: {event: Event}) {  
+export default function EventCard({event}: {event: EventType}) {  
   const [isSaved, setIsSaved] = useState(false);
-  const [value] = useState(50);
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
@@ -52,14 +39,13 @@ export default function EventCard({event}: {event: Event}) {
   const handleNavigate = () => {
     router.push(`/events/${event.eventId}`);
   };
-
   return (
     <div className="w-[310px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
       {event && (
         <>
           <div className="h-[165px] relative overflow-hidden">
             <Image
-              src={'/images/DummyEvent2.png'} // want to add actual image url
+              src={event.eventImageUrl} // '/images/DummyEvent2.png'
               className="rounded-t-[10px] transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
               width={310}
               height={165}
@@ -90,12 +76,14 @@ export default function EventCard({event}: {event: Event}) {
                     />
                   </button>
                 </div>
-                <p
-                  className="text-shark-900 font-medium text-md text-wrap"
-                  style={{ marginTop: '-10px' }}
-                >
-                  By {event.organizer}
-                </p>
+                {event.organizationName && (
+                  <p
+                    className="text-shark-900 font-medium text-md text-wrap"
+                    style={{ marginTop: '-10px' }}
+                  >
+                    By {event.organizationName}
+                  </p>
+                )}
                 {!event.donationEnabled && (
                   <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
                     {event.eventDescription}
@@ -141,28 +129,36 @@ export default function EventCard({event}: {event: Event}) {
               </div>
             </div>
           </div>
-          {event.donationEnabled && (
-            <div className="flex justify-center w-[308px] mt-[20px]">
-              <div className="w-[258px] flex gap-1 justify-center items-center flex-col">
-                <Progress
-                  aria-label="Downloading..."
-                  className="w-[249px]"
-                  color="success"
-                  showValueLabel={false}
-                  size="md"
-                  value={value}
-                />
-                <div className="flex gap-1 justify-between w-full px-[4px] text-[12px] text-secondary ">
-                  <div className="text-verdant-600">
-                    <span>{100 - value}%</span> to complete
-                  </div>
-                  <div className="text-shark-500">
-                    Goal $<span>20,000</span>
+          {event.donationEnabled &&
+            event.donations !== null &&
+            event.donationGoal !== null && (
+              <div className="flex justify-center w-[308px] mt-[20px]">
+                <div className="w-[258px] flex gap-1 justify-center items-center flex-col">
+                  <Progress
+                    aria-label="Downloading..."
+                    className="w-[249px]"
+                    color="success"
+                    showValueLabel={false}
+                    size="md"
+                    value={(event.donations / event.donationGoal) * 100}
+                  />
+                  <div className="flex gap-1 justify-between w-full px-[4px] text-[12px] text-secondary ">
+                    <div className="text-verdant-600">
+                      <span>
+                        {Math.round(
+                          100 - (event.donations / event.donationGoal) * 100
+                        )}
+                        %
+                      </span>{' '}
+                      to complete
+                    </div>
+                    <div className="text-shark-500">
+                      Goal Rs. <span>{event.donationGoal}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </>
       )}
     </div>

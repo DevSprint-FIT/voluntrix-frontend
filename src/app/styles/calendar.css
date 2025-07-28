@@ -17,6 +17,21 @@
   font-weight: normal !important;
 }
 
+/* Prevent underline on dates */
+.react-calendar__tile abbr {
+  text-decoration: none;
+}
+
+/* Remove red color on weekends */
+.react-calendar__month-view__days__day--weekend {
+  color: inherit; /* Use default text color */
+}
+
+/* Keep your event highlight class */
+.highlight-event {
+  @apply bg-blue-500 text-white rounded-full;
+}
+
 /* Remove underlines from all text */
 .react-calendar__tile abbr,
 .react-calendar__month-view__weekdays abbr {
@@ -36,10 +51,60 @@
   font-weight: normal !important;
 }
 
+/* Set the calendar background color to #FBFBFB */
+.react-calendar {
+  background-color: #fbfbfb !important;
+  border: none;  
+  font-family: inherit;
+  cursor: default;
+}
+
 /* Style weekday headers */
 .react-calendar__month-view__weekdays abbr {
   font-family: inherit;
   cursor: default;
+}
+
+/* Style the month/year label */
+.react-calendar__navigation__label {
+  background-color: #ecfdf5 !important; /* verdant-50 */
+  color: #047857 !important; /* verdant-600 */
+  border-radius: 9999px !important; /* rounded-full */
+  padding: 6px 12px !important;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* Highlight event dates with verdant-600 background */
+.react-calendar__tile.highlight-event {
+  background-color: #0cbc8b !important; /* verdant-600 */
+  color: white !important;
+  border-radius: 50px;
+  font-weight: 600;
+}
+
+/* Style for the year dropdown to show years from current to bottom */
+.year-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.year-dropdown option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.year-dropdown option:hover {
+  background-color: #f3f4f6;
 }
 
 /* ONLY style for event dates - this is what you want highlighted */

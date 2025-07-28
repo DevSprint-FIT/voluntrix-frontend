@@ -1,12 +1,76 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Calendar, Mail, Phone, X, Award } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Mail,
+  Phone,
+  X,
+  Award,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import {
   volunteerProfileService,
   VolunteerProfile,
   Organization,
 } from "@/services/volunteerProfileService";
+
+// Notification Modal Component
+const NotificationModal = ({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  type: "success" | "error";
+  title: string;
+  message: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl w-full max-w-md mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            {type === "success" ? (
+              <CheckCircle className="text-green-600" size={24} />
+            ) : (
+              <AlertCircle className="text-red-600" size={24} />
+            )}
+            <h2 className="text-lg font-semibold font-secondary text-gray-900">
+              {title}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <p className="text-gray-600 font-secondary mb-6">{message}</p>
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className={`px-4 py-2 rounded-full font-primary tracking-wide text-base ${
+              type === "success"
+                ? "bg-green-600 text-white"
+                : "bg-red-600 text-white"
+            }`}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Modal Component
 const FollowedOrganizationsModal = ({
@@ -89,6 +153,12 @@ const VolunteerProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"success" | "error">("success");
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+
   // Using hardcoded values as specified
   const volunteerId = 1;
   const username = "anne13";
@@ -129,9 +199,24 @@ const VolunteerProfilePage = () => {
       setFollowedOrganizations((prev) =>
         prev.filter((org) => org.id !== organizationId)
       );
+
+      // Show success modal
+      setModalType("success");
+      setModalTitle("Organization Unfollowed");
+      setModalMessage("You have successfully unfollowed this organization.");
+      setModalOpen(true);
     } catch (err) {
       console.error("Failed to unfollow organization:", err);
-      alert("Failed to unfollow organization. Please try again.");
+
+      // Show error modal
+      setModalType("error");
+      setModalTitle("Unfollow Failed");
+      setModalMessage(
+        err instanceof Error
+          ? err.message
+          : "Failed to unfollow organization. Please try again."
+      );
+      setModalOpen(true);
     }
   };
 
@@ -333,6 +418,15 @@ const VolunteerProfilePage = () => {
         onClose={() => setIsModalOpen(false)}
         organizations={followedOrganizations}
         onUnfollow={handleUnfollow}
+      />
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
       />
     </div>
   );

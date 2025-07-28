@@ -151,7 +151,7 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
           className="w-[639px] flex flex-col items-center justify-start rounded-[20px] gap-1"
         >
           <div className="w-[607px] h-[1px] bg-shark-200"></div>
-          <div className="w-[639px] relative flex flex-col items-center justify-start text-shark-300 text-lg max-h-[200px] overflow-y-auto">
+          <div className="w-[633px] relative flex flex-col items-center justify-start text-shark-300 text-lg max-h-[200px] overflow-y-auto overflow-x-hidden">
             {searchResults.map((result, index) => {
               const isResultValid = eventTitles.includes(result);
               return (

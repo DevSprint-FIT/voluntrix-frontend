@@ -6,7 +6,7 @@ interface ErrorDisplayProps {
   error: string;
 }
 
-export default function ErrorDisplay({ error }: ErrorDisplayProps) {
+export default function EventErrorDisplay({ error }: ErrorDisplayProps) {
   const isNetworkError =
     error.includes('Network') ||
     error.includes('Unexpected') ||

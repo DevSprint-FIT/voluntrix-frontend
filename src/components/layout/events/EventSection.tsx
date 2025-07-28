@@ -4,29 +4,9 @@ import { useRef, useEffect, useState } from 'react';
 import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
 import { EventType } from '@/types/EventType';
-
-const eventData: EventType = {
-  eventId: 1,
-  eventTitle: 'FIT Future Careers',
-  eventDescription:
-    'Join us for an exclusive event focused on connecting aspiring professionals with industry leaders.',
-  eventLocation: 'FIT Auditorium',
-  eventStartDate: '2025-11-20',
-  eventEndDate: '2025-11-22',
-  eventTime: '10:00:00',
-  eventImageUrl: '/images/DummyEvent2.png',
-  volunteerCount: 0,
-  eventType: 'ONLINE',
-  eventVisibility: 'PRIVATE',
-  eventStatus: 'PENDING',
-  sponsorshipEnabled: true,
-  donationEnabled: false,
-  categories: [
-    { categoryId: 1, categoryName: 'environment' },
-    { categoryId: 3, categoryName: 'technology' },
-  ],
-  organizer: 'INTECS, UoM',
-};
+import { fetchRecommendedEvents } from '@/services/eventService';
+import EventCardSkeleton from '@/components/UI/EventCardSkeleton';
+import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
 
 interface EventSectionProps {
   title: string;
@@ -37,6 +17,26 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getRecommendedEvents = async (id: number) => {
+      try {
+        const eventsData = await fetchRecommendedEvents(id);
+        setEvents(eventsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching all events:', err);
+        setError('Failed to fetch events.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getRecommendedEvents(3); // add volunteer id
+  }, []);
 
   const checkScroll = () => {
     const { current } = scrollRef;
@@ -86,11 +86,20 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
             className="w-[1200px] flex overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar"
           >
             <div className="flex gap-7 mb-12">
-              <EventCard event={eventData} />
-              <EventCard event={eventData} />
-              <EventCard event={eventData} />
-              <EventCard event={eventData} />
-              <EventCard event={eventData} />
+              {isLoading ? (
+                <div className="flex gap-7">
+                  <EventCardSkeleton />
+                  <EventCardSkeleton />
+                  <EventCardSkeleton />
+                  <EventCardSkeleton />
+                </div>
+              ) : error ? (
+                <EventErrorDisplay error={error} />
+              ) : (
+                events.map((event) => (
+                  <EventCard key={event.eventId} event={event} />
+                ))
+              )}
             </div>
           </div>
         </div>

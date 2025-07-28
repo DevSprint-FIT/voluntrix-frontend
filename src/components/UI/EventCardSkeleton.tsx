@@ -1,6 +1,6 @@
 import { Card, Skeleton } from '@heroui/react';
 
-export default function EventSkeleton() {
+export default function EventCardSkeleton() {
   return (
     <Card
       className="w-[310px] h-[460px] flex flex-col items-center justify-start bg-white shadow-lg gap-3"

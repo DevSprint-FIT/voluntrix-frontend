@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { EventType } from '@/types/EventType';
+import { EventCreateType } from '@/types/EventCreateType';
 
 export const fetchEventById = async (id: number): Promise<EventType> => {
   try {
     const response = await axios.get<EventType>(
-      `http://localhost:8080/api/public/events/${id}`
+      `http://localhost:8080/api/public/events/with-org/${id}`
     );
 
     return response.data;
@@ -19,7 +20,7 @@ export const fetchFilteredEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/filter',
+      'http://localhost:8080/api/public/events/filter-with-org',
       { params }
     );
 
@@ -35,7 +36,7 @@ export const fetchSearchedEvents = async (
 ): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/search',
+      'http://localhost:8080/api/public/events/search-with-org',
       { params: { query: searchText } }
     );
 
@@ -55,6 +56,83 @@ export const fetchEventTitles = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching event:', error);
+    throw error;
+  }
+};
+
+export const createEvent = async (eventData: EventCreateType) => {
+  // const token = 'mock-token-for-testing'; // authentication token
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8080/api/public/events',
+      eventData,
+      {
+        headers: {
+          // Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating event:', error);
+    throw error;
+  }
+};
+
+export const fetchEventByHostId = async (id: number): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      `http://localhost:8080/api/public/events/host/${id}`
+    );
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.warn('Unexpected response format:', data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Failed to fetch events:', error);
+    return [];
+  }
+};
+
+export const fetchAllEvents = async (): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/events'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    throw error;
+  }
+};
+
+export const fetchLatestEvents = async (): Promise<EventType[]> => {
+  try {
+    const response = await axios.get<EventType[]>(
+      'http://localhost:8080/api/public/events/latest-three'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    throw error;
+  }
+};
+
+export const fetchRecommendedEvents = async (
+  id: number
+): Promise<EventType[]> => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/public/events/recommended/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all events:', error);
     throw error;
   }
 };

@@ -9,15 +9,7 @@ import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/eventService';
 import { EventType } from '@/types/EventType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
-
-const sponsorData = {
-  sponsorships: [
-    'Title Partner',
-    'Platinum Partner',
-    'Gold Partner',
-    'Silver Partner',
-  ],
-};
+import { fetchSponsorshipsByEvent } from '@/services/sponsorshipService';
 
 export default function EventPage({
   params,
@@ -30,6 +22,7 @@ export default function EventPage({
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [sponsorships, setSponsorships] = useState<string[]>([]);
 
   useEffect(() => {
     if (isNaN(eventId)) {
@@ -38,15 +31,31 @@ export default function EventPage({
       return;
     }
 
-    const getEvent = async () => {
+    const getEventAndSponsorships = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const eventData = await fetchEventById(eventId);
-        if (eventData) {
-          setEvent(eventData);
-        } else {
+
+        if (!eventData) {
           setError('Event not found');
+          return;
+        }
+
+        setEvent(eventData);
+
+        if (eventData.sponsorshipEnabled) {
+          try {
+            const sponsorshipData = await fetchSponsorshipsByEvent(eventId);
+            const sponsorshipNames = sponsorshipData.map(
+              (s) => s.sponsorshipName
+            );
+            setSponsorships(sponsorshipNames);
+          } catch (sponsErr) {
+            console.error('Failed to fetch sponsorships:', sponsErr);
+            setSponsorships([]);
+          }
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -59,7 +68,7 @@ export default function EventPage({
       }
     };
 
-    getEvent();
+    getEventAndSponsorships();
   }, [eventId]);
 
   return (
@@ -74,7 +83,10 @@ export default function EventPage({
         </div>
       ) : event ? (
         <>
-          <Event event={event} sponsor={sponsorData} />
+          <Event
+            event={event}
+            sponsor={{ sponsorships }}
+          />
           <EventSection
             title="Based on your browsing history"
             subTitle="Based on searches and preferences"

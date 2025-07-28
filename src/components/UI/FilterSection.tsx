@@ -1,33 +1,33 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Button, Switch } from '@heroui/react';
+import { Button } from '@heroui/react';
 import Image from 'next/image';
-import SelectField from './SelectField';
+// import SelectField from './SelectField';
 
-const provinces = [
-  { key: 'western', label: 'Western' },
-  { key: 'central', label: 'Central' },
-  { key: 'southern', label: 'Southern' },
-  { key: 'northern', label: 'Northern' },
-  { key: 'eastern', label: 'Eastern' },
-  { key: 'north_western', label: 'North Western' },
-  { key: 'north_central', label: 'North Central' },
-  { key: 'uva', label: 'Uva' },
-  { key: 'sabaragamuwa', label: 'Sabaragamuwa' },
-];
+// const provinces = [
+//   { key: 'western', label: 'Western' },
+//   { key: 'central', label: 'Central' },
+//   { key: 'southern', label: 'Southern' },
+//   { key: 'northern', label: 'Northern' },
+//   { key: 'eastern', label: 'Eastern' },
+//   { key: 'north_western', label: 'North Western' },
+//   { key: 'north_central', label: 'North Central' },
+//   { key: 'uva', label: 'Uva' },
+//   { key: 'sabaragamuwa', label: 'Sabaragamuwa' },
+// ];
 
-const districtsByProvince = {
-  western: ['Colombo', 'Gampaha', 'Kalutara'],
-  central: ['Kandy', 'Matale', 'Nuwara Eliya'],
-  southern: ['Galle', 'Matara', 'Hambantota'],
-  northern: ['Jaffna', 'Kilinochchi', 'Mannar', 'Vavuniya', 'Mullaitivu'],
-  eastern: ['Batticaloa', 'Ampara', 'Trincomalee'],
-  north_western: ['Kurunegala', 'Puttalam'],
-  north_central: ['Anuradhapura', 'Polonnaruwa'],
-  uva: ['Badulla', 'Monaragala'],
-  sabaragamuwa: ['Ratnapura', 'Kegalle'],
-};
+// const districtsByProvince = {
+//   western: ['Colombo', 'Gampaha', 'Kalutara'],
+//   central: ['Kandy', 'Matale', 'Nuwara Eliya'],
+//   southern: ['Galle', 'Matara', 'Hambantota'],
+//   northern: ['Jaffna', 'Kilinochchi', 'Mannar', 'Vavuniya', 'Mullaitivu'],
+//   eastern: ['Batticaloa', 'Ampara', 'Trincomalee'],
+//   north_western: ['Kurunegala', 'Puttalam'],
+//   north_central: ['Anuradhapura', 'Polonnaruwa'],
+//   uva: ['Badulla', 'Monaragala'],
+//   sabaragamuwa: ['Ratnapura', 'Kegalle'],
+// };
 
 const categories = [
   { id: 1, name: 'Environment' },
@@ -204,7 +204,7 @@ export default function FilterSection({
             </div>
 
             {/* Location */}
-            <div className="w-[297px] flex flex-col gap-1">
+            {/* <div className="w-[297px] flex flex-col gap-1">
               <p className="font-secondary text-shark-900 font-medium text-md">
                 Location
               </p>
@@ -244,7 +244,7 @@ export default function FilterSection({
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Category */}
             <div className="w-[297px] flex flex-col gap-1">
@@ -261,7 +261,7 @@ export default function FilterSection({
                     <div
                       key={category.id}
                       className={`py-1 px-2 border-2 rounded-[20px] cursor-pointer transition-all 
-        ${isSelected ? 'border-shark-950 text-shark-950' : 'border-shark-300'}`}
+                        ${isSelected ? 'border-shark-950 text-shark-950' : 'border-shark-300'}`}
                       onClick={() =>
                         handleCategoryToggle(category.id, category.name)
                       }
@@ -274,7 +274,7 @@ export default function FilterSection({
             </div>
 
             {/* Participation */}
-            <div className="w-[297px] flex flex-col gap-1">
+            {/* <div className="w-[297px] flex flex-col gap-1">
               <p className="font-secondary text-shark-900 font-medium text-md">
                 Participation Type
               </p>
@@ -325,7 +325,7 @@ export default function FilterSection({
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Error Message */}
             {errorMessage && (
