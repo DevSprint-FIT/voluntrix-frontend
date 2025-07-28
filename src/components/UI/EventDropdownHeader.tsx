@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface Event {
-  id: string;
-  name: string;
+  eventId: string;
+  eventTitle: string;
 }
 
 interface EventDropdownHeaderProps {
@@ -36,7 +36,7 @@ export default function EventDropdownHeader({
             className="flex items-center space-x-2 bg-verdant-50 hover:bg-verdant-100 px-4 py-2 rounded-lg border border-verdant-200 transition-colors"
           >
             <span className="font-secondary font-semibold text-shark-950">
-              {selectedEvent.name}
+              {selectedEvent.eventTitle}
             </span>
             <ChevronDown
               className={`h-4 w-4 text-shark-700 transition-transform ${
@@ -51,16 +51,16 @@ export default function EventDropdownHeader({
               <div className="py-2 max-h-64 overflow-y-auto">
                 {events.map((event) => (
                   <button
-                    key={event.id}
+                    key={event.eventId}
                     onClick={() => handleEventSelect(event)}
                     className={`w-full text-left px-4 py-3 hover:bg-verdant-50 transition-colors ${
-                      selectedEvent.id === event.id
+                      selectedEvent.eventId === event.eventId
                         ? "bg-verdant-50 text-verdant-700"
                         : "text-shark-950"
                     }`}
                   >
                     <span className="font-secondary font-medium">
-                      {event.name}
+                      {event.eventTitle}
                     </span>
                   </button>
                 ))}
