@@ -47,7 +47,7 @@ export default function SignupPage() {
             // Redirect based on profile completion status
             if (user.role == null) {
               router.replace('/auth/role-selection');
-            } else if (!user.isProfileCompleted) {
+            } else if (!user.profileCompleted) {
               router.replace(`/auth/profile-form?type=${user.role.toLowerCase()}`);
             } else {
               router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);

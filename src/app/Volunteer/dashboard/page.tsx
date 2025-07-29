@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -24,8 +25,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  isEmailVerified: boolean;
-  isProfileCompleted: boolean;
+  emailVerified: boolean;
+  profileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -226,43 +227,38 @@ const VolunteerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   
-    useEffect(() => {
-      const checkAuthAndLoadData = async () => {
-        try {
-          if (!authService.isAuthenticated()) {
-            router.replace('/auth/login');
-            return;
-          }
-  
-          const currentUser = await authService.getCurrentUser();
-          if (!currentUser) {
-            router.replace('/auth/login');
-            return;
-          }
-  
-          // Check if user is volunteer
-          if (currentUser.role.toLowerCase() !== 'volunteer') {
-            router.replace('/dashboard');
-            return;
-          }
-  
-          // Check if profile is completed
-          if (!currentUser.isProfileCompleted) {
-            router.replace('/auth/profile-form?type=volunteer');
-            return;
-          }
-  
-          setUser(currentUser);
-        } catch (error) {
-          console.error('Auth check error:', error);
-          router.replace('/auth/signup');
-        } finally {
-          setIsLoading(false);
+  useEffect(() => {
+    const checkAuthAndLoadData = async () => {
+      try {
+        if (!authService.isAuthenticated()) {
+          router.replace('/auth/login');
+          return;
         }
-      };
-  
-      checkAuthAndLoadData();
-    }, [router]);
+
+        const currentUser = await authService.getCurrentUser();
+        if (!currentUser) {
+          router.replace('/auth/login');
+          return;
+        }
+
+        // Check if profile is completed
+        if (!currentUser.profileCompleted) {
+          console.log(currentUser);
+          router.replace('/auth/profile-form?type=volunteer');
+          return;
+        }
+
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.replace('/auth/signup');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthAndLoadData();
+  }, [router]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {

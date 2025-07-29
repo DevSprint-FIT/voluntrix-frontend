@@ -18,8 +18,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  isEmailVerified: boolean;
-  isProfileCompleted: boolean;
+  emailVerified: boolean;
+  profileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -87,7 +87,7 @@ const ProfileFormContent = () => {
         }
 
         // Check if profile is already completed
-        if (user.isProfileCompleted) {
+        if (user.profileCompleted) {
           router.replace(`/${user.role.slice(0, 1) + user.role.slice(1).toLowerCase()}/dashboard`);
           return;
         } else if (user.role == null) {
@@ -148,6 +148,12 @@ const ProfileFormContent = () => {
         
         console.log("Organization created successfully:", response);
         
+        // Update local auth service profile status
+        await authService.updateProfileStatus(true);
+        
+        // Add delay to allow backend to process the profile completion
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
         // Navigate to organization dashboard
         router.push('/Organization/dashboard');
         return;
@@ -160,6 +166,12 @@ const ProfileFormContent = () => {
 
         console.log("Volunteer created successfully:", response);
 
+        // Update local auth service profile status
+        await authService.updateProfileStatus(true);
+        
+        // Add delay to allow backend to process the profile completion
+        await new Promise(resolve => setTimeout(resolve, 4000));
+
         // Navigate to volunteer dashboard
         router.push('/Volunteer/dashboard');
         return;
@@ -171,6 +183,12 @@ const ProfileFormContent = () => {
         const response = await createSponsor(sponsorData);
 
         console.log("Sponsor created successfully:", response);
+
+        // Update local auth service profile status
+        await authService.updateProfileStatus(true);
+        
+        // Add delay to allow backend to process the profile completion
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
         // Navigate to sponsor dashboard
         router.push('/Sponsor/dashboard');
@@ -211,7 +229,25 @@ const ProfileFormContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100">
+    <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 relative">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-sm mx-4">
+            <div className="w-16 h-16 mx-auto mb-6 relative">
+              <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
+              Completing Your Profile
+            </h3>
+            <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
+              Please wait while we set up your account and redirect you to your dashboard...
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: -10 }}

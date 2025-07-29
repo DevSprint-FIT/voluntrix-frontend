@@ -12,8 +12,8 @@ interface SetRoleResponse {
     authProvider: string;
     nextStep: string;
     redirectUrl: string;
-    isEmailVerified: boolean;
-    isProfileCompleted: boolean;
+    emailVerified: boolean;
+    profileCompleted: boolean;
   };
 }
 
