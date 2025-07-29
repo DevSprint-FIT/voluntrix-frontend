@@ -62,14 +62,14 @@ export default function Event({
       console.log('Organization ID:', event.organizationId);
 
       if (event.eventVisibility === 'PUBLIC') {
-        console.log('✅ Public event — eligible by default.');
+        console.log('Public event — eligible by default.');
         setIsEligibleToApply(true);
         return;
       }
 
       if (!event.organizationId) {
         console.warn(
-          '⚠️ Organization ID is missing. Cannot determine eligibility.'
+          'Organization ID is missing. Cannot determine eligibility.'
         );
         return;
       }
@@ -86,16 +86,16 @@ export default function Event({
         console.log('Volunteer institute:', volInstitute);
 
         if (orgInstitute && volInstitute && orgInstitute === volInstitute) {
-          console.log('✅ Institutes match. Volunteer is eligible.');
+          console.log('Institutes match. Volunteer is eligible.');
           setIsEligibleToApply(true);
         } else {
           console.warn(
-            '❌ Institutes do not match. Volunteer is not eligible.'
+            'Institutes do not match. Volunteer is not eligible.'
           );
           setIsEligibleToApply(false);
         }
       } catch (error) {
-        console.error('❌ Error during eligibility check:', error);
+        console.error('Error during eligibility check:', error);
         setIsEligibleToApply(false);
       }
     };
