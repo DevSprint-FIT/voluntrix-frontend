@@ -30,7 +30,7 @@ export default function HostEvents() {
     const getEvents = async () => {
       try {
         setLoading(true);
-        const data = await fetchEventByHostId(1); // add host id dynamically
+        const data = await fetchEventByHostId();
         console.log('Fetched data:', JSON.stringify(data, null, 2));
 
         setEvents(Array.isArray(data) ? data : []);
