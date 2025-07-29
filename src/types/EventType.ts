@@ -21,4 +21,6 @@ export type EventType = {
   organizationId: number | null;
   organizationName: string | null;
   organizationImageUrl: string | null;
+  institute: string;
+  eventHostRewardPoints: number;
 };

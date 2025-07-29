@@ -2,26 +2,27 @@
 
 import { Button, Progress, useDisclosure } from '@heroui/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EventType } from '@/types/EventType';
 import VolunteerApplication from '@/components/UI/VolunteerApplication';
 import SponsorshipsModal from '@/components/UI/SponsorshipsModal';
 import DonationModal from '@/components/UI/DonationModal';
-
-interface Sponsor {
-  sponsorships: string[];
-}
+import { fetchVolunteer } from '@/services/volunteerApplicationService';
+import { SponsorshipType } from '@/types/SponsorshipType';
 
 export default function Event({
   event,
-  sponsor,
+  sponsorshipNames,
+  sponsorships,
 }: {
   event: EventType;
-  sponsor: Sponsor;
+  sponsorshipNames: string[];
+  sponsorships: SponsorshipType[];
 }) {
   const [isSaved, setIsSaved] = useState(false);
   const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+  const [isEligibleToApply, setIsEligibleToApply] = useState<boolean>(false);
 
   const handleSave = () => {
     setIsSaved((prevState) => !prevState);
@@ -52,6 +53,52 @@ export default function Event({
     onOpen: openFormModal,
     onOpenChange: onFormChange,
   } = useDisclosure();
+
+  useEffect(() => {
+    const checkEligibility = async () => {
+      console.log('🔍 Checking eligibility...');
+      console.log('Event visibility:', event.eventVisibility);
+      console.log('Organization ID:', event.organizationId);
+
+      if (event.eventVisibility === 'PUBLIC') {
+        console.log('Public event — eligible by default.');
+        setIsEligibleToApply(true);
+        return;
+      }
+
+      if (!event.organizationId) {
+        console.warn(
+          'Organization ID is missing. Cannot determine eligibility.'
+        );
+        return;
+      }
+
+      try {
+        const vol = await fetchVolunteer();
+
+        console.log('Fetched volunteer:', vol);
+
+        const orgInstitute = event.institute?.trim().toLowerCase();
+        const volInstitute = vol?.institute?.trim().toLowerCase();
+
+        console.log('Organization institute:', orgInstitute);
+        console.log('Volunteer institute:', volInstitute);
+
+        if (orgInstitute && volInstitute && orgInstitute === volInstitute) {
+          console.log('Institutes match. Volunteer is eligible.');
+          setIsEligibleToApply(true);
+        } else {
+          console.warn('Institutes do not match. Volunteer is not eligible.');
+          setIsEligibleToApply(false);
+        }
+      } catch (error) {
+        console.error('Error during eligibility check:', error);
+        setIsEligibleToApply(false);
+      }
+    };
+
+    checkEligibility();
+  }, [event.eventVisibility, event.organizationId, event.institute]);
 
   return (
     <div className="w-full flex items-start justify-center mb-[88px]">
@@ -158,17 +205,20 @@ export default function Event({
                   </div>
                 );
               })()}
-              <Button
-                onPress={openFormModal}
-                variant="shadow"
-                className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-              >
-                Volunteer Now
-              </Button>
+              {isEligibleToApply && (
+                <Button
+                  onPress={openFormModal}
+                  variant="shadow"
+                  className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
+                >
+                  Volunteer Now
+                </Button>
+              )}
               <VolunteerApplication
                 isFormOpen={isFormOpen}
                 onFormChange={onFormChange}
                 eventId={event.eventId}
+                isEligibleToApply={isEligibleToApply}
               />
             </div>
           </div>
@@ -185,7 +235,7 @@ export default function Event({
                 partnerships.
               </p>
               <div className="flex items-center gap-2 flex-wrap">
-                {sponsor.sponsorships.map((tag, index) => (
+                {sponsorshipNames.map((tag, index) => (
                   <div
                     key={index}
                     className="flex justify-center items-center rounded-[4px] bg-[#E7E7E7]"
@@ -229,6 +279,7 @@ export default function Event({
                 <SponsorshipsModal
                   isOpen={isSponsorModalOpen}
                   onClose={() => setIsSponsorModalOpen(false)}
+                  sponsorships={sponsorships}
                 />
               )}
             </div>

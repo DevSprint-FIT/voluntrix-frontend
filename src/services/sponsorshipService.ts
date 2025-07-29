@@ -42,7 +42,7 @@ export const fetchSponsorshipsByEvent = async (
       }
     );
 
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching sponsorships by event:', error);
     throw error;

@@ -10,6 +10,7 @@ import { fetchEventById } from '@/services/eventService';
 import { EventType } from '@/types/EventType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
 import { fetchSponsorshipsByEvent } from '@/services/sponsorshipService';
+import { SponsorshipType } from '@/types/SponsorshipType';
 
 export default function EventPage({
   params,
@@ -22,7 +23,8 @@ export default function EventPage({
   const [event, setEvent] = useState<EventType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sponsorships, setSponsorships] = useState<string[]>([]);
+  const [sponsorships, setSponsorships] = useState<SponsorshipType[]>([]);
+  const [sponsorshipNames, setSponsorshipNames] = useState<string[]>([]);
 
   useEffect(() => {
     if (isNaN(eventId)) {
@@ -48,10 +50,9 @@ export default function EventPage({
         if (eventData.sponsorshipEnabled) {
           try {
             const sponsorshipData = await fetchSponsorshipsByEvent(eventId);
-            const sponsorshipNames = sponsorshipData.map(
-              (s) => s.type
-            );
-            setSponsorships(sponsorshipNames);
+            const sponsorshipNames = sponsorshipData.map((s) => s.type);
+            setSponsorships(sponsorshipData);
+            setSponsorshipNames(sponsorshipNames);
           } catch (sponsErr) {
             console.error('Failed to fetch sponsorships:', sponsErr);
             setSponsorships([]);
@@ -83,7 +84,11 @@ export default function EventPage({
         </div>
       ) : event ? (
         <>
-          <Event event={event} sponsor={{ sponsorships }} />
+          <Event
+            event={event}
+            sponsorshipNames={sponsorshipNames}
+            sponsorships={sponsorships}
+          />
           <EventSection
             title="Recommended Events for You"
             subTitle="Upcoming events tailored to your interests and availability."
