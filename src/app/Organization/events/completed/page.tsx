@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Table, { Column } from "@/components/UI/Table";
-import { Event, getEventsByOrgId } from "@/services/eventTableService";
+import { Event, getEventsByStatus } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -12,23 +11,11 @@ export default function CompletedEventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const searchParams = useSearchParams();
-  const orgIdString = searchParams?.get('orgId');
-  const orgId = orgIdString && !isNaN(Number(orgIdString)) ? Number(orgIdString) : null;
-
-
   useEffect(() => {
-    // Validate orgId
-    if (orgId === null) {
-      setError("Invalid organization ID");
-      setLoading(false);
-      return;
-    }
-
     const fetchEvents = async () => {
       try {
         setError(null);
-        const data = await getEventsByOrgId(orgId, "COMPLETE");
+        const data = await getEventsByStatus("COMPLETE");
         setEvents(data);
       } catch (error) {
         console.error("Failed to load completed events", error);
@@ -39,7 +26,7 @@ export default function CompletedEventsPage() {
     };
 
     fetchEvents();
-  }, [orgId]);
+  }, []);
 
   const columns: Column<Event>[] = [
     { 

@@ -1,33 +1,3 @@
-import { OrganizationType } from '@/types/OrganizationType';
-import axios from 'axios';
-
-export const fetchOrganizationTitles = async () => {
-  try {
-    const response = await axios.get(
-      'http://localhost:8080/api/public/organizations/names'
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching event:', error);
-    throw error;
-  }
-};
-
-export const fetchOrganizationById = async (
-  id: number
-): Promise<OrganizationType> => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/api/public/organizations/${id}`
-    );
-
-    return response.data.data;
-  } catch (error) {
-    console.error('Error fetching organization by ID:', error);
-    throw error;
-  }
-};
 
 export type Organization = {
   id: number;
@@ -36,20 +6,68 @@ export type Organization = {
   imageUrl: string;
 };
 
-export const getOrganizationById = async (
-  orgId: number
-): Promise<Organization> => {
+// Get current organization using token
+export const getOrganizationByToken = async (): Promise<Organization> => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+
   try {
-    const response = await fetch(
-      `http://localhost:8080/api/public/organizations/${orgId}`
-    );
+    const response = await fetch(`${baseUrl}/organizations/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`, 
+        "Content-Type": "application/json", 
+      },
+    });
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch organization: ${response.status}`);
+      throw new Error(`Failed to fetch organization: ${response.status} ${response.statusText}`);
     }
-    const responseBody = await response.json();
-    return responseBody.data as Organization;
+
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
-    console.error("Error fetching organization:", error);
+    console.error("Failed to fetch organization:", error);
     throw error;
   }
+};
+
+// Get all organizations 
+export const getAllOrganizations = async (): Promise<Organization[]> => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/organizations/all`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch organizations: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    throw error;
+  }
+};
+
+// Legacy function for backward compatibility
+export const getOrganizationById = async (orgId: number): Promise<Organization> => {
+  console.warn("getOrganizationById is deprecated. Use getOrganizationByToken instead.");
+  return getOrganizationByToken();
 };
