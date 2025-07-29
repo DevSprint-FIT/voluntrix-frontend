@@ -1,27 +1,39 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import { EventStatusCounts, getEventStatusCounts } from "@/services/eventStatsService";
 import { getOrganizationById, Organization } from "@/services/organizationService";
 
-const tabs = [
-  { name: "Active Events", href: "/Organization/events/active" },
-  { name: "Event Requests", href: "/Organization/events/requests" },
-  { name: "Completed Events", href: "/Organization/events/completed" },
-];
-
 export default function EventsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [counts, setCounts] = useState<EventStatusCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const orgId = 1; // Replace with actual org ID
+  
+  // Extract orgId from search parameters
+  const orgIdString = searchParams?.get('orgId');
+  const orgId = orgIdString ? parseInt(orgIdString) : 1;
+
+
+  // Generate dynamic tabs with orgId parameter
+  const tabs = [
+    { name: "Active Events", href: `/Organization/events/active?orgId=${orgId}` },
+    { name: "Event Requests", href: `/Organization/events/requests?orgId=${orgId}` },
+    { name: "Completed Events", href: `/Organization/events/completed?orgId=${orgId}` },
+  ];
 
   useEffect(() => {
+    // Validate orgId
+    if (!orgId || isNaN(orgId)) {
+      console.error("Invalid organization ID");
+      return;
+    }
+
     const getCounts = async () => {
       try {
         const data = await getEventStatusCounts(orgId);
@@ -50,9 +62,19 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
     setCurrentPage(pageNumber);
   };
 
+  // Show error if orgId is invalid
+  if (!orgId || isNaN(orgId)) {
+    return (
+      <div className="p-4 w-full max-w-full overflow-x-hidden">
+        <div className="text-center text-red-500 py-8">
+          Invalid organization ID. Please provide a valid orgId parameter.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 w-full max-w-full overflow-x-hidden">
-
       {/* Title with Organization Info */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 px-4 gap-4">
         {/* Left Side: Title */}
@@ -100,7 +122,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       {/* Tabs */}
       <div className="flex gap-6 border-b border-shark-100 mb-4 overflow-x-auto">
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href;
+          const isActive = pathname === tab.href.split('?')[0];
           return (
             <Link
               key={tab.href}
@@ -121,7 +143,6 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       <div className="py-8">
         {children}
       </div>
-
     </div>
   );
 }

@@ -19,7 +19,7 @@ export type Volunteer = {
   username: string; 
 };
 
-// Fetch events  by status
+// Fetch events by status 
 export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Promise<Event[]> => {
   try {
     let url = `http://localhost:8080/api/public/organizations/${orgId}/events`;
@@ -27,16 +27,62 @@ export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Pro
       url += `?status=${status}`;
     }
 
+    console.log(`🔍 Making API request to: ${url}`);
+
     const response = await fetch(url);
+    
+    console.log(` Response status: ${response.status}`);
+    console.log(` Response ok: ${response.ok}`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
+      // Handle 404 as "no data found" instead of an error
+      if (response.status === 404) {
+        console.log(` No events found for orgId ${orgId} with status ${status || 'any'} (404)`);
+        return []; // Return empty array instead of throwing error
+      }
+      
+      
+      let errorMessage = `Failed to fetch events: ${response.status} ${response.statusText}`;
+      
+      try {
+        const errorData = await response.text();
+        console.log(`🔍 Error response body:`, errorData);
+        
+        
+        try {
+          const parsedError = JSON.parse(errorData);
+          errorMessage = parsedError.message || parsedError.error || errorMessage;
+        } catch (parseError) {
+          
+          if (errorData) {
+            errorMessage = errorData;
+          }
+        }
+      } catch (textError) {
+        console.log(`🔍 Could not read error response body`);
+      }
+
+      
+      if (response.status === 500) {
+        throw new Error(`Server error: ${errorMessage}`);
+      } else {
+        throw new Error(errorMessage);
+      }
     }
 
     const data = await response.json();
-    return data as Event[];
+    console.log(` Successfully fetched ${data?.length || 0} events for orgId ${orgId}`);
+    
+    
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("🔍 Error fetching events:", error);
+    
+    
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Cannot connect to backend server. Make sure the server at http://localhost:8080 is running.');
+    }
+    
     throw error;
   }
 };

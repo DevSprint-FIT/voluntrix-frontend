@@ -2,6 +2,7 @@
 
 import { Check, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Table, { Column } from "@/components/UI/Table";
 import { Event, Volunteer, getEventsByOrgId, updateEventStatus, getAllVolunteers } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
@@ -12,6 +13,7 @@ export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [volunteers, setVolunteers] = useState<Map<number, Volunteer>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [updatingEventId, setUpdatingEventId] = useState<number | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
@@ -23,11 +25,22 @@ export default function EventRequestsPage() {
     buttonClass: string;
   } | null>(null);
 
-  const orgId = 1; 
+  const searchParams = useSearchParams();
+  const orgIdString = searchParams?.get('orgId');
+  const orgId = orgIdString && !isNaN(Number(orgIdString)) ? Number(orgIdString) : null;
+
 
   useEffect(() => {
+    // Validate orgId
+    if (orgId === null) {
+      setError("Invalid organization ID");
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        setError(null);
         // Fetch events and volunteers concurrently
         const [eventsData, volunteersData] = await Promise.all([
           getEventsByOrgId(orgId, "PENDING"),
@@ -38,13 +51,14 @@ export default function EventRequestsPage() {
         setVolunteers(volunteersData);
       } catch (error) {
         console.error("Failed to load data", error);
+        setError("Failed to load event requests");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [orgId]);
 
   const openConfirmationModal = (eventId: number, newStatus: "ACTIVE" | "DENIED") => {
     const isAccepting = newStatus === "ACTIVE";
@@ -75,15 +89,10 @@ export default function EventRequestsPage() {
     try {
       console.log(`Updating event ${eventId} to status: ${status}`);
       
-      console.log(`Before API call - Event ID: ${eventId}, Target Status: ${status}`);
-      
       const updatedEvent = await updateEventStatus(eventId, status);
       
-      // Log response details
       console.log('Update successful. Response:', updatedEvent);
-      console.log(`After API call - Event ID: ${eventId}, Status in response: ${updatedEvent.eventStatus}`);
       
-      // Verify response status is as expected
       if (updatedEvent.eventStatus !== status) {
         console.warn(`Warning: Expected status ${status} but got ${updatedEvent.eventStatus}`);
       }
@@ -144,7 +153,6 @@ export default function EventRequestsPage() {
         </div>
         <div className="flex flex-col">
           <span className="text-sm font-medium">{volunteer.firstName} {volunteer.lastName}</span>
-         
         </div>
       </div>
     );
@@ -173,7 +181,6 @@ export default function EventRequestsPage() {
         <span>{formatDate(value)}</span>
       )
     },
-    
     { 
       header: "Status", 
       accessor: "eventStatus",
@@ -223,6 +230,18 @@ export default function EventRequestsPage() {
       ),
     },
   ];
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
+        <div className="text-center text-red-500 py-8">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">

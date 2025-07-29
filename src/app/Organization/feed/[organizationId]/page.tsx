@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import MetricCard from "@/components/UI/MetricCard";
 import { HeartIcon, Share2Icon, FileTextIcon, UploadCloud } from "lucide-react";
 import PostCard from "@/components/UI/PostCard";
@@ -16,6 +17,14 @@ import { Post, Organization } from "@/services/types";
 import { calculateMetrics, calculateTotalMediaSize } from "@/services/utils";
 
 export default function SocialFeed() {
+ const params = useParams();
+
+if (!params || typeof params.organizationId !== "string") {
+  throw new Error("Organization ID is missing or invalid.");
+}
+
+const organizationId = Number(params.organizationId);
+
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -34,8 +43,7 @@ export default function SocialFeed() {
   });
   const [filter, setFilter] = useState('all');
 
-  const organizationId = 1;
-  const userId = 1;
+  const userId = organizationId;
   const userType = "ORGANIZATION";
 
   useEffect(() => {
