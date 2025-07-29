@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Crown, BarChart3, DollarSign, Eye, TrendingUp } from "lucide-react";
+import { Crown, BarChart3, DollarSign, Eye} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -15,6 +15,21 @@ import {
   DashboardData,
   ContributionData,
 } from "@/services/volunteerDashboardService";
+import { useRouter } from "next/navigation";
+import authService from "@/services/authService";
+
+interface User {
+  userId: number;
+  email: string;
+  fullName: string;
+  handle: string;
+  role: string;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
+}
 
 const StatCard = ({
   title,
@@ -206,6 +221,48 @@ const VolunteerDashboard = () => {
   // Using hardcoded values as specified
   const volunteerId = 1;
   const username = "anne13";
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  
+    useEffect(() => {
+      const checkAuthAndLoadData = async () => {
+        try {
+          if (!authService.isAuthenticated()) {
+            router.replace('/auth/login');
+            return;
+          }
+  
+          const currentUser = await authService.getCurrentUser();
+          if (!currentUser) {
+            router.replace('/auth/login');
+            return;
+          }
+  
+          // Check if user is volunteer
+          if (currentUser.role.toLowerCase() !== 'volunteer') {
+            router.replace('/dashboard');
+            return;
+          }
+  
+          // Check if profile is completed
+          if (!currentUser.isProfileCompleted) {
+            router.replace('/auth/profile-form?type=volunteer');
+            return;
+          }
+  
+          setUser(currentUser);
+        } catch (error) {
+          console.error('Auth check error:', error);
+          router.replace('/auth/signup');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      checkAuthAndLoadData();
+    }, [router]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {

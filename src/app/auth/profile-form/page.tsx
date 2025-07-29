@@ -96,7 +96,7 @@ const ProfileFormContent = () => {
         }
 
         // Get profile type from URL params or user role
-        const typeParam = searchParams.get('type');
+        const typeParam = searchParams ? searchParams.get('type') : null;
         const userRole = user.role?.toLowerCase();
         
         const validTypes = ['volunteer', 'organization', 'sponsor'];
