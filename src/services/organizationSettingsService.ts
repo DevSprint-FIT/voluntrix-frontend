@@ -1,3 +1,5 @@
+import authService from "./authService";
+
 export type OrganizationSettings = {
   id: number;
   email: string;
@@ -6,6 +8,7 @@ export type OrganizationSettings = {
   imageUrl: string;
   name: string;
   institute: string;
+  phone?: string;
 };
 
 const getAuthHeaders = () => {
@@ -20,14 +23,14 @@ const getAuthHeaders = () => {
 };
 
 const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
 export const getOrganizationSettings = async (): Promise<OrganizationSettings> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/organizations/me`, {
+    const response = await fetch(`${getBaseUrl()}/api/organizations/me`, {
       method: "GET",
-      headers: getAuthHeaders(),
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -43,7 +46,8 @@ export const getOrganizationSettings = async (): Promise<OrganizationSettings> =
       isVerified: data.isVerified,
       imageUrl: data.imageUrl,
       name: data.name,
-      institute: data.institute
+      institute: data.institute,
+      phone: data.phone || "", 
     };
   } catch (error) {
     console.error("Error fetching organization settings:", error);
@@ -51,34 +55,34 @@ export const getOrganizationSettings = async (): Promise<OrganizationSettings> =
   }
 };
 
-export const updateOrganizationEmail = async (
+export const updateOrganizationPhone = async (
   id: number,
-  email: string
+  phone: string
 ): Promise<OrganizationSettings> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/organizations/profile`, {
+    const response = await fetch(`${getBaseUrl()}/api/organizations/profile`, {
       method: "PATCH",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ email }),
+      headers: authService.getAuthHeaders(),
+      body: JSON.stringify({ phone }),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update email: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to update phone number: ${response.status} ${response.statusText}`);
     }
 
     const { data } = await response.json();
     return data;
   } catch (error) {
-    console.error("Error updating email:", error);
+    console.error("Error updating phone number:", error);
     throw error;
   }
 };
 
 export const deleteOrganizationById = async (id: number): Promise<void> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/users/account`, {
+    const response = await fetch(`${getBaseUrl()}/api/users/account`, {
       method: "DELETE",
-      headers: getAuthHeaders(),
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {

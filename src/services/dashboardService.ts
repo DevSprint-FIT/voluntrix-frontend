@@ -8,7 +8,7 @@ export interface InstituteDistribution {
 }
 
 const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
 const getAuthHeaders = () => {
@@ -31,7 +31,7 @@ export async function getFollowersStats(year: number): Promise<FollowersData[]> 
   }
 
   try {
-    const response = await fetch(`${baseUrl}/follow/stats?year=${year}`, {
+    const response = await fetch(`${baseUrl}/api/follow/stats?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ export async function getInstituteDistribution(): Promise<InstituteDistribution>
   }
 
   try {
-    const response = await fetch(`${baseUrl}/follow/institute-distribution`, {
+    const response = await fetch(`${baseUrl}/api/follow/institute-distribution`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ export async function getEventDataForOrganization(): Promise<{
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${baseUrl}/public/events/all`, {
+    const response = await fetch(`${baseUrl}/api/public/events/all`, {
       method: "GET",
       headers,
     });
