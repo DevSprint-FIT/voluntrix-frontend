@@ -256,7 +256,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-5 m-5">
+    <div className="p-5 m-5 ">
       {/* Title with Organization Info */}
       <div className="flex justify-between items-center mb-6">
         {/* Left Side: Title */}
