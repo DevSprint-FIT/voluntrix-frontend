@@ -115,7 +115,7 @@ const PostModal: React.FC<PostModalProps> = ({
 
         <Textarea
            value={content}
-           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+           onChange={(e) => setContent(e.target.value)}
            placeholder="What do you want to talk about?"
            minRows={6}
            maxRows={8}

@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
 import PostCard from "@/components/UI/PostCard";
-import { getAllPublicPosts} from "@/services/publicSocialFeedService";
+import { 
+  getAllPublicPosts, 
+  getCurrentOrganizationDetails, 
+  getCurrentVolunteerDetails,
+  getAllOrganizations
+} from "@/services/publicSocialFeedService";
 import { reactToPost, removeReaction } from "@/services/reactionService";
 import ProfileCard from "@/components/UI/PublicFeedLeftSideBar";
-import { getOrganizationDetails, getVolunteerDetails } from "@/services/publicSocialFeedService"; 
 import MetricCard from "@/components/UI/MetricCard";
 import { HeartIcon, Share2Icon, FileTextIcon } from "lucide-react";
 import { calculateMetrics } from "@/services/utils";
 import SuggestedOrganizations from "@/components/UI/SuggestedOrganizations";
 import { updatePost } from "@/services/socialFeedService";
-import { fetchPosts } from "@/services/socialFeedService";
 import Navbar from "@/components/UI/Navbar";
 
 interface ProfileCardProps {
@@ -35,15 +37,12 @@ const isVolunteer = (userType: UserType): userType is "VOLUNTEER" => userType ==
 const isOrganization = (userType: UserType): userType is "ORGANIZATION" => userType === USER_TYPE.ORGANIZATION;
 
 const PublicFeedPage = () => {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  
   const [posts, setPosts] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actualUserType, setActualUserType] = useState<UserType>("ORGANIZATION"); 
+  const [userType, setUserType] = useState<UserType>("ORGANIZATION"); 
   const [metrics, setMetrics] = useState({
     totalPosts: 0,
     postGrowth: "0%",
@@ -52,18 +51,6 @@ const PublicFeedPage = () => {
     totalShares: 0,
     sharesGrowth: "0%",
   });
-
-  
-  const username = React.useMemo(() => {
-    if (!params) return null;
-    return params.username as string || null;
-  }, [params]);
-
-  const urlUserType = React.useMemo(() => {
-    if (!searchParams) return "ORGANIZATION" as UserType;
-    const type = searchParams.get('type') as UserType;
-    return (type === "VOLUNTEER" || type === "ORGANIZATION") ? type : "ORGANIZATION";
-  }, [searchParams]);
 
   const handleShareClick = async (postId: number) => {
     try {
@@ -93,89 +80,33 @@ const PublicFeedPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (!username) {
-      setError("Username is required");
-      setLoading(false);
-      return;
-    }
+  // Store organization data in state for later use in other effects
+  const [organizationData, setOrganizationData] = useState<any>(null);
 
+  useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        
+        // Get public posts
         const postResponse = await getAllPublicPosts();
+        console.log("Sample post structure:", postResponse.length > 0 ? JSON.stringify(postResponse[0], null, 2) : "No posts");
         setPosts(postResponse);
-        setMetrics(calculateMetrics(postResponse));
-
-        // Smart detection: try to determine the actual user type
-        let detectedUserType: UserType = "ORGANIZATION";
-        let profileData = null;
-        let fetchedUserId = 0;
-
-        // Strategy: Try both types regardless of URL parameter
-        // First try the URL specified type, then try the other type
         
-        if (urlUserType === USER_TYPE.ORGANIZATION) {
-          // Try organization first
-          const orgData = await getOrganizationDetails(username);
-          if (orgData && orgData.id) {
-            profileData = orgData;
-            fetchedUserId = orgData.id;
-            detectedUserType = USER_TYPE.ORGANIZATION;
-          } else {
-            // If organization fails, try volunteer
-            const volunteerData = await getVolunteerDetails(username);
-            if (volunteerData && volunteerData.id) {
-              profileData = volunteerData;
-              fetchedUserId = volunteerData.id;
-              detectedUserType = USER_TYPE.VOLUNTEER;
-            }
-          }
-        } else {
-          // Try volunteer first
-          const volunteerData = await getVolunteerDetails(username);
-          if (volunteerData && volunteerData.id) {
-            profileData = volunteerData;
-            fetchedUserId = volunteerData.id;
-            detectedUserType = USER_TYPE.VOLUNTEER;
-          } else {
-            // If volunteer fails, try organization
-            const orgData = await getOrganizationDetails(username);
-            if (orgData && orgData.id) {
-              profileData = orgData;
-              fetchedUserId = orgData.id;
-              detectedUserType = USER_TYPE.ORGANIZATION;
-            }
-          }
-        }
+        // First try as organization (based on JWT token)
+        const orgData = await getCurrentOrganizationDetails();
+        let detectedUserType: UserType = USER_TYPE.ORGANIZATION;
+        let profileId = 0;
 
-        // If no data found for either type
-        if (!profileData || !fetchedUserId) {
-          setError("User not found");
-          return;
-        }
-
-        // Set the detected user type and ID
-        setUserId(fetchedUserId);
-        setActualUserType(detectedUserType); // Update the actual detected type
-
-        console.log(`Detected user type: ${detectedUserType} for username: ${username}`);
-
-        // Set profile data based on detected type
-        if (detectedUserType === USER_TYPE.VOLUNTEER) {
-          const volunteerData = profileData as any;
-          setProfile({
-            name: `${volunteerData.firstName} ${volunteerData.lastName}`,
-            institute: volunteerData.institute,
-            about: volunteerData.about,
-            profileImageUrl: volunteerData.imageUrl,  
-            isVerified: undefined,
-          });
-        } else if (detectedUserType === USER_TYPE.ORGANIZATION) {
-          const orgData = profileData as any;
+        // If organization details not found, try as volunteer
+        if (orgData) {
+          profileId = orgData.id;
+          setUserType(USER_TYPE.ORGANIZATION);
+          
+          // Save organization data for later use
+          setOrganizationData(orgData);
+          
           setProfile({
             name: orgData.name,
             institute: orgData.institute,
@@ -183,12 +114,35 @@ const PublicFeedPage = () => {
             profileImageUrl: orgData.imageUrl,
             isVerified: orgData.isVerified,
           });
-
-          // Fetch only the posts by this organization for metrics
-          const orgPosts = await fetchPosts(fetchedUserId);
-          const orgMetrics = calculateMetrics(orgPosts);
-          setMetrics(orgMetrics);
+        } else {
+          // Try volunteer
+          const volunteerData = await getCurrentVolunteerDetails();
+          if (volunteerData) {
+            profileId = volunteerData.id;
+            detectedUserType = USER_TYPE.VOLUNTEER;
+            setUserType(USER_TYPE.VOLUNTEER);
+            
+            setProfile({
+              name: `${volunteerData.firstName} ${volunteerData.lastName}`,
+              institute: volunteerData.institute,
+              about: volunteerData.about,
+              profileImageUrl: volunteerData.imageUrl,  
+              isVerified: undefined,
+            });
+          }
         }
+        
+        // If no profile data found for either type
+        if (profileId === 0) {
+          setError("No user profile found. Please ensure you are properly authenticated.");
+          setLoading(false);
+          return;
+        }
+
+        // Set the detected user ID
+        setUserId(profileId);
+        
+        console.log(`Detected user type: ${detectedUserType}`);
 
       } catch (error) {
         console.error("Error loading data:", error);
@@ -199,7 +153,29 @@ const PublicFeedPage = () => {
     };
 
     fetchData();
-  }, [username, urlUserType]);
+  }, []);
+  
+  // Calculate metrics whenever posts or organization data changes
+  useEffect(() => {
+    if (organizationData && posts.length > 0 && isOrganization(userType)) {
+      console.log("Recalculating metrics for organization:", organizationData.name);
+      console.log("Total posts available:", posts.length);
+      
+      // Filter posts that belong to this organization by matching the name
+      const orgPosts = posts.filter(post => 
+        post.organizationName === organizationData.name
+      );
+      
+      console.log(`Found ${orgPosts.length} posts for ${organizationData.name}`);
+      
+      // Calculate metrics from filtered posts
+      if (orgPosts.length > 0) {
+        const calculatedMetrics = calculateMetrics(orgPosts);
+        console.log("Calculated metrics:", calculatedMetrics);
+        setMetrics(calculatedMetrics);
+      }
+    }
+  }, [posts, organizationData, userType]);
 
   const handleLike = async (postId: number, liked: boolean) => {
     if (!userId || userId === 0) {
@@ -209,7 +185,7 @@ const PublicFeedPage = () => {
     
     try {
       if (liked) {
-        await removeReaction(postId, userId, actualUserType); // Use actualUserType
+        await removeReaction(postId, userId, userType);
         setPosts(prevPosts => 
           prevPosts.map(post => 
             post.id === postId 
@@ -218,7 +194,7 @@ const PublicFeedPage = () => {
           )
         );
       } else {
-        await reactToPost({ socialFeedId: postId, userId, userType: actualUserType }); // Use actualUserType
+        await reactToPost({ socialFeedId: postId, userId, userType: userType });
         setPosts(prevPosts => 
           prevPosts.map(post => 
             post.id === postId 
@@ -298,7 +274,7 @@ const PublicFeedPage = () => {
               <PostCard
                 key={post.id}
                 postId={post.id}
-                username={post.organizationUsername}
+                username={post.handle || post.organizationUsername || ""}
                 content={post.content}
                 imageUrl={post.mediaUrl}
                 mediaType={post.mediaType}
@@ -310,7 +286,7 @@ const PublicFeedPage = () => {
                 timeAgo={post.timeAgo}
                 isPublicView={true}
                 userId={userId}
-                userType={actualUserType} // Use actualUserType
+                userType={userType}
                 handleShareClick={handleShareClick}
                 onLike={handleLike}
               />
@@ -319,7 +295,7 @@ const PublicFeedPage = () => {
         </main>
 
         {/* Right Sidebar – Only for ORGANIZATION */}
-        {isOrganization(actualUserType) && ( // Use actualUserType
+        {isOrganization(userType) && (
           <aside className="hidden md:block md:w-1/5 space-y-4 sticky top-24 self-start mr-[3%] w-[22%] ml-10">
             <MetricCard
               title="Total Posts"
@@ -355,9 +331,9 @@ const PublicFeedPage = () => {
         )}
 
         {/* Right Sidebar – For VOLUNTEER */}
-        {isVolunteer(actualUserType) && ( // Use actualUserType
+        {isVolunteer(userType) && (
           <aside className="hidden md:block md:w-1/4 space-y-4 sticky top-6 self-start">
-            <SuggestedOrganizations volunteerId={userId} />
+            <SuggestedOrganizations />
           </aside>
         )}
 

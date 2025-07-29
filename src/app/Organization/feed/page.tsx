@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import MetricCard from "@/components/UI/MetricCard";
 import { HeartIcon, Share2Icon, FileTextIcon, UploadCloud } from "lucide-react";
 import PostCard from "@/components/UI/PostCard";
 import PostModal from "@/components/UI/PostModal";
 import {
-  fetchOrganizationById,
-  fetchPosts,
+  fetchMyOrganization,
+  fetchMyPosts,
   createPost,
   deletePost,
   updatePost,
@@ -17,14 +16,6 @@ import { Post, Organization } from "@/services/types";
 import { calculateMetrics, calculateTotalMediaSize } from "@/services/utils";
 
 export default function SocialFeed() {
- const params = useParams();
-
-if (!params || typeof params.organizationId !== "string") {
-  throw new Error("Organization ID is missing or invalid.");
-}
-
-const organizationId = Number(params.organizationId);
-
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -42,24 +33,34 @@ const organizationId = Number(params.organizationId);
     sharesGrowth: "0%",
   });
   const [filter, setFilter] = useState('all');
-
-  const userId = organizationId;
-  const userType = "ORGANIZATION";
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const org = await fetchOrganizationById(organizationId);
+        setLoading(true);
+        setError(null);
+        
+        // Fetch organization and posts concurrently
+        const [org, fetchedPosts] = await Promise.all([
+          fetchMyOrganization(),
+          fetchMyPosts()
+        ]);
+        
         setOrganization(org);
-        const fetchedPosts = await fetchPosts(org.id);
         setPosts(Array.isArray(fetchedPosts) ? [...fetchedPosts].reverse() : []);
         setMetrics(calculateMetrics(fetchedPosts));
       } catch (error) {
         console.error("Error loading social feed data:", error);
+        setError("Failed to load social feed data. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
+    
     loadData();
-  }, [organizationId]);
+  }, []);
 
   const handlePostSubmit = async (
     content: string,
@@ -73,10 +74,9 @@ const organizationId = Number(params.organizationId);
     }
 
     try {
-      
       if (editingPost) {
         const existingPost = posts.find(post => post.id === editingPost.postId);
-        if(!existingPost) return;
+        if (!existingPost) return;
 
         const updatedPost = await updatePost(
           editingPost.postId,
@@ -86,7 +86,6 @@ const organizationId = Number(params.organizationId);
           existingPost.shares
         );
 
-       
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === editingPost.postId
@@ -96,13 +95,12 @@ const organizationId = Number(params.organizationId);
         );
         setEditingPost(null);
       } else {
-        const newPost = await createPost(content, organization.id, mediaUrl, mediaType, mediaSizeInBytes);
+        const newPost = await createPost(content, mediaUrl, mediaType, mediaSizeInBytes);
         if (newPost) {
           setPosts((prevPosts) => [newPost, ...prevPosts]);
         }
       }
 
-      
       setShowModal(false);
     } catch (error) {
       console.error("Error submitting or updating post:", error);
@@ -123,7 +121,6 @@ const organizationId = Number(params.organizationId);
       console.error("Error deleting post:", error);
     }
   };
-  
 
   const totalMediaSizeInGB = calculateTotalMediaSize(posts); 
   const storageLimitInGB = 15;
@@ -153,65 +150,76 @@ const organizationId = Number(params.organizationId);
         )
       );
 
-      
       try {
         await updatePost(postId, updatedPost.content, updatedPost.mediaUrl, updatedPost.impressions);
       } catch (error) {
         console.error("Failed to update like count in the database:", error);
-        
       }
     }
   };
 
- const handleShareClick = async (postId: number) => {
-  const updatedPost = posts.find((post) => post.id === postId);
-  if (updatedPost) {
-    const updatedPostCopy = { ...updatedPost, shares: (updatedPost.shares || 0) + 1 };
-    setPosts(prevPosts => prevPosts.map(post => post.id === postId ? updatedPostCopy : post));
-    
-    try {
-      await updatePost(
-        postId,
-        updatedPostCopy.content,
-        updatedPostCopy.mediaUrl,
-        updatedPostCopy.impressions,
-        updatedPostCopy.shares
-      );
-    } catch (error) {
-      console.error("Failed to update share count in the database:", error);
+  const handleShareClick = async (postId: number) => {
+    const updatedPost = posts.find((post) => post.id === postId);
+    if (updatedPost) {
+      const updatedPostCopy = { ...updatedPost, shares: (updatedPost.shares || 0) + 1 };
+      setPosts(prevPosts => prevPosts.map(post => post.id === postId ? updatedPostCopy : post));
+      
+      try {
+        await updatePost(
+          postId,
+          updatedPostCopy.content,
+          updatedPostCopy.mediaUrl,
+          updatedPostCopy.impressions,
+          updatedPostCopy.shares
+        );
+      } catch (error) {
+        console.error("Failed to update share count in the database:", error);
+      }
     }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
-};
 
-
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div >
-      <div className="flex justify-between items-center px-4 ml-8">
-  {/* Left Side */}
-  <div className="pl-4">
-    <p className="text-shark-300">Organization / Social Feed</p>
-    <h1 className="font-secondary text-2xl font-bold">Social Feed</h1>
-  </div>
-
-  {/* Right Side */}
-  <div className="flex items-center space-x-2 pr-4">
-    <img
-      src={organization?.imageUrl} 
-      alt="Institute Logo"
-      className="w-10 h-10 rounded-full object-cover"
-    />
     <div>
-      <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
-      <p className="font-secondary  text-shark-700 text-xs leading-tight">{organization?.institute}</p>       
-    </div>
-  </div>
-</div>
+      <div className="flex justify-between items-center px-4 ml-8">
+        {/* Left Side */}
+        <div className="pl-4">
+          <p className="text-shark-300">Organization / Social Feed</p>
+          <h1 className="font-secondary text-2xl font-bold">Social Feed</h1>
+        </div>
 
+        {/* Right Side */}
+        <div className="flex items-center space-x-2 pr-4">
+          <img
+            src={organization?.imageUrl} 
+            alt="Institute Logo"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
+            <p className="font-secondary text-shark-700 text-xs leading-tight">{organization?.institute}</p>       
+          </div>
+        </div>
+      </div>
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-4 ml-8">
         {/* Left Content */}
-        <div className="md:col-span-8 space-y-4 mt-1 ">
+        <div className="md:col-span-8 space-y-4 mt-1">
           {/* Start a Post */}
           <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
@@ -238,42 +246,42 @@ const organizationId = Number(params.organizationId);
             <h2 className="text-2xl font-secondary font-bold mb-4 pl-4 text-shark-950">All activity</h2>
             <div className="flex gap-3 pl-4 pb-4">
               <button
-                   onClick={() => setFilter('all')}
-                   className={`w-20 px-2 py-1 rounded-full 
-                   ${filter === 'all' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
+                onClick={() => setFilter('all')}
+                className={`w-20 px-2 py-1 rounded-full 
+                ${filter === 'all' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'}`}
               >
-             Posts
-            </button>
+                Posts
+              </button>
               <button
-                   onClick={() => setFilter('images')}
-                   className={`w-20 px-2 py-1 rounded-full 
-                   ${filter === 'images' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
+                onClick={() => setFilter('images')}
+                className={`w-20 px-2 py-1 rounded-full 
+                ${filter === 'images' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'}`}
               >
-              Images
-             </button>
+                Images
+              </button>
               <button 
-                   onClick={() => setFilter('videos')}
-                   className={`w-20 px-2 py-1 rounded-full 
-                   ${filter === 'videos' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'} `}
+                onClick={() => setFilter('videos')}
+                className={`w-20 px-2 py-1 rounded-full 
+                ${filter === 'videos' ? 'bg-shark-950 text-white' : 'bg-white text-shark-950 border border-shark-950'}`}
               >
-             Videos
-            </button>
+                Videos
+              </button>
             </div>
             {filteredPosts.map((post) => (
               <PostCard
                 key={post.id}
                 user={post.organizationName}
-                username="{post.organizationUsername}"
-                institute={(organization?.institute ?? "")}
+                username={organization?.name || post.organizationName || ""}
+                institute={post.institute || organization?.institute || ""}
                 followers={organization?.followerCount ?? 0}
                 timeAgo={post.timeAgo ?? ""}
                 content={post.content}
                 imageUrl={post.mediaUrl}
-                profileImageUrl={organization?.imageUrl}
+                profileImageUrl={post.organizationImageUrl || organization?.imageUrl}
                 postId={post.id}
                 impressions={post.impressions || 0}
-                userId={userId}
-                userType={userType}
+                userId={organization?.id || 0}
+                userType="ORGANIZATION"
                 mediaType={post.mediaType}
                 isPublicView={false}
                 onEdit={() =>
@@ -298,7 +306,7 @@ const organizationId = Number(params.organizationId);
             value={posts.length}
             percentageChange={`${metrics.postGrowth} this month`}
             icon={
-              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
                 <FileTextIcon className="w-5 h-5" />
               </div>
             }
@@ -308,7 +316,7 @@ const organizationId = Number(params.organizationId);
             value={posts.reduce((sum, post) => sum + (post.impressions || 0), 0)}
             percentageChange={`${metrics.impressionsGrowth} this month`}
             icon={
-              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
                 <HeartIcon className="w-5 h-5" />
               </div>
             }
@@ -318,7 +326,7 @@ const organizationId = Number(params.organizationId);
             value={posts.reduce((sum, post) => sum + (post.shares || 0), 0)}
             percentageChange={`${metrics.sharesGrowth} this month`}
             icon={
-              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 mr-4">
                 <Share2Icon className="w-5 h-5" />
               </div>
             }
@@ -328,15 +336,15 @@ const organizationId = Number(params.organizationId);
           <div className="bg-[#FBFBFB] p-5 rounded-xl">
             <div className="flex justify-between items-start mb-2">
               <div className="font-secondary text-[0.625rem] bg-shark-100 rounded-full pr-2 pl-2 pt-1 pb-1">FREE PLAN</div>
-              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 ml-4 ">
+              <div className="bg-verdant-50 text-verdant-500 rounded-full flex items-center justify-center w-10 h-10 ml-4">
                 <UploadCloud className="w-6 h-6" />
               </div>
             </div>
 
             <div className="text-center">
-               <h3 className="font-bold mb-1 font-secondary text-xl">Your Storage</h3>
-               <p className="text-sm text-shark-300 mb-3">Supervise your drive space<br/> in the easiest way</p>
-               <button className="bg-verdant-50 rounded-full pl-3 pr-3 pt-1 pb-1 text-verdant-800 border border-verdant-800 font-secondary font-medium">Upgrade</button>
+              <h3 className="font-bold mb-1 font-secondary text-xl">Your Storage</h3>
+              <p className="text-sm text-shark-300 mb-3">Supervise your drive space<br/> in the easiest way</p>
+              <button className="bg-verdant-50 rounded-full pl-3 pr-3 pt-1 pb-1 text-verdant-800 border border-verdant-800 font-secondary font-medium">Upgrade</button>
             </div>
             
             <div className="flex justify-between text-sm text-shark-400">
@@ -350,9 +358,8 @@ const organizationId = Number(params.organizationId);
                 className="bg-verdant-500 h-full"
                 style={{ width: `${Math.min(storageUsedPercentage, 100)}%` }}
               >
+              </div>
             </div>
-            </div>
-            
           </div>
         </div>
       </div>
