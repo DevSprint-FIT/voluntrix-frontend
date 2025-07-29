@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css'; 
 import "@/app/styles/calendar.css"      
@@ -38,6 +39,8 @@ type InstituteData = {
 };
 
 export default function DashboardPage() {
+  const params = useParams();
+  
   const [value, setValue] = useState(new Date());
   const [eventDates, setEventDates] = useState<Date[]>([]);
   const [donationsData, setDonationsData] = useState<DonationData[]>([]);
@@ -48,8 +51,12 @@ export default function DashboardPage() {
   const [followersThisMonth, setFollowersThisMonth] = useState<number>(0);
   const [totalEventsHosted, setTotalEventsHosted] = useState<number>(0);
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
+  const [organizationId, setOrganizationId] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const username = "IEEESLIT";
+  // Extract username from URL params
+  const username = params?.username as string;
 
   const onChangeHandler = (
     value: Date | [Date | null, Date | null] | null,
@@ -64,9 +71,9 @@ export default function DashboardPage() {
 
   const [instituteData, setInstituteData] = useState<InstituteData[]>([]);
 
-  const fetchInstituteDistribution = async (organizationId: number) => {
+  const fetchInstituteDistribution = async (orgId: number) => {
     try {
-      const data = await getInstituteDistributionByOrganizationId(organizationId);
+      const data = await getInstituteDistributionByOrganizationId(orgId);
       const formatted: InstituteData[] = Object.entries(data).map(([name, value]) => ({
         name,
         value,
@@ -78,67 +85,33 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchFollowersData = async (organizationId: number, year: number) => {
-  setFollowersLoading(true);
-  try {
-    const data: FollowersData[] = await getFollowersStatsByOrganizationId(organizationId, year);
-
-    const formattedData: FollowersChartData[] = data.map(item => ({
-      month: item.month,
-      count: item.count,
-      label: item.month
-    }));
-    setFollowersDataLineGraph(formattedData);
-
-    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
-
-    const currentMonthData = data.find(d => d.month === currentMonth);
-    setFollowersThisMonth(currentMonthData ? currentMonthData.count : 0);
-
-  } catch (error) {
-    console.error("Error fetching followers data:", error);
-    setFollowersDataLineGraph([]);
-    setFollowersThisMonth(0);
-  } finally {
-    setFollowersLoading(false);
-  }
-};
-
-
- useEffect(() => {
-  async function fetchEventData() {
+  const fetchFollowersData = async (orgId: number, year: number) => {
+    setFollowersLoading(true);
     try {
-      const organizationId = 1; 
-      
-      const { eventCount, eventDates } = await getEventDataForOrganization(organizationId);
-      
-      setEventDates(eventDates);
-      setTotalEventsHosted(eventCount); 
-      
-      console.log(`Organization ${organizationId} has ${eventCount} events`);
-    } catch (err) {
-      console.error("Error fetching event data:", err);
-    }
-  }
+      const data: FollowersData[] = await getFollowersStatsByOrganizationId(orgId, year);
 
-  async function fetchOrganizationData() {
-    try {
-      const data = await getOrganizationSettingsByUsername(username);
-      setOrganization(data);
+      const formattedData: FollowersChartData[] = data.map(item => ({
+        month: item.month,
+        count: item.count,
+        label: item.month
+      }));
+      setFollowersDataLineGraph(formattedData);
+
+      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+
+      const currentMonthData = data.find(d => d.month === currentMonth);
+      setFollowersThisMonth(currentMonthData ? currentMonthData.count : 0);
+
     } catch (error) {
-      console.error("Failed to fetch organization", error);
+      console.error("Error fetching followers data:", error);
+      setFollowersDataLineGraph([]);
+      setFollowersThisMonth(0);
+    } finally {
+      setFollowersLoading(false);
     }
-  }
-  
-  fetchEventData();
-  fetchOrganizationData();
-  fetchInstituteDistribution(1);
-  fetchDonationsData(1, selectedYear);
-  fetchFollowersData(1, selectedYear);
-}, [selectedYear]);
+  };
 
-  
-  const fetchDonationsData = async (organizationId: number, year: number) => {
+  const fetchDonationsData = async (orgId: number, year: number) => {
     setDonationsLoading(true);
     try {
       
@@ -180,17 +153,86 @@ export default function DashboardPage() {
     }
   };
 
-  
-  
+  // Main useEffect to fetch organization data and initialize
+  useEffect(() => {
+    const initializeDashboard = async () => {
+      if (!username) {
+        setError("Username is required");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // First, fetch organization data to get the organization ID
+        const orgData = await getOrganizationSettingsByUsername(username);
+        
+        if (!orgData) {
+          setError("Organization not found");
+          setLoading(false);
+          return;
+        }
+
+        setOrganization(orgData);
+        
+        // Get organization ID (check different possible field names)
+        const orgId = (orgData as any).id || (orgData as any).organizationId || 0;
+        
+        if (!orgId) {
+          setError("Invalid organization data - missing ID");
+          setLoading(false);
+          return;
+        }
+
+        setOrganizationId(orgId);
+
+        // Now fetch all other data using the organization ID
+        await Promise.all([
+          fetchEventData(orgId),
+          fetchInstituteDistribution(orgId),
+          fetchDonationsData(orgId, selectedYear),
+          fetchFollowersData(orgId, selectedYear)
+        ]);
+
+      } catch (error) {
+        console.error("Error initializing dashboard:", error);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeDashboard();
+  }, [username, selectedYear]);
+
+  const fetchEventData = async (orgId: number) => {
+    try {
+      const { eventCount, eventDates } = await getEventDataForOrganization(orgId);
+      
+      setEventDates(eventDates);
+      setTotalEventsHosted(eventCount); 
+      
+      console.log(`Organization ${orgId} has ${eventCount} events`);
+    } catch (err) {
+      console.error("Error fetching event data:", err);
+    }
+  };
+
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
-    fetchDonationsData(1, year); 
-    fetchFollowersData(1, year); 
+    if (organizationId) {
+      fetchDonationsData(organizationId, year); 
+      fetchFollowersData(organizationId, year); 
+    }
   };
 
   const handleFollowersYearChange = (year: number) => {
     setSelectedYear(year);
-    fetchFollowersData(1, year); 
+    if (organizationId) {
+      fetchFollowersData(organizationId, year); 
+    }
   };
 
   const tileClassName = ({ date, view }: TileProps) => {
@@ -203,6 +245,39 @@ export default function DashboardPage() {
     }
     return undefined;
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="p-5 m-5">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-verdant-600 mx-auto mb-4"></div>
+            <p>Loading dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="p-5 m-5">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-500 text-lg mb-4">{error}</p>
+            <button 
+              onClick={() => window.history.back()} 
+              className="px-4 py-2 bg-verdant-600 text-white rounded-lg hover:bg-verdant-700"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-5 m-5">

@@ -1,27 +1,39 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import { EventStatusCounts, getEventStatusCounts } from "@/services/eventStatsService";
 import { getOrganizationById, Organization } from "@/services/organizationService";
 
-const tabs = [
-  { name: "Active Events", href: "/Organization/events/active" },
-  { name: "Event Requests", href: "/Organization/events/requests" },
-  { name: "Completed Events", href: "/Organization/events/completed" },
-];
-
 export default function EventsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [counts, setCounts] = useState<EventStatusCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const orgId = 1; // Replace with actual org ID
+  
+  // Extract orgId from search parameters
+  const orgIdString = searchParams?.get('orgId');
+  const orgId = orgIdString ? parseInt(orgIdString) : 1;
+
+
+  // Generate dynamic tabs with orgId parameter
+  const tabs = [
+    { name: "Active Events", href: `/Organization/events/active?orgId=${orgId}` },
+    { name: "Event Requests", href: `/Organization/events/requests?orgId=${orgId}` },
+    { name: "Completed Events", href: `/Organization/events/completed?orgId=${orgId}` },
+  ];
 
   useEffect(() => {
+    // Validate orgId
+    if (!orgId || isNaN(orgId)) {
+      console.error("Invalid organization ID");
+      return;
+    }
+
     const getCounts = async () => {
       try {
         const data = await getEventStatusCounts(orgId);
@@ -50,34 +62,43 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
     setCurrentPage(pageNumber);
   };
 
-  return (
-    <div className="p-4">
+  // Show error if orgId is invalid
+  if (!orgId || isNaN(orgId)) {
+    return (
+      <div className="p-4 w-full max-w-full overflow-x-hidden">
+        <div className="text-center text-red-500 py-8">
+          Invalid organization ID. Please provide a valid orgId parameter.
+        </div>
+      </div>
+    );
+  }
 
+  return (
+    <div className="p-4 w-full max-w-full overflow-x-hidden">
       {/* Title with Organization Info */}
-      <div className="flex justify-between items-center mb-4 px-4">
-      {/* Left Side: Title */}
-        <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 px-4 gap-4">
+        {/* Left Side: Title */}
+        <div className="min-w-0 flex-shrink">
            <p className="text-shark-300">Organization / Events</p>
            <h1 className="text-2xl font-primary font-bold">Events</h1>
         </div>
 
-      {/* Right Side: Organization Info */}
-         <div className="flex items-center gap-3">
+        {/* Right Side: Organization Info */}
+        <div className="flex items-center gap-3 flex-shrink-0">
            <img
              src={organization?.imageUrl} 
              alt="Organization Logo"
-             className="w-10 h-10 rounded-full object-cover"
+             className="w-10 h-10 rounded-full object-cover flex-shrink-0"
            />
-         <div>
-           <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
-           <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{organization?.institute}</p>       
-         </div>
-       </div>
-    </div>
+           <div className="min-w-0">
+             <h2 className="font-semibold font-secondary text-xl leading-tight truncate">{organization?.name}</h2> 
+             <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight truncate">{organization?.institute}</p>       
+           </div>
+        </div>
+      </div>
 
-
-      {/* Event Status Cards */}
-      <div className="flex gap-8 mb-8 justify-start">
+      {/* Event Status Cards - Fixed Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
         <EventStatusCard 
           count={counts?.active}
           loading={loadingCounts}
@@ -99,14 +120,14 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-shark-100 mb-4">
+      <div className="flex gap-6 border-b border-shark-100 mb-4 overflow-x-auto">
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href;
+          const isActive = pathname === tab.href.split('?')[0];
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className={`pb-2 ${
+              className={`pb-2 whitespace-nowrap flex-shrink-0 ${
                 isActive
                   ? "border-b-2 border-verdant-600 text-verdant-600 font-semibold"
                   : "border-b-2 border-transparent text-shark-300"
@@ -121,40 +142,7 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
       {/* Main Content */}
       <div className="py-8">
         {children}
-
-        {/* Pagination 
-        <div className="flex justify-center items-center space-x-2 mt-8">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            className="h-8 w-8 rounded-lg bg-shark-100 text-shark-900 hover:bg-shark-200"
-          >
-            {"<"}
-          </button>
-
-          {[1, 2, 3].map((pageNumber) => (
-            <button
-              key={pageNumber}
-              onClick={() => handlePageClick(pageNumber)}
-              className={`h-8 w-8 rounded-lg ${
-                currentPage === pageNumber
-                  ? "bg-verdant-400 text-white"
-                  : "bg-shark-100 text-shark-900 hover:bg-shark-200"
-              }`}
-            >
-              {pageNumber}
-            </button>
-          ))}
-
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, 3))}
-            className="h-8 w-8 rounded-lg bg-shark-100 text-shark-900 hover:bg-shark-200"
-          >
-            {">"}
-          </button>
-        </div>
-        */}
       </div>
-
     </div>
   );
 }

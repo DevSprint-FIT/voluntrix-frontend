@@ -3,9 +3,17 @@ import { EventType } from '@/types/EventType';
 import { EventCreateType } from '@/types/EventCreateType';
 
 export const fetchEventById = async (id: number): Promise<EventType> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType>(
-      `http://localhost:8080/api/public/events/with-org/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/with-org/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     return response.data;
@@ -18,10 +26,18 @@ export const fetchEventById = async (id: number): Promise<EventType> => {
 export const fetchFilteredEvents = async (
   params: Record<string, string>
 ): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/filter-with-org',
-      { params }
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/filter-with-org`,
+      {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     return response.data;
@@ -34,10 +50,16 @@ export const fetchFilteredEvents = async (
 export const fetchSearchedEvents = async (
   searchText: string
 ): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/search-with-org',
-      { params: { query: searchText } }
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/search-with-org`,
+      {
+        params: { query: searchText },
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
 
     return response.data;
@@ -48,9 +70,17 @@ export const fetchSearchedEvents = async (
 };
 
 export const fetchEventTitles = async () => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get(
-      'http://localhost:8080/api/public/events/names'
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/names`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     return response.data;
@@ -61,15 +91,16 @@ export const fetchEventTitles = async () => {
 };
 
 export const createEvent = async (eventData: EventCreateType) => {
-  // const token = 'mock-token-for-testing'; // authentication token
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/events',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events`,
       eventData,
       {
         headers: {
-          // Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
@@ -81,10 +112,18 @@ export const createEvent = async (eventData: EventCreateType) => {
   }
 };
 
-export const fetchEventByHostId = async (id: number): Promise<EventType[]> => {
+export const fetchEventByHostId = async (): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType[]>(
-      `http://localhost:8080/api/public/events/host/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/host/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     const data = response.data;
     if (Array.isArray(data)) {
@@ -100,9 +139,17 @@ export const fetchEventByHostId = async (id: number): Promise<EventType[]> => {
 };
 
 export const fetchAllEvents = async (): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events'
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/events/all`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -112,9 +159,17 @@ export const fetchAllEvents = async (): Promise<EventType[]> => {
 };
 
 export const fetchLatestEvents = async (): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get<EventType[]>(
-      'http://localhost:8080/api/public/events/latest-three'
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/latest-three`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -123,12 +178,18 @@ export const fetchLatestEvents = async (): Promise<EventType[]> => {
   }
 };
 
-export const fetchRecommendedEvents = async (
-  id: number
-): Promise<EventType[]> => {
+export const fetchRecommendedEvents = async (): Promise<EventType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/public/events/recommended/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/recommended`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -137,10 +198,18 @@ export const fetchRecommendedEvents = async (
   }
 };
 
-export const fetchEventTitlesByHostId = async (hostId: number) => {
+export const fetchEventTitlesByHostId = async () => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/public/events/names/${hostId}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/names`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {

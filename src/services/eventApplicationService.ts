@@ -2,15 +2,19 @@ import axios from 'axios';
 import { EventApplicationCreateType } from '@/types/EventApplicationCreateType';
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
 
-export const CreateEventApplication = async (
+export const createEventApplication = async (
   data: EventApplicationCreateType
 ) => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/event-applications',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications`,
       data,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
@@ -27,9 +31,17 @@ export const CreateEventApplication = async (
 export const getEventApplicAndVol = async (
   eventId: number
 ): Promise<EventApplicAndVolType[]> => {
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/public/event-applications/event/volunteers/${eventId}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications/event/volunteers/${eventId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     console.log('Fetched event applications successfully:', response.data);
@@ -44,15 +56,16 @@ export const updateEventApplicationStatus = async (
   applicationId: number,
   applicationStatus: 'APPROVED' | 'REJECTED'
 ) => {
-  // const token = localStorage.getItem('token'); // authentication token
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
   try {
     const response = await axios.patch(
-      `http://localhost:8080/api/public/event-applications/${applicationId}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications/${applicationId}`,
       { applicationStatus },
       {
         headers: {
-          // Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }

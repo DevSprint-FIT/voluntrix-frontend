@@ -12,7 +12,7 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ count, label, subtext
   return (
     <div
       style={{ backgroundColor: "#FBFBFB" }}
-      className="rounded-xl p-6 min-w-[24rem] flex-grow-0 flex-shrink-0 relative"
+      className="rounded-xl p-6 w-full relative"
     >
       <div className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-verdant-50 rounded-full p-2">
         <BarChart size={24} className="text-verdant-700" />

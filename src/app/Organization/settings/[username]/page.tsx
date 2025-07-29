@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import {
   getOrganizationSettingsByUsername,
   updateOrganizationEmail,
@@ -69,18 +70,24 @@ const NotificationModal = ({
 };
 
 const SettingsPage = () => {
+  const params = useParams();
+
+if (!params || typeof params.username !== "string") {
+  throw new Error("Username parameter is missing or invalid.");
+}
+
+const username = params.username;
+
+  const router = useRouter();
+
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
-  const [orgProfile, setOrgProfile] = useState<{
-  imageUrl: string;
-  name: string;
-  institute: string;
-} | null>(null);
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,23 +95,26 @@ const SettingsPage = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
 
-  const router = useRouter();
-  const username = "IEEESLIT";
-
   useEffect(() => {
     const loadOrganization = async () => {
+      if (!username) return;
+
       try {
+        setLoading(true);
+        setError(null);
         const data = await getOrganizationSettingsByUsername(username);
         setOrganization(data);
         setNewEmail(data.email); // pre-fill current email
       } catch (error) {
         console.error("Failed to fetch organization", error);
+        setError("Failed to load organization settings");
       } finally {
         setLoading(false);
       }
     };
+    
     loadOrganization();
-  }, []);
+  }, [username]);
 
   const handleSaveEmail = async () => {
     if (!organization) return;
@@ -142,32 +152,82 @@ const SettingsPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="p-5">
+        <div className="flex justify-between items-center mb-4 px-4">
+          <div>
+            <p className="text-shark-300">Organization / Settings</p>
+            <h1 className="text-2xl font-primary font-bold">Settings</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+            <div>
+              <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+              <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6">
+          <div className="space-y-4">
+            <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !organization) {
+    return (
+      <div className="p-5">
+        <div className="flex justify-between items-center mb-4 px-4">
+          <div>
+            <p className="text-shark-300">Organization / Settings</p>
+            <h1 className="text-2xl font-primary font-bold">Settings</h1>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">
+            {error || "Organization not found"}
+          </p>
+          <button 
+            onClick={() => router.back()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5">
-        {/* Title with Organization Info */}
+      {/* Title with Organization Info */}
       <div className="flex justify-between items-center mb-4 px-4">
-      {/* Left Side: Title */}
+        {/* Left Side: Title */}
         <div>
-           <p className="text-shark-300">Organization / Settings</p>
-           <h1 className="text-2xl font-primary font-bold">Settings</h1>
+          <p className="text-shark-300">Organization / Settings</p>
+          <h1 className="text-2xl font-primary font-bold">Settings</h1>
         </div>
 
-      {/* Right Side: Organization Info */}
-         <div className="flex items-center gap-3">
-           <img
-             src={organization?.imageUrl} 
-             alt="Organization Logo"
-             className="w-10 h-10 rounded-full object-cover"
-           />
-         <div>
-           <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
-           <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{organization?.institute}</p>       
-         </div>
-       </div>
-    </div>
+        {/* Right Side: Organization Info */}
+        <div className="flex items-center gap-3">
+          <img
+            src={organization?.imageUrl} 
+            alt="Organization Logo"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
+            <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{organization?.institute}</p>       
+          </div>
+        </div>
+      </div>
 
       {/* Email Section */}
-      <div className="bg-[#FBFBFB] shadow-sm  rounded-2xl p-6 mb-6 pr-20 pl-10">
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="font-secondary font-semibold text-xl">Your email address</h2>
@@ -184,7 +244,7 @@ const SettingsPage = () => {
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="border border-shark-200  px-3 py-2 w-full max-w-md text-shark-950 rounded-2xl"
+                    className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-2xl"
                     placeholder="Enter new email"
                   />
                   <div className="flex gap-2 mt-4">
@@ -218,7 +278,7 @@ const SettingsPage = () => {
           {/* Username */}
           <div className="flex flex-col justify-start">
             <div className="font-secondary text-shark-950 font-medium">Your username</div>
-            <div className="font-secondary  text-shark-700">
+            <div className="font-secondary text-shark-700">
               {organization ? (
                 `${organization.username} (not editable)`
               ) : (
@@ -254,7 +314,7 @@ const SettingsPage = () => {
             setOpen(false);
             router.push("/");
           } catch (error) {
-             console.error("Failed to delete account", error);
+            console.error("Failed to delete account", error);
           }
         }}
       />
