@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { HandCoins, MessageCircle, Check, X } from "lucide-react";
-import Table, { Column } from "@/components/UI/Table";
+import React, { useState, useEffect } from 'react';
+import { HandCoins, MessageCircle, Check, X } from 'lucide-react';
+import Table, { Column } from '@/components/UI/Table';
+import ChatController from '@/app/chat/ChatController';
 
 // Types for sponsorship data
 interface SponsorshipRequest {
@@ -18,7 +19,7 @@ interface EventSponsorship {
   name: string;
   jobTitle: string;
   company: string;
-  sponsorshipType: "Platinum" | "Gold" | "Silver" | "Bronze";
+  sponsorshipType: 'Platinum' | 'Gold' | 'Silver' | 'Bronze';
 }
 
 const SponsorshipsPage = () => {
@@ -39,43 +40,43 @@ const SponsorshipsPage = () => {
         // Dummy data for Sponsorship Requests
         const dummyRequests: SponsorshipRequest[] = [
           {
-            id: "1",
-            name: "John Smith",
-            jobTitle: "Marketing Director",
-            company: "TechCorp Solutions",
-            sponsorshipType: "Gold",
+            id: '1',
+            name: 'John Smith',
+            jobTitle: 'Marketing Director',
+            company: 'TechCorp Solutions',
+            sponsorshipType: 'Gold',
           },
           {
-            id: "2",
-            name: "Sarah Johnson",
-            jobTitle: "CEO",
-            company: "Green Energy Ltd",
-            sponsorshipType: "Platinum",
+            id: '2',
+            name: 'Sarah Johnson',
+            jobTitle: 'CEO',
+            company: 'Green Energy Ltd',
+            sponsorshipType: 'Platinum',
           },
         ];
 
         // Dummy data for Event Sponsorships
         const dummySponsorships: EventSponsorship[] = [
           {
-            id: "1",
-            name: "Michael Brown",
-            jobTitle: "VP of Operations",
-            company: "Global Industries",
-            sponsorshipType: "Platinum",
+            id: '1',
+            name: 'Michael Brown',
+            jobTitle: 'VP of Operations',
+            company: 'Global Industries',
+            sponsorshipType: 'Platinum',
           },
           {
-            id: "2",
-            name: "Emily Davis",
-            jobTitle: "Regional Manager",
-            company: "Local Business Hub",
-            sponsorshipType: "Silver",
+            id: '2',
+            name: 'Emily Davis',
+            jobTitle: 'Regional Manager',
+            company: 'Local Business Hub',
+            sponsorshipType: 'Silver',
           },
         ];
 
         setSponsorshipRequests(dummyRequests);
         setEventSponsorships(dummySponsorships);
       } catch (error) {
-        console.error("Error fetching sponsorship data:", error);
+        console.error('Error fetching sponsorship data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -87,57 +88,57 @@ const SponsorshipsPage = () => {
   // Helper function to get sponsorship type badge color
   const getSponsorshipBadgeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case "platinum":
-        return "bg-gray-100 text-gray-800 border border-gray-300";
-      case "gold":
-        return "bg-yellow-100 text-yellow-800 border border-yellow-300";
-      case "silver":
-        return "bg-gray-50 text-gray-700 border border-gray-200";
-      case "bronze":
-        return "bg-orange-100 text-orange-800 border border-orange-300";
+      case 'platinum':
+        return 'bg-gray-100 text-gray-800 border border-gray-300';
+      case 'gold':
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-300';
+      case 'silver':
+        return 'bg-gray-50 text-gray-700 border border-gray-200';
+      case 'bronze':
+        return 'bg-orange-100 text-orange-800 border border-orange-300';
       default:
-        return "bg-blue-100 text-blue-800 border border-blue-300";
+        return 'bg-blue-100 text-blue-800 border border-blue-300';
     }
   };
 
   // Action handlers
   const handleApprove = (id: string) => {
-    console.log("Approved sponsorship request:", id);
+    console.log('Approved sponsorship request:', id);
     // TODO: Implement approval logic
   };
 
   const handleReject = (id: string) => {
-    console.log("Rejected sponsorship request:", id);
+    console.log('Rejected sponsorship request:', id);
     // TODO: Implement rejection logic
   };
 
-  const handleChat = (id: string, type: "request" | "sponsorship") => {
+  const handleChat = (id: string, type: 'request' | 'sponsorship') => {
     console.log(`Opening chat for ${type}:`, id);
     // TODO: Implement chat functionality
   };
 
   const handleOpenSponsorChat = () => {
-    console.log("Opening sponsor chat");
+    console.log('Opening sponsor chat');
     // TODO: Implement sponsor chat functionality - to be integrated later
   };
 
   // Table configurations
   const sponsorshipRequestColumns: Column<SponsorshipRequest>[] = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
     },
     {
-      header: "Job Title",
-      accessor: "jobTitle",
+      header: 'Job Title',
+      accessor: 'jobTitle',
     },
     {
-      header: "Company",
-      accessor: "company",
+      header: 'Company',
+      accessor: 'company',
     },
     {
-      header: "Sponsorship Type",
-      accessor: "sponsorshipType",
+      header: 'Sponsorship Type',
+      accessor: 'sponsorshipType',
       cell: (value) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getSponsorshipBadgeColor(
@@ -149,8 +150,8 @@ const SponsorshipsPage = () => {
       ),
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (value, row) => (
         <div className="flex items-center gap-6">
           <button
@@ -174,20 +175,20 @@ const SponsorshipsPage = () => {
 
   const eventSponsorshipColumns: Column<EventSponsorship>[] = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
     },
     {
-      header: "Job Title",
-      accessor: "jobTitle",
+      header: 'Job Title',
+      accessor: 'jobTitle',
     },
     {
-      header: "Company",
-      accessor: "company",
+      header: 'Company',
+      accessor: 'company',
     },
     {
-      header: "Sponsorship Type",
-      accessor: "sponsorshipType",
+      header: 'Sponsorship Type',
+      accessor: 'sponsorshipType',
       cell: (value) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getSponsorshipBadgeColor(
@@ -225,6 +226,9 @@ const SponsorshipsPage = () => {
               <MessageCircle size={20} />
               Chat with Sponsors
             </button>
+            <div className="hidden md:block absolute right-0 top-0 h-full">
+              <ChatController />
+            </div>
           </div>
         </div>
       </div>
