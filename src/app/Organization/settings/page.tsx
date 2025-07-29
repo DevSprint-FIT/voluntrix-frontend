@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
-  getOrganizationSettingsByUsername,
+  getOrganizationSettings,
   updateOrganizationEmail,
   OrganizationSettings,
   deleteOrganizationById
 } from "@/services/organizationSettingsService";
-import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import PhoneVerificationModal from "@/components/UI/PhoneVerification";
 import AccountDeletionModal from "@/components/UI/AccountDeletion";
@@ -70,14 +69,6 @@ const NotificationModal = ({
 };
 
 const SettingsPage = () => {
-  const params = useParams();
-
-if (!params || typeof params.username !== "string") {
-  throw new Error("Username parameter is missing or invalid.");
-}
-
-const username = params.username;
-
   const router = useRouter();
 
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
@@ -97,12 +88,10 @@ const username = params.username;
 
   useEffect(() => {
     const loadOrganization = async () => {
-      if (!username) return;
-
       try {
         setLoading(true);
         setError(null);
-        const data = await getOrganizationSettingsByUsername(username);
+        const data = await getOrganizationSettings();
         setOrganization(data);
         setNewEmail(data.email); // pre-fill current email
       } catch (error) {
@@ -114,7 +103,7 @@ const username = params.username;
     };
     
     loadOrganization();
-  }, [username]);
+  }, []);
 
   const handleSaveEmail = async () => {
     if (!organization) return;

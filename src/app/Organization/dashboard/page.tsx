@@ -4,7 +4,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css'; 
 import "@/app/styles/calendar.css"      
@@ -16,8 +15,8 @@ import CustomNavigation from "@/components/UI/CustomNavigation";
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
 
-import { getEventDataForOrganization, getFollowersStatsByOrganizationId, FollowersData, getInstituteDistributionByOrganizationId } from "@/services/dashboardService";
-import { getOrganizationSettingsByUsername, OrganizationSettings } from "@/services/organizationSettingsService";
+import { getEventDataForOrganization, getFollowersStats, FollowersData, getInstituteDistribution } from "@/services/dashboardService";
+import { getOrganizationSettings, OrganizationSettings } from "@/services/organizationSettingsService";
 
 interface TileProps {
   date: Date;
@@ -42,8 +41,6 @@ type InstituteData = {
 };
 
 export default function DashboardPage() {
-  const params = useParams();
-  
   const [value, setValue] = useState(new Date());
   const [eventDates, setEventDates] = useState<Date[]>([]);
   const [donationsData, setDonationsData] = useState<DonationData[]>([]);
@@ -54,12 +51,8 @@ export default function DashboardPage() {
   const [followersThisMonth, setFollowersThisMonth] = useState<number>(0);
   const [totalEventsHosted, setTotalEventsHosted] = useState<number>(0);
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
-  const [organizationId, setOrganizationId] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Extract username from URL params
-  const username = params?.username as string;
 
   const onChangeHandler = (
     value: Date | [Date | null, Date | null] | null,
@@ -74,9 +67,9 @@ export default function DashboardPage() {
 
   const [instituteData, setInstituteData] = useState<InstituteData[]>([]);
 
-  const fetchInstituteDistribution = async (orgId: number) => {
+  const fetchInstituteDistribution = async () => {
     try {
-      const data = await getInstituteDistributionByOrganizationId(orgId);
+      const data = await getInstituteDistribution();
       const formatted: InstituteData[] = Object.entries(data).map(([name, value]) => ({
         name,
         value,
@@ -88,10 +81,10 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchFollowersData = async (orgId: number, year: number) => {
+  const fetchFollowersData = async (year: number) => {
     setFollowersLoading(true);
     try {
-      const data: FollowersData[] = await getFollowersStatsByOrganizationId(orgId, year);
+      const data: FollowersData[] = await getFollowersStats(year);
 
       const formattedData: FollowersChartData[] = data.map(item => ({
         month: item.month,
@@ -114,7 +107,7 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchDonationsData = async (orgId: number, year: number) => {
+  const fetchDonationsData = async (year: number) => {
     setDonationsLoading(true);
     try {
       
@@ -156,21 +149,28 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchEventData = async () => {
+    try {
+      const { eventCount, eventDates } = await getEventDataForOrganization();
+      
+      setEventDates(eventDates);
+      setTotalEventsHosted(eventCount); 
+      
+      console.log(`Organization has ${eventCount} events`);
+    } catch (err) {
+      console.error("Error fetching event data:", err);
+    }
+  };
+
   // Main useEffect to fetch organization data and initialize
   useEffect(() => {
     const initializeDashboard = async () => {
-      if (!username) {
-        setError("Username is required");
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
 
-        // First, fetch organization data to get the organization ID
-        const orgData = await getOrganizationSettingsByUsername(username);
+        // First, fetch organization data
+        const orgData = await getOrganizationSettings();
         
         if (!orgData) {
           setError("Organization not found");
@@ -179,24 +179,13 @@ export default function DashboardPage() {
         }
 
         setOrganization(orgData);
-        
-        // Get organization ID (check different possible field names)
-        const orgId = (orgData as any).id || (orgData as any).organizationId || 0;
-        
-        if (!orgId) {
-          setError("Invalid organization data - missing ID");
-          setLoading(false);
-          return;
-        }
 
-        setOrganizationId(orgId);
-
-        // Now fetch all other data using the organization ID
+        // Now fetch all other data using token-based authentication
         await Promise.all([
-          fetchEventData(orgId),
-          fetchInstituteDistribution(orgId),
-          fetchDonationsData(orgId, selectedYear),
-          fetchFollowersData(orgId, selectedYear)
+          fetchEventData(),
+          fetchInstituteDistribution(),
+          fetchDonationsData(selectedYear),
+          fetchFollowersData(selectedYear)
         ]);
 
       } catch (error) {
@@ -208,34 +197,17 @@ export default function DashboardPage() {
     };
 
     initializeDashboard();
-  }, [username, selectedYear]);
-
-  const fetchEventData = async (orgId: number) => {
-    try {
-      const { eventCount, eventDates } = await getEventDataForOrganization(orgId);
-      
-      setEventDates(eventDates);
-      setTotalEventsHosted(eventCount); 
-      
-      console.log(`Organization ${orgId} has ${eventCount} events`);
-    } catch (err) {
-      console.error("Error fetching event data:", err);
-    }
-  };
+  }, [selectedYear]);
 
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
-    if (organizationId) {
-      fetchDonationsData(organizationId, year); 
-      fetchFollowersData(organizationId, year); 
-    }
+    fetchDonationsData(year); 
+    fetchFollowersData(year); 
   };
 
   const handleFollowersYearChange = (year: number) => {
     setSelectedYear(year);
-    if (organizationId) {
-      fetchFollowersData(organizationId, year); 
-    }
+    fetchFollowersData(year); 
   };
 
   const tileClassName = ({ date, view }: TileProps) => {
@@ -311,7 +283,7 @@ export default function DashboardPage() {
         <StatCard title="Total Events Hosted" value={totalEventsHosted} icon={<BarChart size={20} />} />
         <StatCard title="This Month Donations" value="LKR 4,500" icon={<BarChart size={20} />} />
         <StatCard title="This Month Followers" value={followersThisMonth} icon={<BarChart size={20} />} />
-        <StatCard title="Total Views" value={200} icon={<BarChart size={20} />} />
+        <StatCard title="Total Views" value={40} icon={<BarChart size={20} />} />
       </div>
 
       {/* Calendar + Graph Section */}
@@ -320,7 +292,6 @@ export default function DashboardPage() {
         <div className="bg-[#FBFBFB] rounded-xl p-6 w-[25rem] h-[25rem]">
           <h2 className="text-lg font-secondary font-semibold mb-4">Event Dates</h2>
           
-          {/* Add CustomNavigation component here */}
           <CustomNavigation 
             date={value} 
             onNavigate={setValue}
@@ -331,7 +302,7 @@ export default function DashboardPage() {
               value={value}
               onChange={onChangeHandler}
               tileClassName={tileClassName}
-              showNavigation={false} // Hide default navigation
+              showNavigation={false} 
               formatShortWeekday={(locale, date) => {
                 const dayIndex = date.getDay();
                 const dayMap = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -342,7 +313,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Graph (right side) - Takes remaining space */}
+        {/* Graph (right side)  */}
         <div className="bg-[#FBFBFB] rounded-xl p-6 flex-1 h-[25rem]">
           <h2 className="text-lg font-bold mb-0">Followers Institutes Distribution</h2>
           <FollowersPieChart data={instituteData} />

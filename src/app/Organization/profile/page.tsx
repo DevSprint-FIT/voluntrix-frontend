@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { getOrganizationByUsername } from "@/services/organizationProfileService";
+import { getOrganizationByToken } from "@/services/organizationProfileService";
 import ProfileHeader from "@/components/UI/ProfileHeader";
 import AboutSection from "@/components/UI/AboutSection";
 import BankInformation from "@/components/UI/BankInformation";
@@ -10,26 +9,16 @@ import ContactInformation from "@/components/UI/ContactInformation";
 import SocialLinks from "@/components/UI/SocialLinks";
 
 const Page = () => {
-  const params = useParams();
-
-if (!params || typeof params.username !== "string") {
-  throw new Error("Username parameter is missing or invalid.");
-}
-
-const username = params.username;
-
   const [organizationData, setOrganizationData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!username) return;
-      
       try {
         setLoading(true);
         setError(null);
-        const data = await getOrganizationByUsername(username);
+        const data = await getOrganizationByToken();
         setOrganizationData(data);
       } catch (error) {
         console.error("Error fetching organization data:", error);
@@ -40,7 +29,7 @@ const username = params.username;
     };
 
     fetchData();
-  }, [username]);
+  }, []);
 
   if (loading) {
     return (

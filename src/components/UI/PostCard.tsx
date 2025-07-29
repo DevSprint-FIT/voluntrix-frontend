@@ -114,8 +114,16 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   const handleCommentSubmit = async () => {
+    if (!commentText.trim()) return; // Don't submit empty comments
+    
     try {
-      await addComment(postId, "IEEESLIT", "ORGANIZATION", commentText);
+      // Using simplified addComment that relies on JWT token for user identity
+      await addComment(postId, commentText);
+      
+      // Refresh comments after adding a new one
+      const fetchedComments = await getCommentsForPost(postId);
+      setComments(fetchedComments);
+      
       setCommentText("");
     } catch (error) {
       console.error("Error adding comment:", error);

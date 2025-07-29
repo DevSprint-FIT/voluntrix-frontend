@@ -1,10 +1,11 @@
+
+
 "use client";
 
 import { Check, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Table, { Column } from "@/components/UI/Table";
-import { Event, Volunteer, getEventsByOrgId, updateEventStatus, getAllVolunteers } from "@/services/eventTableService";
+import { Event, Volunteer, getEventsByStatus, updateEventStatus, getAllVolunteers } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import ConfirmationModal from "@/components/UI/ConfirmationModal";
@@ -25,40 +26,40 @@ export default function EventRequestsPage() {
     buttonClass: string;
   } | null>(null);
 
-  const searchParams = useSearchParams();
-  const orgIdString = searchParams?.get('orgId');
-  const orgId = orgIdString && !isNaN(Number(orgIdString)) ? Number(orgIdString) : null;
-
-
   useEffect(() => {
-    // Validate orgId
-    if (orgId === null) {
-      setError("Invalid organization ID");
-      setLoading(false);
-      return;
-    }
-
     const fetchData = async () => {
       try {
         setError(null);
+        console.log(" Starting to fetch event requests and volunteers...");
+        
         // Fetch events and volunteers concurrently
         const [eventsData, volunteersData] = await Promise.all([
-          getEventsByOrgId(orgId, "PENDING"),
+          getEventsByStatus("PENDING"),
           getAllVolunteers()
         ]);
+        
+        console.log("Fetched events:", eventsData);
+        console.log(" Fetched volunteers map:", volunteersData);
         
         setEvents(eventsData);
         setVolunteers(volunteersData);
       } catch (error) {
-        console.error("Failed to load data", error);
-        setError("Failed to load event requests");
-      } finally {
+        console.error(" Failed to load data", error);
+  
+  if (error instanceof Error) {
+    setError(`Failed to load event requests: ${error.message}`);
+  } else {
+    setError("Failed to load event requests: An unknown error occurred.");
+  }
+}
+
+        finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [orgId]);
+  }, []);
 
   const openConfirmationModal = (eventId: number, newStatus: "ACTIVE" | "DENIED") => {
     const isAccepting = newStatus === "ACTIVE";
@@ -117,8 +118,11 @@ export default function EventRequestsPage() {
     setConfirmAction(null);
   };
 
+  
   const VolunteerInfo = ({ eventHostId }: { eventHostId: number }) => {
     const volunteer = volunteers.get(eventHostId);
+    
+    console.log(` Looking for volunteer with ID: ${eventHostId}`, volunteer);
     
     if (!volunteer) {
       return (
@@ -126,7 +130,7 @@ export default function EventRequestsPage() {
           <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
             <User className="h-6 w-6 text-gray-500" />
           </div>
-          <span className="text-gray-500">Unknown Host</span>
+          <span className="text-gray-500">Unknown Host (ID: {eventHostId})</span>
         </div>
       );
     }
@@ -134,10 +138,10 @@ export default function EventRequestsPage() {
     return (
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-          {volunteer.profilePictureUrl ? (
+          {volunteer.profilePictureUrl && volunteer.profilePictureUrl !== "string" ? (
             <img 
               src={volunteer.profilePictureUrl} 
-              alt={`${volunteer.firstName} ${volunteer.lastName}`}
+              alt={volunteer.fullName}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -152,7 +156,8 @@ export default function EventRequestsPage() {
           )}
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-medium">{volunteer.firstName} {volunteer.lastName}</span>
+          <span className="text-sm font-medium">{volunteer.fullName}</span>
+          <span className="text-xs text-gray-500">@{volunteer.username}</span>
         </div>
       </div>
     );
@@ -237,7 +242,13 @@ export default function EventRequestsPage() {
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
         <div className="text-center text-red-500 py-8">
-          {error}
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -247,8 +258,9 @@ export default function EventRequestsPage() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
       {loading ? (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center py-8">
           <Loader2 className="h-8 w-8 text-verdant-600 animate-spin" />
+          <span className="ml-2 text-gray-600">Loading event requests...</span>
         </div>
       ) : events.length === 0 ? (
         <div className="text-center text-gray-500 py-8">

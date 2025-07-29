@@ -60,7 +60,7 @@ const NotificationModal = ({
 };
 
 interface Props {
-  volunteerId: number;
+  volunteerId?: number; 
 }
 
 export default function SuggestedOrganizations({ volunteerId }: Props) {
@@ -75,18 +75,18 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
   useEffect(() => {
     async function fetchData() {
       const allOrgs = await getAllOrganizations();
-      const followedOrgIds = await getFollowedOrganizationIds(volunteerId);
+      const followedOrgIds = await getFollowedOrganizationIds();
 
       const unfollowed = allOrgs.filter(org => !followedOrgIds.includes(org.id));
       setUnfollowedOrgs(unfollowed);
     }
 
-    if (volunteerId) fetchData(); 
-  }, [volunteerId]);
+    fetchData(); 
+  }, []);
 
   const handleFollow = async (orgId: number) => {
     try {
-      await followOrganization(volunteerId, orgId);
+      await followOrganization(orgId);
       setUnfollowedOrgs(prev => prev.filter(org => org.id !== orgId));
 
       // Show success modal

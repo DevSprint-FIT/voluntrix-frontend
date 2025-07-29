@@ -2,9 +2,36 @@ import { Post } from "./types";
 import { arrayToDate, getTimeAgoFromDate } from "./utils";
 import { PublicFeedOrganizationDetails, PublicFeedVolunteerDetails } from "./types";
 
+// Get API base URL from environment variable
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
+};
+
+// Get auth token from environment variable
+const getAuthToken = () => {
+  return process.env.NEXT_PUBLIC_AUTH_TOKEN;
+};
+
+// Create headers with authorization
+const createHeaders = (contentType = "application/json") => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    "Content-Type": contentType
+  };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
+
 export async function getAllPublicPosts(): Promise<Post[]> {
   try {
-    const res = await fetch("http://localhost:8080/api/public/social-feed");
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/public/posts/all`, {
+      headers: createHeaders()
+    });
     if(!res.ok)
       throw new Error("Failed to fetch public posts");
     const data: Post[] = await res.json();
@@ -24,53 +51,84 @@ export async function getAllPublicPosts(): Promise<Post[]> {
   }
 }
 
-// Temporary debug version - replace your getVolunteerDetails function with this
-export async function getVolunteerDetails(username: string): Promise<PublicFeedVolunteerDetails | null> {
+// Get current volunteer information from JWT token
+export async function getCurrentVolunteerDetails(): Promise<PublicFeedVolunteerDetails | null> {
   try {
-    console.log(`Trying to fetch volunteer: ${username}`);
-    const res = await fetch(`http://localhost:8080/api/public/volunteers/${username}`);
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/volunteer/me`, {
+      headers: createHeaders()
+    });
     
     if (!res.ok) {
-      console.log(`Volunteer API returned ${res.status}: ${res.statusText} for ${username}`);
+      console.log(`Volunteer API returned ${res.status}: ${res.statusText}`);
       return null;
     }
     
     const data = await res.json();
-    console.log("Raw volunteer API response:", data); // DEBUG: See exact response structure
+    const result = data.data || data;
     
-    // Try different possible field names for ID
-    const id = data.id || data.volunteerId || data.userId || null;
-    console.log("Extracted volunteer ID:", id); // DEBUG: See what ID we got
+    // Extract necessary fields
+    const { id, firstName, lastName, institute, about, imageUrl } = result;
     
-    const { firstName, lastName, institute, about, imageUrl } = data;
-    
-    const result = { 
+    return { 
       firstName, 
       lastName, 
       institute, 
-      about, 
+      about: about || "", 
       imageUrl, 
       id 
     };
-    
-    console.log("Final volunteer data:", result); // DEBUG: See final processed data
-    return result;
   } catch (error) {
     console.error("Error fetching volunteer data:", error);
     return null;
   }
 }
 
-// Organization details - UPDATED: No longer throws errors
-export async function getOrganizationDetails(username: string): Promise<PublicFeedOrganizationDetails | null> {
+// Get all volunteers (for admin purposes)
+export async function getAllVolunteers(): Promise<PublicFeedVolunteerDetails[]> {
   try {
-    const res = await fetch(`http://localhost:8080/api/public/organizations/by-username/${username}`);
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/public/volunteers/all`, {
+      headers: createHeaders()
+    });
+    
     if (!res.ok) {
-      console.log(`Organization not found: ${username}`);
-      return null; // Return null instead of throwing
+      console.log(`Volunteers API returned ${res.status}: ${res.statusText}`);
+      return [];
     }
+    
+    const data = await res.json();
+    return (data.data || data).map((volunteer: any) => ({
+      id: volunteer.id,
+      firstName: volunteer.firstName,
+      lastName: volunteer.lastName,
+      institute: volunteer.institute,
+      about: volunteer.about || "",
+      imageUrl: volunteer.imageUrl
+    }));
+  } catch (error) {
+    console.error("Error fetching all volunteers:", error);
+    return [];
+  }
+}
+
+// Get current organization from JWT token
+export async function getCurrentOrganizationDetails(): Promise<PublicFeedOrganizationDetails | null> {
+  try {
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/organizations/me`, {
+      headers: createHeaders()
+    });
+    
+    if (!res.ok) {
+      console.log(`Organization API returned ${res.status}: ${res.statusText}`);
+      return null;
+    }
+    
     const json = await res.json();
-    const { name, institute, description, isVerified, imageUrl, id } = json.data;
+    const data = json.data || json;
+    
+    const { name, institute, description, isVerified, imageUrl, id } = data;
     return { name, institute, description, isVerified, imageUrl, id };
   } catch (error) {
     console.error("Error fetching organization data:", error);
@@ -81,10 +139,17 @@ export async function getOrganizationDetails(username: string): Promise<PublicFe
 // All organizations for feed right sidebar
 export async function getAllOrganizations(): Promise<any[]> {
   try {
-    const res = await fetch("http://localhost:8080/api/public/organizations");
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/organizations/all`, {
+      headers: createHeaders()
+    });
+    
     if (!res.ok) throw new Error("Failed to fetch organizations");
-    const json = await res.json(); 
-    return json.data.map((org: any) => ({
+    
+    const json = await res.json();
+    const organizations = json.data || json;
+    
+    return organizations.map((org: any) => ({
       id: org.id,
       name: org.name,
       imageUrl: org.imageUrl,
@@ -97,12 +162,17 @@ export async function getAllOrganizations(): Promise<any[]> {
   }
 }
 
-// Fetch followed organization IDs for a volunteer
-export async function getFollowedOrganizationIds(volunteerId: number): Promise<number[]> {
+// Fetch followed organization IDs for the authenticated user
+export async function getFollowedOrganizationIds(): Promise<number[]> {
   try {
-    const res = await fetch(`http://localhost:8080/api/public/follow/${volunteerId}`);
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/follow`, {
+      headers: createHeaders()
+    });
+    
     if (!res.ok) throw new Error("Failed to fetch followed organization IDs");
-    const ids: number[] = await res.json(); // List of org IDs
+    const response = await res.json();
+    const ids: number[] = response.data || response; // List of org IDs
     return ids;
   } catch (error) {
     console.error("Error fetching followed organizations:", error);
@@ -110,20 +180,21 @@ export async function getFollowedOrganizationIds(volunteerId: number): Promise<n
   }
 }
 
-// Follow an organization
-export async function followOrganization(volunteerId: number, organizationId: number): Promise<string> {
+// Follow an organization using authenticated user
+export async function followOrganization(organizationId: number): Promise<string> {
   try {
-    const res = await fetch("http://localhost:8080/api/public/follow/", {
+    const BASE_URL = getBaseUrl();
+    const res = await fetch(`${BASE_URL}/follow`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ volunteerId, organizationId }),
+      headers: createHeaders(),
+      body: JSON.stringify({ organizationId }),
     });
+    
     if (!res.ok) {
       const errorText = await res.text();
       throw new Error(errorText || "Failed to follow organization");
     }
+    
     return await res.text();
   } catch (error) {
     console.error("Error following organization:", error);

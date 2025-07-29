@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Table, { Column } from "@/components/UI/Table";
-import { Event, getEventsByOrgId } from "@/services/eventTableService";
+import { Event, getEventsByStatus } from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -11,37 +10,25 @@ export default function ActiveEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const searchParams = useSearchParams();
-  const orgIdString = searchParams?.get('orgId');
-  const orgId = orgIdString && !isNaN(Number(orgIdString)) ? Number(orgIdString) : null;
-
 
   useEffect(() => {
-    // Validate orgId
-    if (orgId === null ) {
-      setError("Invalid organization ID");
-      setLoading(false);
-      return;
-    }
-
     const fetchEvents = async () => {
       try {
         setError(null);
-        console.log(`Fetching active events for orgId: ${orgId}`);
-        const data = await getEventsByOrgId(orgId, "ACTIVE");
-        console.log(`Received ${data?.length || 0} active events for orgId: ${orgId}`, data);
+        console.log(`Fetching active events using token`);
+        const data = await getEventsByStatus("ACTIVE");
+        console.log(`Received ${data?.length || 0} active events`, data);
         setEvents(data);
       } catch (error) {
-        console.error(`Failed to load active events for orgId: ${orgId}`, error);
-        setError(`Failed to load active events for organization ${orgId}`);
+        console.error(`Failed to load active events`, error);
+        setError(`Failed to load active events`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchEvents();
-  }, [orgId]);
+  }, []);
 
   const columns: Column<Event>[] = [
     { 
@@ -81,9 +68,6 @@ export default function ActiveEventsPage() {
         <h1 className="text-2xl font-bold mb-4">Active Events</h1>
         <div className="text-center text-red-500 py-8">
           <p>{error}</p>
-          <p className="text-sm mt-2 text-gray-600">
-            Organization ID: {orgId}
-          </p>
           <button 
             onClick={() => window.location.reload()} 
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"

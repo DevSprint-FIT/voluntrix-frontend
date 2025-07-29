@@ -1,3 +1,4 @@
+
 export type EventStatus = "DRAFT" | "PENDING" | "ACTIVE" | "COMPLETE" | "DENIED";
 
 export type Event = {
@@ -11,58 +12,89 @@ export type Event = {
   eventHostId: number;
 };
 
+
 export type Volunteer = {
   volunteerId: number;
-  firstName: string;
-  lastName: string;
+  userId: number;
+  username: string;
+  fullName: string;                    
+  email: string;
+  institute: string;
+  instituteEmail: string;
+  isAvailable: boolean;
+  volunteerLevel: number;
+  rewardPoints: number;
+  isEventHost: boolean;
+  joinedDate: string;
+  about: string;
+  phoneNumber: string;
   profilePictureUrl: string | null;
-  username: string; 
 };
 
-// Fetch events by status 
-export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Promise<Event[]> => {
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+};
+
+const getAuthHeaders = () => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
+
+
+export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const baseUrl = getBaseUrl();
+
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+
   try {
-    let url = `http://localhost:8080/api/public/organizations/${orgId}/events`;
-    if (status) {
-      url += `?status=${status}`;
-    }
+    let url = `${baseUrl}/public/events/all`;
+    
+    console.log(` Making API request to: ${url}`);
 
-    console.log(`🔍 Making API request to: ${url}`);
-
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     
     console.log(` Response status: ${response.status}`);
     console.log(` Response ok: ${response.ok}`);
 
     if (!response.ok) {
-      // Handle 404 as "no data found" instead of an error
       if (response.status === 404) {
-        console.log(` No events found for orgId ${orgId} with status ${status || 'any'} (404)`);
-        return []; // Return empty array instead of throwing error
+        console.log(` No events found with status ${status || 'any'} (404)`);
+        return [];
       }
-      
       
       let errorMessage = `Failed to fetch events: ${response.status} ${response.statusText}`;
       
       try {
         const errorData = await response.text();
-        console.log(`🔍 Error response body:`, errorData);
-        
+        console.log(` Error response body:`, errorData);
         
         try {
           const parsedError = JSON.parse(errorData);
           errorMessage = parsedError.message || parsedError.error || errorMessage;
         } catch (parseError) {
-          
           if (errorData) {
             errorMessage = errorData;
           }
         }
       } catch (textError) {
-        console.log(`🔍 Could not read error response body`);
+        console.log(` Could not read error response body`);
       }
 
-      
       if (response.status === 500) {
         throw new Error(`Server error: ${errorMessage}`);
       } else {
@@ -70,32 +102,45 @@ export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Pro
       }
     }
 
-    const data = await response.json();
-    console.log(` Successfully fetched ${data?.length || 0} events for orgId ${orgId}`);
+    const result = await response.json();
+    const allEvents = result.data || result;
     
+    console.log(` Successfully fetched ${allEvents?.length || 0} events`);
     
-    return Array.isArray(data) ? data : [];
+    // Filter by status if provided
+    if (status && Array.isArray(allEvents)) {
+      const filteredEvents = allEvents.filter((event: Event) => event.eventStatus === status);
+      console.log(` Filtered to ${filteredEvents.length} events with status: ${status}`);
+      return filteredEvents;
+    }
+    
+    return Array.isArray(allEvents) ? allEvents : [];
   } catch (error) {
-    console.error("🔍 Error fetching events:", error);
-    
+    console.error(" Error fetching events:", error);
     
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Cannot connect to backend server. Make sure the server at http://localhost:8080 is running.');
+      throw new Error('Cannot connect to backend server. Make sure the server is running.');
     }
     
     throw error;
   }
 };
 
-// Update event status
+// Your existing updateEventStatus function (unchanged)
 export const updateEventStatus = async (eventId: number, status: EventStatus): Promise<Event> => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const baseUrl = getBaseUrl();
+
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+
   try {
-    const url = `http://localhost:8080/api/public/events/${eventId}`;
+    const url = `${baseUrl}/events/${eventId}`;
     
     console.log(`Making PATCH request to: ${url}`);
     console.log(`Request body:`, { eventStatus: status });
     
-    // Create request body with explicit property and value
     const requestBody = {
       eventStatus: status
     };
@@ -105,7 +150,8 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
     });
@@ -131,7 +177,8 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
     }
 
     try {
-      const updatedEvent = JSON.parse(responseText);
+      const result = JSON.parse(responseText);
+      const updatedEvent = result.data || result;
       console.log('Updated event received:', updatedEvent);
       return updatedEvent as Event;
     } catch (parseError) {
@@ -147,39 +194,95 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
   }
 };
 
-// Fetch all volunteers and return as a map for easier lookup
+
 export const getAllVolunteers = async (): Promise<Map<number, Volunteer>> => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const baseUrl = getBaseUrl();
+
+  if (!token) {
+    throw new Error("Authentication token not found. Please check your environment variables.");
+  }
+
   try {
-    const url = `http://localhost:8080/api/public/volunteers`;
+    const url = `${baseUrl}/public/volunteers/all`;
     
-    const response = await fetch(url);
+    console.log(`Fetching volunteers from: ${url}`);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,  
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(` Volunteers response status: ${response.status}`);
+    console.log(` Volunteers response ok: ${response.ok}`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch volunteers: ${response.status} ${response.statusText}`);
+      let errorMessage = `Failed to fetch volunteers: ${response.status} ${response.statusText}`;
+      
+      try {
+        const errorData = await response.text();
+        console.log(` Volunteers error response body:`, errorData);
+        
+        try {
+          const parsedError = JSON.parse(errorData);
+          errorMessage = parsedError.message || parsedError.error || errorMessage;
+        } catch (parseError) {
+          if (errorData) {
+            errorMessage = errorData;
+          }
+        }
+      } catch (textError) {
+        console.log(` Could not read volunteers error response body`);
+      }
+
+      throw new Error(errorMessage);
     }
 
-    const volunteers: Volunteer[] = await response.json();
+    const result = await response.json();
+    console.log(` Raw volunteer response:`, result);
+    
+    const volunteers: any[] = result.data || result;
+    console.log(` Processing ${volunteers.length} volunteers`);
     
     // Create a map for quick lookup by volunteerId
     const volunteerMap = new Map<number, Volunteer>();
     volunteers.forEach(volunteer => {
+      // Map the API response to our Volunteer type
       volunteerMap.set(volunteer.volunteerId, {
         volunteerId: volunteer.volunteerId,
-        firstName: volunteer.firstName,
-        lastName: volunteer.lastName,
-        profilePictureUrl: volunteer.profilePictureUrl,
-        username: volunteer.username
+        userId: volunteer.userId,
+        username: volunteer.username,
+        fullName: volunteer.fullName,
+        email: volunteer.email,
+        institute: volunteer.institute,
+        instituteEmail: volunteer.instituteEmail,
+        isAvailable: volunteer.isAvailable,
+        volunteerLevel: volunteer.volunteerLevel,
+        rewardPoints: volunteer.rewardPoints,
+        isEventHost: volunteer.isEventHost,
+        joinedDate: volunteer.joinedDate,
+        about: volunteer.about,
+        phoneNumber: volunteer.phoneNumber,
+        profilePictureUrl: volunteer.profilePictureUrl
       });
     });
 
+    console.log(` Created volunteer map with ${volunteerMap.size} entries`);
     return volunteerMap;
   } catch (error) {
     console.error("Error fetching volunteers:", error);
+    
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Cannot connect to backend server. Make sure the server is running.');
+    }
+    
     throw error;
   }
 };
 
-// Fetch volunteer details by ID - returns only what need for display
 export const getVolunteerById = async (volunteerId: number): Promise<Volunteer> => {
   try {
     const volunteerMap = await getAllVolunteers();
@@ -194,4 +297,10 @@ export const getVolunteerById = async (volunteerId: number): Promise<Volunteer> 
     console.error("Error fetching volunteer:", error);
     throw error;
   }
+};
+
+// Legacy function for backward compatibility - now uses token-based auth
+export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Promise<Event[]> => {
+  console.warn("getEventsByOrgId is deprecated. Use getEventsByStatus instead.");
+  return getEventsByStatus(status);
 };

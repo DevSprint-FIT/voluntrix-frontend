@@ -2,14 +2,31 @@ import { Reaction, CreateReaction, ReactionStatusDTO } from "./types";
 
 const BASE_URL = "http://localhost:8080/api/public/reactions";
 
+// Get auth token from environment variable
+const getAuthToken = () => {
+  return process.env.NEXT_PUBLIC_AUTH_TOKEN;
+};
+
+// Create headers with authorization
+const createHeaders = (contentType = "application/json") => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    "Content-Type": contentType
+  };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
+
 // Create or toggle a reaction
 export async function reactToPost(createReaction: CreateReaction): Promise<Reaction | null> {
   try {
     const response = await fetch(`${BASE_URL}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: createHeaders(),
       body: JSON.stringify(createReaction)
     });
 
@@ -28,7 +45,9 @@ export async function reactToPost(createReaction: CreateReaction): Promise<React
 // Get all reactions for a specific post
 export async function getReactionsForPost(socialFeedId: number): Promise<Reaction[]> {
   try {
-    const response = await fetch(`${BASE_URL}/${socialFeedId}`);
+    const response = await fetch(`${BASE_URL}/${socialFeedId}/total-reactions`, {
+      headers: createHeaders()
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch reactions");
     }
@@ -47,7 +66,9 @@ export async function getUserReaction(
   userType: string
 ): Promise<ReactionStatusDTO | null> {
   try {
-    const response = await fetch(`${BASE_URL}/${socialFeedId}/${userId}/${userType}`);
+    const response = await fetch(`${BASE_URL}/${socialFeedId}/my-reaction`, {
+      headers: createHeaders()
+    });
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -61,11 +82,12 @@ export async function getUserReaction(
       try {
         errorObj = errorText ? JSON.parse(errorText) : null;
       } catch {
-        
+        // Not valid JSON, keep as text
       }
 
-      console.error("Server error response (non-OK):", errorObj || errorText || "No content");
-      throw new Error("Failed to fetch user reaction");
+      console.error(`Server error response (${response.status}):`, errorObj || errorText || "No content");
+      console.error(`Attempted URL: ${BASE_URL}/${socialFeedId}/my-reaction`);
+      throw new Error(`Failed to fetch user reaction: ${response.status} ${response.statusText}`);
     }
 
     const data: ReactionStatusDTO = await response.json();
@@ -83,8 +105,10 @@ export async function removeReaction(
   userType: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${BASE_URL}/${socialFeedId}/${userId}/${userType}`, {
+    const response = await fetch(`${BASE_URL}/${socialFeedId}/remove-reaction`, {
       method: "DELETE",
+      headers: createHeaders(),
+      body: JSON.stringify({ userId, userType })
     });
 
     return response.ok;

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@heroui/react';
 import Image from 'next/image';
-import { fetchOrganizationTitles } from '@/services/organizationService';
+import { fetchOrganizationTitles } from '@/services/organizationTitlesSrvice';
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 
 interface OrganizationECProps {
