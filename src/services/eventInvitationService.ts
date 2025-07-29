@@ -14,7 +14,7 @@ export const createEventInvitation = async (
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/event-invitations',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/event-invitations`,
       payload,
       {
         headers: {

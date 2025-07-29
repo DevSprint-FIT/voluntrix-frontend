@@ -7,7 +7,7 @@ export const CreateEventApplication = async (
 ) => {
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/event-applications',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/event-applications`,
       data,
       {
         headers: {
@@ -29,7 +29,7 @@ export const getEventApplicAndVol = async (
 ): Promise<EventApplicAndVolType[]> => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/public/event-applications/event/volunteers/${eventId}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/event-applications/event/volunteers/${eventId}`
     );
 
     console.log('Fetched event applications successfully:', response.data);
@@ -48,7 +48,7 @@ export const updateEventApplicationStatus = async (
 
   try {
     const response = await axios.patch(
-      `http://localhost:8080/api/public/event-applications/${applicationId}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/event-applications/${applicationId}`,
       { applicationStatus },
       {
         headers: {

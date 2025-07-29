@@ -1,5 +1,6 @@
 'use client';
 
+import { makeEventHost } from '@/services/volunteerProfileService';
 import {
   Modal,
   ModalContent,
@@ -11,6 +12,7 @@ import {
   CardBody,
 } from '@heroui/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface VolunteerToHostModalProps {
@@ -24,14 +26,21 @@ export default function VolunteerToHostModal({
 }: VolunteerToHostModalProps) {
   const [isConfirming, setIsConfirming] = useState(false);
 
+  const router = useRouter();
+
   const handleConfirm = async () => {
     setIsConfirming(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsConfirming(false);
-    onOpenChange();
-    // Add your API call here to upgrade volunteer to event host
-    console.log('Volunteer upgraded to Event Host');
+    try {
+      // Call the service to make the volunteer an event host
+      await makeEventHost(6); // Replace with actual volunteer ID
+      console.log('Volunteer upgraded to Event Host');
+      router.push('/event-host/events');
+    } catch (error) {
+      console.error('Error making volunteer an event host:', error);
+    } finally {
+      setIsConfirming(false);
+      onOpenChange();
+    }
   };
 
   const benefits = [

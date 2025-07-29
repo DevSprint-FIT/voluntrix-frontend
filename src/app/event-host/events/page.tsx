@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
+import { useRouter } from 'next/navigation';
 
-export default function HostEvents({ params }: { params: { id: string } }) {
+export default function HostEvents() {
   const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
@@ -19,13 +20,17 @@ export default function HostEvents({ params }: { params: { id: string } }) {
     completed: 0,
   });
 
-  const hostId = Number(params.id);
+  const router = useRouter();
+
+  const handleRowClick = (eventId: string) => {
+    router.push(`/EventHostWorkspace/${eventId}/tasks`);
+  };
 
   useEffect(() => {
     const getEvents = async () => {
       try {
         setLoading(true);
-        const data = await fetchEventByHostId(hostId);
+        const data = await fetchEventByHostId(1); // add host id dynamically
         console.log('Fetched data:', JSON.stringify(data, null, 2));
 
         setEvents(Array.isArray(data) ? data : []);
@@ -53,7 +58,7 @@ export default function HostEvents({ params }: { params: { id: string } }) {
     };
 
     getEvents();
-  }, [hostId]);
+  }, []);
 
   const statsCards = [
     {
@@ -130,7 +135,7 @@ export default function HostEvents({ params }: { params: { id: string } }) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
-          <p className="text-[#B0B0B0] font-secondary">Loading dashboard...</p>
+          <p className="text-[#B0B0B0] font-secondary">Loading events...</p>
         </div>
       </div>
     );
@@ -267,6 +272,7 @@ export default function HostEvents({ params }: { params: { id: string } }) {
                     <tr
                       key={event.eventId}
                       className="hover:bg-shark-50 space-y-4 cursor-pointer"
+                      onClick={() => handleRowClick(String(event.eventId))}
                     >
                       <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
                         <div className="text-md font-primary font-medium text-shark-900">

@@ -10,7 +10,11 @@ import {
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
 import { createVolunteerEventParticipation } from '@/services/volunteerEventParticipationService';
 
-const EventVolunteersPage = () => {
+const EventVolunteersPage = ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
   const [activeTab, setActiveTab] = useState<'volunteers' | 'applications'>(
     'volunteers'
   );
@@ -21,6 +25,8 @@ const EventVolunteersPage = () => {
   const [volunteerApplications, setVolunteerApplications] = useState<
     EventApplicAndVolType[]
   >([]);
+  const resolvedParams = React.use(params);
+  const eventId = Number(resolvedParams.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,8 +34,8 @@ const EventVolunteersPage = () => {
         setIsLoading(true);
 
         const response: EventApplicAndVolType[] = await getEventApplicAndVol(
-          52
-        ); // Replace with dynamic eventId
+          eventId
+        );
         console.log('Fetched volunteer data:', response);
 
         const volunteers: EventApplicAndVolType[] = response.filter(
@@ -50,7 +56,7 @@ const EventVolunteersPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [eventId]);
 
   const handleApproveApplication = async (id: number) => {
     console.log('Approved volunteer application:', id);

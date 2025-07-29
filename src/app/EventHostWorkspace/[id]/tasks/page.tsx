@@ -52,9 +52,10 @@ interface CompletedTask {
   resourceUrl: string;
 }
 
-const EventHostTasksPage = () => {
+const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
+    const resolvedParams = React.use(params);
   // Event ID - using 1 for now as specified
-  const eventId = 1;
+  const eventId = Number(resolvedParams.id);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
