@@ -1,3 +1,4 @@
+import { SponsorshipType } from '@/types/SponsorshipType';
 import React, { useState } from 'react';
 
 interface SponsorshipPackage {
@@ -15,7 +16,8 @@ interface SponsorshipBenefit {
 const SponsorshipModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+  sponsorships: SponsorshipType[];
+}> = ({ isOpen, onClose, sponsorships }) => {
   const [selectedPackage, setSelectedPackage] = useState<string | null>('platinum');
 
   const packages: SponsorshipPackage[] = [
