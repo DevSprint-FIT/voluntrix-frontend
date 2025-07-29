@@ -15,7 +15,7 @@ export const createVolunteerEventParticipation = async (
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/participations',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/participations`,
       payload,
       {
         headers: {

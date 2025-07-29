@@ -7,7 +7,7 @@ export const createSponsorships = async (data: SponsorshipCreateType) => {
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/public/sponsorships',
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/sponsorships`,
       data,
       {
         headers: {
@@ -25,10 +25,12 @@ export const createSponsorships = async (data: SponsorshipCreateType) => {
   }
 };
 
-export const fetchSponsorshipsByEvent = async (eventId: number): Promise<SponsorshipType[]> => {
+export const fetchSponsorshipsByEvent = async (
+  eventId: number
+): Promise<SponsorshipType[]> => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/public/sponsorships/event/${eventId}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/sponsorships/event/${eventId}`
     );
 
     return response.data;
