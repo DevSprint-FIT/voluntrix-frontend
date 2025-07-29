@@ -39,7 +39,6 @@ const blankEvent: EventCreateType = {
   sponsorshipProposalUrl: null,
   donationGoal: null,
   categories: [],
-  eventHostId: 1,
   organizationId: null,
 };
 

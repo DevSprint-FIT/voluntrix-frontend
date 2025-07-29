@@ -14,6 +14,5 @@ export interface EventCreateType {
   sponsorshipProposalUrl: string | null;
   donationGoal: number | null;
   categories: { categoryId: number }[];
-  eventHostId: number;
   organizationId: number | null;
 }
