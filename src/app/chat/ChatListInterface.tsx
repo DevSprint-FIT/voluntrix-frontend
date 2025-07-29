@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { Stomp, CompatClient } from '@stomp/stompjs';
 
+interface StompFrame {
+  body: string;
+}
+
 interface ChatUser {
   username: string;
   lastMessage?: string;
@@ -59,7 +63,7 @@ export default function ChatListInterface({
     try {
       // Fetch recent conversations for the current user
       const conversationsResponse = await fetch(
-        `http://localhost:8081/api/private-chat/conversations/${encodeURIComponent(
+        `http://localhost:8080/api/private-chat/conversations/${encodeURIComponent(
           currentUser
         )}`
       );
@@ -143,7 +147,7 @@ export default function ChatListInterface({
 
       // Fetch sponsors
       const sponsorsResponse = await fetch(
-        'http://localhost:8081/api/private-chat/sponsors'
+        'http://localhost:8080/api/private-chat/sponsors'
       );
       if (sponsorsResponse.ok) {
         const sponsorsData = await sponsorsResponse.json();
@@ -182,7 +186,7 @@ export default function ChatListInterface({
       console.log('Setting up real-time updates for chat list...');
 
       try {
-        const socket = new SockJS('http://localhost:8081/ws');
+        const socket = new SockJS('http://localhost:8080/ws');
         const client = Stomp.over(() => socket);
 
         client.debug = (str: string) =>
@@ -199,7 +203,7 @@ export default function ChatListInterface({
             // This will listen to messages from any room this user is part of
             client.subscribe(
               `/topic/chat-updates/${currentUser}`,
-              (payload) => {
+              (payload: StompFrame) => {
                 console.log('Received chat list update:', payload.body);
                 const update = JSON.parse(payload.body);
                 handleChatUpdate(update);

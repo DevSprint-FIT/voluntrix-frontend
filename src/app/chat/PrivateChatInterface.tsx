@@ -73,7 +73,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
     try {
       console.log('Creating/getting private room for:', user1, 'and', user2);
       
-      const response = await fetch('http://localhost:8081/api/private-chat/create-room', {
+      const response = await fetch('http://localhost:8080/api/private-chat/create-room', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
     try {
       console.log('Loading private room history for:', roomId);
       
-      const response = await fetch(`http://localhost:8081/api/private-chat/room/${roomId}/history?username=${encodeURIComponent(username)}`);
+      const response = await fetch(`http://localhost:8080/api/private-chat/room/${roomId}/history?username=${encodeURIComponent(username)}`);
       
       if (response.ok) {
         const history = await response.json();
@@ -130,7 +130,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
         
         // Mark messages as read after loading history
         try {
-          await fetch(`http://localhost:8081/api/private-chat/room/${roomId}/mark-read?username=${encodeURIComponent(username)}`, {
+          await fetch(`http://localhost:8080/api/private-chat/room/${roomId}/mark-read?username=${encodeURIComponent(username)}`, {
             method: 'POST'
           });
           console.log('Marked messages as read for room:', roomId);
@@ -168,7 +168,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
 
       // Connect to WebSocket
       console.log('Connecting to WebSocket...');
-      const socket = new SockJS('http://localhost:8081/ws');
+      const socket = new SockJS('http://localhost:8080/ws');
       
       socket.onopen = () => console.log('SockJS connection opened');
       socket.onclose = (event) => {

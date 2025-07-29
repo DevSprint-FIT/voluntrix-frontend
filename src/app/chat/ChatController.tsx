@@ -9,7 +9,7 @@ export default function ChatController({
 }: {
   setShowChat: (show: boolean) => void;
 }) {
-  const [chatState, setChatState] = useState<ChatState>('chatList');
+  const [chatState, setChatState] = useState<ChatState>('login');
   const [currentUser, setCurrentUser] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [usernameInput, setUsernameInput] = useState('');
