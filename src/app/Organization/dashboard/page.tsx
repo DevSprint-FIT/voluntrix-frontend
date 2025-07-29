@@ -224,12 +224,13 @@ export default function DashboardPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="p-5 m-5">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-verdant-600 mx-auto mb-4"></div>
-            <p>Loading dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
+          <p className="text-shark-600 font-primary">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -255,7 +256,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-5 m-5">
+    <div className="p-5 m-5 ">
       {/* Title with Organization Info */}
       <div className="flex justify-between items-center mb-6">
         {/* Left Side: Title */}

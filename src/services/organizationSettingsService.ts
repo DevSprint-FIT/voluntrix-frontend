@@ -99,7 +99,7 @@ export const sendVerificationCode = async (
   captchaToken: string
 ): Promise<void> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/verify`, {
+    const response = await fetch(`${getBaseUrl()}/api/verify/phone`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
