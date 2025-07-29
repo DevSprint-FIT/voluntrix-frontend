@@ -1,0 +1,24 @@
+export type EventType = {
+  eventId: number;
+  eventTitle: string;
+  eventDescription: string;
+  eventLocation: string;
+  eventStartDate: string;
+  eventEndDate: string;
+  eventTime: string;
+  eventImageUrl: string;
+  volunteerCount: number;
+  eventType: string;
+  eventVisibility: string;
+  eventStatus: string;
+  sponsorshipEnabled: boolean;
+  donationEnabled: boolean;
+  sponsorshipProposalUrl: string | null;
+  donationGoal: number | null;
+  donations: number | null;
+  categories: { categoryId: number; categoryName: string }[];
+  eventHostId: number;
+  organizationId: number | null;
+  organizationName: string | null;
+  organizationImageUrl: string | null;
+};
