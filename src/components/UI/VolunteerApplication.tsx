@@ -20,6 +20,7 @@ interface VolunteerApplicationProps {
   isFormOpen: boolean;
   onFormChange: (open: boolean) => void;
   eventId: number;
+  isEligibleToApply: boolean;
 }
 
 const options = [
@@ -33,6 +34,7 @@ export default function VolunteerApplication({
   isFormOpen,
   onFormChange,
   eventId,
+  isEligibleToApply,
 }: VolunteerApplicationProps) {
   const [area, setArea] = useState<string | null>(null);
   const [isAgree, setIsAgree] = useState<boolean>(false);
@@ -58,7 +60,9 @@ export default function VolunteerApplication({
     setArea(e.target.value);
   };
 
-  const isFormValid = Boolean(area && reason.trim() && isAgree);
+  const isFormValid = Boolean(
+    area && reason.trim() && isAgree && isEligibleToApply
+  );
 
   const handleSubmit = async (onClose: () => void) => {
     if (!isFormValid) return;
@@ -68,7 +72,6 @@ export default function VolunteerApplication({
     try {
       await createEventApplication({
         eventId: eventId,
-        volunteerId: 1, // Replace with actual volunteer ID
         description: reason,
         contributionArea: area?.toUpperCase() as
           | 'DESIGN'
@@ -189,7 +192,10 @@ export default function VolunteerApplication({
                   disabled={!isFormValid || isLoading}
                   isLoading={isLoading}
                   className={`bg-shark-950 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px] 
-                    ${(!isFormValid || isLoading) && 'opacity-40 cursor-not-allowed'}`}
+                    ${
+                      (!isFormValid || isLoading) &&
+                      'opacity-40 cursor-not-allowed'
+                    }`}
                   onPress={() => handleSubmit(onClose)}
                 >
                   Submit
