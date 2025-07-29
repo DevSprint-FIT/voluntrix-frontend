@@ -14,8 +14,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  isEmailVerified: boolean;
-  isProfileCompleted: boolean;
+  emailVerified: boolean;
+  profileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -50,7 +50,7 @@ const OrganizationDashboard = () => {
         }
 
         // Check if profile is completed
-        if (!currentUser.isProfileCompleted) {
+        if (!currentUser.profileCompleted) {
           router.replace('/auth/profile-form?type=organization');
           return;
         }
@@ -223,14 +223,14 @@ const OrganizationDashboard = () => {
               </div>
               <div>
                 <p className="text-sm text-shark-500 font-primary">Email Status</p>
-                <p className={`font-medium font-primary ${user.isEmailVerified ? 'text-green-600' : 'text-yellow-600'}`}>
-                  {user.isEmailVerified ? 'Verified' : 'Pending Verification'}
+                <p className={`font-medium font-primary ${user.emailVerified ? 'text-green-600' : 'text-yellow-600'}`}>
+                  {user.emailVerified ? 'Verified' : 'Pending Verification'}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-shark-500 font-primary">Profile Status</p>
-                <p className={`font-medium font-primary ${user.isProfileCompleted ? 'text-green-600' : 'text-yellow-600'}`}>
-                  {user.isProfileCompleted ? 'Complete' : 'Incomplete'}
+                <p className={`font-medium font-primary ${user.profileCompleted ? 'text-green-600' : 'text-yellow-600'}`}>
+                  {user.profileCompleted ? 'Complete' : 'Incomplete'}
                 </p>
               </div>
             </div>

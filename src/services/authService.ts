@@ -4,8 +4,8 @@ interface User {
   fullName: string;
   handle: string;
   role: string;
-  isEmailVerified: boolean;
-  isProfileCompleted: boolean;
+  emailVerified: boolean;
+  profileCompleted: boolean;
   authProvider: string;
   createdAt: string;
   lastLogin: string;
@@ -27,6 +27,7 @@ interface SignupResponseDto {
   message: string;
   data: {
     token: string;
+    refreshToken: string;
     userId: number;
     email: string;
     handle: string;
@@ -37,8 +38,8 @@ interface SignupResponseDto {
     authProvider: string;
     nextStep: string;
     redirectUrl: string;
-    isEmailVerified: boolean;
-    isProfileCompleted: boolean;
+    emailVerified: boolean;
+    profileCompleted: boolean;
   };
 }
 
@@ -55,8 +56,8 @@ interface UserProfileResponse {
     fullName: string;
     handle: string;
     role: string;
-    isEmailVerified: boolean;
-    isProfileCompleted: boolean;
+    emailVerified: boolean;
+    profileCompleted: boolean;
     authProvider: string;
     createdAt: string;
     lastLogin: string;
@@ -67,11 +68,13 @@ class AuthService {
   private static instance: AuthService;
   private user: User | null = null;
   private token: string | null = null;
-  
+  private refreshToken: string | null = null;
+
   private constructor() {
     // Initialize token from localStorage on startup
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('auth_token');
+      this.refreshToken = localStorage.getItem('auth_refresh_token');
     }
   }
   
@@ -95,11 +98,28 @@ class AuthService {
     
     return this.token;
   }
+
+  getRefreshToken(): string | null {
+    if (this.refreshToken) return this.refreshToken;
+    
+    if (typeof window !== 'undefined') {
+      this.refreshToken = localStorage.getItem('auth_refresh_token');
+    }
+    
+    return this.refreshToken;
+  }
   
   private setToken(token: string): void {
     this.token = token;
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+    }
+  }
+
+  private setRefreshToken(token: string): void {
+    this.refreshToken = token;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('auth_refresh_token', token);
     }
   }
   
@@ -111,19 +131,26 @@ class AuthService {
   
   private clearToken(): void {
     this.token = null;
+    this.refreshToken = null;
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_refresh_token');
     }
   }
   
   private getAuthHeaders(): HeadersInit {
     const token = this.getToken();
+    const refreshToken = this.getRefreshToken();
     const headers: HeadersInit = {
       "Content-Type": "application/json",
     };
     
     if (token) {
       headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (refreshToken) {
+      headers['X-Refresh-Token'] = refreshToken;
     }
     
     return headers;
@@ -156,14 +183,15 @@ class AuthService {
       
       if (result.data.token) {
         this.setToken(result.data.token);
+        this.setRefreshToken(result.data.refreshToken);
         const user: User = {
           userId: result.data.userId,
           email: result.data.email,
           fullName: result.data.fullName,
           handle: result.data.handle,
           role: result.data.role,
-          isEmailVerified: result.data.isEmailVerified,
-          isProfileCompleted: result.data.isProfileCompleted,
+          emailVerified: result.data.emailVerified,
+          profileCompleted: result.data.profileCompleted,
           authProvider: result.data.authProvider,
           createdAt: result.data.createdAt,
           lastLogin: result.data.lastLogin,
@@ -213,6 +241,7 @@ class AuthService {
       
       if (result.data.token) {
         this.setToken(result.data.token);
+        this.setRefreshToken(result.data.refreshToken);
         // Create user object from response
         const user: User = {
           userId: result.data.userId,
@@ -220,8 +249,8 @@ class AuthService {
           fullName: result.data.fullName,
           handle: result.data.handle,
           role: result.data.role,
-          isEmailVerified: result.data.isEmailVerified,
-          isProfileCompleted: result.data.isProfileCompleted,
+          emailVerified: result.data.emailVerified,
+          profileCompleted: result.data.profileCompleted,
           authProvider: result.data.authProvider,
           createdAt: result.data.createdAt,
           lastLogin: result.data.lastLogin,
@@ -234,9 +263,9 @@ class AuthService {
         
         if (!user.role || user.role === "null") {
           nextStep = "role-selection";
-        } else if (user.role && !user.isProfileCompleted) {
+        } else if (user.role && !user.profileCompleted) {
           nextStep = "profile-form";
-        } else if (user.isProfileCompleted) {
+        } else if (user.profileCompleted) {
           nextStep = "dashboard";
         }
         
@@ -300,8 +329,8 @@ class AuthService {
         fullName: result.data.fullName,
         handle: result.data.handle,
         role: result.data.role,
-        isEmailVerified: result.data.isEmailVerified,
-        isProfileCompleted: result.data.isProfileCompleted,
+        emailVerified: result.data.emailVerified,
+        profileCompleted: result.data.profileCompleted,
         authProvider: result.data.authProvider,
         createdAt: result.data.createdAt,
         lastLogin: result.data.lastLogin,
@@ -314,17 +343,17 @@ class AuthService {
     }
   }
 
-  async updateProfileStatus(isProfileCompleted: boolean): Promise<void> {
+  async updateProfileStatus(profileCompleted: boolean): Promise<void> {
     try {
       if (this.user) {
         // Update local user state
-        this.user.isProfileCompleted = isProfileCompleted;
+        this.user.profileCompleted = profileCompleted;
         
         // Optionally, you can also call backend to update the status
         // await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/profile-status`, {
         //   method: "PUT",
         //   headers: this.getAuthHeaders(),
-        //   body: JSON.stringify({ isProfileCompleted }),
+        //   body: JSON.stringify({ profileCompleted: profileCompleted }),
         // });
       }
     } catch (error) {
