@@ -1,6 +1,6 @@
 'use client';
 
-import { makeEventHost } from '@/services/volunteerProfileService';
+import { promoteToEventHost } from '@/services/volunteerProfileService';
 import {
   Modal,
   ModalContent,
@@ -11,7 +11,6 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -31,8 +30,7 @@ export default function VolunteerToHostModal({
   const handleConfirm = async () => {
     setIsConfirming(true);
     try {
-      // Call the service to make the volunteer an event host
-      await makeEventHost(6); // Replace with actual volunteer ID
+      await promoteToEventHost();
       console.log('Volunteer upgraded to Event Host');
       router.push('/event-host/events');
     } catch (error) {
@@ -86,13 +84,7 @@ export default function VolunteerToHostModal({
                         organize, and lead events that matter. You&apos;ll be at
                         the forefront of community engagement, bringing people
                         together for causes you&apos;re passionate about while
-                        developing valuable leadership skills.{' '}
-                        <Link
-                          href="#learn-more"
-                          className="text-verdant-600 hover:text-verdant-700 underline font-medium"
-                        >
-                          Learn more
-                        </Link>
+                        developing valuable leadership skills.
                       </p>
                     </div>
                   </CardBody>
