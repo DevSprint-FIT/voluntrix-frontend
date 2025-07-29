@@ -12,6 +12,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import Link from "next/link";
+ import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,6 +24,8 @@ interface MenuItem {
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -117,7 +120,10 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       {/* Back Button */}
       <div>
         <button
-          onClick={() => setSelectedItem("Back")}
+          onClick={() => {
+            setSelectedItem("Back");
+            router.push('/event-host/events');
+          }}
           className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
