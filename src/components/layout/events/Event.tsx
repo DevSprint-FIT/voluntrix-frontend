@@ -8,17 +8,16 @@ import VolunteerApplication from '@/components/UI/VolunteerApplication';
 import SponsorshipsModal from '@/components/UI/SponsorshipsModal';
 import DonationModal from '@/components/UI/DonationModal';
 import { fetchVolunteer } from '@/services/volunteerApplicationService';
-
-interface Sponsor {
-  sponsorships: string[];
-}
+import { SponsorshipType } from '@/types/SponsorshipType';
 
 export default function Event({
   event,
-  sponsor,
+  sponsorshipNames,
+  sponsorships,
 }: {
   event: EventType;
-  sponsor: Sponsor;
+  sponsorshipNames: string[];
+  sponsorships: SponsorshipType[];
 }) {
   const [isSaved, setIsSaved] = useState(false);
   const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
@@ -89,9 +88,7 @@ export default function Event({
           console.log('Institutes match. Volunteer is eligible.');
           setIsEligibleToApply(true);
         } else {
-          console.warn(
-            'Institutes do not match. Volunteer is not eligible.'
-          );
+          console.warn('Institutes do not match. Volunteer is not eligible.');
           setIsEligibleToApply(false);
         }
       } catch (error) {
@@ -238,7 +235,7 @@ export default function Event({
                 partnerships.
               </p>
               <div className="flex items-center gap-2 flex-wrap">
-                {sponsor.sponsorships.map((tag, index) => (
+                {sponsorshipNames.map((tag, index) => (
                   <div
                     key={index}
                     className="flex justify-center items-center rounded-[4px] bg-[#E7E7E7]"
@@ -282,6 +279,7 @@ export default function Event({
                 <SponsorshipsModal
                   isOpen={isSponsorModalOpen}
                   onClose={() => setIsSponsorModalOpen(false)}
+                  sponsorships={sponsorships}
                 />
               )}
             </div>
