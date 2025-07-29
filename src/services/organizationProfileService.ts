@@ -7,7 +7,7 @@ export async function getOrganizationByToken() {
   }
 
   try {
-    const response = await fetch(`${baseUrl}/organizations/me`, {
+    const response = await fetch(`${baseUrl}/api/organizations/me`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`, 

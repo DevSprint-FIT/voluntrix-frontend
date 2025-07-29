@@ -25,7 +25,7 @@ const getBaseUrl = () => {
 
 export const getOrganizationSettings = async (): Promise<OrganizationSettings> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/organizations/me`, {
+    const response = await fetch(`${getBaseUrl()}/api/organizations/me`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
@@ -56,7 +56,7 @@ export const updateOrganizationEmail = async (
   email: string
 ): Promise<OrganizationSettings> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/organizations/profile`, {
+    const response = await fetch(`${getBaseUrl()}/api/organizations/profile`, {
       method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify({ email }),
@@ -76,7 +76,7 @@ export const updateOrganizationEmail = async (
 
 export const deleteOrganizationById = async (id: number): Promise<void> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/users/account`, {
+    const response = await fetch(`${getBaseUrl()}/api/users/account`, {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
@@ -95,7 +95,7 @@ export const sendVerificationCode = async (
   captchaToken: string
 ): Promise<void> => {
   try {
-    const response = await fetch(`${getBaseUrl()}/verify`, {
+    const response = await fetch(`${getBaseUrl()}/api/verify/phone`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
