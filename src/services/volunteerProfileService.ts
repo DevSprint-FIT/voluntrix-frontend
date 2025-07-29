@@ -123,11 +123,20 @@ export const fetchVolunteer = async (
   }
 };
 
-export const makeEventHost = async (id: number) => {
+export const promoteToEventHost = async () => {
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
   try {
-    const response = await axios.patch(`${API_BASE_URL}/volunteers/${id}`, {
-      isEventHost: true,
-    });
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/volunteers/promote-to-event-host`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error making volunteer an event host:', error);
