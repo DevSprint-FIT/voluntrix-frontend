@@ -1,3 +1,4 @@
+import authService from "./authService";
 
 export interface EventStatusCounts {
   active: number;
@@ -8,7 +9,7 @@ export interface EventStatusCounts {
 // Fetch event counts for the authenticated organization
 export const getEventStatusCounts = async (): Promise<EventStatusCounts> => {
   const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
   if (!token) {
     throw new Error("Authentication token not found. Please check your environment variables.");
@@ -16,12 +17,9 @@ export const getEventStatusCounts = async (): Promise<EventStatusCounts> => {
 
   try {
     
-    const response = await fetch(`${baseUrl}/public/events/all`, {
+    const response = await fetch(`${baseUrl}/api/public/events/all`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {

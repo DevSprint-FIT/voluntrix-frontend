@@ -13,6 +13,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -23,13 +24,8 @@ interface MenuItem {
 
 const Sidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>("Home");
-
-  useEffect(() => {
-    setTimeout(() => {
-      setNotificationCount(3);
-    }, 500);
-  }, []);
+  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const pathname = usePathname();
 
   const menuItems: MenuItem[] = [
     { name: "Home", icon: Home, href: "/" },
@@ -45,6 +41,23 @@ const Sidebar = () => {
     { name: "Social Feed", icon: Send, href: "/Organization/feed" },
     { name: "Settings", icon: Settings, href: "/Organization/settings" },
   ];
+
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find(item => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem("Dashboard");
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setNotificationCount(3);
+    }, 500);
+  }, []);
 
   return (
     <div className="h-screen w-60 bg-[#f8fefc] border-r  py-6 flex flex-col justify-between fixed">

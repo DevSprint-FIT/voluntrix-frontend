@@ -1,3 +1,5 @@
+import authService from "./authService";
+
 export interface FollowersData {
   month: string;
   count: number;
@@ -23,20 +25,12 @@ const getAuthHeaders = () => {
 };
 
 export async function getFollowersStats(year: number): Promise<FollowersData[]> {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     const response = await fetch(`${baseUrl}/api/follow/stats?year=${year}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -52,20 +46,12 @@ export async function getFollowersStats(year: number): Promise<FollowersData[]> 
 }
 
 export async function getInstituteDistribution(): Promise<InstituteDistribution> {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     const response = await fetch(`${baseUrl}/api/follow/institute-distribution`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -84,23 +70,12 @@ export async function getEventDataForOrganization(): Promise<{
   eventCount: number;
   eventDates: Date[];
 }> {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = getBaseUrl();
 
   try {
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
     const response = await fetch(`${baseUrl}/api/public/events/all`, {
       method: "GET",
-      headers,
+      headers: authService.getAuthHeaders(),
     });
     
     if (!response.ok) {
@@ -122,14 +97,11 @@ export async function getEventDataForOrganization(): Promise<{
     
   } catch (error) {
     console.error("Error fetching event data:", error);
-    return {
-      eventCount: 0,
-      eventDates: []
-    };
+    throw error;
   }
 }
 
-// Legacy functions for backward compatibility (will be removed)
+// Legacy functions for backward compatibility
 export async function getFollowersStatsByOrganizationId(orgId: number, year: number): Promise<FollowersData[]> {
   console.warn("getFollowersStatsByOrganizationId is deprecated. Use getFollowersStats instead.");
   return getFollowersStats(year);

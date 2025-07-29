@@ -1,3 +1,4 @@
+import authService from "./authService";
 
 export type Organization = {
   id: number;
@@ -9,19 +10,16 @@ export type Organization = {
 // Get current organization using token
 export const getOrganizationByToken = async (): Promise<Organization> => {
   const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
   if (!token) {
     throw new Error("Authentication token not found. Please check your environment variables.");
   }
 
   try {
-    const response = await fetch(`${baseUrl}/organizations/me`, {
+    const response = await fetch(`${baseUrl}/api/organizations/me`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`, 
-        "Content-Type": "application/json", 
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -39,19 +37,16 @@ export const getOrganizationByToken = async (): Promise<Organization> => {
 // Get all organizations 
 export const getAllOrganizations = async (): Promise<Organization[]> => {
   const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
   if (!token) {
     throw new Error("Authentication token not found. Please check your environment variables.");
   }
 
   try {
-    const response = await fetch(`${baseUrl}/organizations/all`, {
+    const response = await fetch(`${baseUrl}/api/organizations/all`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     if (!response.ok) {

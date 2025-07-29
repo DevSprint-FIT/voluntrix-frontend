@@ -1,36 +1,18 @@
 import { Post } from "./types";
 import { arrayToDate, getTimeAgoFromDate } from "./utils";
 import { PublicFeedOrganizationDetails, PublicFeedVolunteerDetails } from "./types";
+import authService from "./authService"; // Import the auth service
 
 // Get API base URL from environment variable
 const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
-};
-
-// Get auth token from environment variable
-const getAuthToken = () => {
-  return process.env.NEXT_PUBLIC_AUTH_TOKEN;
-};
-
-// Create headers with authorization
-const createHeaders = (contentType = "application/json") => {
-  const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": contentType
-  };
-  
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  
-  return headers;
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 };
 
 export async function getAllPublicPosts(): Promise<Post[]> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/public/posts/all`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/public/posts/all`, {
+      headers: authService.getAuthHeaders()
     });
     if(!res.ok)
       throw new Error("Failed to fetch public posts");
@@ -55,8 +37,8 @@ export async function getAllPublicPosts(): Promise<Post[]> {
 export async function getCurrentVolunteerDetails(): Promise<PublicFeedVolunteerDetails | null> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/volunteer/me`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/volunteer/me`, {
+      headers: authService.getAuthHeaders()
     });
     
     if (!res.ok) {
@@ -88,8 +70,8 @@ export async function getCurrentVolunteerDetails(): Promise<PublicFeedVolunteerD
 export async function getAllVolunteers(): Promise<PublicFeedVolunteerDetails[]> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/public/volunteers/all`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/public/volunteers/all`, {
+      headers: authService.getAuthHeaders()
     });
     
     if (!res.ok) {
@@ -116,8 +98,8 @@ export async function getAllVolunteers(): Promise<PublicFeedVolunteerDetails[]> 
 export async function getCurrentOrganizationDetails(): Promise<PublicFeedOrganizationDetails | null> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/organizations/me`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/organizations/me`, {
+      headers: authService.getAuthHeaders()
     });
     
     if (!res.ok) {
@@ -140,8 +122,8 @@ export async function getCurrentOrganizationDetails(): Promise<PublicFeedOrganiz
 export async function getAllOrganizations(): Promise<any[]> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/organizations/all`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/organizations/all`, {
+      headers: authService.getAuthHeaders()
     });
     
     if (!res.ok) throw new Error("Failed to fetch organizations");
@@ -166,8 +148,8 @@ export async function getAllOrganizations(): Promise<any[]> {
 export async function getFollowedOrganizationIds(): Promise<number[]> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/follow`, {
-      headers: createHeaders()
+    const res = await fetch(`${BASE_URL}/api/follow`, {
+      headers: authService.getAuthHeaders()
     });
     
     if (!res.ok) throw new Error("Failed to fetch followed organization IDs");
@@ -184,9 +166,9 @@ export async function getFollowedOrganizationIds(): Promise<number[]> {
 export async function followOrganization(organizationId: number): Promise<string> {
   try {
     const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/follow`, {
+    const res = await fetch(`${BASE_URL}/api/follow`, {
       method: "POST",
-      headers: createHeaders(),
+      headers: authService.getAuthHeaders(),
       body: JSON.stringify({ organizationId }),
     });
     

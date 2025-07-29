@@ -1,3 +1,5 @@
+import authService from "./authService"; // Import the auth service
+
 // Comment interface
 export interface Comment {
   id: number;
@@ -9,28 +11,9 @@ export interface Comment {
   ProfileImageUrl?: string; 
 }
 
-// Get API base URL from environment variable
+// Get API base URL 
 const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
-};
-
-// Get auth token from environment variable
-const getAuthToken = () => {
-  return process.env.NEXT_PUBLIC_AUTH_TOKEN;
-};
-
-// Create headers with authorization
-const createHeaders = (contentType = "application/json") => {
-  const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": contentType
-  };
-  
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  
-  return headers;
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 };
 
 // Add comment function
@@ -38,17 +21,19 @@ export async function addComment(
   socialFeedId: number,
   content: string
 ): Promise<Comment> {
-  const BASE_URL = getBaseUrl();
+  const baseUrl = getBaseUrl();
 
   try {
     // Get the authenticated organization's username from /organizations/me endpoint
-    const orgResponse = await fetch(`${BASE_URL}/organizations/me`, {
+    const orgResponse = await fetch(`${baseUrl}/api/organizations/me`, {
       method: "GET",
-      headers: createHeaders()
+      headers: authService.getAuthHeaders()
     });
 
     if (!orgResponse.ok) {
-      throw new Error(`Failed to fetch organization info: ${orgResponse.status}`);
+      const errorText = await orgResponse.text();
+      console.error("Failed to fetch organization info:", errorText);
+      throw new Error(`Failed to fetch organization info: ${orgResponse.status} - ${errorText}`);
     }
 
     const orgData = await orgResponse.json();
@@ -57,9 +42,9 @@ export async function addComment(
     
     console.log("Adding comment with username:", userUsername);
     
-    const response = await fetch(`${BASE_URL}/comments`, {
+    const response = await fetch(`${baseUrl}/api/comments`, {
       method: "POST",
-      headers: createHeaders(),
+      headers: authService.getAuthHeaders(),
       body: JSON.stringify({
         socialFeedId,
         userUsername,
@@ -69,17 +54,13 @@ export async function addComment(
     });
   
     if (!response.ok) {
-      let errorText = "";
-      try {
-        errorText = await response.text();
-      } catch (e) {
-        errorText = "Could not read error text";
-      }
+      const errorText = await response.text();
       console.error("Add comment failed:", response.status, errorText);
-      throw new Error(`Failed to add comment: ${response.status} ${errorText}`);
+      throw new Error(`Failed to add comment: ${response.status} - ${errorText}`);
     }
     
-    return response.json();
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("Error adding comment:", error);
     throw error;
@@ -89,21 +70,20 @@ export async function addComment(
 // Get comments for post
 export const getCommentsForPost = async (postId: number): Promise<Comment[]> => {
   try {
-    const BASE_URL = getBaseUrl();
-    const response = await fetch(`${BASE_URL}/comments/${postId}/all-comments`, {
-      headers: createHeaders()
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/comments/${postId}/all-comments`, {
+      method: "GET",
+      headers: authService.getAuthHeaders()
     });
+    
     if (!response.ok) {
-      let errorText = "";
-      try {
-        errorText = await response.text();
-      } catch (e) {
-        errorText = "Could not read error text";
-      }
+      const errorText = await response.text();
       console.error("Fetch comments failed:", response.status, errorText);
-      throw new Error(`Failed to fetch comments: ${response.status} ${errorText}`);
+      throw new Error(`Failed to fetch comments: ${response.status} - ${errorText}`);
     }
-    return await response.json();
+    
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("Network or server error while fetching comments:", error);
     throw error;
@@ -113,21 +93,16 @@ export const getCommentsForPost = async (postId: number): Promise<Comment[]> => 
 // Delete comment
 export const deleteComment = async (commentId: number): Promise<void> => {
   try {
-    const BASE_URL = getBaseUrl();
-    const response = await fetch(`${BASE_URL}/comments/${commentId}`, {
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/comments/${commentId}`, {
       method: "DELETE",
-      headers: createHeaders()
+      headers: authService.getAuthHeaders()
     });
     
     if (!response.ok) {
-      let errorText = "";
-      try {
-        errorText = await response.text();
-      } catch (e) {
-        errorText = "Could not read error text";
-      }
+      const errorText = await response.text();
       console.error("Delete comment failed:", response.status, errorText);
-      throw new Error(`Failed to delete comment: ${response.status} ${errorText}`);
+      throw new Error(`Failed to delete comment: ${response.status} - ${errorText}`);
     }
   } catch (error) {
     console.error("Network or server error while deleting comment:", error);

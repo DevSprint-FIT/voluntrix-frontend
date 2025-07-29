@@ -1,3 +1,4 @@
+import authService from "./authService";
 
 export type EventStatus = "DRAFT" | "PENDING" | "ACTIVE" | "COMPLETE" | "DENIED";
 
@@ -32,7 +33,7 @@ export type Volunteer = {
 };
 
 const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
 const getAuthHeaders = () => {
@@ -56,16 +57,13 @@ export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> 
   }
 
   try {
-    let url = `${baseUrl}/public/events/all`;
+    let url = `${baseUrl}/api/public/events/all`;
     
     console.log(` Making API request to: ${url}`);
 
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
     
     console.log(` Response status: ${response.status}`);
@@ -136,7 +134,7 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
   }
 
   try {
-    const url = `${baseUrl}/events/${eventId}`;
+    const url = `${baseUrl}/api/events/${eventId}`;
     
     console.log(`Making PATCH request to: ${url}`);
     console.log(`Request body:`, { eventStatus: status });
@@ -149,10 +147,7 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
     
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
       body: JSON.stringify(requestBody),
     });
 
@@ -204,16 +199,13 @@ export const getAllVolunteers = async (): Promise<Map<number, Volunteer>> => {
   }
 
   try {
-    const url = `${baseUrl}/public/volunteers/all`;
+    const url = `${baseUrl}/api/public/volunteers/all`;
     
     console.log(`Fetching volunteers from: ${url}`);
     
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,  
-        "Content-Type": "application/json",
-      },
+      headers: authService.getAuthHeaders(),
     });
 
     console.log(` Volunteers response status: ${response.status}`);

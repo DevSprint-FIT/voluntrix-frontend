@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   getOrganizationSettings,
-  updateOrganizationEmail,
+  updateOrganizationPhone,
   OrganizationSettings,
   deleteOrganizationById
 } from "@/services/organizationSettingsService";
@@ -77,8 +77,8 @@ const SettingsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [editingEmail, setEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
@@ -93,7 +93,7 @@ const SettingsPage = () => {
         setError(null);
         const data = await getOrganizationSettings();
         setOrganization(data);
-        setNewEmail(data.email); // pre-fill current email
+        setNewPhone(data.phone ?? "");
       } catch (error) {
         console.error("Failed to fetch organization", error);
         setError("Failed to load organization settings");
@@ -105,27 +105,27 @@ const SettingsPage = () => {
     loadOrganization();
   }, []);
 
-  const handleSaveEmail = async () => {
+  const handleSavePhone = async () => {
     if (!organization) return;
 
     console.log("Starting email update...");
     
     try {
-      const updated = await updateOrganizationEmail(organization.id, newEmail);
+      const updated = await updateOrganizationPhone(organization.id, newPhone);
       console.log("Email update successful:", updated);
       
       setOrganization(updated);
-      setEditingEmail(false);
+      setEditingPhone(false);
 
       // Show success modal
       setModalType("success");
-      setModalTitle("Email Updated");
-      setModalMessage("Your email address has been successfully updated.");
+      setModalTitle("Phone Number Updated");
+      setModalMessage("Your phone number has been successfully updated.");
       setModalOpen(true);
       
       console.log("Success modal should show now");
     } catch (error) {
-      console.error("Failed to update email:", error);
+      console.error("Failed to update phone number:", error);
 
       // Show error modal
       setModalType("error");
@@ -219,32 +219,32 @@ const SettingsPage = () => {
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="font-secondary font-semibold text-xl">Your email address</h2>
+            <h2 className="font-secondary font-semibold text-xl">Your contact number</h2>
 
             <div className="mb-4 text-shark-700">
-              {!editingEmail ? (
-                organization?.email || (
+              {!editingPhone ? (
+                organization?.phone || (
                   <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
                 )
               ) : (
                 <>
-                  <div className="mb-2">{organization?.email}</div>
+                  <div className="mb-2">{organization?.phone}</div>
                   <input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
                     className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-2xl"
-                    placeholder="Enter new email"
+                    placeholder="Enter new contact number"
                   />
                   <div className="flex gap-2 mt-4">
                     <Button
-                      onPress={() => setEditingEmail(false)}
+                      onPress={() => setEditingPhone(false)}
                       className="!rounded-full bg-shark-100 text-shark-900 font-primary"
                     >
                       Cancel
                     </Button>
                     <Button
-                      onPress={handleSaveEmail}
+                      onPress={handleSavePhone}
                       className="!rounded-full bg-shark-950 text-shark-50 font-primary"
                     >
                       Save
@@ -254,12 +254,12 @@ const SettingsPage = () => {
               )}
             </div>
 
-            {!editingEmail && (
+            {!editingPhone && (
               <Button
-                onPress={() => setEditingEmail(true)}
+                onPress={() => setEditingPhone(true)}
                 className="!rounded-full bg-shark-950 text-shark-50 font-primary"
               >
-                Change email
+                Change contact number
               </Button>
             )}
           </div>

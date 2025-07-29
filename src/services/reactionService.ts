@@ -1,32 +1,18 @@
 import { Reaction, CreateReaction, ReactionStatusDTO } from "./types";
+import authService from "./authService"; // Import the auth service
 
-const BASE_URL = "http://localhost:8080/api/public/reactions";
-
-// Get auth token from environment variable
-const getAuthToken = () => {
-  return process.env.NEXT_PUBLIC_AUTH_TOKEN;
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 };
 
-// Create headers with authorization
-const createHeaders = (contentType = "application/json") => {
-  const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": contentType
-  };
-  
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  
-  return headers;
-};
+const BASE_URL = `${getBaseUrl()}/api/public/reactions`;
 
 // Create or toggle a reaction
 export async function reactToPost(createReaction: CreateReaction): Promise<Reaction | null> {
   try {
     const response = await fetch(`${BASE_URL}`, {
       method: "POST",
-      headers: createHeaders(),
+      headers: authService.getAuthHeaders(),
       body: JSON.stringify(createReaction)
     });
 
@@ -46,7 +32,7 @@ export async function reactToPost(createReaction: CreateReaction): Promise<React
 export async function getReactionsForPost(socialFeedId: number): Promise<Reaction[]> {
   try {
     const response = await fetch(`${BASE_URL}/${socialFeedId}/total-reactions`, {
-      headers: createHeaders()
+      headers: authService.getAuthHeaders()
     });
     if (!response.ok) {
       throw new Error("Failed to fetch reactions");
@@ -67,7 +53,7 @@ export async function getUserReaction(
 ): Promise<ReactionStatusDTO | null> {
   try {
     const response = await fetch(`${BASE_URL}/${socialFeedId}/my-reaction`, {
-      headers: createHeaders()
+      headers: authService.getAuthHeaders()
     });
 
     if (!response.ok) {
@@ -76,7 +62,6 @@ export async function getUserReaction(
         return null;
       }
 
-      
       const errorText = await response.text();
       let errorObj = null;
       try {
@@ -107,7 +92,7 @@ export async function removeReaction(
   try {
     const response = await fetch(`${BASE_URL}/${socialFeedId}/remove-reaction`, {
       method: "DELETE",
-      headers: createHeaders(),
+      headers: authService.getAuthHeaders(),
       body: JSON.stringify({ userId, userType })
     });
 
