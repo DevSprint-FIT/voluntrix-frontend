@@ -30,6 +30,7 @@ const SponsorshipsPage = () => {
   const [eventSponsorships, setEventSponsorships] = useState<
     EventSponsorship[]
   >([]);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     // Simulate data loading with dummy data
@@ -119,6 +120,7 @@ const SponsorshipsPage = () => {
 
   const handleOpenSponsorChat = () => {
     console.log('Opening sponsor chat');
+    setShowChat((prev) => !prev);
     // TODO: Implement sponsor chat functionality - to be integrated later
   };
 
@@ -226,8 +228,12 @@ const SponsorshipsPage = () => {
               <MessageCircle size={20} />
               Chat with Sponsors
             </button>
-            <div className="hidden md:block absolute right-0 top-0 h-full">
-              <ChatController />
+            <div
+              className={`fixed top-0 right-0 h-full shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+                showChat ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              <ChatController setShowChat={setShowChat} />
             </div>
           </div>
         </div>
