@@ -5,7 +5,8 @@ export const createVolunteerEventParticipation = async (
   volunteerId: number,
   areaOfContribution: string
 ) => {
-  // const token = localStorage.getItem('token'); // authentication token
+  // authentication token
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
   const payload = {
     eventId,
@@ -15,11 +16,11 @@ export const createVolunteerEventParticipation = async (
 
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/participations`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/participations`,
       payload,
       {
         headers: {
-          // Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
