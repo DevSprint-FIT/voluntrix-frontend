@@ -14,7 +14,7 @@ import {
   SelectItem,
 } from '@heroui/react';
 import Link from 'next/link';
-import { CreateEventApplication } from '@/services/eventApplicationService';
+import { createEventApplication } from '@/services/eventApplicationService';
 
 interface VolunteerApplicationProps {
   isFormOpen: boolean;
@@ -66,7 +66,7 @@ export default function VolunteerApplication({
     setIsLoading(true);
 
     try {
-      await CreateEventApplication({
+      await createEventApplication({
         eventId: eventId,
         volunteerId: 1, // Replace with actual volunteer ID
         description: reason,
