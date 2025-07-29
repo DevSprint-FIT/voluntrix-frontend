@@ -116,7 +116,7 @@ class AuthService {
     }
   }
   
-  private getAuthHeaders(): HeadersInit {
+  public getAuthHeaders(): HeadersInit {
     const token = this.getToken();
     const headers: HeadersInit = {
       "Content-Type": "application/json",
