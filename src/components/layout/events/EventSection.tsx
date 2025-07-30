@@ -22,9 +22,9 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getRecommendedEvents = async (id: number) => {
+    const getRecommendedEvents = async () => {
       try {
-        const eventsData = await fetchRecommendedEvents(id);
+        const eventsData = await fetchRecommendedEvents();
         setEvents(eventsData);
         setError(null);
       } catch (err) {
@@ -35,7 +35,7 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
       }
     };
 
-    getRecommendedEvents(3); // add volunteer id
+    getRecommendedEvents();
   }, []);
 
   const checkScroll = () => {
