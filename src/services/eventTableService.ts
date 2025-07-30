@@ -36,25 +36,10 @@ const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
-const getAuthHeaders = () => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-};
-
 
 export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+ 
   const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     let url = `${baseUrl}/api/public/events/all`;
@@ -126,12 +111,8 @@ export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> 
 
 // Your existing updateEventStatus function (unchanged)
 export const updateEventStatus = async (eventId: number, status: EventStatus): Promise<Event> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = getBaseUrl();
 
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     const url = `${baseUrl}/api/events/${eventId}`;
@@ -191,12 +172,7 @@ export const updateEventStatus = async (eventId: number, status: EventStatus): P
 
 
 export const getAllVolunteers = async (): Promise<Map<number, Volunteer>> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     const url = `${baseUrl}/api/public/volunteers/all`;

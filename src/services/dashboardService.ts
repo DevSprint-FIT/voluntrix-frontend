@@ -13,17 +13,6 @@ const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
-const getAuthHeaders = () => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-};
-
 export async function getFollowersStats(year: number): Promise<FollowersData[]> {
   const baseUrl = getBaseUrl();
 
