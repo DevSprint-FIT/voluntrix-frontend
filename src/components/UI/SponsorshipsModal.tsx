@@ -8,6 +8,7 @@ import {
   ModalFooter,
   Button,
 } from '@heroui/react';
+import { CheckCircle } from 'lucide-react';
 
 const SponsorshipModal: React.FC<{
   isOpen: boolean;
@@ -18,122 +19,93 @@ const SponsorshipModal: React.FC<{
     useState<SponsorshipType | null>(sponsorships[0] || null);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onFormChange} size="4xl">
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onFormChange}
+      size="4xl"
+      className="rounded-2xl"
+    >
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex flex-col items-center justify-center gap-2">
-              <h2 className="text-3xl text-shark-950 font-semibold text-center font-primary">
+            <ModalHeader className="text-center space-y-2 flex flex-col pt-6 pb-7">
+              <h2 className="text-2xl font-semibold text-shark-950 font-primary">
                 Become a Proud Sponsor of Voluntrix Events
               </h2>
-              <p className="text-shark-700 text-center font-normal font-secondary text-sm">
+              <p className="text-shark-600 font-normal text-sm font-secondary">
                 Support community-driven events and gain brand exposure through
                 our flexible sponsorship packages.
               </p>
             </ModalHeader>
-            <ModalBody className="flex flex-row justify-center items-center gap-6">
-              <div className="w-1/2 space-y-6">
+
+            <ModalBody className="flex flex-col lg:flex-row justify-between gap-6 px-6">
+              <div className="w-full lg:w-1/2 space-y-4">
                 {sponsorships.map((pkg) => (
                   <div
                     key={pkg.sponsorshipId}
-                    className={`rounded-xl transition-all duration-300 cursor-pointer bg-shark-50 ${
+                    className={`rounded-xl border px-5 py-4 cursor-pointer transition-all ${
                       selectedPackage?.sponsorshipId === pkg.sponsorshipId
-                        ? ''
-                        : 'border-shark-100'
-                    } ${!pkg.available ? 'opacity-60' : 'hover:shadow-xl'}`}
+                        ? 'border-verdant-600 bg-verdant-50 shadow-md'
+                        : 'border-shark-200 hover:shadow-sm'
+                    } ${!pkg.available ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onClick={() => pkg.available && setSelectedPackage(pkg)}
+                    role="radio"
+                    aria-checked={
+                      selectedPackage?.sponsorshipId === pkg.sponsorshipId
+                    }
                   >
-                    <label className="py-3 pr-2 pl-4 flex items-start space-x-4 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        value={pkg.sponsorshipId}
-                        checked={
-                          selectedPackage?.sponsorshipId === pkg.sponsorshipId
-                        }
-                        onChange={() =>
-                          pkg.available && setSelectedPackage(pkg)
-                        }
-                        disabled={!pkg.available}
-                        className="w-4 h-4 mt-1 text-verdant-500 rounded-md"
-                      />
-                      <div className="flex gap-9">
-                        <div className="flex flex-col">
-                          <span className="font-bold text-shark-950 text-lg">
-                            {pkg.type}
-                          </span>
-                          <span className="text-shark-700 text-md">
-                            {pkg.price}
-                          </span>
-                        </div>
-
-                        {!pkg.available && (
-                          <span className=" bg-shark-200 text-shark-900 text-sm px-2 rounded  mt-1 flex h-5 ">
-                            Not Available
-                          </span>
-                        )}
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="text-lg font-bold text-shark-950">
+                          {pkg.type}
+                        </span>
+                        <span className="text-md text-shark-700">
+                          Rs. {pkg.price.toLocaleString()}
+                        </span>
                       </div>
-                    </label>
+
+                      {!pkg.available && (
+                        <span className="text-xs bg-shark-200 text-shark-900 px-2 py-1 rounded">
+                          Not Available
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="w-1/2 rounded-3xl bg-shark-50 p-6">
-                <h3 className="font-semibold text-xl">Includes :</h3>
-                <div>
-                  {selectedPackage &&
-                    (() => {
-                      if (!selectedPackage.benefits) return null;
-
-                      // Split the benefits paragraph into sentences
-                      const sentences = selectedPackage.benefits
-                        .split('.')
-                        .map((s) => s.trim())
-                        .filter((s) => s.length > 0);
-
-                      return sentences.map((sentence, idx) => (
-                        <div key={idx} className="flex flex-wrap items-center">
-                          <div className="flex items-center justify-center mr-2 order-1">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-[#029972]"
-                            >
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          </div>
-                          <p className="w-80 text-sm text-shark-900">
-                            {sentence}.
-                          </p>
-                        </div>
-                      ));
-                    })()}
-                </div>
+              <div className="w-full lg:w-1/2 rounded-2xl bg-shark-50 p-6 space-y-3">
+                <h3 className="text-xl font-semibold mb-3 text-shark-900">
+                  What You Get:
+                </h3>
+                {selectedPackage?.benefits ? (
+                  selectedPackage.benefits
+                    .split('.')
+                    .map((sentence) => sentence.trim())
+                    .filter(Boolean)
+                    .map((sentence, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <CheckCircle className="w-5 h-5 text-verdant-600 mt-1" />
+                        <p className="text-shark-800 text-sm">{sentence}.</p>
+                      </div>
+                    ))
+                ) : (
+                  <p className="text-sm text-shark-500">No benefits listed.</p>
+                )}
               </div>
             </ModalBody>
-            <ModalFooter>
+
+            <ModalFooter className="px-6">
               <Button
                 variant="shadow"
-                // disabled={!isFormValid || isLoading}
-                // isLoading={isLoading}
-                className={
-                  'bg-verdant-600 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px]'
-                }
-                // ${
-                // (!isFormValid || isLoading) &&
-                // 'opacity-40 cursor-not-allowed'
-                // }`}
+                className="bg-verdant-600 hover:bg-verdant-700 text-white font-medium rounded-full px-6 py-2 text-sm tracking-wide"
                 onPress={() => {
                   console.log(
                     `Requesting plans for ${selectedPackage?.type} package`
                   );
                   onClose();
                 }}
+                isDisabled={!selectedPackage}
               >
                 Request Sponsorship
               </Button>
