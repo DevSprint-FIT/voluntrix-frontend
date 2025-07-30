@@ -1,4 +1,4 @@
-import { AxiosHeaders } from "axios";
+import { AxiosHeaders } from 'axios';
 
 interface User {
   userId: number;
@@ -161,23 +161,16 @@ class AuthService {
   public getAuthHeadersAxios(): AxiosHeaders {
     const token = this.getToken();
     const headers = new AxiosHeaders();
-    headers.set("Content-Type", "application/json");
+    headers.set('Content-Type', 'application/json');
 
     if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      headers.set('Authorization', `Bearer ${token}`);
     }
 
     return headers;
   }
-
-  async signup(
-    data: SignupData
-  ): Promise<{
-    success: boolean;
-    message: string;
-    user?: User;
-    nextStep?: string;
-  }> {
+  
+  async signup(data: SignupData): Promise<{ success: boolean; message: string; user?: User; nextStep?: string }> {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/signup`,

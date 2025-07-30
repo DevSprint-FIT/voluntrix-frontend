@@ -1,22 +1,17 @@
 import axios from 'axios';
 import { EventApplicationCreateType } from '@/types/EventApplicationCreateType';
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
+import authService from '@/services/authService';
 
 export const createEventApplication = async (
   data: EventApplicationCreateType
 ) => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications`,
       data,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 
@@ -31,16 +26,11 @@ export const createEventApplication = async (
 export const getEventApplicAndVol = async (
   eventId: number
 ): Promise<EventApplicAndVolType[]> => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications/event/volunteers/${eventId}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 
@@ -56,18 +46,12 @@ export const updateEventApplicationStatus = async (
   applicationId: number,
   applicationStatus: 'APPROVED' | 'REJECTED'
 ) => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-applications/${applicationId}`,
       { applicationStatus },
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 
