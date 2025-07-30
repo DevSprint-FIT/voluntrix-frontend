@@ -98,6 +98,7 @@ const SponsorshipModal: React.FC<{
             <ModalFooter className="px-6">
               <Button
                 variant="shadow"
+                isLoading={false}
                 className="bg-verdant-600 hover:bg-verdant-700 text-white font-medium rounded-full px-6 py-2 text-sm tracking-wide"
                 onPress={() => {
                   console.log(
