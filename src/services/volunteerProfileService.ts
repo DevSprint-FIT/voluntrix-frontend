@@ -130,7 +130,7 @@ export const fetchVolunteer = async (): Promise<VolunteerProfile> => {
 export const promoteToEventHost = async () => {
   try {
     const response = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/volunteers/promote-to-event-host`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/volunteers/promote-to-event-host`,
       {},
       {
         headers: authService.getAuthHeadersAxios(),
