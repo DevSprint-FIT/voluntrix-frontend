@@ -1,20 +1,15 @@
 import axios from 'axios';
 import { SponsorshipType } from '@/types/SponsorshipType';
 import { SponsorshipCreateType } from '@/types/SponsorshipCreateType';
+import authService from '@/services/authService';
 
 export const createSponsorships = async (data: SponsorshipCreateType) => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sponsorships`,
       data,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 
@@ -29,16 +24,11 @@ export const createSponsorships = async (data: SponsorshipCreateType) => {
 export const fetchSponsorshipsByEvent = async (
   eventId: number
 ): Promise<SponsorshipType[]> => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sponsorships/event/${eventId}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 

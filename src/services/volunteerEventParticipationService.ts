@@ -1,13 +1,11 @@
 import axios from 'axios';
+import authService from '@/services/authService';
 
 export const createVolunteerEventParticipation = async (
   eventId: number,
   volunteerId: number,
   areaOfContribution: string
 ) => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   const payload = {
     eventId,
     volunteerId,
@@ -19,10 +17,7 @@ export const createVolunteerEventParticipation = async (
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/participations`,
       payload,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
     return response.status === 201;

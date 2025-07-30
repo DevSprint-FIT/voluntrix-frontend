@@ -1,3 +1,5 @@
+import { AxiosHeaders } from 'axios';
+
 interface User {
   userId: number;
   email: string;
@@ -126,6 +128,18 @@ class AuthService {
       headers.Authorization = `Bearer ${token}`;
     }
     
+    return headers;
+  }
+
+  public getAuthHeadersAxios(): AxiosHeaders {
+    const token = this.getToken();
+    const headers = new AxiosHeaders();
+    headers.set('Content-Type', 'application/json');
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+
     return headers;
   }
   

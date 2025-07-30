@@ -1,12 +1,10 @@
 import axios from 'axios';
+import authService from '@/services/authService';
 
 export const createEventInvitation = async (
   eventId: number,
   organizationId: number
 ) => {
-  // authentication token
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   const payload = {
     eventId,
     organizationId,
@@ -18,10 +16,7 @@ export const createEventInvitation = async (
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-invitations`,
       payload,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
     return response.status === 201;

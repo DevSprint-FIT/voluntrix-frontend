@@ -1,4 +1,5 @@
 import axios from 'axios';
+import authService from '@/services/authService';
 
 const API_BASE_URL = 'http://localhost:8080/api/public';
 
@@ -111,11 +112,14 @@ export const volunteerProfileService = {
   },
 };
 
-export const fetchVolunteer = async (
-  username: string
-): Promise<VolunteerProfile> => {
+export const fetchVolunteer = async (): Promise<VolunteerProfile> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/volunteers/${username}`);
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/volunteers/me`,
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching volunteer profile:', error);
@@ -124,17 +128,12 @@ export const fetchVolunteer = async (
 };
 
 export const promoteToEventHost = async () => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
   try {
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/volunteers/promote-to-event-host`,
       {},
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
     return response.data;
