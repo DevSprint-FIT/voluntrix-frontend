@@ -159,27 +159,47 @@ const VolunteerProfilePage = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
 
-  // Using hardcoded values as specified
-  const volunteerId = 1;
-  const username = "anne13";
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        console.log("Starting to fetch volunteer profile data...");
+
         // Fetch volunteer profile
-        const profileData = await volunteerProfileService.getVolunteerProfile(
-          username
-        );
+        console.log("Fetching volunteer profile...");
+        const profileData = await volunteerProfileService.getVolunteerProfile();
+        console.log("Volunteer profile fetched successfully:", profileData);
         setProfile(profileData);
 
         // Fetch followed organizations
-        const organizationsData =
-          await volunteerProfileService.getFollowedOrganizations(volunteerId);
-        setFollowedOrganizations(organizationsData);
+        console.log("Fetching followed organizations...");
+        try {
+          const organizationsData =
+            await volunteerProfileService.getFollowedOrganizations();
+          console.log(
+            "Followed organizations fetched successfully:",
+            organizationsData
+          );
+          setFollowedOrganizations(organizationsData);
+        } catch (orgError) {
+          console.error("Failed to fetch followed organizations:", orgError);
+          // Don't fail the entire component if organizations can't be fetched
+          setFollowedOrganizations([]);
+
+          // Show a notification about the organization fetch failure
+          setModalType("error");
+          setModalTitle("Organizations Loading Error");
+          setModalMessage(
+            orgError instanceof Error
+              ? orgError.message
+              : "Failed to load followed organizations. Your profile is still available."
+          );
+          setModalOpen(true);
+        }
       } catch (err) {
+        console.error("Error fetching profile data:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
@@ -191,10 +211,8 @@ const VolunteerProfilePage = () => {
 
   const handleUnfollow = async (organizationId: number) => {
     try {
-      await volunteerProfileService.unfollowOrganization(
-        volunteerId,
-        organizationId
-      );
+      await volunteerProfileService.unfollowOrganization(organizationId);
+
       // Remove the organization from the local state
       setFollowedOrganizations((prev) =>
         prev.filter((org) => org.id !== organizationId)
@@ -223,7 +241,6 @@ const VolunteerProfilePage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        {" "}
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
           <p className="text-gray-600 font-secondary">Loading profile...</p>
@@ -235,7 +252,6 @@ const VolunteerProfilePage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        {" "}
         <div className="text-center">
           <p className="text-red-600 font-secondary mb-4">Error: {error}</p>
           <button
@@ -278,7 +294,7 @@ const VolunteerProfilePage = () => {
             <div className="flex items-start space-x-10">
               <img
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
-                alt={profile.firstName}
+                alt={profile.fullName}
                 className="w-32 h-32 rounded-lg object-cover"
               />
 
@@ -288,15 +304,17 @@ const VolunteerProfilePage = () => {
                     @{profile.username}
                   </span>
                   <h2 className="text-2xl font-bold font-secondary text-gray-900">
-                    {profile.firstName} {profile.lastName}
+                    {profile.fullName}
                   </h2>
                 </div>
 
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="flex items-center text-gray-600 font-secondary">
-                    <MapPin size={16} className="mr-1" />
-                    <span>{profile.institute}</span>
-                  </div>
+                  {profile.institute && (
+                    <div className="flex items-center text-gray-600 font-secondary">
+                      <MapPin size={16} className="mr-1" />
+                      <span>{profile.institute}</span>
+                    </div>
+                  )}
                   <div className="flex items-center text-gray-600 font-secondary">
                     <Calendar size={16} className="mr-1" />
                     <span>
@@ -368,6 +386,19 @@ const VolunteerProfilePage = () => {
                     </p>
                   </div>
                 </div>
+                {profile.instituteEmail && (
+                  <div className="flex items-center space-x-3">
+                    <Mail size={16} className="text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 font-secondary">
+                        Institute Email
+                      </p>
+                      <p className="font-medium text-gray-900 font-secondary">
+                        {profile.instituteEmail}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

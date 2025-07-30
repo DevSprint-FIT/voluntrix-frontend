@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  getVolunteerSettingsByUsername,
+  getVolunteerSettings,
   updateVolunteerEmail,
   updateVolunteerAvailability,
   VolunteerSettings,
@@ -66,10 +66,65 @@ const NotificationModal = ({
   );
 };
 
+// Confirmation Modal Component
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Delete",
+  cancelText = "Cancel",
+  isDestructive = false,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isDestructive?: boolean;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl w-full max-w-md mx-4 p-6">
+        <div className="flex items-center mb-4">
+          <AlertCircle className="text-red-600 mr-3" size={24} />
+          <h2 className="text-lg font-semibold font-secondary text-gray-900">
+            {title}
+          </h2>
+        </div>
+        <p className="text-gray-600 font-secondary mb-6">{message}</p>
+        <div className="flex justify-end gap-3">
+          <Button
+            onPress={onClose}
+            className="rounded-full bg-shark-100 text-shark-900 font-primary tracking-wide text-base"
+          >
+            {cancelText}
+          </Button>
+          <Button
+            onPress={onConfirm}
+            className={`rounded-full font-primary tracking-wide text-base ${
+              isDestructive
+                ? "bg-red-600 text-white"
+                : "bg-shark-950 text-shark-50"
+            }`}
+          >
+            {confirmText}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SettingsPage = () => {
   const [volunteer, setVolunteer] = useState<VolunteerSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
@@ -82,16 +137,18 @@ const SettingsPage = () => {
   const [modalMessage, setModalMessage] = useState("");
 
   const router = useRouter();
-  const username = "anne13";
 
   useEffect(() => {
     const loadVolunteer = async () => {
       try {
-        const data = await getVolunteerSettingsByUsername(username);
+        setLoading(true);
+        setError(null);
+        const data = await getVolunteerSettings();
         setVolunteer(data);
         setNewEmail(data.email);
       } catch (error) {
-        console.error("Failed to fetch volunteer", error);
+        console.error("Failed to fetch volunteer settings:", error);
+        setError("Failed to load volunteer settings");
       } finally {
         setLoading(false);
       }
@@ -103,10 +160,7 @@ const SettingsPage = () => {
     if (!volunteer) return;
 
     try {
-      const updated = await updateVolunteerEmail(
-        volunteer.volunteerId,
-        newEmail
-      );
+      const updated = await updateVolunteerEmail(newEmail);
       setVolunteer(updated);
       setEditingEmail(false);
 
@@ -136,16 +190,38 @@ const SettingsPage = () => {
     setUpdatingAvailability(true);
     try {
       const newAvailability = !volunteer.isAvailable;
-      const updated = await updateVolunteerAvailability(
-        volunteer.volunteerId,
-        newAvailability
-      );
+      const updated = await updateVolunteerAvailability(newAvailability);
       setVolunteer(updated);
+
+      // Show success modal
+      setModalType("success");
+      setModalTitle("Availability Updated");
+      setModalMessage(
+        `Your availability has been updated to ${
+          newAvailability ? "Available" : "Not Available"
+        }.`
+      );
+      setModalOpen(true);
     } catch (error) {
       console.error("Failed to update availability:", error);
+
+      // Show error modal
+      setModalType("error");
+      setModalTitle("Update Failed");
+      setModalMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to update availability. Please try again."
+      );
+      setModalOpen(true);
     } finally {
       setUpdatingAvailability(false);
     }
+  };
+
+  const handleDeleteAccount = () => {
+    // This is just for display - no actual functionality implemented
+    console.log("Delete account clicked - functionality not implemented");
   };
 
   if (loading) {
@@ -165,11 +241,34 @@ const SettingsPage = () => {
     );
   }
 
+  if (error || !volunteer) {
+    return (
+      <div className="p-5">
+        <span className="text-shark-300">Volunteer / Settings</span>
+        <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">
+          Settings
+        </h1>
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">
+            {error || "Volunteer settings not found"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5">
       <span className="text-shark-300">Volunteer / Settings</span>
       <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">Settings</h1>
 
+      {/* Email Section */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -178,12 +277,10 @@ const SettingsPage = () => {
             </h2>
             <div className="mb-4 text-shark-700">
               {!editingEmail ? (
-                volunteer?.email || (
-                  <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
-                )
+                volunteer.email
               ) : (
                 <>
-                  <div className="mb-2">{volunteer?.email}</div>
+                  <div className="mb-2">{volunteer.email}</div>
                   <input
                     type="email"
                     value={newEmail}
@@ -193,7 +290,10 @@ const SettingsPage = () => {
                   />
                   <div className="flex gap-2 mt-4">
                     <Button
-                      onPress={() => setEditingEmail(false)}
+                      onPress={() => {
+                        setEditingEmail(false);
+                        setNewEmail(volunteer.email);
+                      }}
                       className="rounded-full bg-shark-100 text-shark-900 font-primary tracking-wide text-base"
                     >
                       Cancel
@@ -224,17 +324,13 @@ const SettingsPage = () => {
               Your username
             </div>
             <div className="font-secondary text-shark-700">
-              {volunteer ? (
-                `${volunteer.username} (not editable)`
-              ) : (
-                <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
-              )}
+              {volunteer.username} (not editable)
             </div>
           </div>
         </div>
       </div>
 
-      {/* Availability */}
+      {/* Availability Section */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <h2 className="font-secondary font-semibold text-2xl mb-2">
           Availability
@@ -250,10 +346,10 @@ const SettingsPage = () => {
             </div>
             <div
               className={`font-secondary font-medium ${
-                volunteer?.isAvailable ? "text-green-600" : "text-red-600"
+                volunteer.isAvailable ? "text-green-600" : "text-red-600"
               }`}
             >
-              {volunteer?.isAvailable ? "Available" : "Not Available"}
+              {volunteer.isAvailable ? "Available" : "Not Available"}
             </div>
           </div>
         </div>
@@ -264,7 +360,7 @@ const SettingsPage = () => {
         >
           {updatingAvailability
             ? "Updating..."
-            : volunteer?.isAvailable
+            : volunteer.isAvailable
             ? "Set Not Available"
             : "Set Available"}
         </Button>
@@ -278,7 +374,10 @@ const SettingsPage = () => {
         <div className="mb-4 text-shark-700">
           Permanently delete your account and all data.
         </div>
-        <Button className="rounded-full bg-red-600 text-shark-50 font-primary tracking-wide text-base">
+        <Button
+          onPress={handleDeleteAccount}
+          className="rounded-full bg-red-600 text-shark-50 font-primary tracking-wide text-base"
+        >
           Delete Account
         </Button>
       </div>
