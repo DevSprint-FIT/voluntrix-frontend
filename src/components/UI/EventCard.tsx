@@ -6,7 +6,7 @@ import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 
-export default function EventCard({event}: {event: EventType}) {  
+export default function EventCard({ event }: { event: EventType }) {
   // const [isSaved, setIsSaved] = useState(false);
 
   // const handleSave = () => {
@@ -83,11 +83,19 @@ export default function EventCard({event}: {event: EventType}) {
                     By {event.organizationName}
                   </p>
                 )}
-                {!event.donationEnabled && (
-                  <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
-                    {event.eventDescription}
-                  </p>
-                )}
+                {!event.donationEnabled &&
+                  (() => {
+                    const sentences = event.eventDescription.match(
+                      /[^.!?]+[.!?]+/g
+                    ) || [event.eventDescription];
+                    const preview = sentences.slice(0, 2).join(' ');
+
+                    return (
+                      <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
+                        {preview}
+                      </p>
+                    );
+                  })()}
                 <div className="flex items-center gap-2 flex-wrap">
                   {event.categories.map((category, index) => (
                     <div
