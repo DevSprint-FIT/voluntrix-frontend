@@ -51,7 +51,7 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
   const scroll = (direction: 'left' | 'right') => {
     const { current } = scrollRef;
     if (current) {
-      const scrollAmount = 450;
+      const scrollAmount = 350;
       current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
