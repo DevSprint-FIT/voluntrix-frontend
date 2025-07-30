@@ -1,14 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  BarChart,
-  Calendar,
-  Bell,
-  LogOut,
-  LucideIcon,
-  Home,
-} from 'lucide-react';
+import { BarChart, Calendar, Bell, LogOut, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 import Image from 'next/image';
@@ -23,8 +16,7 @@ interface MenuItem {
 
 const VolunteerSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Home');
-
+  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   useEffect(() => {
     setTimeout(() => {
       setNotificationCount(3);
@@ -32,9 +24,7 @@ const VolunteerSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Home', icon: Home, href: '/' },
     { name: 'Dashboard', icon: BarChart, href: `/event-host/dashboard` },
-    // { name: 'Profile', icon: User, href: '/event-host/profile' },
     { name: 'Events', icon: Calendar, href: `/event-host/events` },
     {
       name: 'Notifications',
@@ -42,8 +32,6 @@ const VolunteerSidebar = () => {
       badge: notificationCount,
       href: `/event-host/notifications`,
     },
-    // { name: 'Social Feed', icon: Send, href: '/event-host/social-feed' },
-    // { name: 'Settings', icon: Settings, href: '/event-host/settings' },
   ];
 
   const router = useRouter();
@@ -57,7 +45,8 @@ const VolunteerSidebar = () => {
             alt="Logo"
             width={152}
             height={44}
-            className="ml-[-10px]"
+            className="ml-[-10px] cursor-pointer"
+            onClick={() => router.push('/')}
           />
         </div>
         <nav>

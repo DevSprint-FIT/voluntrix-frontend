@@ -43,6 +43,9 @@ export default function HostEvents() {
           completed: data.filter(
             (e) => e.eventStatus.toUpperCase() === 'COMPLETE'
           ).length,
+          denied: data.filter(
+            (e) => e.eventStatus.toUpperCase() === 'DENIED'
+          ).length,
         };
 
         setEventCounts(counts);
@@ -94,6 +97,7 @@ export default function HostEvents() {
     { id: 'active', label: 'Active Events', active: false },
     { id: 'applied', label: 'Applied Events', active: false },
     { id: 'completed', label: 'Completed Events', active: false },
+    { id: 'denied', label: 'Denied Events', active: false },
   ];
 
   function formatDate(dateString: string) {

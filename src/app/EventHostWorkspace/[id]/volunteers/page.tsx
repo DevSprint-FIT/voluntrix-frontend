@@ -9,6 +9,7 @@ import {
 } from '@/services/eventApplicationService';
 import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
 import { createVolunteerEventParticipation } from '@/services/volunteerEventParticipationService';
+import { recruitVolunteer } from '@/services/eventService';
 
 const EventVolunteersPage = ({
   params,
@@ -61,7 +62,8 @@ const EventVolunteersPage = ({
   const handleApproveApplication = async (id: number) => {
     console.log('Approved volunteer application:', id);
     try {
-      await updateEventApplicationStatus(id, 'APPROVED');
+      const updatedApp = await updateEventApplicationStatus(id, 'APPROVED');
+      console.log('Application approved successfully:', updatedApp);
 
       const approvedApp = volunteerApplications.find((app) => app.id === id);
       console.log('Payload to backend:', {
@@ -76,6 +78,9 @@ const EventVolunteersPage = ({
           approvedApp.contributionArea
         );
       }
+
+      const volCount = await recruitVolunteer(eventId);
+      console.log('Volunteer recruited successfully:', volCount);
 
       setVolunteerApplications((prevApplications) => {
         const approvedApp = prevApplications.find((app) => app.id === id);
