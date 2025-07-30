@@ -43,15 +43,15 @@ const VolunteerSidebar = () => {
   }, []);
 
   useEffect(() => {
-    const getVolunteerProfile = async ({ username }: { username: string }) => {
+    const getVolunteerProfile = async () => {
       try {
-        const data = await fetchVolunteer(username);
+        const data = await fetchVolunteer();
         setVolunteer(data);
       } catch (error) {
         console.error('Error fetching volunteer profile:', error);
       }
     };
-    getVolunteerProfile({ username: 'shanu123' }); // add your logic to get the username dynamically
+    getVolunteerProfile();
   }, []);
 
   const menuItems: MenuItem[] = [
