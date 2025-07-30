@@ -1,135 +1,147 @@
 import { SponsorshipType } from '@/types/SponsorshipType';
 import React, { useState } from 'react';
-
-interface SponsorshipPackage {
-  id: string;
-  name: string;
-  price: string;
-  available: boolean;
-}
-
-interface SponsorshipBenefit {
-  id: string;
-  description: string;
-}
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from '@heroui/react';
 
 const SponsorshipModal: React.FC<{
   isOpen: boolean;
-  onClose: () => void;
   sponsorships: SponsorshipType[];
-}> = ({ isOpen, onClose, sponsorships }) => {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>('platinum');
-
-  const packages: SponsorshipPackage[] = [
-    { id: 'platinum', name: 'Platinum Sponsor', price: 'LKR 500,000', available: true },
-    { id: 'gold', name: 'Gold Sponsor', price: 'LKR 250,000', available: true },
-    { id: 'silver', name: 'Silver Sponsor', price: 'LKR 100,000', available: false },
-    { id: 'community', name: 'Community Partner', price: 'LKR 50,000', available: true },
-  ];
-
-  const benefits: SponsorshipBenefit[] = [
-    { id: 'logo', description: 'Prominent logo placement on all media (physical + digital)' },
-    { id: 'speaking', description: 'Speaking opportunity at opening ceremony' },
-    { id: 'booth', description: 'Branded booth space & banners at venue' },
-    { id: 'media', description: 'Featured in media and press releases' },
-    { id: 'materials', description: 'Logo on all recap materials & event emails' },
-    { id: 'video', description: 'Customized thank-you video from team' },
-  ];
-
-  if (!isOpen) return null;
+  onFormChange: (open: boolean) => void;
+}> = ({ isOpen, sponsorships, onFormChange }) => {
+  const [selectedPackage, setSelectedPackage] =
+    useState<SponsorshipType | null>(sponsorships[0] || null);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl w-full max-w-4xl relative p-12">
-        
-        <button 
-          onClick={onClose}
-          className="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
-          aria-label="Close"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+    <Modal isOpen={isOpen} onOpenChange={onFormChange} size="4xl">
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col items-center justify-center gap-2">
+              <h2 className="text-3xl text-shark-950 font-semibold text-center font-primary">
+                Become a Proud Sponsor of Voluntrix Events
+              </h2>
+              <p className="text-shark-700 text-center font-normal font-secondary text-sm">
+                Support community-driven events and gain brand exposure through
+                our flexible sponsorship packages.
+              </p>
+            </ModalHeader>
+            <ModalBody className="flex flex-row justify-center items-center gap-6">
+              <div className="w-1/2 space-y-6">
+                {sponsorships.map((pkg) => (
+                  <div
+                    key={pkg.sponsorshipId}
+                    className={`rounded-xl transition-all duration-300 cursor-pointer bg-shark-50 ${
+                      selectedPackage?.sponsorshipId === pkg.sponsorshipId
+                        ? ''
+                        : 'border-shark-100'
+                    } ${!pkg.available ? 'opacity-60' : 'hover:shadow-xl'}`}
+                    onClick={() => pkg.available && setSelectedPackage(pkg)}
+                  >
+                    <label className="py-3 pr-2 pl-4 flex items-start space-x-4 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        value={pkg.sponsorshipId}
+                        checked={
+                          selectedPackage?.sponsorshipId === pkg.sponsorshipId
+                        }
+                        onChange={() =>
+                          pkg.available && setSelectedPackage(pkg)
+                        }
+                        disabled={!pkg.available}
+                        className="w-4 h-4 mt-1 text-verdant-500 rounded-md"
+                      />
+                      <div className="flex gap-9">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-shark-950 text-lg">
+                            {pkg.type}
+                          </span>
+                          <span className="text-shark-700 text-md">
+                            {pkg.price}
+                          </span>
+                        </div>
 
-       
-        <div className="p-8">
-          <h2 className="text-[1.85rem] font-bold text-center mb-2 font-primary">Become a Proud Sponsor of Voluntrix Events</h2>
-          <p className="text-shark-600 text-center mb-8 font-secondary text-sm">
-            Support community-driven events and gain brand exposure through<br /> our flexible sponsorship packages.
-          </p>
-
-          <div className="flex flex-col md:flex-row gap-6">
-            
-            <div className="md:w-1/2 space-y-6">
-              {packages.map((pkg) => (
-                <div 
-                  key={pkg.id}
-                  className={`p-4 rounded-xl   transition-all duration-300 cursor-pointer bg-[#fbfbfb] ${
-                    selectedPackage === pkg.id ? '' : 'border-gray-200'
-                  } ${!pkg.available ? 'opacity-60' : 'hover:shadow-xl'}`}
-                  onClick={() => pkg.available && setSelectedPackage(pkg.id)}
-                >
-                  <label className="flex items-start space-x-4 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      value={pkg.id}
-                      checked={selectedPackage === pkg.id}
-                      onChange={() => pkg.available && setSelectedPackage(pkg.id)}
-                      disabled={!pkg.available}
-                      className="w-5 h-5 mt-1 accent-[#029972]"
-                    />
-                    <div className="flex gap-9">
-                      <div className='flex flex-col'>
-                        
-                    <span className="font-bold text-xl">{pkg.name}</span>
-                      <span className="text-gray-700">{pkg.price}</span>
-
-                        
-                        </div>  
-                      
-                      {!pkg.available && (
-                        <span className=" bg-gray-200 text-gray-700 text-sm px-2 rounded  mt-1 flex h-5 ">
-                          Not Available
-                        </span>
-                      )}
-                    </div>
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            
-            <div className="md:w-1/2 pl-4  rounded-3xl bg-[#fbfbfb]">
-            <br></br>
-              <h3 className="font-semibold text-xl mb-4 ">Includes :</h3>
-              <div>
-                {benefits.map((benefit) => (
-                  <div key={benefit.id} className="mb-4 flex items-center gap-8">
-                    <div className=" flex items-center justify-center mr-2 order-1">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#029972]">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </div>
-                    <p className='w-80'>{benefit.description}</p>
+                        {!pkg.available && (
+                          <span className=" bg-shark-200 text-shark-900 text-sm px-2 rounded  mt-1 flex h-5 ">
+                            Not Available
+                          </span>
+                        )}
+                      </div>
+                    </label>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
 
-          <div className="mt-8 flex justify-end">
-            <button 
-              className="bg-gray-900 text-white px-6 py-3 rounded-full font-medium text-lg"
-              onClick={() => console.log(`Requesting plans for ${selectedPackage} package`)}
-            >
-              Request Plans
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <div className="w-1/2 rounded-3xl bg-shark-50 p-6">
+                <h3 className="font-semibold text-xl">Includes :</h3>
+                <div>
+                  {selectedPackage &&
+                    (() => {
+                      if (!selectedPackage.benefits) return null;
+
+                      // Split the benefits paragraph into sentences
+                      const sentences = selectedPackage.benefits
+                        .split('.')
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0);
+
+                      return sentences.map((sentence, idx) => (
+                        <div key={idx} className="flex flex-wrap items-center">
+                          <div className="flex items-center justify-center mr-2 order-1">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-[#029972]"
+                            >
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </div>
+                          <p className="w-80 text-sm text-shark-900">
+                            {sentence}.
+                          </p>
+                        </div>
+                      ));
+                    })()}
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="shadow"
+                // disabled={!isFormValid || isLoading}
+                // isLoading={isLoading}
+                className={
+                  'bg-verdant-600 text-white text-sm font-primary px-6 py-2 rounded-[20px] tracking-[1px]'
+                }
+                // ${
+                // (!isFormValid || isLoading) &&
+                // 'opacity-40 cursor-not-allowed'
+                // }`}
+                onPress={() => {
+                  console.log(
+                    `Requesting plans for ${selectedPackage?.type} package`
+                  );
+                  onClose();
+                }}
+              >
+                Request Sponsorship
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
