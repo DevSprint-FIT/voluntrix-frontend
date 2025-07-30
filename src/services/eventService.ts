@@ -169,3 +169,19 @@ export const fetchEventTitlesByHostId = async () => {
     throw error;
   }
 };
+
+export const recruitVolunteer = async (eventId: number) => {
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/recruit-volunteer/${eventId}`,
+      {},
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error recruiting volunteer:', error);
+    throw error;
+  }
+};
