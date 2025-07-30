@@ -19,14 +19,14 @@ export default function Event({
   sponsorshipNames: string[];
   sponsorships: SponsorshipType[];
 }) {
-  const [isSaved, setIsSaved] = useState(false);
+  // const [isSaved, setIsSaved] = useState(false);
   const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isEligibleToApply, setIsEligibleToApply] = useState<boolean>(false);
 
-  const handleSave = () => {
-    setIsSaved((prevState) => !prevState);
-  };
+  // const handleSave = () => {
+  //   setIsSaved((prevState) => !prevState);
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -121,7 +121,7 @@ export default function Event({
                   <p className="w-[513px] font-secondary text-shark-950 font-medium text-4xl text-left text-wrap">
                     {event.eventTitle}
                   </p>
-                  <button onClick={handleSave}>
+                  {/* <button onClick={handleSave}>
                     <Image
                       src={
                         isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
@@ -130,7 +130,7 @@ export default function Event({
                       height={32}
                       alt="save"
                     />
-                  </button>
+                  </button> */}
                 </div>
                 {event.organizationId !== null && (
                   <div className="flex gap-2 items-center">

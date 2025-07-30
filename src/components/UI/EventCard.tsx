@@ -1,18 +1,17 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
 import { Progress } from '@heroui/progress';
 import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 
 export default function EventCard({event}: {event: EventType}) {  
-  const [isSaved, setIsSaved] = useState(false);
+  // const [isSaved, setIsSaved] = useState(false);
 
-  const handleSave = () => {
-    setIsSaved((prevState) => !prevState);
-  };
+  // const handleSave = () => {
+  //   setIsSaved((prevState) => !prevState);
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -65,7 +64,7 @@ export default function EventCard({event}: {event: EventType}) {
                   <p className="w-[234px] text-shark-950 font-bold text-xl text-left text-wrap">
                     {event.eventTitle}
                   </p>
-                  <button onClick={handleSave}>
+                  {/* <button onClick={handleSave}>
                     <Image
                       src={
                         isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
@@ -74,7 +73,7 @@ export default function EventCard({event}: {event: EventType}) {
                       height={24}
                       alt="save"
                     />
-                  </button>
+                  </button> */}
                 </div>
                 {event.organizationName && (
                   <p
