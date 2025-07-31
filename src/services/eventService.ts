@@ -185,3 +185,33 @@ export const recruitVolunteer = async (eventId: number) => {
     throw error;
   }
 };
+
+export const fetchTotalEventsCountByHostId = async (): Promise<number> => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/total-events-count`,
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching event count:', error);
+    throw error;
+  }
+};
+
+export const fetchTotalEventHostRewardPoints = async (): Promise<number> => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/total-event-host-reward-points`,
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total event host reward points:', error);
+    throw error;
+  }
+};
