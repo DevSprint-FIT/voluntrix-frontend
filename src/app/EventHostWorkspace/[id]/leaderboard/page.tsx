@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import EventLeaderboard, {
   LeaderboardEntry,
-} from '@/components/UI/EventLeaderboard';
-import { eventLeaderboardService } from '@/services/eventLeaderboard';
+} from "@/components/UI/EventLeaderboard";
+import { eventLeaderboardService } from "@/services/eventLeaderboard";
 
-const EventHostLeaderboardPage = ({ params }: { params: Promise<{ id: string }>}) => {
+const EventHostLeaderboardPage = ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
     []
   );
@@ -15,7 +19,6 @@ const EventHostLeaderboardPage = ({ params }: { params: Promise<{ id: string }>}
   const [error, setError] = useState<string | null>(null);
   const resolvedParams = React.use(params);
 
-  // Hardcoded eventId for now - can be made dynamic later
   const eventId = Number(resolvedParams.id);
 
   useEffect(() => {
@@ -30,9 +33,9 @@ const EventHostLeaderboardPage = ({ params }: { params: Promise<{ id: string }>}
         setLeaderboardData(data.volunteerLeaderboard);
         setEventHostPoints(data.eventHostPoints);
       } catch (err) {
-        console.error('Failed to fetch leaderboard data:', err);
+        console.error("Failed to fetch leaderboard data:", err);
         setError(
-          err instanceof Error ? err.message : 'Failed to load leaderboard data'
+          err instanceof Error ? err.message : "Failed to load leaderboard data"
         );
       } finally {
         setIsLoading(false);
