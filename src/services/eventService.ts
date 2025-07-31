@@ -128,7 +128,7 @@ export const fetchAllEvents = async (): Promise<EventType[]> => {
 export const fetchLatestEvents = async (): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/latest-three`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/events/latest-three`
     );
     return response.data;
   } catch (error) {
