@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Home,
   BarChart,
   User,
   Calendar,
@@ -29,7 +28,6 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   const menuItems: MenuItem[] = [
-    { name: 'Home', icon: Home, href: '/' },
     { name: 'Dashboard', icon: BarChart, href: '/Organization/dashboard' },
     { name: 'Profile', icon: User, href: '/Organization/profile' },
     { name: 'Events', icon: Calendar, href: '/Organization/events/active' },
