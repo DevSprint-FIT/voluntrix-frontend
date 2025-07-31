@@ -1,6 +1,7 @@
 import authService from "./authService";
 
 export type EventStatus = "DRAFT" | "PENDING" | "ACTIVE" | "COMPLETE" | "DENIED";
+export type ApplicationStatus = "APPROVED" | "REJECTED" | "PENDING";
 
 export type Event = {
   eventId: number;
@@ -11,288 +12,261 @@ export type Event = {
   eventStatus: EventStatus;
   volunteerCount: number;
   eventHostId: number;
+  eventHost?: {
+    volunteerId: number;
+    fullName: string;
+    profilePictureUrl: string | null;
+  };
 };
 
-
-export type Volunteer = {
-  volunteerId: number;
-  userId: number;
-  username: string;
-  fullName: string;                    
-  email: string;
-  institute: string;
-  instituteEmail: string;
-  isAvailable: boolean;
-  volunteerLevel: number;
-  rewardPoints: number;
-  isEventHost: boolean;
-  joinedDate: string;
-  about: string;
-  phoneNumber: string;
-  profilePictureUrl: string | null;
+export type EventInvitation = {
+  id: number;
+  eventId: number;
+  organizationId: number;
+  applicationStatus: ApplicationStatus;
 };
+
+export interface EventStatusCounts {
+  active: number;
+  pending: number;
+  completed: number;
+}
 
 const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
-const getAuthHeaders = () => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
+// Get current organization ID
+const getCurrentOrganizationId = async (): Promise<number> => {
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/api/organizations/me`, {
+    method: "GET",
+    headers: authService.getAuthHeaders(),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to get organization info');
   }
+  
+  const result = await response.json();
+  const data = result.data || result;
+  
+  if (!data?.id) {
+    throw new Error('Organization ID not found');
+  }
+  
+  return data.id;
+};
+
+// Get all volunteers for host lookup
+const getAllVolunteers = async (): Promise<Map<number, any>> => {
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/api/public/volunteers/all`, {
+    method: "GET",
+    headers: authService.getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch volunteers: ${response.status}`);
+  }
+
+  const volunteers = await response.json();
+  const volunteerMap = new Map();
+  volunteers.forEach((volunteer: any) => {
+    volunteerMap.set(volunteer.volunteerId, volunteer);
+  });
+
+  return volunteerMap;
+};
+
+// Get all events
+const getAllEvents = async (): Promise<Event[]> => {
+  const baseUrl = getBaseUrl();
+  
+  try {
+    const response = await fetch(`${baseUrl}/api/events/all`, {
+      method: "GET",
+      headers: authService.getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      // Fallback to public endpoint
+      const publicResponse = await fetch(`${baseUrl}/api/public/events/all`, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
+      
+      if (!publicResponse.ok) {
+        throw new Error(`Failed to fetch events: ${publicResponse.status}`);
+      }
+      
+      const publicEvents = await publicResponse.json();
+      const events = publicEvents.data || publicEvents;
+      
+      // Debug: Log the first event to see its structure
+      if (events.length > 0) {
+        console.log('Sample event structure:', JSON.stringify(events[0], null, 2));
+      }
+      
+      return Array.isArray(events) ? events : [];
+    }
+
+    const result = await response.json();
+    const events = result.data || result;
+    
+    // Debug: Log the first event to see its structure
+    if (events.length > 0) {
+      console.log('Sample event structure:', JSON.stringify(events[0], null, 2));
+    }
+    
+    return Array.isArray(events) ? events : [];
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    throw error;
+  }
+};
+
+// Get event invitations for current organization
+export const getEventInvitationsByOrganization = async (): Promise<EventInvitation[]> => {
+  const orgId = await getCurrentOrganizationId();
+  const baseUrl = getBaseUrl();
+  
+  const response = await fetch(`${baseUrl}/api/event-invitations/organization/${orgId}`, {
+    method: "GET",
+    headers: authService.getAuthHeaders(),
+  });
+  
+  if (!response.ok) {
+    if (response.status === 404) return [];
+    throw new Error(`Failed to fetch event invitations: ${response.status}`);
+  }
+
+  const result = await response.json();
+  const invitations = result.data || result;
+  return Array.isArray(invitations) ? invitations : [];
+};
+
+// Get events by status with event host information
+export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> => {
+  // Get all required data
+  const [invitations, allEvents, volunteers] = await Promise.all([
+    getEventInvitationsByOrganization(),
+    getAllEvents(),
+    getAllVolunteers()
+  ]);
+
+  if (invitations.length === 0) return [];
+
+  // Create invitation lookup map
+  const invitationMap = new Map();
+  invitations.forEach(inv => {
+    invitationMap.set(inv.eventId, inv);
+  });
+
+  // Filter and enrich events
+  return allEvents
+    .filter(event => {
+      const invitation = invitationMap.get(event.eventId);
+      if (!invitation) return false;
+
+      if (status === "PENDING") {
+        // Show event requests (PENDING application status)
+        return invitation.applicationStatus === "PENDING";
+      } else if (status === "ACTIVE") {
+        // Show active events (ACTIVE event status + APPROVED invitation)
+        return event.eventStatus === "ACTIVE" && invitation.applicationStatus === "APPROVED";
+      } else if (status === "COMPLETE") {
+        // Show completed events
+        return event.eventStatus === "COMPLETE" && invitation.applicationStatus === "APPROVED";
+      }
+      
+      return true; // Show all if no status filter
+    })
+    .map(event => {
+      // Add event host information
+      const volunteer = volunteers.get(event.eventHostId);
+      console.log(`Looking for eventHostId: ${event.eventHostId}, found volunteer:`, volunteer);
+      
+      return {
+        ...event,
+        eventHost: volunteer ? {
+          volunteerId: volunteer.volunteerId,
+          fullName: volunteer.fullName,
+          profilePictureUrl: volunteer.profilePictureUrl
+        } : {
+          volunteerId: event.eventHostId,
+          fullName: "Unknown Host",
+          profilePictureUrl: null
+        }
+      };
+    });
+};
+
+// Get event status counts
+export const getEventStatusCounts = async (): Promise<EventStatusCounts> => {
+  const [pendingRequests, activeEvents, completedEvents] = await Promise.all([
+    getEventsByStatus("PENDING"),
+    getEventsByStatus("ACTIVE"), 
+    getEventsByStatus("COMPLETE")
+  ]);
+
   return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
+    pending: pendingRequests.length,
+    active: activeEvents.length,
+    completed: completedEvents.length,
   };
 };
 
-
-export const getEventsByStatus = async (status?: EventStatus): Promise<Event[]> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+// Update invitation and event status
+const updateEventStatus = async (
+  eventId: number, 
+  invitationId: number, 
+  applicationStatus: ApplicationStatus,
+  eventStatus: EventStatus
+): Promise<void> => {
   const baseUrl = getBaseUrl();
+  const headers = authService.getAuthHeaders();
+  const orgId = await getCurrentOrganizationId();
 
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
+  // Update invitation status
+  const invitationResponse = await fetch(`${baseUrl}/api/event-invitations/${invitationId}`, {
+    method: 'PATCH',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      eventId,
+      organizationId: orgId,
+      applicationStatus
+    }),
+  });
+
+  if (!invitationResponse.ok) {
+    throw new Error(`Failed to update invitation: ${invitationResponse.status}`);
   }
 
-  try {
-    let url = `${baseUrl}/api/public/events/all`;
-    
-    console.log(` Making API request to: ${url}`);
+  // Update event status
+  const eventResponse = await fetch(`${baseUrl}/api/events/${eventId}/status`, {
+    method: 'PATCH',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ eventStatus }),
+  });
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: authService.getAuthHeaders(),
-    });
-    
-    console.log(` Response status: ${response.status}`);
-    console.log(` Response ok: ${response.ok}`);
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        console.log(` No events found with status ${status || 'any'} (404)`);
-        return [];
-      }
-      
-      let errorMessage = `Failed to fetch events: ${response.status} ${response.statusText}`;
-      
-      try {
-        const errorData = await response.text();
-        console.log(` Error response body:`, errorData);
-        
-        try {
-          const parsedError = JSON.parse(errorData);
-          errorMessage = parsedError.message || parsedError.error || errorMessage;
-        } catch (parseError) {
-          if (errorData) {
-            errorMessage = errorData;
-          }
-        }
-      } catch (textError) {
-        console.log(` Could not read error response body`);
-      }
-
-      if (response.status === 500) {
-        throw new Error(`Server error: ${errorMessage}`);
-      } else {
-        throw new Error(errorMessage);
-      }
-    }
-
-    const result = await response.json();
-    const allEvents = result.data || result;
-    
-    console.log(` Successfully fetched ${allEvents?.length || 0} events`);
-    
-    // Filter by status if provided
-    if (status && Array.isArray(allEvents)) {
-      const filteredEvents = allEvents.filter((event: Event) => event.eventStatus === status);
-      console.log(` Filtered to ${filteredEvents.length} events with status: ${status}`);
-      return filteredEvents;
-    }
-    
-    return Array.isArray(allEvents) ? allEvents : [];
-  } catch (error) {
-    console.error(" Error fetching events:", error);
-    
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Cannot connect to backend server. Make sure the server is running.');
-    }
-    
-    throw error;
+  if (!eventResponse.ok) {
+    console.error(`Failed to update event status: ${eventResponse.status}`);
   }
 };
 
-// Your existing updateEventStatus function (unchanged)
-export const updateEventStatus = async (eventId: number, status: EventStatus): Promise<Event> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
-
-  try {
-    const url = `${baseUrl}/api/events/${eventId}`;
-    
-    console.log(`Making PATCH request to: ${url}`);
-    console.log(`Request body:`, { eventStatus: status });
-    
-    const requestBody = {
-      eventStatus: status
-    };
-    
-    console.log(`Stringified body: ${JSON.stringify(requestBody)}`);
-    
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: authService.getAuthHeaders(),
-      body: JSON.stringify(requestBody),
-    });
-
-    console.log(`Response status: ${response.status}`);
-    console.log(`Response ok: ${response.ok}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Error response body:`, errorText);
-      throw new Error(`Failed to update event status: ${response.status} ${response.statusText}`);
-    }
-
-    const responseText = await response.text();
-    console.log('Raw response text:', responseText);
-    
-    if (!responseText || responseText.trim() === '') {
-      console.log('Empty response - status update successful');
-      return {
-        eventId: eventId,
-        eventStatus: status
-      } as Event;
-    }
-
-    try {
-      const result = JSON.parse(responseText);
-      const updatedEvent = result.data || result;
-      console.log('Updated event received:', updatedEvent);
-      return updatedEvent as Event;
-    } catch (parseError) {
-      console.log('Response is not JSON, but status update was successful');
-      return {
-        eventId: eventId,
-        eventStatus: status
-      } as Event;
-    }
-  } catch (error) {
-    console.error("Error updating event status:", error);
-    throw error;
-  }
+// Approve event request
+export const approveEventRequest = async (eventId: number, invitationId: number): Promise<void> => {
+  await updateEventStatus(eventId, invitationId, "APPROVED", "ACTIVE");
 };
 
-
-export const getAllVolunteers = async (): Promise<Map<number, Volunteer>> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  const baseUrl = getBaseUrl();
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
-
-  try {
-    const url = `${baseUrl}/api/public/volunteers/all`;
-    
-    console.log(`Fetching volunteers from: ${url}`);
-    
-    const response = await fetch(url, {
-      method: "GET",
-      headers: authService.getAuthHeaders(),
-    });
-
-    console.log(` Volunteers response status: ${response.status}`);
-    console.log(` Volunteers response ok: ${response.ok}`);
-
-    if (!response.ok) {
-      let errorMessage = `Failed to fetch volunteers: ${response.status} ${response.statusText}`;
-      
-      try {
-        const errorData = await response.text();
-        console.log(` Volunteers error response body:`, errorData);
-        
-        try {
-          const parsedError = JSON.parse(errorData);
-          errorMessage = parsedError.message || parsedError.error || errorMessage;
-        } catch (parseError) {
-          if (errorData) {
-            errorMessage = errorData;
-          }
-        }
-      } catch (textError) {
-        console.log(` Could not read volunteers error response body`);
-      }
-
-      throw new Error(errorMessage);
-    }
-
-    const result = await response.json();
-    console.log(` Raw volunteer response:`, result);
-    
-    const volunteers: any[] = result.data || result;
-    console.log(` Processing ${volunteers.length} volunteers`);
-    
-    // Create a map for quick lookup by volunteerId
-    const volunteerMap = new Map<number, Volunteer>();
-    volunteers.forEach(volunteer => {
-      // Map the API response to our Volunteer type
-      volunteerMap.set(volunteer.volunteerId, {
-        volunteerId: volunteer.volunteerId,
-        userId: volunteer.userId,
-        username: volunteer.username,
-        fullName: volunteer.fullName,
-        email: volunteer.email,
-        institute: volunteer.institute,
-        instituteEmail: volunteer.instituteEmail,
-        isAvailable: volunteer.isAvailable,
-        volunteerLevel: volunteer.volunteerLevel,
-        rewardPoints: volunteer.rewardPoints,
-        isEventHost: volunteer.isEventHost,
-        joinedDate: volunteer.joinedDate,
-        about: volunteer.about,
-        phoneNumber: volunteer.phoneNumber,
-        profilePictureUrl: volunteer.profilePictureUrl
-      });
-    });
-
-    console.log(` Created volunteer map with ${volunteerMap.size} entries`);
-    return volunteerMap;
-  } catch (error) {
-    console.error("Error fetching volunteers:", error);
-    
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Cannot connect to backend server. Make sure the server is running.');
-    }
-    
-    throw error;
-  }
-};
-
-export const getVolunteerById = async (volunteerId: number): Promise<Volunteer> => {
-  try {
-    const volunteerMap = await getAllVolunteers();
-    const volunteer = volunteerMap.get(volunteerId);
-    
-    if (!volunteer) {
-      throw new Error(`Volunteer with ID ${volunteerId} not found`);
-    }
-
-    return volunteer;
-  } catch (error) {
-    console.error("Error fetching volunteer:", error);
-    throw error;
-  }
-};
-
-// Legacy function for backward compatibility - now uses token-based auth
-export const getEventsByOrgId = async (orgId: number, status?: EventStatus): Promise<Event[]> => {
-  console.warn("getEventsByOrgId is deprecated. Use getEventsByStatus instead.");
-  return getEventsByStatus(status);
+// Reject event request
+export const rejectEventRequest = async (eventId: number, invitationId: number): Promise<void> => {
+  await updateEventStatus(eventId, invitationId, "REJECTED", "DENIED");
 };

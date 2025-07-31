@@ -1,25 +1,31 @@
-
-
 "use client";
 
 import { Check, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
-import { Event, Volunteer, getEventsByStatus, updateEventStatus, getAllVolunteers } from "@/services/eventTableService";
+import { 
+  Event, 
+  EventInvitation,
+  getEventsByStatus, 
+  getEventInvitationsByOrganization,
+  approveEventRequest,
+  rejectEventRequest
+} from "@/services/eventTableService";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import ConfirmationModal from "@/components/UI/ConfirmationModal";
 
 export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [volunteers, setVolunteers] = useState<Map<number, Volunteer>>(new Map());
+  const [invitations, setInvitations] = useState<EventInvitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingEventId, setUpdatingEventId] = useState<number | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     eventId: number;
-    status: "ACTIVE" | "DENIED";
+    invitationId: number;
+    action: "approve" | "reject";
     title: string;
     message: string;
     buttonText: string;
@@ -30,30 +36,27 @@ export default function EventRequestsPage() {
     const fetchData = async () => {
       try {
         setError(null);
-        console.log(" Starting to fetch event requests and volunteers...");
+        console.log("Starting to fetch event requests...");
         
-        // Fetch events and volunteers concurrently
-        const [eventsData, volunteersData] = await Promise.all([
+        // Fetch pending events and invitations
+        const [eventsData, invitationsData] = await Promise.all([
           getEventsByStatus("PENDING"),
-          getAllVolunteers()
+          getEventInvitationsByOrganization()
         ]);
         
         console.log("Fetched events:", eventsData);
-        console.log(" Fetched volunteers map:", volunteersData);
+        console.log("Fetched invitations:", invitationsData);
         
         setEvents(eventsData);
-        setVolunteers(volunteersData);
+        setInvitations(invitationsData);
       } catch (error) {
-        console.error(" Failed to load data", error);
-  
-  if (error instanceof Error) {
-    setError(`Failed to load event requests: ${error.message}`);
-  } else {
-    setError("Failed to load event requests: An unknown error occurred.");
-  }
-}
-
-        finally {
+        console.error("Failed to load data", error);
+        if (error instanceof Error) {
+          setError(`Failed to load event requests: ${error.message}`);
+        } else {
+          setError("Failed to load event requests: An unknown error occurred.");
+        }
+      } finally {
         setLoading(false);
       }
     };
@@ -61,18 +64,26 @@ export default function EventRequestsPage() {
     fetchData();
   }, []);
 
-  const openConfirmationModal = (eventId: number, newStatus: "ACTIVE" | "DENIED") => {
-    const isAccepting = newStatus === "ACTIVE";
+  const openConfirmationModal = (eventId: number, action: "approve" | "reject") => {
+    // Find the invitation for this event
+    const invitation = invitations.find(inv => inv.eventId === eventId);
+    if (!invitation) {
+      alert("Could not find invitation for this event");
+      return;
+    }
+
+    const isApproving = action === "approve";
     
     setConfirmAction({
       eventId,
-      status: newStatus,
-      title: isAccepting ? "Accept Event Request" : "Reject Event Request",
-      message: isAccepting 
+      invitationId: invitation.id,
+      action,
+      title: isApproving ? "Accept Event Request" : "Reject Event Request",
+      message: isApproving 
         ? "Are you sure you want to accept this event request? Once accepted, the event will be activated and managed under your organization."
         : "Are you sure you want to reject this event request? This action cannot be undone.",
-      buttonText: isAccepting ? "Accept" : "Reject",
-      buttonClass: isAccepting 
+      buttonText: isApproving ? "Accept" : "Reject",
+      buttonClass: isApproving 
         ? "bg-verdant-500 hover:bg-verdant-600 text-white" 
         : "bg-red-500 hover:bg-red-600 text-white"
     });
@@ -83,20 +94,20 @@ export default function EventRequestsPage() {
   const handleConfirm = async () => {
     if (!confirmAction) return;
     
-    const { eventId, status } = confirmAction;
+    const { eventId, invitationId, action } = confirmAction;
     setConfirmModalOpen(false);
     setUpdatingEventId(eventId);
     
     try {
-      console.log(`Updating event ${eventId} to status: ${status}`);
+      console.log(`${action === 'approve' ? 'Approving' : 'Rejecting'} event ${eventId} with invitation ${invitationId}`);
       
-      const updatedEvent = await updateEventStatus(eventId, status);
-      
-      console.log('Update successful. Response:', updatedEvent);
-      
-      if (updatedEvent.eventStatus !== status) {
-        console.warn(`Warning: Expected status ${status} but got ${updatedEvent.eventStatus}`);
+      if (action === 'approve') {
+        await approveEventRequest(eventId, invitationId);
+      } else {
+        await rejectEventRequest(eventId, invitationId);
       }
+      
+      console.log(`${action === 'approve' ? 'Approval' : 'Rejection'} successful`);
       
       // Remove the updated event from the list since it's no longer PENDING
       setEvents(prevEvents => {
@@ -104,9 +115,15 @@ export default function EventRequestsPage() {
         console.log(`Removed event ${eventId} from list. Remaining events:`, newEvents.length);
         return newEvents;
       });
+
+      // Also remove from invitations list
+      setInvitations(prevInvitations => 
+        prevInvitations.filter(inv => inv.eventId !== eventId)
+      );
+      
     } catch (error) {
-      console.error("Failed to update event status:", error);
-      alert(`Failed to ${status === 'ACTIVE' ? 'accept' : 'reject'} event. Please try again.`);
+      console.error(`Failed to ${action} event:`, error);
+      alert(`Failed to ${action} event. Please try again.`);
     } finally {
       setUpdatingEventId(null);
       setConfirmAction(null);
@@ -118,19 +135,14 @@ export default function EventRequestsPage() {
     setConfirmAction(null);
   };
 
-  
-  const VolunteerInfo = ({ eventHostId }: { eventHostId: number }) => {
-    const volunteer = volunteers.get(eventHostId);
-    
-    console.log(` Looking for volunteer with ID: ${eventHostId}`, volunteer);
-    
-    if (!volunteer) {
+  const VolunteerInfo = ({ eventHost }: { eventHost?: Event['eventHost'] }) => {
+    if (!eventHost) {
       return (
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
             <User className="h-6 w-6 text-gray-500" />
           </div>
-          <span className="text-gray-500">Unknown Host (ID: {eventHostId})</span>
+          <span className="text-gray-500">Unknown Host</span>
         </div>
       );
     }
@@ -138,10 +150,10 @@ export default function EventRequestsPage() {
     return (
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-          {volunteer.profilePictureUrl && volunteer.profilePictureUrl !== "string" ? (
+          {eventHost.profilePictureUrl ? (
             <img 
-              src={volunteer.profilePictureUrl} 
-              alt={volunteer.fullName}
+              src={eventHost.profilePictureUrl} 
+              alt={eventHost.fullName}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -151,40 +163,44 @@ export default function EventRequestsPage() {
           ) : (
             <User className="h-6 w-6 text-gray-500" />
           )}
-          {volunteer.profilePictureUrl && (
+          {eventHost.profilePictureUrl && (
             <User className="h-6 w-6 text-gray-500 hidden" />
           )}
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-medium">{volunteer.fullName}</span>
-          <span className="text-xs text-gray-500">@{volunteer.username}</span>
+          <span className="text-sm font-medium">{eventHost.fullName}</span>
+          <span className="text-xs text-gray-500">ID: {eventHost.volunteerId}</span>
         </div>
       </div>
     );
   };
 
   const columns: Column<Event>[] = [
-    { 
-      header: "Event Name", 
+     {
+      header: "Event Name",
       accessor: "eventTitle",
       cell: (value, row) => (
         <div className="flex flex-col">
-          <span className="font-bold">{value}</span>
+          <span className="font-bold">{typeof value === "string" || typeof value === "number" ? value : "—"}</span>
+
           <span className="text-xs text-shark-500">#{row.eventId}</span>
         </div>
-      )
+      ),
     },
     { 
       header: "Requested By",
       accessor: "eventHostId",
-      cell: (_, row) => <VolunteerInfo eventHostId={row.eventHostId} />
+      cell: (_, row) => <VolunteerInfo eventHost={row.eventHost} />
     },
-    { 
-      header: "Date", 
+    {
+      header: "Date",
       accessor: "eventStartDate",
-      cell: (value) => (
-        <span>{formatDate(value)}</span>
-      )
+      cell: (value) => {
+        if (value && (typeof value === "string" || typeof value === "number" || value instanceof Date)) {
+          return <span>{formatDate(value)}</span>;
+        }
+        return <span>—</span>;
+      },
     },
     { 
       header: "Status", 
@@ -205,7 +221,7 @@ export default function EventRequestsPage() {
             className={`rounded-md bg-verdant-100 p-2 cursor-pointer hover:bg-verdant-200 disabled:opacity-50 disabled:cursor-not-allowed ${
               updatingEventId === row.eventId ? 'opacity-50' : ''
             }`}
-            onClick={() => openConfirmationModal(row.eventId, "ACTIVE")}
+            onClick={() => openConfirmationModal(row.eventId, "approve")}
             disabled={updatingEventId === row.eventId}
             title="Accept Event"
           >
@@ -221,7 +237,7 @@ export default function EventRequestsPage() {
             className={`rounded-md bg-red-100 p-2 cursor-pointer hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed ${
               updatingEventId === row.eventId ? 'opacity-50' : ''
             }`}
-            onClick={() => openConfirmationModal(row.eventId, "DENIED")}
+            onClick={() => openConfirmationModal(row.eventId, "reject")}
             disabled={updatingEventId === row.eventId}
             title="Reject Event"
           >

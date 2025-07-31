@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Home,
   BarChart,
   User,
   Calendar,
@@ -30,7 +29,7 @@ interface MenuItem {
 
 const VolunteerSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Home');
+  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [volunteer, setVolunteer] = useState<VolunteerProfile>();
 
@@ -55,7 +54,6 @@ const VolunteerSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Home', icon: Home, href: '/' },
     { name: 'Dashboard', icon: BarChart, href: '/Volunteer/dashboard' },
     { name: 'Profile', icon: User, href: '/Volunteer/profile' },
     { name: 'Events', icon: Calendar, href: '/Volunteer/events/active' },
@@ -78,6 +76,7 @@ const VolunteerSidebar = () => {
             src="/images/logo.svg"
             alt="Logo"
             className="h-18 w-18 ml-[-10px]"
+            onClick={() => router.push('/')}
           />
         </div>
 

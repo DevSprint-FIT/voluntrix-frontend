@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   ListTodo,
   Trophy,
@@ -10,9 +10,9 @@ import {
   FileText,
   Users,
   DollarSign,
-} from "lucide-react";
-import Link from "next/link";
- import { useRouter } from 'next/navigation';
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,7 +23,7 @@ interface MenuItem {
 
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+  const [selectedItem, setSelectedItem] = useState<string>('Tasks');
 
   const router = useRouter();
 
@@ -34,29 +34,33 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Tasks", icon: ListTodo, href: `/EventHostWorkspace/${eventId}/tasks` },
     {
-      name: "Volunteers",
+      name: 'Tasks',
+      icon: ListTodo,
+      href: `/EventHostWorkspace/${eventId}/tasks`,
+    },
+    {
+      name: 'Volunteers',
       icon: Users,
       href: `/EventHostWorkspace/${eventId}/volunteers`,
     },
     {
-      name: "Sponsorships",
+      name: 'Sponsorships',
       icon: DollarSign,
       href: `/EventHostWorkspace/${eventId}/sponsorships`,
     },
     {
-      name: "Leaderboard",
+      name: 'Leaderboard',
       icon: Trophy,
       href: `/EventHostWorkspace/${eventId}/leaderboard`,
     },
     {
-      name: "Documents",
+      name: 'Documents',
       icon: FileText,
       href: `/EventHostWorkspace/${eventId}/documents`,
     },
     {
-      name: "Notifications",
+      name: 'Notifications',
       icon: Bell,
       badge: notificationCount,
       href: `/EventHostWorkspace/${eventId}/notifications`,
@@ -72,6 +76,7 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
             className="h-18 w-18 ml-[-10px]"
+            onClick={() => router.push('/')}
           />
         </div>
 
@@ -82,17 +87,17 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
               const isActive = selectedItem === item.name;
 
               return (
-                <Link key={item.name} href={item.href || "#"}>
+                <Link key={item.name} href={item.href || '#'}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? "text-verdant-700 font-semibold" : ""
+                      isActive ? 'text-verdant-700 font-semibold' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <item.icon
                         className={`h-5 w-5 ${
-                          isActive ? "text-verdant-700" : ""
+                          isActive ? 'text-verdant-700' : ''
                         }`}
                       />
                       <span className="font-secondary font-medium text-shark-950">
@@ -100,7 +105,7 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
                       </span>
                     </div>
 
-                    {typeof item.badge === "number" && item.badge > 0 && (
+                    {typeof item.badge === 'number' && item.badge > 0 && (
                       <span className="text-xs bg-verdant-100 text-shark-950 px-1.5 rounded-md">
                         {item.badge}
                       </span>
@@ -121,7 +126,7 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       <div>
         <button
           onClick={() => {
-            setSelectedItem("Back");
+            setSelectedItem('Back');
             router.push('/event-host/events');
           }}
           className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"

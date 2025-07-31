@@ -1,4 +1,4 @@
-import authService from "./authService"; // Import the auth service
+import authService from "./authService"; 
 
 // Comment interface
 export interface Comment {
@@ -38,7 +38,7 @@ export async function addComment(
 
     const orgData = await orgResponse.json();
     const userUsername = orgData.data?.username || orgData.username;
-    const userType = "ORGANIZATION"; // Since we're using organization token
+    const userType = "ORGANIZATION"; 
     
     console.log("Adding comment with username:", userUsername);
     

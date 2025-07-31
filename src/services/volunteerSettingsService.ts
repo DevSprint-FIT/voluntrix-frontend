@@ -1,29 +1,58 @@
+import authService from "@/services/authService";
+
 export type VolunteerSettings = {
   volunteerId: number;
-  email: string;
+  userId: number;
   username: string;
+  fullName: string;
+  email: string;
+  institute?: string;
+  instituteEmail?: string;
   isAvailable: boolean;
+  volunteerLevel: number;
+  rewardPoints: number;
+  isEventHost: boolean;
+  joinedDate: string;
+  about: string;
+  phoneNumber: string;
+  profilePictureUrl: string;
 };
 
-export const getVolunteerSettingsByUsername = async (
-  username: string
-): Promise<VolunteerSettings> => {
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
+
+export const getVolunteerSettings = async (): Promise<VolunteerSettings> => {
   try {
-    const response = await fetch(
-      `http://localhost:8080/api/public/volunteers/${username}`
-    );
+    const response = await fetch(`${getBaseUrl()}/api/volunteers/me`, {
+      method: "GET",
+      headers: authService.getAuthHeaders(),
+    });
+
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch volunteer settings: ${response.statusText}`
+        `Failed to fetch volunteer settings: ${response.status} ${response.statusText}`
       );
     }
 
     const data = await response.json();
+
     return {
       volunteerId: data.volunteerId,
-      email: data.email,
+      userId: data.userId,
       username: data.username,
+      fullName: data.fullName,
+      email: data.email,
+      institute: data.institute,
+      instituteEmail: data.instituteEmail,
       isAvailable: data.isAvailable,
+      volunteerLevel: data.volunteerLevel,
+      rewardPoints: data.rewardPoints,
+      isEventHost: data.isEventHost,
+      joinedDate: data.joinedDate,
+      about: data.about,
+      phoneNumber: data.phoneNumber,
+      profilePictureUrl: data.profilePictureUrl,
     };
   } catch (error) {
     console.error("Error fetching volunteer settings:", error);
@@ -32,27 +61,22 @@ export const getVolunteerSettingsByUsername = async (
 };
 
 export const updateVolunteerEmail = async (
-  volunteerId: number,
   email: string
 ): Promise<VolunteerSettings> => {
   try {
-    const response = await fetch(
-      `http://localhost:8080/api/public/volunteers/${volunteerId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      }
-    );
+    const response = await fetch(`${getBaseUrl()}/api/volunteers/profile`, {
+      method: "PATCH",
+      headers: authService.getAuthHeaders(),
+      body: JSON.stringify({ email }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to update email: ${response.statusText}`);
+      throw new Error(
+        `Failed to update email: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
-    // Return the actual volunteer data, not wrapped in data property
     return data;
   } catch (error) {
     console.error("Error updating volunteer email:", error);
@@ -61,23 +85,19 @@ export const updateVolunteerEmail = async (
 };
 
 export const updateVolunteerAvailability = async (
-  volunteerId: number,
   isAvailable: boolean
 ): Promise<VolunteerSettings> => {
   try {
-    const response = await fetch(
-      `http://localhost:8080/api/public/volunteers/${volunteerId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isAvailable }),
-      }
-    );
+    const response = await fetch(`${getBaseUrl()}/api/volunteers/profile`, {
+      method: "PATCH",
+      headers: authService.getAuthHeaders(),
+      body: JSON.stringify({ isAvailable }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to update availability: ${response.statusText}`);
+      throw new Error(
+        `Failed to update availability: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
