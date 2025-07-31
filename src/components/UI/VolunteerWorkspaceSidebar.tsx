@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -14,6 +15,8 @@ interface MenuItem {
 const VolunteerWorkspaceSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -93,7 +96,10 @@ const VolunteerWorkspaceSidebar = () => {
       {/* Back Button */}
       <div>
         <button
-          onClick={() => setSelectedItem("Back")}
+          onClick={() => {
+            setSelectedItem("Back");
+            router.push("/Volunteer/events/active");
+          }}
           className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
