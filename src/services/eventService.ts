@@ -92,7 +92,7 @@ export const createEvent = async (eventData: EventCreateType) => {
 export const fetchEventByHostId = async (): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/host/`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/host`,
       {
         headers: authService.getAuthHeadersAxios(),
       }
