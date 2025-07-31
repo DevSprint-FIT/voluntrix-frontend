@@ -25,17 +25,11 @@ export interface VolunteerProfile {
 
 export interface DashboardData {
   currentLevel: number;
-  // totalVolunteeringEvents: number;
   contributionsData: ContributionData[];
 }
 
 export interface ContributionData {
   date: string;
-  contributions: number;
-}
-
-export interface MonthlyContribution {
-  month: string;
   contributions: number;
 }
 
@@ -48,12 +42,10 @@ export const volunteerDashboardService = {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch volunteer profile: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Failed to fetch profile: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data: VolunteerProfile = await response.json();
       return data;
     } catch (error) {
       console.error('Error fetching volunteer profile:', error);
@@ -61,7 +53,6 @@ export const volunteerDashboardService = {
     }
   },
 
-  // Get task submitted dates for contribution grid using JWT token
   async getTaskSubmittedDates(): Promise<number[][]> {
     try {
       const response = await fetch(
@@ -74,11 +65,11 @@ export const volunteerDashboardService = {
 
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch task submitted dates: ${response.status} ${response.statusText}`
+          `Failed to fetch task submitted dates: ${response.statusText}`
         );
       }
 
-      const data = await response.json();
+      const data: number[][] = await response.json();
       return data;
     } catch (error) {
       console.error('Error fetching task submitted dates:', error);
@@ -86,33 +77,26 @@ export const volunteerDashboardService = {
     }
   },
 
-  // Convert backend date format to contribution data
   processContributionDates(submittedDates: number[][]): ContributionData[] {
     const contributionMap = new Map<string, number>();
 
-    // Process submitted dates
-    submittedDates.forEach((dateArray) => {
-      const [year, month, day] = dateArray;
-      const dateString = `${year}-${month.toString().padStart(2, '0')}-${day
+    submittedDates.forEach(([year, month, day]) => {
+      const date = `${year}-${month.toString().padStart(2, '0')}-${day
         .toString()
         .padStart(2, '0')}`;
-      contributionMap.set(
-        dateString,
-        (contributionMap.get(dateString) || 0) + 1
-      );
+      contributionMap.set(date, (contributionMap.get(date) || 0) + 1);
     });
 
-    // Generate full year data (Jan to Dec 2025)
-    const contributions: ContributionData[] = [];
     const startDate = new Date('2025-01-01');
     const endDate = new Date('2025-12-31');
+    const contributions: ContributionData[] = [];
 
     const currentDate = new Date(startDate);
     while (currentDate <= endDate) {
-      const dateString = currentDate.toISOString().split('T')[0];
+      const dateStr = currentDate.toISOString().split('T')[0];
       contributions.push({
-        date: dateString,
-        contributions: contributionMap.get(dateString) || 0,
+        date: dateStr,
+        contributions: contributionMap.get(dateStr) || 0,
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -128,6 +112,7 @@ export const volunteerDashboardService = {
           headers: authService.getAuthHeadersAxios(),
         }
       );
+
       return response.data;
     } catch (error) {
       console.error('Error fetching event count:', error);
@@ -143,21 +128,19 @@ export const volunteerDashboardService = {
           headers: authService.getAuthHeadersAxios(),
         }
       );
+
       return response.data;
     } catch (error) {
-      console.error('Error fetching total event host reward points:', error);
+      console.error('Error fetching event host reward points:', error);
       throw error;
     }
   },
 
-  // Get complete dashboard data using JWT authentication
   async getDashboardData(): Promise<DashboardData> {
     try {
-      const [profile, submittedDates, eventCount, rewardPoints] = await Promise.all([
+      const [profile, submittedDates] = await Promise.all([
         this.getVolunteerProfile(),
         this.getTaskSubmittedDates(),
-        this.fetchTotalEventsCountByHostId(),
-        this.fetchTotalEventHostRewardPoints(),
       ]);
 
       const contributionsData = this.processContributionDates(submittedDates);
@@ -167,6 +150,7 @@ export const volunteerDashboardService = {
         contributionsData,
       };
     } catch (error) {
+      console.error('Error fetching dashboard data:', error);
       throw new Error(
         `Failed to fetch dashboard data: ${
           error instanceof Error ? error.message : 'Unknown error'
@@ -175,7 +159,6 @@ export const volunteerDashboardService = {
     }
   },
 
-  // Get contribution intensity level for styling
   getContributionIntensity(contributions: number): string {
     if (contributions === 0) return 'bg-gray-200';
     if (contributions === 1) return 'bg-green-400';
@@ -184,10 +167,9 @@ export const volunteerDashboardService = {
     return 'bg-green-700';
   },
 
-  // Calculate total contributions for the year
   calculateTotalContributions(contributionsData: ContributionData[]): number {
     return contributionsData.reduce(
-      (total, day) => total + day.contributions,
+      (sum, { contributions }) => sum + contributions,
       0
     );
   },
