@@ -1,8 +1,7 @@
 'use client';
 
-import { Button, Progress } from '@heroui/react';
+import { Button, Progress, useDisclosure } from '@heroui/react';
 import Image from 'next/image';
-import { useState } from 'react';
 import { EventType } from '@/types/EventType';
 import DonationModal from '@/components/UI/DonationModal';
 
@@ -13,8 +12,6 @@ export default function Event({
   event: EventType;
   sponsorshipNames: string[];
 }) {
-  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -34,6 +31,12 @@ export default function Event({
       hour12: true,
     }).format(date); // Output: "10:00 AM"
   };
+
+  const {
+    isOpen: isDonationModalOpen,
+    onOpen: openDonationModal,
+    onOpenChange: onDonationModalChange,
+  } = useDisclosure();
 
   return (
     <div className="w-full flex items-start justify-center mb-[88px]">
@@ -233,7 +236,7 @@ export default function Event({
                 <Button
                   variant="shadow"
                   className="flex gap-0 w-[160px] bg-verdant-800 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-                  onPress={() => setIsDonationModalOpen(true)}
+                  onPress={openDonationModal}
                 >
                   Donate Now
                   <Image
@@ -245,8 +248,8 @@ export default function Event({
                 </Button>
                 {isDonationModalOpen && (
                   <DonationModal
-                    open={isDonationModalOpen}
-                    setOpen={setIsDonationModalOpen}
+                    isOpen={isDonationModalOpen}
+                    onChange={onDonationModalChange}
                   />
                 )}
               </div>

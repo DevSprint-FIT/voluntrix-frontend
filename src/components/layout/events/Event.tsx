@@ -19,7 +19,6 @@ export default function Event({
   sponsorshipNames: string[];
   sponsorships: SponsorshipType[];
 }) {
-  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isEligibleToApply, setIsEligibleToApply] = useState<boolean>(false);
 
   // const handleSave = () => {
@@ -56,6 +55,12 @@ export default function Event({
     isOpen: isSponsorModalOpen,
     onOpen: openSponsorModal,
     onOpenChange: onSponsorModalChange,
+  } = useDisclosure();
+
+    const {
+    isOpen: isDonationModalOpen,
+    onOpen: openDonationModal,
+    onOpenChange: onDonationModalChange,
   } = useDisclosure();
 
   useEffect(() => {
@@ -323,7 +328,7 @@ export default function Event({
                 <Button
                   variant="shadow"
                   className="flex gap-0 w-[160px] bg-verdant-800 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-                  onPress={() => setIsDonationModalOpen(true)}
+                  onPress={openDonationModal}
                 >
                   Donate Now
                   <Image
@@ -335,8 +340,8 @@ export default function Event({
                 </Button>
                 {isDonationModalOpen && (
                   <DonationModal
-                    open={isDonationModalOpen}
-                    setOpen={setIsDonationModalOpen}
+                    isOpen={isDonationModalOpen}
+                    onChange={onDonationModalChange}
                   />
                 )}
               </div>
