@@ -1,22 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Crown, BarChart3, DollarSign, Eye } from "lucide-react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import React, { useState, useEffect } from 'react';
+import { Crown, BarChart3, HandCoins } from 'lucide-react';
 import {
   volunteerDashboardService,
   DashboardData,
   ContributionData,
-} from "@/services/volunteerDashboardService";
-import { useRouter } from "next/navigation";
-import authService from "@/services/authService";
+} from '@/services/volunteerDashboardService';
+import { useRouter } from 'next/navigation';
+import authService from '@/services/authService';
 
 interface User {
   userId: number;
@@ -35,8 +27,8 @@ const StatCard = ({
   title,
   value,
   icon: Icon,
-  color = "text-gray-600",
-  bgColor = "bg-gray-50",
+  color = 'text-gray-600',
+  bgColor = 'bg-gray-50',
 }: {
   title: string;
   value: string;
@@ -63,28 +55,28 @@ const StatCard = ({
 
 const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Create a grid of weeks for the year 2025 (Jan to Dec)
   const weeks = [];
   let currentWeek = [];
 
   // Start from January 1, 2025
-  const startDate = new Date("2025-01-01");
-  const endDate = new Date("2025-12-31");
+  const startDate = new Date('2025-01-01');
+  const endDate = new Date('2025-12-31');
 
   const currentDate = new Date(startDate);
 
@@ -95,7 +87,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   while (currentDate <= endDate) {
-    const dateString = currentDate.toISOString().split("T")[0];
+    const dateString = currentDate.toISOString().split('T')[0];
     const dayData = data.find((d) => d.date === dateString);
     const contributions = dayData ? dayData.contributions : 0;
 
@@ -125,7 +117,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 font-secondary">
-          {volunteerDashboardService.calculateTotalContributions(data)}{" "}
+          {volunteerDashboardService.calculateTotalContributions(data)}{' '}
           Contributions in This Year
         </h3>
       </div>
@@ -175,12 +167,12 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
                         ? volunteerDashboardService.getContributionIntensity(
                             day.contributions
                           )
-                        : "bg-transparent"
+                        : 'bg-transparent'
                     }`}
                     title={
                       day
                         ? `${day.contributions} contributions on ${day.date}`
-                        : ""
+                        : ''
                     }
                   />
                 ))}
@@ -214,7 +206,6 @@ const EventHostDashboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState("2025");
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
@@ -226,20 +217,20 @@ const EventHostDashboard = () => {
     const checkAuthAndLoadData = async () => {
       try {
         if (!authService.isAuthenticated()) {
-          router.replace("/auth/login");
+          router.replace('/auth/login');
           return;
         }
 
         const currentUser = await authService.getCurrentUser();
         if (!currentUser) {
-          router.replace("/auth/login");
+          router.replace('/auth/login');
           return;
         }
 
         // Check if profile is completed
         if (!currentUser.profileCompleted) {
           console.log(currentUser);
-          router.replace("/auth/profile-form?type=volunteer");
+          router.replace('/auth/profile-form?type=volunteer');
           return;
         }
 
@@ -248,8 +239,8 @@ const EventHostDashboard = () => {
         // Fetch dashboard data after authentication is confirmed
         await fetchDashboardData();
       } catch (error) {
-        console.error("Auth check error:", error);
-        router.replace("/auth/signup");
+        console.error('Auth check error:', error);
+        router.replace('/auth/signup');
       } finally {
         setIsLoading(false);
       }
@@ -273,7 +264,7 @@ const EventHostDashboard = () => {
       );
       setTotalContributionsFromChart(chartTotal);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -322,7 +313,7 @@ const EventHostDashboard = () => {
       <div className="bg-white px-9 py-4">
         <div>
           <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
-            Volunteer / Dashboard
+            Event Host / Dashboard
           </nav>
           <h1 className="text-2xl font-bold text-gray-900 font-secondary">
             Main Dashboard
@@ -342,23 +333,16 @@ const EventHostDashboard = () => {
               bgColor="bg-[#ECFDF6]"
             />
             <StatCard
-              title="Total Volunteering"
+              title="Total Events"
               value={`${dashboardData.totalVolunteeringEvents} Events`}
               icon={BarChart3}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
             />
             <StatCard
-              title="Total Donations"
-              value={`LKR ${dashboardData.totalDonations.toLocaleString()}`}
-              icon={DollarSign}
-              color="text-[#029972]"
-              bgColor="bg-[#ECFDF6]"
-            />
-            <StatCard
-              title="Total Profile Views"
-              value="250"
-              icon={Eye}
+              title="Total Points"
+              value={`10 Points`}
+              icon={HandCoins}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
             />
@@ -367,73 +351,6 @@ const EventHostDashboard = () => {
           {/* Contribution Calendar */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-8">
             <ContributionGrid data={dashboardData.contributionsData} />
-          </div>
-
-          {/* Contributions Chart */}
-          <div className="bg-[#FBFBFB] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 font-secondary">
-                    <span>{selectedYear}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <div>
-                <span className="text-3xl font-bold text-gray-900 font-secondary">
-                  LKR {totalContributionsFromChart.toLocaleString()}
-                </span>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className="text-sm text-[#B0B0B0] font-secondary">
-                    Total Monthly Donations
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dashboardData.monthlyContributions}>
-                  <XAxis
-                    dataKey="month"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#6B7280" }}
-                  />
-                  <YAxis hide />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#10B981",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
-                    }}
-                    labelStyle={{
-                      color: "white",
-                    }}
-                    itemStyle={{
-                      color: "white",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="contributions"
-                    stroke="#10B981"
-                    strokeWidth={3}
-                    dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
-                    activeDot={{
-                      r: 6,
-                      fill: "white",
-                      stroke: "#10B981",
-                      strokeWidth: 2,
-                    }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
           </div>
         </div>
       </div>
