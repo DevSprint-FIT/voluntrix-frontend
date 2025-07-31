@@ -128,14 +128,11 @@ export const fetchAllEvents = async (): Promise<EventType[]> => {
 export const fetchLatestEvents = async (): Promise<EventType[]> => {
   try {
     const response = await axios.get<EventType[]>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/events/latest-three`,
-      {
-        headers: authService.getAuthHeadersAxios(),
-      }
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/latest-three`
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching all events:', error);
+    console.error('Error fetching latest events:', error);
     throw error;
   }
 };
