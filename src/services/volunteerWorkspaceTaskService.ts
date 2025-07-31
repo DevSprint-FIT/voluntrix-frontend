@@ -13,9 +13,9 @@ export interface BackendTaskDTO {
   createdDate: string;
   updatedDate: string;
   dueDate: string | null;
-  taskStatus: "TO_DO" | "IN_PROGRESS" | "DONE";
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  taskStatus: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
+  taskCategory: 'DESIGN' | 'EDITORIAL' | 'LOGISTICS' | 'PROGRAMMING';
   resourceUrl: string | null;
   taskSubmittedDate: string | null;
   assigneeId: number;
@@ -30,14 +30,14 @@ export interface BackendTaskDTO {
 export interface ToDoTask {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   dueDate: string;
 }
 
 export interface TaskInReview {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   taskSubmittedDate: string;
   resourceUrl: string;
 }
@@ -45,7 +45,7 @@ export interface TaskInReview {
 export interface CompletedTask {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   taskRewardPoints: number;
   resourceUrl: string;
 }
@@ -54,7 +54,7 @@ export interface CompletedTask {
 export interface TaskUpdateDTO {
   description?: string;
   dueDate?: string;
-  taskStatus?: "TO_DO" | "IN_PROGRESS" | "DONE";
+  taskStatus?: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
   resourceUrl?: string;
   taskSubmittedDate?: string;
   assigneeId?: number;
@@ -63,17 +63,17 @@ export interface TaskUpdateDTO {
 }
 
 export class WorkspaceTaskService {
-  private static readonly BASE_URL = "http://localhost:8080/api/public/tasks";
+  private static readonly BASE_URL = 'http://localhost:8080/api/public/tasks';
   private static readonly VOLUNTEER_ID = 1; // Hardcoded for now
   private static readonly EVENT_ID = 1; // Hardcoded for now
 
   // Helper method to format date
   private static formatDate(dateString: string | null): string {
-    if (!dateString) return "No date";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    if (!dateString) return 'No date';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   }
 
@@ -95,7 +95,7 @@ export class WorkspaceTaskService {
       description: backendTask.description,
       taskDifficulty: backendTask.taskDifficulty,
       taskSubmittedDate: this.formatDate(backendTask.taskSubmittedDate),
-      resourceUrl: backendTask.resourceUrl || "",
+      resourceUrl: backendTask.resourceUrl || '',
     };
   }
 
@@ -107,7 +107,7 @@ export class WorkspaceTaskService {
       description: backendTask.description,
       taskDifficulty: backendTask.taskDifficulty,
       taskRewardPoints: backendTask.taskRewardPoints,
-      resourceUrl: backendTask.resourceUrl || "",
+      resourceUrl: backendTask.resourceUrl || '',
     };
   }
 
@@ -130,7 +130,7 @@ export class WorkspaceTaskService {
         totalTasksCompleted: data.DONE || 0,
       };
     } catch (error) {
-      console.error("Error fetching task stats:", error);
+      console.error('Error fetching task stats:', error);
       // Return default values on error
       return {
         totalTasksDue: 0,
@@ -154,7 +154,7 @@ export class WorkspaceTaskService {
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToToDoTask(task));
     } catch (error) {
-      console.error("Error fetching TO_DO tasks:", error);
+      console.error('Error fetching TO_DO tasks:', error);
       return [];
     }
   }
@@ -173,7 +173,7 @@ export class WorkspaceTaskService {
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToTaskInReview(task));
     } catch (error) {
-      console.error("Error fetching IN_PROGRESS tasks:", error);
+      console.error('Error fetching IN_PROGRESS tasks:', error);
       return [];
     }
   }
@@ -192,7 +192,7 @@ export class WorkspaceTaskService {
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToCompletedTask(task));
     } catch (error) {
-      console.error("Error fetching DONE tasks:", error);
+      console.error('Error fetching DONE tasks:', error);
       return [];
     }
   }
@@ -207,24 +207,24 @@ export class WorkspaceTaskService {
       const now = new Date();
       const currentDateTime = `${now.getFullYear()}-${(now.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}T${now
+        .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}T${now
         .getHours()
         .toString()
-        .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
+        .padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now
         .getSeconds()
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, '0')}`;
 
       const updateData: TaskUpdateDTO = {
-        taskStatus: "IN_PROGRESS",
+        taskStatus: 'IN_PROGRESS',
         resourceUrl: resourceUrl,
         taskSubmittedDate: currentDateTime,
       };
 
       const response = await fetch(`${this.BASE_URL}/${taskId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(updateData),
       });
@@ -241,7 +241,7 @@ export class WorkspaceTaskService {
 
       return true;
     } catch (error) {
-      console.error("Error submitting task:", error);
+      console.error('Error submitting task:', error);
       return false;
     }
   }
