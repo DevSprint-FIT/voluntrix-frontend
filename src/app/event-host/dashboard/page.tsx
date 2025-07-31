@@ -7,6 +7,10 @@ import {
   DashboardData,
   ContributionData,
 } from '@/services/volunteerDashboardService';
+import {
+  fetchTotalEventHostRewardPoints,
+  fetchTotalEventsCountByHostId,
+} from '@/services/eventService';
 import { useRouter } from 'next/navigation';
 import authService from '@/services/authService';
 
@@ -200,12 +204,15 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   );
 };
 
-const EventHostDashboard = () => {
+const VolunteerDashboard = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
+  const [totalEvents, setTotalEvents] = useState<number>();
+  const [totalPoints, setTotalPoints] = useState<number>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState('2025');
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
@@ -256,6 +263,11 @@ const EventHostDashboard = () => {
 
       const data = await volunteerDashboardService.getDashboardData();
       setDashboardData(data);
+
+      const totalPoints = await fetchTotalEventHostRewardPoints();
+      setTotalPoints(totalPoints);
+      const totalEvents = await fetchTotalEventsCountByHostId();
+      setTotalEvents(totalEvents);
 
       // Calculate total from monthly contributions for the chart
       const chartTotal = data.monthlyContributions.reduce(
@@ -334,14 +346,14 @@ const EventHostDashboard = () => {
             />
             <StatCard
               title="Total Events"
-              value={`${dashboardData.totalVolunteeringEvents} Events`}
+              value={`${totalEvents} Events`}
               icon={BarChart3}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
             />
             <StatCard
               title="Total Points"
-              value={`10 Points`}
+              value={`${totalPoints} Points`}
               icon={HandCoins}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
@@ -358,4 +370,4 @@ const EventHostDashboard = () => {
   );
 };
 
-export default EventHostDashboard;
+export default VolunteerDashboard;
