@@ -4,14 +4,14 @@ import { Providers } from "./providers";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Voluntrix",
-  description: "Join, organize, and support volunteer events effortlessly.",
-  keywords: ["volunteering", "events", "community", "nonprofits"],
+  title: 'Voluntrix',
+  description: 'Join, organize, and support volunteer events effortlessly.',
+  keywords: ['volunteering', 'events', 'community', 'nonprofits'],
   openGraph: {
-    title: "Voluntrix",
-    description: "Empowering volunteers and organizations worldwide.",
-    url: "https://voluntrix-preview.vercel.app/",
-    type: "website",
+    title: 'Voluntrix',
+    description: 'Empowering volunteers and organizations worldwide.',
+    url: 'https://voluntrix-preview.vercel.app/',
+    type: 'website',
   },
 };
 
@@ -33,7 +33,9 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <main>
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   );
