@@ -1,4 +1,4 @@
-import EventCard from '@/components/public/EventCard';
+import EventCard from '@/components/UI/EventCard';
 import EventCardSkeleton from '@/components/UI/EventCardSkeleton';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
 import { EventType } from '@/types/EventType';

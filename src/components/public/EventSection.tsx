@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import EventCard from '@/components/public/EventCard';
+import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
 import { EventType } from '@/types/EventType';
 import { fetchAllEvents } from '@/services/publicUserService';
