@@ -52,9 +52,13 @@ interface CompletedTask {
   resourceUrl: string;
 }
 
-const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const resolvedParams = React.use(params);
-  // Event ID - using 1 for now as specified
+const EventHostTasksPage = ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const resolvedParams = React.use(params);
+
   const eventId = Number(resolvedParams.id);
 
   // Modal states
@@ -221,7 +225,7 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
         return "bg-verdant-200 text-verdant-900";
       case "LOGISTICS":
         return "bg-shark-100 text-shark-800";
-      case "PROGRAMMING":
+      case "PROGRAM":
         return "bg-shark-200 text-shark-900";
       default:
         return "bg-gray-100 text-gray-800";

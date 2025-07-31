@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Users, Check, X } from 'lucide-react';
-import Table, { Column } from '@/components/UI/Table';
+import React, { useState, useEffect } from "react";
+import { Users, Check, X } from "lucide-react";
+import Table, { Column } from "@/components/UI/Table";
 import {
   getEventApplicAndVol,
   updateEventApplicationStatus,
-} from '@/services/eventApplicationService';
-import { EventApplicAndVolType } from '@/types/EventApplicAndVolType';
-import { createVolunteerEventParticipation } from '@/services/volunteerEventParticipationService';
+} from "@/services/eventApplicationService";
+import { EventApplicAndVolType } from "@/types/EventApplicAndVolType";
+import { createVolunteerEventParticipation } from "@/services/volunteerEventParticipationService";
 
 const EventVolunteersPage = ({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) => {
-  const [activeTab, setActiveTab] = useState<'volunteers' | 'applications'>(
-    'volunteers'
+  const [activeTab, setActiveTab] = useState<"volunteers" | "applications">(
+    "volunteers"
   );
   const [isLoading, setIsLoading] = useState(true);
   const [eventVolunteers, setEventVolunteers] = useState<
@@ -36,20 +36,20 @@ const EventVolunteersPage = ({
         const response: EventApplicAndVolType[] = await getEventApplicAndVol(
           eventId
         );
-        console.log('Fetched volunteer data:', response);
+        console.log("Fetched volunteer data:", response);
 
         const volunteers: EventApplicAndVolType[] = response.filter(
-          (item) => item.applicationStatus === 'APPROVED'
+          (item) => item.applicationStatus === "APPROVED"
         );
 
         const applications: EventApplicAndVolType[] = response.filter(
-          (item) => item.applicationStatus === 'PENDING'
+          (item) => item.applicationStatus === "PENDING"
         );
 
         setEventVolunteers(volunteers);
         setVolunteerApplications(applications);
       } catch (error) {
-        console.error('Error fetching volunteer data:', error);
+        console.error("Error fetching volunteer data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -59,12 +59,12 @@ const EventVolunteersPage = ({
   }, [eventId]);
 
   const handleApproveApplication = async (id: number) => {
-    console.log('Approved volunteer application:', id);
+    console.log("Approved volunteer application:", id);
     try {
-      await updateEventApplicationStatus(id, 'APPROVED');
+      await updateEventApplicationStatus(id, "APPROVED");
 
       const approvedApp = volunteerApplications.find((app) => app.id === id);
-      console.log('Payload to backend:', {
+      console.log("Payload to backend:", {
         eventId: approvedApp?.eventId,
         volunteerId: approvedApp?.volunteerId,
         contributionArea: approvedApp?.contributionArea,
@@ -92,7 +92,7 @@ const EventVolunteersPage = ({
 
             return [
               ...prevVolunteers,
-              { ...approvedApp, applicationStatus: 'APPROVED' },
+              { ...approvedApp, applicationStatus: "APPROVED" },
             ];
           });
         }
@@ -100,44 +100,44 @@ const EventVolunteersPage = ({
         return updatedApplications;
       });
     } catch (error) {
-      console.error('Error approving application:', error);
+      console.error("Error approving application:", error);
     }
   };
 
   const handleRejectApplication = async (id: number) => {
-    console.log('Rejected volunteer application:', id);
+    console.log("Rejected volunteer application:", id);
     try {
-      await updateEventApplicationStatus(id, 'REJECTED');
+      await updateEventApplicationStatus(id, "REJECTED");
       setVolunteerApplications((prev) => prev.filter((app) => app.id !== id));
     } catch (error) {
-      console.error('Error rejecting application:', error);
+      console.error("Error rejecting application:", error);
     }
   };
 
   const getCategoryBadgeColor = (category: string) => {
     switch (category) {
-      case 'DESIGN':
-        return 'bg-verdant-100 text-verdant-800';
-      case 'EDITORIAL':
-        return 'bg-verdant-200 text-verdant-900';
-      case 'LOGISTICS':
-        return 'bg-shark-100 text-shark-800';
-      case 'PROGRAMMING':
-        return 'bg-shark-200 text-shark-900';
+      case "DESIGN":
+        return "bg-verdant-100 text-verdant-800";
+      case "EDITORIAL":
+        return "bg-verdant-200 text-verdant-900";
+      case "LOGISTICS":
+        return "bg-shark-100 text-shark-800";
+      case "PROGRAM":
+        return "bg-shark-200 text-shark-900";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // Table configurations
   const eventVolunteersColumns: Column<EventApplicAndVolType>[] = [
     {
-      header: 'Volunteer',
-      accessor: 'volunteerName',
+      header: "Volunteer",
+      accessor: "volunteerName",
     },
     {
-      header: 'Contribution Area',
-      accessor: 'contributionArea',
+      header: "Contribution Area",
+      accessor: "contributionArea",
       cell: (value) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
@@ -152,12 +152,12 @@ const EventVolunteersPage = ({
 
   const volunteerApplicationsColumns: Column<EventApplicAndVolType>[] = [
     {
-      header: 'Volunteer',
-      accessor: 'volunteerName',
+      header: "Volunteer",
+      accessor: "volunteerName",
     },
     {
-      header: 'Contribution Area',
-      accessor: 'contributionArea',
+      header: "Contribution Area",
+      accessor: "contributionArea",
       cell: (value) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
@@ -169,8 +169,8 @@ const EventVolunteersPage = ({
       ),
     },
     {
-      header: 'Description',
-      accessor: 'description',
+      header: "Description",
+      accessor: "description",
       cell: (value) => (
         <div className="max-w-md">
           <p className="text-sm text-shark-700 line-clamp-2">
@@ -180,8 +180,8 @@ const EventVolunteersPage = ({
       ),
     },
     {
-      header: 'Actions',
-      accessor: 'id',
+      header: "Actions",
+      accessor: "id",
       cell: (value) => (
         <div className="flex items-center gap-6">
           <button
@@ -208,7 +208,7 @@ const EventVolunteersPage = ({
     label,
     count,
   }: {
-    tabKey: 'volunteers' | 'applications';
+    tabKey: "volunteers" | "applications";
     label: string;
     count: number;
   }) => (
@@ -216,8 +216,8 @@ const EventVolunteersPage = ({
       onClick={() => setActiveTab(tabKey)}
       className={`px-6 py-3 font-bold text-base font-secondary border-b-2 transition-colors ${
         activeTab === tabKey
-          ? 'text-verdant-600 border-verdant-600 bg-verdant-50'
-          : 'text-shark-700 border-transparent hover:text-verdant-600 hover:border-verdant-600'
+          ? "text-verdant-600 border-verdant-600 bg-verdant-50"
+          : "text-shark-700 border-transparent hover:text-verdant-600 hover:border-verdant-600"
       }`}
     >
       {label} ({count})
@@ -263,7 +263,7 @@ const EventVolunteersPage = ({
 
       {/* Tab Content */}
       <div className="px-6">
-        {activeTab === 'volunteers' && (
+        {activeTab === "volunteers" && (
           <div>
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-1">
@@ -285,7 +285,7 @@ const EventVolunteersPage = ({
           </div>
         )}
 
-        {activeTab === 'applications' && (
+        {activeTab === "applications" && (
           <div>
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-shark-950 font-secondary mb-1">

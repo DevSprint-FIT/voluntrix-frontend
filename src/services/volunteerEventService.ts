@@ -5,11 +5,7 @@ const getBaseUrl = () => {
 };
 
 export type EventType = "ONLINE" | "ONSITE";
-export type ContributionArea =
-  | "DESIGN"
-  | "EDITORIAL"
-  | "LOGISTICS"
-  | "PROGRAMMING";
+export type ContributionArea = "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
 
 export type ActiveEvent = {
   eventId: number;

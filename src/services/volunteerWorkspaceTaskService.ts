@@ -15,7 +15,7 @@ export interface BackendTaskDTO {
   dueDate: string | null;
   taskStatus: "TO_DO" | "IN_PROGRESS" | "DONE";
   taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   resourceUrl: string | null;
   taskSubmittedDate: string | null;
   assigneeId: number;

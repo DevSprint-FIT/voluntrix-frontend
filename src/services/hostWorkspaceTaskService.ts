@@ -7,7 +7,7 @@ export interface TaskDTO {
   dueDate: string;
   taskStatus: "TO_DO" | "IN_PROGRESS" | "DONE";
   taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   resourceUrl: string | null;
   taskSubmittedDate: string | null;
   assigneeId: number;
@@ -28,7 +28,7 @@ export interface TaskCreateDTO {
   description: string;
   dueDate: string; // yyyy-MM-dd format
   taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   assigneeId: number;
   eventId: number;
 }
@@ -49,7 +49,7 @@ export interface VolunteerEventParticipationDTO {
   volunteerId: number;
   volunteerUsername: string;
   eventId: number;
-  areaOfContribution: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  areaOfContribution: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   eventRewardPoints: number;
   isInactive: boolean;
 }
@@ -227,7 +227,7 @@ class HostWorkspaceTaskService {
   // Filter volunteers by contribution area
   filterVolunteersByContributionArea(
     volunteers: VolunteerEventParticipationDTO[],
-    contributionArea: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING"
+    contributionArea: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM"
   ): VolunteerEventParticipationDTO[] {
     return volunteers.filter(
       (volunteer) =>
