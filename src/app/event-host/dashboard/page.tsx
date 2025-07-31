@@ -1,14 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import {
-  Crown,
-  BarChart3,
-  DollarSign,
-  Eye,
-  ChevronDown,
-  TrendingUp,
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Crown, BarChart3, DollarSign, Eye } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -16,19 +9,34 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
-} from 'recharts';
+} from "recharts";
 import {
   volunteerDashboardService,
   DashboardData,
   ContributionData,
-} from '@/services/volunteerDashboardService';
+} from "@/services/volunteerDashboardService";
+import { useRouter } from "next/navigation";
+import authService from "@/services/authService";
+
+interface User {
+  userId: number;
+  email: string;
+  fullName: string;
+  handle: string;
+  role: string;
+  emailVerified: boolean;
+  profileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
+}
 
 const StatCard = ({
   title,
   value,
   icon: Icon,
-  color = 'text-gray-600',
-  bgColor = 'bg-gray-50',
+  color = "text-gray-600",
+  bgColor = "bg-gray-50",
 }: {
   title: string;
   value: string;
@@ -55,29 +63,28 @@ const StatCard = ({
 
 const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   const months = [
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-    'Jan',
-    'Feb',
-    'Mar',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Create a grid of weeks
+  // Create a grid of weeks for the year 2025 (Jan to Dec)
   const weeks = [];
   let currentWeek = [];
 
-  // Start from March 1, 2024
-  const startDate = new Date('2024-03-01');
-  const endDate = new Date('2025-03-31');
+  // Start from January 1, 2025
+  const startDate = new Date("2025-01-01");
+  const endDate = new Date("2025-12-31");
 
   const currentDate = new Date(startDate);
 
@@ -88,7 +95,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   while (currentDate <= endDate) {
-    const dateString = currentDate.toISOString().split('T')[0];
+    const dateString = currentDate.toISOString().split("T")[0];
     const dayData = data.find((d) => d.date === dateString);
     const contributions = dayData ? dayData.contributions : 0;
 
@@ -107,6 +114,10 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   if (currentWeek.length > 0) {
+    // Fill remaining days of the last week
+    while (currentWeek.length < 7) {
+      currentWeek.push(null);
+    }
     weeks.push(currentWeek);
   }
 
@@ -114,8 +125,8 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 font-secondary">
-          {volunteerDashboardService.calculateTotalContributions(data)}{' '}
-          contributions in the last year
+          {volunteerDashboardService.calculateTotalContributions(data)}{" "}
+          Contributions in This Year
         </h3>
       </div>
 
@@ -141,11 +152,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         {/* Month labels and contribution grid */}
         <div className="flex-1">
           {/* Month labels */}
-          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5 px-10">
+          <div className="flex justify-between text-xs text-[#B0B0B0] mb-2 font-secondary h-5">
             {months.map((month, index) => (
               <span
                 key={index}
-                className="text-center flex items-center justify-center"
+                className="text-center flex items-center justify-center flex-1"
               >
                 {month}
               </span>
@@ -153,7 +164,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
           </div>
 
           {/* Contribution grid */}
-          <div className="flex space-x-1.5">
+          <div className="flex space-x-2">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="space-y-1">
                 {week.map((day, dayIndex) => (
@@ -164,12 +175,12 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
                         ? volunteerDashboardService.getContributionIntensity(
                             day.contributions
                           )
-                        : 'bg-transparent'
+                        : "bg-transparent"
                     }`}
                     title={
                       day
                         ? `${day.contributions} contributions on ${day.date}`
-                        : ''
+                        : ""
                     }
                   />
                 ))}
@@ -184,11 +195,11 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
         <div className="flex items-center space-x-2 text-xs text-[#B0B0B0] font-secondary">
           <span>Less</span>
           <div className="flex space-x-1">
-            <div className="w-3 h-3 bg-gray-100 rounded-sm" />
-            <div className="w-3 h-3 bg-green-200 rounded-sm" />
-            <div className="w-3 h-3 bg-green-300 rounded-sm" />
+            <div className="w-3 h-3 bg-gray-200 rounded-sm" />
             <div className="w-3 h-3 bg-green-400 rounded-sm" />
             <div className="w-3 h-3 bg-green-500 rounded-sm" />
+            <div className="w-3 h-3 bg-green-600 rounded-sm" />
+            <div className="w-3 h-3 bg-green-700 rounded-sm" />
           </div>
           <span>More</span>
         </div>
@@ -203,39 +214,77 @@ const EventHostDashboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState('2025');
+  const [selectedYear, setSelectedYear] = useState("2025");
+  const [totalContributionsFromChart, setTotalContributionsFromChart] =
+    useState(0);
 
-  // Using hardcoded values as specified
-  const eventHostId = 1;
-  const username = 'anne13';
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const checkAuthAndLoadData = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        if (!authService.isAuthenticated()) {
+          router.replace("/auth/login");
+          return;
+        }
 
-        const data = await volunteerDashboardService.getDashboardData(
-          username,
-          eventHostId
-        );
-        setDashboardData(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        const currentUser = await authService.getCurrentUser();
+        if (!currentUser) {
+          router.replace("/auth/login");
+          return;
+        }
+
+        // Check if profile is completed
+        if (!currentUser.profileCompleted) {
+          console.log(currentUser);
+          router.replace("/auth/profile-form?type=volunteer");
+          return;
+        }
+
+        setUser(currentUser);
+
+        // Fetch dashboard data after authentication is confirmed
+        await fetchDashboardData();
+      } catch (error) {
+        console.error("Auth check error:", error);
+        router.replace("/auth/signup");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchDashboardData();
-  }, []);
+    checkAuthAndLoadData();
+  }, [router]);
 
-  if (loading) {
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await volunteerDashboardService.getDashboardData();
+      setDashboardData(data);
+
+      // Calculate total from monthly contributions for the chart
+      const chartTotal = data.monthlyContributions.reduce(
+        (total, month) => total + month.contributions,
+        0
+      );
+      setTotalContributionsFromChart(chartTotal);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
-          <p className="text-[#B0B0B0] font-secondary">Loading dashboard...</p>
+          <p className="text-gray-600 font-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -243,11 +292,11 @@ const EventHostDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4 font-secondary">Error: {error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={fetchDashboardData}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-secondary"
           >
             Retry
@@ -259,7 +308,7 @@ const EventHostDashboard = () => {
 
   if (!dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <p className="text-[#B0B0B0] font-secondary">
           No dashboard data available.
         </p>
@@ -273,7 +322,7 @@ const EventHostDashboard = () => {
       <div className="bg-white px-9 py-4">
         <div>
           <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
-            Event Host / Dashboard
+            Volunteer / Dashboard
           </nav>
           <h1 className="text-2xl font-bold text-gray-900 font-secondary">
             Main Dashboard
@@ -293,13 +342,13 @@ const EventHostDashboard = () => {
               bgColor="bg-[#ECFDF6]"
             />
             <StatCard
-              title="Total Events Hosted"
+              title="Total Volunteering"
               value={`${dashboardData.totalVolunteeringEvents} Events`}
               icon={BarChart3}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
             />
-            {/* <StatCard
+            <StatCard
               title="Total Donations"
               value={`LKR ${dashboardData.totalDonations.toLocaleString()}`}
               icon={DollarSign}
@@ -308,11 +357,11 @@ const EventHostDashboard = () => {
             />
             <StatCard
               title="Total Profile Views"
-              value="1k+"
+              value="250"
               icon={Eye}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"
-            /> */}
+            />
           </div>
 
           {/* Contribution Calendar */}
@@ -327,7 +376,6 @@ const EventHostDashboard = () => {
                 <div className="flex items-center space-x-2">
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 font-secondary">
                     <span>{selectedYear}</span>
-                    <ChevronDown size={16} />
                   </button>
                 </div>
               </div>
@@ -336,15 +384,11 @@ const EventHostDashboard = () => {
             <div className="mb-6">
               <div>
                 <span className="text-3xl font-bold text-gray-900 font-secondary">
-                  925
+                  LKR {totalContributionsFromChart.toLocaleString()}
                 </span>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className="text-sm text-[#B0B0B0] font-secondary">
-                    Total Contributions
-                  </span>
-                  <span className="flex items-center text-sm text-green-600 font-medium font-secondary">
-                    <TrendingUp size={16} className="mr-1" />
-                    {volunteerDashboardService.getPercentageChange()}
+                    Total Monthly Donations
                   </span>
                 </div>
               </div>
@@ -357,21 +401,21 @@ const EventHostDashboard = () => {
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
+                    tick={{ fontSize: 12, fill: "#6B7280" }}
                   />
                   <YAxis hide />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#10B981',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: 'white',
+                      backgroundColor: "#10B981",
+                      border: "none",
+                      borderRadius: "8px",
+                      color: "white",
                     }}
                     labelStyle={{
-                      color: 'white',
+                      color: "white",
                     }}
                     itemStyle={{
-                      color: 'white',
+                      color: "white",
                     }}
                   />
                   <Line
@@ -379,11 +423,11 @@ const EventHostDashboard = () => {
                     dataKey="contributions"
                     stroke="#10B981"
                     strokeWidth={3}
-                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
                     activeDot={{
                       r: 6,
-                      fill: 'white',
-                      stroke: '#10B981',
+                      fill: "white",
+                      stroke: "#10B981",
                       strokeWidth: 2,
                     }}
                   />
