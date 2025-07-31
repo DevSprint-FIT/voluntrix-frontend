@@ -18,19 +18,7 @@ import {
 } from "@/services/volunteerDashboardService";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
-
-interface User {
-  userId: number;
-  email: string;
-  fullName: string;
-  handle: string;
-  role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  authProvider: string;
-  createdAt: string;
-  lastLogin: string;
-}
+import { User } from "@/services/authService";
 
 const StatCard = ({
   title,

@@ -81,6 +81,7 @@ const ProfileFormContent = () => {
         }
         
         const user = await authService.getCurrentUser();
+        console.log("Current user on form:", user);
         if (!user) {
           router.replace('/auth/login');
           return;
@@ -147,7 +148,7 @@ const ProfileFormContent = () => {
         const response = await createOrganization(orgData);
         
         console.log("Organization created successfully:", response);
-        
+
         // Update local auth service profile status
         await authService.updateProfileStatus(true);
         
@@ -168,9 +169,9 @@ const ProfileFormContent = () => {
 
         // Update local auth service profile status
         await authService.updateProfileStatus(true);
-        
+
         // Add delay to allow backend to process the profile completion
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Navigate to volunteer dashboard
         router.push('/Volunteer/dashboard');
@@ -192,6 +193,8 @@ const ProfileFormContent = () => {
 
         // Navigate to sponsor dashboard
         router.push('/Sponsor/dashboard');
+
+        
         return;
       }
 
@@ -205,7 +208,9 @@ const ProfileFormContent = () => {
         alert('Profile submission failed. Please try again.');
       }
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
     }
   };
 
