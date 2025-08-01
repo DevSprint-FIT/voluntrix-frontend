@@ -13,7 +13,6 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import Link from 'next/link';
 import { createEventApplication } from '@/services/eventApplicationService';
 import { AxiosError } from 'axios';
 
@@ -154,11 +153,11 @@ export default function VolunteerApplication({
                       className="rounded-[5px] border-[2px] border-shark-800 h-[110px] w-full p-2 resize-none"
                     />
                   </div>
-                  <div className="flex gap-2 items-start">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => setIsAgree((prev) => !prev)}
-                    >
+                  <div
+                    className="flex gap-2 items-start cursor-pointer"
+                    onClick={() => setIsAgree((prev) => !prev)}
+                  >
+                    <div>
                       {!isAgree ? (
                         <Image
                           src={'/icons/tick-box.svg'}
@@ -179,10 +178,8 @@ export default function VolunteerApplication({
                       I agree to follow the event guidelines, commit to my
                       responsibilities, represent the event professionally, and
                       accept the{' '}
-                      <Link href={'#'} className="underline">
-                        Terms & Conditions
-                      </Link>{' '}
-                      of volunteering.
+                      <span className="underline">Terms & Conditions</span> of
+                      volunteering.
                     </div>
                   </div>
                 </div>
