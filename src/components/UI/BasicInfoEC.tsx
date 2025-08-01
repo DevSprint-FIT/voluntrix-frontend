@@ -43,11 +43,11 @@ export default function BasicInfoEC({
       data.eventType &&
       data.eventVisibility &&
       data.eventStartDate &&
-      data.eventEndDate &&
-      data.eventTime &&
+      // data.eventEndDate &&
+      // data.eventTime &&
       data.eventImageUrl &&
       data.categories.length > 0 &&
-      data.eventStartDate <= data.eventEndDate;
+      (!data.eventEndDate || data.eventStartDate <= data.eventEndDate);
 
     if (
       data.eventStartDate &&
@@ -134,7 +134,7 @@ export default function BasicInfoEC({
           <input
             type="date"
             className="w-[141px] h-8 border-2 border-shark-300 rounded-lg text-shark-300"
-            value={data.eventEndDate}
+            value={data.eventEndDate || ''}
             onChange={(e) => onChange({ eventEndDate: e.target.value })}
           />
         </label>
@@ -143,7 +143,7 @@ export default function BasicInfoEC({
           <input
             type="time"
             className="px-4 rounded-lg border-[2px] h-8 border-shark-300 text-shark-500 placeholder:text-shark-400 focus:ring-shark-400 focus:border-shark-400"
-            value={data.eventTime}
+            value={data.eventTime || ''}
             onChange={(e) => onChange({ eventTime: e.target.value })}
           />
         </label>

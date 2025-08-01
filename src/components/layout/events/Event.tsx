@@ -19,14 +19,12 @@ export default function Event({
   sponsorshipNames: string[];
   sponsorships: SponsorshipType[];
 }) {
-  const [isSaved, setIsSaved] = useState(false);
-  const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isEligibleToApply, setIsEligibleToApply] = useState<boolean>(false);
 
-  const handleSave = () => {
-    setIsSaved((prevState) => !prevState);
-  };
+  // const handleSave = () => {
+  //   setIsSaved((prevState) => !prevState);
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -52,6 +50,12 @@ export default function Event({
     isOpen: isFormOpen,
     onOpen: openFormModal,
     onOpenChange: onFormChange,
+  } = useDisclosure();
+
+  const {
+    isOpen: isSponsorModalOpen,
+    onOpen: openSponsorModal,
+    onOpenChange: onSponsorModalChange,
   } = useDisclosure();
 
   useEffect(() => {
@@ -121,7 +125,7 @@ export default function Event({
                   <p className="w-[513px] font-secondary text-shark-950 font-medium text-4xl text-left text-wrap">
                     {event.eventTitle}
                   </p>
-                  <button onClick={handleSave}>
+                  {/* <button onClick={handleSave}>
                     <Image
                       src={
                         isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
@@ -130,7 +134,7 @@ export default function Event({
                       height={32}
                       alt="save"
                     />
-                  </button>
+                  </button> */}
                 </div>
                 {event.organizationId !== null && (
                   <div className="flex gap-2 items-center">
@@ -271,15 +275,15 @@ export default function Event({
               <Button
                 variant="shadow"
                 className="w-[160px] bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-                onPress={() => setIsSponsorModalOpen(true)}
+                onPress={openSponsorModal}
               >
                 Sponsor Now
               </Button>
               {isSponsorModalOpen && (
                 <SponsorshipsModal
                   isOpen={isSponsorModalOpen}
-                  onClose={() => setIsSponsorModalOpen(false)}
                   sponsorships={sponsorships}
+                  onFormChange={onSponsorModalChange}
                 />
               )}
             </div>

@@ -2,7 +2,6 @@ import React from 'react';
 import { Providers } from '../providers';
 import Navbar from '@/components/UI/Navbar';
 import FooterSection from '@/components/layout/FooterSection';
-import GoToTop from '@/components/UI/GoToTop';
 
 export default function EventHostLayout({
   children,
@@ -14,7 +13,6 @@ export default function EventHostLayout({
       <Navbar />
       <Providers>{children}</Providers>
       <FooterSection />
-      <GoToTop />
     </main>
   );
 }

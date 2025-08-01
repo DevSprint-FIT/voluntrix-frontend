@@ -1,18 +1,17 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
 import { Progress } from '@heroui/progress';
 import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 
-export default function EventCard({event}: {event: EventType}) {  
-  const [isSaved, setIsSaved] = useState(false);
+export default function EventCard({ event }: { event: EventType }) {
+  // const [isSaved, setIsSaved] = useState(false);
 
-  const handleSave = () => {
-    setIsSaved((prevState) => !prevState);
-  };
+  // const handleSave = () => {
+  //   setIsSaved((prevState) => !prevState);
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -65,7 +64,7 @@ export default function EventCard({event}: {event: EventType}) {
                   <p className="w-[234px] text-shark-950 font-bold text-xl text-left text-wrap">
                     {event.eventTitle}
                   </p>
-                  <button onClick={handleSave}>
+                  {/* <button onClick={handleSave}>
                     <Image
                       src={
                         isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
@@ -74,7 +73,7 @@ export default function EventCard({event}: {event: EventType}) {
                       height={24}
                       alt="save"
                     />
-                  </button>
+                  </button> */}
                 </div>
                 {event.organizationName && (
                   <p
@@ -84,11 +83,19 @@ export default function EventCard({event}: {event: EventType}) {
                     By {event.organizationName}
                   </p>
                 )}
-                {!event.donationEnabled && (
-                  <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
-                    {event.eventDescription}
-                  </p>
-                )}
+                {!event.donationEnabled &&
+                  (() => {
+                    const sentences = event.eventDescription.match(
+                      /[^.!?]+[.!?]+/g
+                    ) || [event.eventDescription];
+                    const preview = sentences.slice(0, 2).join(' ');
+
+                    return (
+                      <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">
+                        {preview}
+                      </p>
+                    );
+                  })()}
                 <div className="flex items-center gap-2 flex-wrap">
                   {event.categories.map((category, index) => (
                     <div

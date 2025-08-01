@@ -1,16 +1,15 @@
 import { OrganizationTitles } from '@/types/OrganizationTitles';
 import axios from 'axios';
+import authService from '@/services/authService';
 
-export const fetchOrganizationTitles = async (): Promise<OrganizationTitles[]> => {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
+export const fetchOrganizationTitles = async (): Promise<
+  OrganizationTitles[]
+> => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/organizations/names`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authService.getAuthHeadersAxios(),
       }
     );
 
