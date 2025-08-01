@@ -13,6 +13,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button, useDisclosure } from "@heroui/react";
 import VolunteerToHostModal from "./VolunteerToHostModal";
 import {
@@ -33,6 +34,7 @@ const VolunteerSidebar = () => {
   const [selectedItem, setSelectedItem] = useState<string>("Home");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [volunteer, setVolunteer] = useState<VolunteerProfile>();
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -68,6 +70,17 @@ const VolunteerSidebar = () => {
     { name: "Social Feed", icon: Send, href: "/social-feed" },
     { name: "Settings", icon: Settings, href: "/Volunteer/settings" },
   ];
+
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem("Dashboard");
+    }
+  }, [pathname]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
