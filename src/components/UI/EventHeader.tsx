@@ -52,11 +52,11 @@ const EventHeader: React.FC<EventHeaderProps> = ({ eventId }) => {
 
   if (loading) {
     return (
-      <div className="bg-white px-6 py-4 pt-10 sticky top-0 z-20">
-        <div className="relative inline-block">
-          <div className="flex items-center space-x-2 bg-verdant-50 px-4 py-2 rounded-lg border border-verdant-200">
+      <div className="bg-white px-8 py-6 pt-12 sticky top-0 z-20">
+        <div className="relative inline-block ml-4">
+          <div className="flex items-center space-x-3 bg-verdant-50 px-6 py-3 rounded-xl border border-verdant-200">
             <div className="animate-pulse">
-              <div className="h-5 bg-verdant-200 rounded w-48"></div>
+              <div className="h-6 bg-verdant-200 rounded w-56"></div>
             </div>
           </div>
         </div>
@@ -66,10 +66,10 @@ const EventHeader: React.FC<EventHeaderProps> = ({ eventId }) => {
 
   if (error) {
     return (
-      <div className="bg-white px-6 py-4 pt-10 sticky top-0 z-20">
-        <div className="relative inline-block">
-          <div className="flex items-center space-x-2 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
-            <span className="font-secondary font-semibold text-red-600">
+      <div className="bg-white px-8 py-6 pt-12 sticky top-0 z-20">
+        <div className="relative inline-block ml-4">
+          <div className="flex items-center space-x-3 bg-red-50 px-6 py-3 rounded-xl border border-red-200">
+            <span className="font-secondary font-semibold text-red-600 text-lg">
               {error}
             </span>
           </div>
@@ -79,10 +79,10 @@ const EventHeader: React.FC<EventHeaderProps> = ({ eventId }) => {
   }
 
   return (
-    <div className="bg-white px-6 py-4 pt-10 sticky top-0 z-20">
-      <div className="relative inline-block">
-        <div className="flex items-center space-x-2 bg-verdant-50 px-4 py-2 rounded-lg border border-verdant-200">
-          <span className="font-secondary font-semibold text-shark-950">
+    <div className="bg-white px-8 py-6 pt-12 sticky top-0 z-20">
+      <div className="relative inline-block ml-4">
+        <div className="flex items-center space-x-3 bg-verdant-50 px-6 py-3 rounded-xl border border-verdant-200">
+          <span className="font-secondary font-semibold text-shark-950 text-lg">
             {event?.eventTitle || "Event"}
           </span>
         </div>
