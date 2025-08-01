@@ -13,7 +13,7 @@ interface MenuItem {
   badge?: number;
 }
 
-const VolunteerWorkspaceSidebar = () => {
+const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
   const pathname = usePathname();
@@ -30,18 +30,18 @@ const VolunteerWorkspaceSidebar = () => {
     {
       name: "Tasks",
       icon: ListTodo,
-      href: "/VolunteerWorkspace/${eventId}/tasks",
+      href: `/VolunteerWorkspace/${eventId}/tasks`,
     },
     {
       name: "Leaderboard",
       icon: Trophy,
-      href: "/VolunteerWorkspace/${eventId}/leaderboard",
+      href: `/VolunteerWorkspace/${eventId}/leaderboard`,
     },
     {
       name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: "/VolunteerWorkspace/${eventId}/notifications",
+      href: `/VolunteerWorkspace/${eventId}/notifications`,
     },
   ];
 
@@ -54,7 +54,7 @@ const VolunteerWorkspaceSidebar = () => {
       // Default to Tasks if no match found
       setSelectedItem("Tasks");
     }
-  }, [pathname]);
+  }, [pathname, menuItems]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
@@ -64,7 +64,7 @@ const VolunteerWorkspaceSidebar = () => {
           <img
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
-            className="h-18 w-18 ml-[-10px]"
+            className="h-18 w-18 ml-[-10px] cursor-pointer"
             onClick={() => router.push("/")}
           />
         </div>
