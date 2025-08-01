@@ -15,6 +15,7 @@ import {
 } from '@heroui/react';
 import Link from 'next/link';
 import { createEventApplication } from '@/services/eventApplicationService';
+import { AxiosError } from 'axios';
 
 interface VolunteerApplicationProps {
   isFormOpen: boolean;
@@ -88,10 +89,10 @@ export default function VolunteerApplication({
       onClose();
       openSuccessModal();
     } catch (error) {
-      console.error('Submission error:', error);
+      const err = error as AxiosError<{ message: string }>;
+      console.error('Submission error:', err);
       setErrorMessage(
-        error?.response?.data?.message ||
-          'Something went wrong. Please try again.'
+        err.response?.data?.message || 'Something went wrong. Please try again.'
       );
       onClose();
       openErrorModal();
