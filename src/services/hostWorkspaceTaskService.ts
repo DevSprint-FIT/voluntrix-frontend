@@ -1,3 +1,6 @@
+// Service for host workspace task management with JWT integration
+import authService from "@/services/authService";
+
 // Task-related types based on backend DTOs
 export interface TaskDTO {
   taskId: number;
@@ -54,8 +57,9 @@ export interface VolunteerEventParticipationDTO {
   isInactive: boolean;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api/public";
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
 
 class HostWorkspaceTaskService {
   // Enhanced error handling method
@@ -99,7 +103,11 @@ class HostWorkspaceTaskService {
   async getTaskStatusCounts(eventId: number): Promise<TaskStatusCount> {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/tasks/event/${eventId}/status-count`
+        `${getBaseUrl()}/api/tasks/event/${eventId}/status-count`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
       return await this.handleApiResponse<TaskStatusCount>(response);
     } catch (error) {
@@ -115,7 +123,11 @@ class HostWorkspaceTaskService {
   ): Promise<TaskDTO[]> {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/tasks/event/${eventId}?taskStatus=${taskStatus}`
+        `${getBaseUrl()}/api/tasks/event/${eventId}?taskStatus=${taskStatus}`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
       return await this.handleApiResponse<TaskDTO[]>(response);
     } catch (error) {
@@ -130,7 +142,11 @@ class HostWorkspaceTaskService {
   ): Promise<VolunteerEventParticipationDTO[]> {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/participations/event/${eventId}/available`
+        `${getBaseUrl()}/api/participations/event/${eventId}/available`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
       return await this.handleApiResponse<VolunteerEventParticipationDTO[]>(
         response
@@ -144,11 +160,9 @@ class HostWorkspaceTaskService {
   // Create a new task
   async createTask(taskData: TaskCreateDTO): Promise<TaskDTO> {
     try {
-      const response = await fetch(`${API_BASE_URL}/tasks`, {
+      const response = await fetch(`${getBaseUrl()}/api/tasks`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authService.getAuthHeaders(),
         body: JSON.stringify(taskData),
       });
 
@@ -167,11 +181,9 @@ class HostWorkspaceTaskService {
     try {
       console.log("Updating task with data:", updateData); // Debug log
 
-      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      const response = await fetch(`${getBaseUrl()}/api/tasks/${taskId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authService.getAuthHeaders(),
         body: JSON.stringify(updateData),
       });
 
