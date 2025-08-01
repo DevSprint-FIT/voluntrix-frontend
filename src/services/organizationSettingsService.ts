@@ -11,39 +11,41 @@ export type OrganizationSettings = {
   phone?: string;
 };
 
-
 const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 };
 
-export const getOrganizationSettings = async (): Promise<OrganizationSettings> => {
-  try {
-    const response = await fetch(`${getBaseUrl()}/api/organizations/me`, {
-      method: "GET",
-      headers: authService.getAuthHeaders(),
-    });
+export const getOrganizationSettings =
+  async (): Promise<OrganizationSettings> => {
+    try {
+      const response = await fetch(`${getBaseUrl()}/api/organizations/me`, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch organization settings: ${response.status} ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch organization settings: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const { data } = await response.json();
+
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        isVerified: data.isVerified,
+        imageUrl: data.imageUrl,
+        name: data.name,
+        institute: data.institute,
+        phone: data.phone || "",
+      };
+    } catch (error) {
+      console.error("Error fetching organization settings:", error);
+      throw error;
     }
-
-    const { data } = await response.json();
-    
-    return {
-      id: data.id,
-      email: data.email,
-      username: data.username,
-      isVerified: data.isVerified,
-      imageUrl: data.imageUrl,
-      name: data.name,
-      institute: data.institute,
-      phone: data.phone || "", 
-    };
-  } catch (error) {
-    console.error("Error fetching organization settings:", error);
-    throw error;
-  }
-};
+  };
 
 export const updateOrganizationPhone = async (
   id: number,
@@ -57,7 +59,9 @@ export const updateOrganizationPhone = async (
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update phone number: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to update phone number: ${response.status} ${response.statusText}`
+      );
     }
 
     const { data } = await response.json();
@@ -76,7 +80,9 @@ export const deleteOrganizationById = async (id: number): Promise<void> => {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to delete organization: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to delete organization: ${response.status} ${response.statusText}`
+      );
     }
   } catch (error) {
     console.error("Error deleting organization:", error);

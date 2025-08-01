@@ -1,20 +1,19 @@
 import axios from 'axios';
 import authService from '@/services/authService';
 
-const API_BASE_URL = 'http://localhost:8080/api/public';
-
 export interface VolunteerProfile {
   volunteerId: number;
+  userId: number;
   username: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
-  institute: string;
+  institute?: string;
+  instituteEmail?: string;
   isAvailable: boolean;
   volunteerLevel: number;
   rewardPoints: number;
   isEventHost: boolean;
-  joinedDate: number[];
+  joinedDate: string;
   about: string;
   phoneNumber: string;
   profilePictureUrl: string;
@@ -30,7 +29,7 @@ export interface Organization {
   accountNumber: string;
   isVerified: boolean;
   followerCount: number;
-  joinedDate: number[];
+  joinedDate: string;
   description: string;
   website: string;
   bankName: string;
@@ -42,73 +41,188 @@ export interface OrganizationResponse {
   data: Organization;
 }
 
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
+
 export const volunteerProfileService = {
-  // Get volunteer profile by username
-  async getVolunteerProfile(username: string): Promise<VolunteerProfile> {
-    const response = await fetch(`${API_BASE_URL}/volunteers/${username}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch volunteer profile');
+  // Get volunteer profile (current user)
+  async getVolunteerProfile(): Promise<VolunteerProfile> {
+    try {
+      const response = await fetch(`${getBaseUrl()}/api/volunteers/me`, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch volunteer profile: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+
+      return {
+        volunteerId: data.volunteerId,
+        userId: data.userId,
+        username: data.username,
+        fullName: data.fullName,
+        email: data.email,
+        institute: data.institute,
+        instituteEmail: data.instituteEmail,
+        isAvailable: data.isAvailable,
+        volunteerLevel: data.volunteerLevel,
+        rewardPoints: data.rewardPoints,
+        isEventHost: data.isEventHost,
+        joinedDate: data.joinedDate,
+        about: data.about,
+        phoneNumber: data.phoneNumber,
+        profilePictureUrl: data.profilePictureUrl,
+      };
+    } catch (error) {
+      console.error("Error fetching volunteer profile:", error);
+      throw error;
     }
-    return response.json();
   },
 
   // Get organization IDs followed by volunteer
-  async getFollowedOrganizationIds(volunteerId: number): Promise<number[]> {
-    const response = await fetch(`${API_BASE_URL}/follow/${volunteerId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch followed organizations');
+  async getFollowedOrganizationIds(): Promise<number[]> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/follow/followed-organizations`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch followed organizations: ${response.status} ${response.statusText}`
+        );
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Error fetching followed organization IDs:", error);
+      throw error;
     }
-    return response.json();
   },
 
   // Get organization details by ID
   async getOrganizationById(id: number): Promise<Organization> {
-    const response = await fetch(`${API_BASE_URL}/organizations/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch organization details');
+    try {
+      const url = `${getBaseUrl()}/api/public/organizations/${id}`;
+      console.log(`Fetching organization data from: ${url}`);
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
+
+      console.log(`Response status for organization ${id}:`, response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error response for organization ${id}:`, errorText);
+        throw new Error(
+          `Failed to fetch organization details: ${response.status} ${response.statusText} - ${errorText}`
+        );
+      }
+
+      const data: OrganizationResponse = await response.json();
+      console.log(`Successfully fetched organization ${id}:`, data);
+      return data.data;
+    } catch (error) {
+      console.error(`Error fetching organization ${id}:`, error);
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        throw new Error(
+          `Network error: Unable to connect to the server. Please check if the backend is running at ${getBaseUrl()}`
+        );
+      }
+      throw error;
     }
-    const data: OrganizationResponse = await response.json();
-    return data.data;
   },
 
   // Get all followed organizations details
-  async getFollowedOrganizations(volunteerId: number): Promise<Organization[]> {
-    const organizationIds = await this.getFollowedOrganizationIds(volunteerId);
-    const organizations = await Promise.all(
-      organizationIds.map((id) => this.getOrganizationById(id))
-    );
-    return organizations;
+  async getFollowedOrganizations(): Promise<Organization[]> {
+    try {
+      console.log("Fetching followed organization IDs...");
+      const organizationIds = await this.getFollowedOrganizationIds();
+      console.log("Followed organization IDs:", organizationIds);
+
+      if (organizationIds.length === 0) {
+        console.log("No followed organizations found");
+        return [];
+      }
+
+      console.log(
+        `Fetching details for ${organizationIds.length} organizations...`
+      );
+      const organizations = await Promise.all(
+        organizationIds.map(async (id) => {
+          try {
+            return await this.getOrganizationById(id);
+          } catch (error) {
+            console.error(`Failed to fetch organization ${id}:`, error);
+            // Skip this organization if it fails, don't fail the entire request
+            return null;
+          }
+        })
+      );
+
+      // Filter out null values (failed requests)
+      const validOrganizations = organizations.filter(
+        (org): org is Organization => org !== null
+      );
+      console.log(
+        `Successfully fetched ${validOrganizations.length} out of ${organizationIds.length} organizations`
+      );
+
+      return validOrganizations;
+    } catch (error) {
+      console.error("Error fetching followed organizations:", error);
+      throw error;
+    }
   },
 
   // Unfollow an organization
-  async unfollowOrganization(
-    volunteerId: number,
-    organizationId: number
-  ): Promise<string> {
-    const response = await fetch(
-      `${API_BASE_URL}/follow/${volunteerId}/${organizationId}`,
-      {
-        method: 'DELETE',
+  async unfollowOrganization(organizationId: number): Promise<string> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/follow/${organizationId}`,
+        {
+          method: "DELETE",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to unfollow organization: ${response.status} ${response.statusText}`
+        );
       }
-    );
-    if (!response.ok) {
-      throw new Error('Failed to unfollow organization');
+
+      return response.text();
+    } catch (error) {
+      console.error("Error unfollowing organization:", error);
+      throw error;
     }
-    return response.text();
   },
 
   // Format joined date
-  formatJoinedDate(joinedDate: number[]): string {
-    if (joinedDate.length >= 3) {
-      const [year, month, day] = joinedDate;
-      const date = new Date(year, month - 1, day);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+  formatJoinedDate(joinedDate: string): string {
+    try {
+      const date = new Date(joinedDate);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Unknown";
     }
-    return 'Unknown';
   },
 };
 
@@ -122,7 +236,7 @@ export const fetchVolunteer = async (): Promise<VolunteerProfile> => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching volunteer profile:', error);
+    console.error("Error fetching volunteer profile:", error);
     throw error;
   }
 };
@@ -138,7 +252,7 @@ export const promoteToEventHost = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error making volunteer an event host:', error);
+    console.error("Error making volunteer an event host:", error);
     throw error;
   }
 };

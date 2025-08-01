@@ -1,17 +1,22 @@
-const API_BASE_URL = "http://localhost:8080/api";
+import authService from "@/services/authService";
+
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
 
 export interface VolunteerProfile {
   volunteerId: number;
+  userId: number;
   username: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
-  institute: string;
+  institute: string | null;
+  instituteEmail: string | null;
   isAvailable: boolean;
   volunteerLevel: number;
   rewardPoints: number;
   isEventHost: boolean;
-  joinedDate: number[];
+  joinedDate: string;
   about: string;
   phoneNumber: string;
   profilePictureUrl: string;
@@ -48,63 +53,126 @@ export interface MonthlyContribution {
 }
 
 export const volunteerDashboardService = {
-  // Get volunteer profile by username
-  async getVolunteerProfile(username: string): Promise<VolunteerProfile> {
-    const response = await fetch(
-      `${API_BASE_URL}/public/volunteers/${username}`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch volunteer profile");
+  // Get volunteer profile using JWT token
+  async getVolunteerProfile(): Promise<VolunteerProfile> {
+    try {
+      const response = await fetch(`${getBaseUrl()}/api/volunteers/me`, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch volunteer profile: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching volunteer profile:", error);
+      throw error;
     }
-    return response.json();
   },
 
-  // Get volunteer participation stats
-  async getVolunteerStats(volunteerId: number): Promise<VolunteerStats> {
-    const response = await fetch(
-      `${API_BASE_URL}/public/participations/volunteer/${volunteerId}/stats`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch volunteer stats");
+  // Get volunteer participation stats using JWT token
+  async getVolunteerStats(): Promise<VolunteerStats> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/participations/volunteer/stats`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch volunteer stats: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching volunteer stats:", error);
+      throw error;
     }
-    return response.json();
   },
 
-  // Get total donations for volunteer
-  async getTotalDonations(volunteerId: number): Promise<number> {
-    const response = await fetch(
-      `${API_BASE_URL}/analytics/volunteer/${volunteerId}/donations/total`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch total donations");
+  // Get total donations for volunteer using JWT token
+  async getTotalDonations(): Promise<number> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/analytics/volunteer/donations/total`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch total donations: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+      return result || 0;
+    } catch (error) {
+      console.error("Error fetching total donations:", error);
+      throw error;
     }
-    const result = await response.json();
-    return result || 0;
   },
 
-  // Get monthly donations for volunteer
-  async getMonthlyDonations(
-    volunteerId: number,
-    year: number
-  ): Promise<MonthlyDonationDto[]> {
-    const response = await fetch(
-      `${API_BASE_URL}/analytics/volunteer/${volunteerId}/donations/monthly?year=${year}`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch monthly donations");
+  // Get monthly donations for volunteer using JWT token
+  async getMonthlyDonations(year: number): Promise<MonthlyDonationDto[]> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/analytics/volunteer/donations/monthly?year=${year}`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch monthly donations: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching monthly donations:", error);
+      throw error;
     }
-    return response.json();
   },
 
-  // Get task submitted dates for contribution grid
-  async getTaskSubmittedDates(assigneeId: number): Promise<number[][]> {
-    const response = await fetch(
-      `${API_BASE_URL}/public/tasks/assignee/${assigneeId}/submitted-dates`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch task submitted dates");
+  // Get task submitted dates for contribution grid using JWT token
+  async getTaskSubmittedDates(): Promise<number[][]> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/tasks/assignee/submitted-dates`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch task submitted dates: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching task submitted dates:", error);
+      throw error;
     }
-    return response.json();
   },
 
   // Convert backend date format to contribution data
@@ -186,19 +254,16 @@ export const volunteerDashboardService = {
     );
   },
 
-  // Get complete dashboard data
-  async getDashboardData(
-    username: string,
-    volunteerId: number
-  ): Promise<DashboardData> {
+  // Get complete dashboard data using JWT authentication
+  async getDashboardData(): Promise<DashboardData> {
     try {
       const [profile, stats, totalDonations, monthlyDonations, submittedDates] =
         await Promise.all([
-          this.getVolunteerProfile(username),
-          this.getVolunteerStats(volunteerId),
-          this.getTotalDonations(volunteerId),
-          this.getMonthlyDonations(volunteerId, 2025),
-          this.getTaskSubmittedDates(volunteerId), // assigneeId is same as volunteerId
+          this.getVolunteerProfile(),
+          this.getVolunteerStats(),
+          this.getTotalDonations(),
+          this.getMonthlyDonations(2025),
+          this.getTaskSubmittedDates(),
         ]);
 
       const totalVolunteeringEvents = stats.activeCount + stats.completedCount;

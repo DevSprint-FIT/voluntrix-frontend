@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Crown, BarChart3, DollarSign, Eye} from "lucide-react";
+import { Crown, BarChart3, DollarSign, Eye } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -18,19 +17,7 @@ import {
 } from "@/services/volunteerDashboardService";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
-
-interface User {
-  userId: number;
-  email: string;
-  fullName: string;
-  handle: string;
-  role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  authProvider: string;
-  createdAt: string;
-  lastLogin: string;
-}
+import { User } from "@/services/authService";
 
 const StatCard = ({
   title,
@@ -219,39 +206,38 @@ const VolunteerDashboard = () => {
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
-  // Using hardcoded values as specified
-  const volunteerId = 1;
-  const username = "anne13";
-
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  
+
   useEffect(() => {
     const checkAuthAndLoadData = async () => {
       try {
         if (!authService.isAuthenticated()) {
-          router.replace('/auth/login');
+          router.replace("/auth/login");
           return;
         }
 
         const currentUser = await authService.getCurrentUser();
         if (!currentUser) {
-          router.replace('/auth/login');
+          router.replace("/auth/login");
           return;
         }
 
         // Check if profile is completed
         if (!currentUser.profileCompleted) {
           console.log(currentUser);
-          router.replace('/auth/profile-form?type=volunteer');
+          router.replace("/auth/profile-form?type=volunteer");
           return;
         }
 
         setUser(currentUser);
+
+        // Fetch dashboard data after authentication is confirmed
+        await fetchDashboardData();
       } catch (error) {
-        console.error('Auth check error:', error);
-        router.replace('/auth/signup');
+        console.error("Auth check error:", error);
+        router.replace("/auth/signup");
       } finally {
         setIsLoading(false);
       }
@@ -260,35 +246,28 @@ const VolunteerDashboard = () => {
     checkAuthAndLoadData();
   }, [router]);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const data = await volunteerDashboardService.getDashboardData(
-          username,
-          volunteerId
-        );
-        setDashboardData(data);
+      const data = await volunteerDashboardService.getDashboardData();
+      setDashboardData(data);
 
-        // Calculate total from monthly contributions for the chart
-        const chartTotal = data.monthlyContributions.reduce(
-          (total, month) => total + month.contributions,
-          0
-        );
-        setTotalContributionsFromChart(chartTotal);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+      // Calculate total from monthly contributions for the chart
+      const chartTotal = data.monthlyContributions.reduce(
+        (total, month) => total + month.contributions,
+        0
+      );
+      setTotalContributionsFromChart(chartTotal);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchDashboardData();
-  }, []);
-
-  if (loading) {
+  if (isLoading || loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -305,7 +284,7 @@ const VolunteerDashboard = () => {
         <div className="text-center">
           <p className="text-red-600 mb-4 font-secondary">Error: {error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={fetchDashboardData}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-secondary"
           >
             Retry
@@ -393,7 +372,7 @@ const VolunteerDashboard = () => {
             <div className="mb-6">
               <div>
                 <span className="text-3xl font-bold text-gray-900 font-secondary">
-                  LKR {totalContributionsFromChart}
+                  LKR {totalContributionsFromChart.toLocaleString()}
                 </span>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className="text-sm text-[#B0B0B0] font-secondary">

@@ -23,8 +23,8 @@ export default function EventSection() {
         setEvents(eventsData);
         setError(null);
       } catch (err) {
-        console.error('Error fetching all events:', err);
-        setError('Failed to fetch events.');
+        console.error('Error fetching latest events:', err);
+        setError('Failed to fetch latest events.');
       } finally {
         setIsLoading(false);
       }
