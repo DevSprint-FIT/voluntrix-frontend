@@ -43,6 +43,7 @@ const PublicFeedPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<UserType>("ORGANIZATION"); 
+  const [organizationsMap, setOrganizationsMap] = useState<Map<string, any>>(new Map());
   const [metrics, setMetrics] = useState({
     totalPosts: 0,
     postGrowth: "0%",
@@ -93,6 +94,14 @@ const PublicFeedPage = () => {
         const postResponse = await getAllPublicPosts();
         console.log("Sample post structure:", postResponse.length > 0 ? JSON.stringify(postResponse[0], null, 2) : "No posts");
         setPosts(postResponse);
+
+        // Fetch all organizations to get follower counts
+        const allOrgs = await getAllOrganizations();
+        const orgMap = new Map();
+        allOrgs.forEach(org => {
+        orgMap.set(org.name, org);
+        });
+        setOrganizationsMap(orgMap);
         
         // First try as organization (based on JWT token)
         const orgData = await getCurrentOrganizationDetails();
@@ -281,7 +290,7 @@ const PublicFeedPage = () => {
                 profileImageUrl={post.organizationImageUrl}
                 user={post.organizationName}
                 institute={(post?.institute ?? "").toUpperCase()}
-                followers={post.followers ?? 0}
+                followers={organizationsMap.get(post.organizationName)?.followerCount ?? 0}
                 impressions={post.impressions}
                 timeAgo={post.timeAgo}
                 isPublicView={true}
