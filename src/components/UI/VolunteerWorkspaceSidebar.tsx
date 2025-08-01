@@ -27,17 +27,21 @@ const VolunteerWorkspaceSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Tasks", icon: ListTodo, href: "/VolunteerWorkspace/tasks" },
+    {
+      name: "Tasks",
+      icon: ListTodo,
+      href: "/VolunteerWorkspace/${eventId}/tasks",
+    },
     {
       name: "Leaderboard",
       icon: Trophy,
-      href: "/VolunteerWorkspace/leaderboard",
+      href: "/VolunteerWorkspace/${eventId}/leaderboard",
     },
     {
       name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: "/VolunteerWorkspace/notifications",
+      href: "/VolunteerWorkspace/${eventId}/notifications",
     },
   ];
 
@@ -61,6 +65,7 @@ const VolunteerWorkspaceSidebar = () => {
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
             className="h-18 w-18 ml-[-10px]"
+            onClick={() => router.push("/")}
           />
         </div>
 
