@@ -15,7 +15,7 @@ export default function VolunteerWorkspaceLayout({
 
   return (
     <div className="flex">
-      <VolunteerWorkspaceSidebar />
+      <VolunteerWorkspaceSidebar eventId={resolvedParams.id} />
       <div className="flex-1 ml-60">
         <EventHeader eventId={resolvedParams.id} />
         <div className="p-6">{children}</div>
