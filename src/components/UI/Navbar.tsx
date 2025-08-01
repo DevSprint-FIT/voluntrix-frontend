@@ -33,9 +33,13 @@ export default function Navbar() {
     router.push('/auth/signup');
   };
 
-  const eventPath = authService.isAuthenticated()
-    ? '/events'
-    : '/public/events';
+  const [eventPath, setEventPath] = useState('/public/events');
+
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      setEventPath('/events');
+    }
+  }, []);
 
   return (
     <nav
