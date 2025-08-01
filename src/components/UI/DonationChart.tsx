@@ -4,12 +4,12 @@ import { ChevronDown } from 'lucide-react';
 
 
 const dummyData = [
-  { month: 'SEP', amount: 3200, label: 'Sep' },
-  { month: 'OCT', amount: 2800, label: 'Oct' },
-  { month: 'NOV', amount: 5000, label: 'Nov' },
-  { month: 'DEC', amount: 2400, label: 'Dec' },
-  { month: 'JAN', amount: 4800, label: 'Jan' },
-  { month: 'FEB', amount: 4600, label: 'Feb' },
+  { month: 'MAR', amount: 3200, label: 'MAR' },
+  { month: 'APR', amount: 2800, label: 'APR' },
+  { month: 'MAY', amount: 5000, label: 'MAY' },
+  { month: 'JUN', amount: 2400, label: 'JUN' },
+  { month: 'JUL', amount: 4800, label: 'JUL' },
+  { month: 'AUG', amount: 4600, label: 'AUG' },
 ];
 
 interface DonationsChartProps {

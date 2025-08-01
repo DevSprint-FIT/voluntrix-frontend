@@ -78,7 +78,7 @@ const Sidebar = () => {
                   <div
                     onClick={() => setSelectedItem(item.name)}
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? "text-verdant-700 font-semibold" : ""
+                      isActive ? "text-verdant-700 font-semibold bg-verdant-50" : ""
                     }`}
                   >
                     <div className="flex items-center space-x-2">
