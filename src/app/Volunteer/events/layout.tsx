@@ -9,6 +9,7 @@ import {
   getVolunteerEventCounts,
 } from "@/services/volunteerEventStatsService";
 import authService from "@/services/authService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
 
 const tabs = [
   { name: "Active Events", href: "/Volunteer/events/active" },
@@ -92,8 +93,13 @@ export default function EventsLayout({
   return (
     <div className="p-4">
       {/* Title */}
-      <span className="text-shark-300">Volunteer / Events</span>
-      <h1 className="text-2xl font-primary font-bold mb-4">Events</h1>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <span className="text-shark-300">Volunteer / Events</span>
+          <h1 className="text-2xl font-primary font-bold">Events</h1>
+        </div>
+        <ProfileIndicator />
+      </div>
 
       {/* Event Status Cards */}
       <div className="flex gap-8 mb-8 justify-start">
