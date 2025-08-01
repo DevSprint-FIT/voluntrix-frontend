@@ -1,41 +1,23 @@
 "use client";
 
 import VolunteerWorkspaceSidebar from "@/components/UI/VolunteerWorkspaceSidebar";
-import EventDropdownHeader from "@/components/UI/EventDropdownHeader";
-import React, { useState } from "react";
-
-interface Event {
-  id: string;
-  name: string;
-}
+import EventHeader from "@/components/UI/EventHeader";
+import React from "react";
 
 export default function VolunteerWorkspaceLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ id: string }>;
 }) {
-  const [selectedEvent, setSelectedEvent] = useState<Event>({
-    id: "1",
-    name: "Community Clean-up Drive",
-  });
-
-  const events: Event[] = [
-    { id: "1", name: "Community Clean-up Drive" },
-    { id: "2", name: "Food Distribution Program" },
-    { id: "3", name: "Tree Planting Initiative" },
-    { id: "4", name: "Elder Care Support" },
-    { id: "5", name: "Educational Workshop" },
-  ];
+  const resolvedParams = React.use(params);
 
   return (
     <div className="flex">
       <VolunteerWorkspaceSidebar />
       <div className="flex-1 ml-60">
-        <EventDropdownHeader
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          events={events}
-        />
+        <EventHeader eventId={resolvedParams.id} />
         <div className="p-6">{children}</div>
       </div>
     </div>
