@@ -12,7 +12,8 @@ import {
   DollarSign,
 } from "lucide-react";
 import Link from "next/link";
- import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -24,6 +25,7 @@ interface MenuItem {
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -34,7 +36,11 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: "Tasks", icon: ListTodo, href: `/EventHostWorkspace/${eventId}/tasks` },
+    {
+      name: "Tasks",
+      icon: ListTodo,
+      href: `/EventHostWorkspace/${eventId}/tasks`,
+    },
     {
       name: "Volunteers",
       icon: Users,
@@ -62,6 +68,17 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       href: `/EventHostWorkspace/${eventId}/notifications`,
     },
   ];
+
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Tasks if no match found
+      setSelectedItem("Tasks");
+    }
+  }, [pathname]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
@@ -122,7 +139,7 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
         <button
           onClick={() => {
             setSelectedItem("Back");
-            router.push('/event-host/events');
+            router.push("/event-host/events");
           }}
           className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
