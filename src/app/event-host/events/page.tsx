@@ -22,8 +22,11 @@ export default function HostEvents() {
 
   const router = useRouter();
 
-  const handleRowClick = (eventId: string) => {
-    router.push(`/EventHostWorkspace/${eventId}/tasks`);
+  const handleRowClick = (eventId: string, eventStatus: string) => {
+    const status = eventStatus.toUpperCase();
+    if (status === 'ACTIVE' || status === 'COMPLETE') {
+      router.push(`/EventHostWorkspace/${eventId}/tasks`);
+    }
   };
 
   useEffect(() => {
@@ -43,9 +46,8 @@ export default function HostEvents() {
           completed: data.filter(
             (e) => e.eventStatus.toUpperCase() === 'COMPLETE'
           ).length,
-          denied: data.filter(
-            (e) => e.eventStatus.toUpperCase() === 'DENIED'
-          ).length,
+          denied: data.filter((e) => e.eventStatus.toUpperCase() === 'DENIED')
+            .length,
         };
 
         setEventCounts(counts);
@@ -276,7 +278,9 @@ export default function HostEvents() {
                     <tr
                       key={event.eventId}
                       className="hover:bg-shark-50 space-y-4 cursor-pointer"
-                      onClick={() => handleRowClick(String(event.eventId))}
+                      onClick={() =>
+                        handleRowClick(String(event.eventId), event.eventStatus)
+                      }
                     >
                       <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
                         <div className="text-md font-primary font-medium text-shark-900">
