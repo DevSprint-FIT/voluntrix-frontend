@@ -1,59 +1,68 @@
 import React from 'react';
 import Image from 'next/image';
-import {Button} from "@heroui/react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Button,
+} from '@heroui/react';
 
 interface DonationModalProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  isOpen: boolean;
+  onChange: (open: boolean) => void;
 }
 
-export default function DonationModal({ open, setOpen }: DonationModalProps) {
-  if (!open) return null;
-
+export default function DonationModal({
+  isOpen,
+  onChange,
+}: DonationModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md mx-4 sm:mx-0 p-12 relative">
-        
-        {/* Close Button (Optional) */}
-        <Button
-          onPress={() => setOpen(false)}
-          className="absolute top-3 right-[-5px] text-gray-500 hover:text-gray-700 bg-transparent text-2xl "
-        >
-          ✕
-        </Button>
-
-        <Image
-          className="mx-auto mt-2"
-          src="/icons/heart.svg"
-          alt="Heart"
-          width={50}
-          height={50}
-        />
-
-        <div className="mt-4 text-center">
-          <h3 className="text-[1.4rem] font-semibold text-gray-900 font-primary ">Make it ongoing!</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            &quot;Username&quot;, your steady support helps us plan ahead
-            and we value your every contribution.
-          </p>
-        </div>
-
-        <div className="mt-6 flex flex-col gap-2">
-          <Button 
-            onPress={() => setOpen(false)}
-            className="w-full py-6 bg-[#029972] text-white text-sm font-semibold rounded-lg"
-          >
-            Yes! Let me donate LKR 1,000
-          </Button>
-          <Button
-          variant='bordered'
-            onPress={() => setOpen(false)}
-            className="w-full py-6 border-2 border-[#029972] text-[#029972] text-sm font-semibold rounded-lg"
-          >
-            No thanks. Complete my own Donation
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onChange}
+      size="lg"
+      className="rounded-2xl"
+    >
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="text-center space-y-1 flex flex-col items-center pt-6 pb-7 px-10">
+              <Image
+                src="/icons/heart.svg"
+                alt="Heart"
+                width={50}
+                height={50}
+              />
+              <h3 className="text-3xl mt-2 font-semibold text-shark-950 font-primary ">
+                Make it ongoing!
+              </h3>
+              <p className="text-sm text-shark-700 font-normal font-secondary">
+                your steady support helps us plan ahead and we value your every
+                contribution.
+              </p>
+            </ModalHeader>
+            <ModalBody className="flex flex-col gap-4 mb-8 items-center">
+              <Button
+                variant="shadow"
+                isLoading={false}
+                onPress={onClose}
+                className="w-[350px] bg-verdant-600 hover:bg-verdant-700 text-white font-medium rounded-2xl py-6 text-sm tracking-wide"
+              >
+                Yes! Let me donate LKR 1,000
+              </Button>
+              <Button
+                isLoading={false}
+                variant="bordered"
+                onPress={onClose}
+                className="w-[350px] py-6 border-2 border-verdant-600 hover:border-verdant-700 hover:text-verdant-700 text-verdant-600 text-sm font-medium rounded-2xl tracking-wide"
+              >
+                No thanks. Complete my own Donation
+              </Button>
+            </ModalBody>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 }
