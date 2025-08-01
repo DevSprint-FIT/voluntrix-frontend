@@ -18,6 +18,7 @@ import {
   VolunteerProfile,
   Organization,
 } from "@/services/volunteerProfileService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
 
 // Notification Modal Component
 const NotificationModal = ({
@@ -370,13 +371,18 @@ const VolunteerProfilePage = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-6 py-4">
-        <div>
-          <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
-            Volunteer / Profile
-          </nav>
-          <h1 className="text-2xl font-bold font-secondary text-gray-900">
-            Profile
-          </h1>
+        <div className="flex justify-between items-start">
+          <div>
+            <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
+              Volunteer / Profile
+            </nav>
+            <h1 className="text-2xl font-bold font-secondary text-gray-900">
+              Profile
+            </h1>
+          </div>
+          <div className="mt-3">
+            <ProfileIndicator />
+          </div>
         </div>
       </div>
 
