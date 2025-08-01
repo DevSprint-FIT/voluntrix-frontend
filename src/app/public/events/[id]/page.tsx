@@ -4,7 +4,7 @@ import { use } from 'react';
 import { useEffect, useState } from 'react';
 import Event from '@/components/public/Event';
 import EventSkeleton from '@/components/UI/EventSkeleton';
-import Breadcrumb from '@/components/public/Breadcrumb';
+import Breadcrumb from '@/components/UI/Breadcrumb';
 import { fetchEventById } from '@/services/publicUserService';
 import { EventType } from '@/types/EventType';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { EventType } from '@/types/EventType';
 import { SponsorshipType } from '@/types/SponsorshipType';
 
-export const fetchFilteredEvents = async (
+export const fetchPublicFilteredEvents = async (
   params: Record<string, string>
 ): Promise<EventType[]> => {
   try {
@@ -20,7 +20,7 @@ export const fetchFilteredEvents = async (
   }
 };
 
-export const fetchSearchedEvents = async (
+export const fetchPublicSearchedEvents = async (
   searchText: string
 ): Promise<EventType[]> => {
   try {
@@ -38,7 +38,7 @@ export const fetchSearchedEvents = async (
   }
 };
 
-export const fetchEventTitles = async () => {
+export const fetchPublicEventTitles = async () => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/events/names`

@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import FilterTag from './FilterTag';
+import { fetchPublicEventTitles } from '@/services/publicUserService';
 import { fetchEventTitles } from '@/services/eventService';
+import authService from '@/services/authService';
 
 type Filters = {
   startDate: string;
@@ -87,7 +89,14 @@ export default function Searchbar({ filters, setSearchText }: SearchbarProps) {
   useEffect(() => {
     const getEventTitles = async () => {
       try {
-        const eventTitles = await fetchEventTitles();
+        let eventTitles;
+
+        if (authService.isAuthenticated()) {
+          eventTitles = await fetchEventTitles();
+        } else {
+          eventTitles = await fetchPublicEventTitles();
+        }
+        
         const titles = eventTitles
           .map((event: { eventTitle: string }) => event.eventTitle)
           .filter((title: string) => title);
