@@ -2,29 +2,16 @@
 
 import { Button, Progress, useDisclosure } from '@heroui/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import { EventType } from '@/types/EventType';
-import VolunteerApplication from '@/components/UI/VolunteerApplication';
-import SponsorshipsModal from '@/components/UI/SponsorshipsModal';
 import DonationModal from '@/components/UI/DonationModal';
-import { fetchVolunteer } from '@/services/volunteerApplicationService';
-import { SponsorshipType } from '@/types/SponsorshipType';
 
 export default function Event({
   event,
   sponsorshipNames,
-  sponsorships,
 }: {
   event: EventType;
   sponsorshipNames: string[];
-  sponsorships: SponsorshipType[];
 }) {
-  const [isEligibleToApply, setIsEligibleToApply] = useState<boolean>(false);
-
-  // const handleSave = () => {
-  //   setIsSaved((prevState) => !prevState);
-  // };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -46,68 +33,10 @@ export default function Event({
   };
 
   const {
-    isOpen: isFormOpen,
-    onOpen: openFormModal,
-    onOpenChange: onFormChange,
-  } = useDisclosure();
-
-  const {
-    isOpen: isSponsorModalOpen,
-    onOpen: openSponsorModal,
-    onOpenChange: onSponsorModalChange,
-  } = useDisclosure();
-
-    const {
     isOpen: isDonationModalOpen,
     onOpen: openDonationModal,
     onOpenChange: onDonationModalChange,
   } = useDisclosure();
-
-  useEffect(() => {
-    const checkEligibility = async () => {
-      console.log('🔍 Checking eligibility...');
-      console.log('Event visibility:', event.eventVisibility);
-      console.log('Organization ID:', event.organizationId);
-
-      if (event.eventVisibility === 'PUBLIC') {
-        console.log('Public event — eligible by default.');
-        setIsEligibleToApply(true);
-        return;
-      }
-
-      if (!event.organizationId) {
-        console.warn(
-          'Organization ID is missing. Cannot determine eligibility.'
-        );
-        return;
-      }
-
-      try {
-        const vol = await fetchVolunteer();
-
-        console.log('Fetched volunteer:', vol);
-
-        const orgInstitute = event.institute?.trim().toLowerCase();
-        const volInstitute = vol?.institute?.trim().toLowerCase();
-
-        console.log('Organization institute:', orgInstitute);
-        console.log('Volunteer institute:', volInstitute);
-
-        if (orgInstitute && volInstitute && orgInstitute === volInstitute) {
-          console.log('Institutes match. Volunteer is eligible.');
-          setIsEligibleToApply(true);
-        } else {
-          console.warn('Institutes do not match. Volunteer is not eligible.');
-          setIsEligibleToApply(false);
-        }
-      } catch (error) {
-        console.error('Error during eligibility check:', error);
-        setIsEligibleToApply(false);
-      }
-    };
-
-    checkEligibility();
-  }, [event.eventVisibility, event.organizationId, event.institute]);
 
   return (
     <div className="w-full flex items-start justify-center mb-[88px]">
@@ -214,21 +143,12 @@ export default function Event({
                   </div>
                 );
               })()}
-              {isEligibleToApply && (
-                <Button
-                  onPress={openFormModal}
-                  variant="shadow"
-                  className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-                >
-                  Volunteer Now
-                </Button>
-              )}
-              <VolunteerApplication
-                isFormOpen={isFormOpen}
-                onFormChange={onFormChange}
-                eventId={event.eventId}
-                isEligibleToApply={isEligibleToApply}
-              />
+              <Button
+                variant="shadow"
+                className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
+              >
+                Volunteer Now
+              </Button>
             </div>
           </div>
         </div>
@@ -259,11 +179,7 @@ export default function Event({
                 variant="ghost"
                 color="default"
                 className="w-[272px] h-[79px] flex items-center justify-center gap-3 rounded-[20px] border border-shark-600 bg-white"
-                onPress={() => {
-                  if (event.sponsorshipProposalUrl) {
-                    window.open(event.sponsorshipProposalUrl, '_blank');
-                  }
-                }}
+                // onPress={() => {}} // want to open login modal
               >
                 <Image
                   src={'/icons/document.svg'}
@@ -280,17 +196,9 @@ export default function Event({
               <Button
                 variant="shadow"
                 className="w-[160px] bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
-                onPress={openSponsorModal}
               >
                 Sponsor Now
               </Button>
-              {isSponsorModalOpen && (
-                <SponsorshipsModal
-                  isOpen={isSponsorModalOpen}
-                  sponsorships={sponsorships}
-                  onFormChange={onSponsorModalChange}
-                />
-              )}
             </div>
           )}
           {event.donationEnabled &&
