@@ -85,7 +85,7 @@ const VolunteerSidebar = () => {
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       {/* Logo */}
       <div>
-        <div className="mb-8 flex justify-center">
+        <div className="mb-10 mt-6 flex justify-center">
           <img
             src="/images/logo.svg"
             alt="Logo"
