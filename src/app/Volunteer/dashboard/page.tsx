@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Crown, BarChart3, DollarSign, Eye } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Crown, BarChart3, DollarSign, Eye } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -9,15 +9,16 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
-} from "recharts";
+} from 'recharts';
 import {
   volunteerDashboardService,
   DashboardData,
   ContributionData,
-} from "@/services/volunteerDashboardService";
-import { useRouter } from "next/navigation";
-import authService from "@/services/authService";
-import ProfileIndicator from "@/components/UI/ProfileIndicator";
+} from '@/services/volunteerDashboardService';
+import { useRouter } from 'next/navigation';
+import authService from '@/services/authService';
+import ProfileIndicator from '@/components/UI/ProfileIndicator';
+import { User } from '@/services/authService';
 
 interface User {
   userId: number;
@@ -36,8 +37,8 @@ const StatCard = ({
   title,
   value,
   icon: Icon,
-  color = "text-gray-600",
-  bgColor = "bg-gray-50",
+  color = 'text-gray-600',
+  bgColor = 'bg-gray-50',
 }: {
   title: string;
   value: string;
@@ -64,28 +65,28 @@ const StatCard = ({
 
 const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Create a grid of weeks for the year 2025 (Jan to Dec)
   const weeks = [];
   let currentWeek = [];
 
   // Start from January 1, 2025
-  const startDate = new Date("2025-01-01");
-  const endDate = new Date("2025-12-31");
+  const startDate = new Date('2025-01-01');
+  const endDate = new Date('2025-12-31');
 
   const currentDate = new Date(startDate);
 
@@ -96,7 +97,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
   }
 
   while (currentDate <= endDate) {
-    const dateString = currentDate.toISOString().split("T")[0];
+    const dateString = currentDate.toISOString().split('T')[0];
     const dayData = data.find((d) => d.date === dateString);
     const contributions = dayData ? dayData.contributions : 0;
 
@@ -126,7 +127,7 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 font-secondary">
-          {volunteerDashboardService.calculateTotalContributions(data)}{" "}
+          {volunteerDashboardService.calculateTotalContributions(data)}{' '}
           Contributions in This Year
         </h3>
       </div>
@@ -176,12 +177,12 @@ const ContributionGrid = ({ data }: { data: ContributionData[] }) => {
                         ? volunteerDashboardService.getContributionIntensity(
                             day.contributions
                           )
-                        : "bg-transparent"
+                        : 'bg-transparent'
                     }`}
                     title={
                       day
                         ? `${day.contributions} contributions on ${day.date}`
-                        : ""
+                        : ''
                     }
                   />
                 ))}
@@ -215,7 +216,7 @@ const VolunteerDashboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState('2025');
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
@@ -227,20 +228,20 @@ const VolunteerDashboard = () => {
     const checkAuthAndLoadData = async () => {
       try {
         if (!authService.isAuthenticated()) {
-          router.replace("/auth/login");
+          router.replace('/auth/login');
           return;
         }
 
         const currentUser = await authService.getCurrentUser();
         if (!currentUser) {
-          router.replace("/auth/login");
+          router.replace('/auth/login');
           return;
         }
 
         // Check if profile is completed
         if (!currentUser.profileCompleted) {
           console.log(currentUser);
-          router.replace("/auth/profile-form?type=volunteer");
+          router.replace('/auth/profile-form?type=volunteer');
           return;
         }
 
@@ -249,8 +250,8 @@ const VolunteerDashboard = () => {
         // Fetch dashboard data after authentication is confirmed
         await fetchDashboardData();
       } catch (error) {
-        console.error("Auth check error:", error);
-        router.replace("/auth/signup");
+        console.error('Auth check error:', error);
+        router.replace('/auth/signup');
       } finally {
         setIsLoading(false);
       }
@@ -274,7 +275,7 @@ const VolunteerDashboard = () => {
       );
       setTotalContributionsFromChart(chartTotal);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -407,21 +408,21 @@ const VolunteerDashboard = () => {
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 12, fill: "#6B7280" }}
+                    tick={{ fontSize: 12, fill: '#6B7280' }}
                   />
                   <YAxis hide />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#10B981",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
+                      backgroundColor: '#10B981',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: 'white',
                     }}
                     labelStyle={{
-                      color: "white",
+                      color: 'white',
                     }}
                     itemStyle={{
-                      color: "white",
+                      color: 'white',
                     }}
                   />
                   <Line
@@ -429,11 +430,11 @@ const VolunteerDashboard = () => {
                     dataKey="contributions"
                     stroke="#10B981"
                     strokeWidth={3}
-                    dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
+                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
                     activeDot={{
                       r: 6,
-                      fill: "white",
-                      stroke: "#10B981",
+                      fill: 'white',
+                      stroke: '#10B981',
                       strokeWidth: 2,
                     }}
                   />

@@ -31,14 +31,14 @@ export interface BackendTaskDTO {
 export interface ToDoTask {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   dueDate: string;
 }
 
 export interface TaskInReview {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   taskSubmittedDate: string;
   resourceUrl: string;
 }
@@ -46,7 +46,7 @@ export interface TaskInReview {
 export interface CompletedTask {
   taskId: string;
   description: string;
-  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
   taskRewardPoints: number;
   resourceUrl: string;
 }
@@ -55,7 +55,7 @@ export interface CompletedTask {
 export interface TaskUpdateDTO {
   description?: string;
   dueDate?: string;
-  taskStatus?: "TO_DO" | "IN_PROGRESS" | "DONE";
+  taskStatus?: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
   resourceUrl?: string;
   taskSubmittedDate?: string;
   assigneeId?: number;
@@ -94,7 +94,7 @@ export const WorkspaceTaskService = {
       description: backendTask.description,
       taskDifficulty: backendTask.taskDifficulty,
       taskSubmittedDate: this.formatDate(backendTask.taskSubmittedDate),
-      resourceUrl: backendTask.resourceUrl || "",
+      resourceUrl: backendTask.resourceUrl || '',
     };
   },
 
@@ -104,7 +104,7 @@ export const WorkspaceTaskService = {
       description: backendTask.description,
       taskDifficulty: backendTask.taskDifficulty,
       taskRewardPoints: backendTask.taskRewardPoints,
-      resourceUrl: backendTask.resourceUrl || "",
+      resourceUrl: backendTask.resourceUrl || '',
     };
   },
 
@@ -204,6 +204,7 @@ export const WorkspaceTaskService = {
     } catch (error) {
       console.error("Error fetching DONE tasks:", error);
       throw error;
+
     }
   },
 
@@ -214,16 +215,16 @@ export const WorkspaceTaskService = {
       const now = new Date();
       const currentDateTime = `${now.getFullYear()}-${(now.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}T${now
+        .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}T${now
         .getHours()
         .toString()
-        .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
+        .padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now
         .getSeconds()
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, '0')}`;
 
       const updateData: TaskUpdateDTO = {
-        taskStatus: "IN_PROGRESS",
+        taskStatus: 'IN_PROGRESS',
         resourceUrl: resourceUrl,
         taskSubmittedDate: currentDateTime,
       };

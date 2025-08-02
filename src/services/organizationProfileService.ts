@@ -1,12 +1,7 @@
 import authService from "./authService";
 
 export async function getOrganizationByToken() {
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-
-  if (!token) {
-    throw new Error("Authentication token not found. Please check your environment variables.");
-  }
 
   try {
     const response = await fetch(`${baseUrl}/api/organizations/me`, {

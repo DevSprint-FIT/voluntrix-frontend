@@ -28,6 +28,9 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
     onYearChange?.(year);
   };
 
+   // Calculate total followers for the year by summing all monthly counts
+  const totalFollowersForYear = data.reduce((sum, item) => sum + item.count, 0);
+
   const currentCount = data[data.length - 1]?.count || 0;
   const previousCount = data[data.length - 2]?.count || 0;
   const percentageChange = previousCount > 0 
@@ -94,7 +97,7 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
           </div>
 
           <div className="text-xl pl-4 font-bold text-gray-900 mb-1">
-            {currentCount.toLocaleString()}
+            {totalFollowersForYear.toLocaleString()}
           </div>
           <div className="text-sm text-gray-500 mb-3 pl-4">
             Total Followers

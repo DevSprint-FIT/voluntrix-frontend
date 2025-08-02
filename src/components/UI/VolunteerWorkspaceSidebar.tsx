@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -38,7 +37,12 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       href: `/VolunteerWorkspace/${eventId}/leaderboard`,
     },
     {
-      name: "Notifications",
+      name: 'Leaderboard',
+      icon: Trophy,
+      href: `/VolunteerWorkspace/${eventId}/leaderboard`,
+    },
+    {
+      name: 'Notifications',
       icon: Bell,
       badge: notificationCount,
       href: `/VolunteerWorkspace/${eventId}/notifications`,
@@ -76,17 +80,17 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
               const isActive = selectedItem === item.name;
 
               return (
-                <Link key={item.name} href={item.href || "#"}>
+                <Link key={item.name} href={item.href || '#'}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? "text-verdant-700 font-semibold" : ""
+                      isActive ? 'text-verdant-700 font-semibold' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <item.icon
                         className={`h-5 w-5 ${
-                          isActive ? "text-verdant-700" : ""
+                          isActive ? 'text-verdant-700' : ''
                         }`}
                       />
                       <span className="font-secondary font-medium text-shark-950">
@@ -94,7 +98,7 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
                       </span>
                     </div>
 
-                    {typeof item.badge === "number" && item.badge > 0 && (
+                    {typeof item.badge === 'number' && item.badge > 0 && (
                       <span className="text-xs bg-verdant-100 text-shark-950 px-1.5 rounded-md">
                         {item.badge}
                       </span>

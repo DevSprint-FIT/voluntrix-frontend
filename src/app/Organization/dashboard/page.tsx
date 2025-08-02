@@ -11,6 +11,9 @@ import FollowersPieChart from "@/components/UI/FollowersPieChart";
 import DonationsChart from "@/components/UI/DonationChart";
 import FollowersChart from "@/components/UI/FollowersChart";
 import CustomNavigation from "@/components/UI/CustomNavigation"; 
+import { useRouter } from "next/navigation";
+import { User } from "@/services/authService";
+import authService from "@/services/authService";
 
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
@@ -53,6 +56,44 @@ export default function DashboardPage() {
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  
+  useEffect(() => {
+    const checkAuthAndLoadData = async () => {
+      try {
+        if (!authService.isAuthenticated()) {
+          router.replace('/auth/login');
+          return;
+        }
+
+        const currentUser = await authService.getCurrentUser();
+        console.log("Current user on organization:", currentUser);
+        if (!currentUser) {
+          router.replace('/auth/login');
+          return;
+        }
+
+        // Check if profile is completed
+        if (!currentUser.profileCompleted) {
+          console.log(currentUser);
+          router.replace('/auth/profile-form?type=organization');
+          return;
+        }
+
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.replace('/auth/signup');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthAndLoadData();
+  }, [router]);
 
   const onChangeHandler = (
     value: Date | [Date | null, Date | null] | null,
@@ -131,12 +172,12 @@ export default function DashboardPage() {
             { month: 'JUN', amount: 4800, label: 'Jun' },
           ],
           2025: [
-            { month: 'SEP', amount: 3200, label: 'Sep' },
-            { month: 'OCT', amount: 2800, label: 'Oct' },
-            { month: 'NOV', amount: 5000, label: 'Nov' },
-            { month: 'DEC', amount: 2400, label: 'Dec' },
-            { month: 'JAN', amount: 4800, label: 'Jan' },
-            { month: 'FEB', amount: 4600, label: 'Feb' },
+            { month: 'MAR', amount: 3200, label: 'MAR' },
+            { month: 'APR', amount: 2800, label: 'APR' },
+            { month: 'MAY', amount: 5000, label: 'MAY' },
+            { month: 'JUN', amount: 2400, label: 'JUN' },
+            { month: 'JUL', amount: 4800, label: 'JUL' },
+            { month: 'AUG', amount: 4600, label: 'AUG' },
           ],
         };
         

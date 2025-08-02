@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import VolunteerWorkspaceSidebar from "@/components/UI/VolunteerWorkspaceSidebar";
 import EventHeader from "@/components/UI/EventHeader";
@@ -12,6 +12,7 @@ export default function VolunteerWorkspaceLayout({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = React.use(params);
+
 
   return (
     <div className="flex">

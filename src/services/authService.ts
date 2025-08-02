@@ -1,6 +1,6 @@
 import { AxiosHeaders } from 'axios';
 
-interface User {
+export interface User {
   userId: number;
   email: string;
   fullName: string;
@@ -273,18 +273,13 @@ class AuthService {
         this.setToken(result.data.token);
         this.setRefreshToken(result.data.refreshToken);
         // Create user object from response
-        const user: User = {
-          userId: result.data.userId,
-          email: result.data.email,
-          fullName: result.data.fullName,
-          handle: result.data.handle,
-          role: result.data.role,
-          emailVerified: result.data.emailVerified,
-          profileCompleted: result.data.profileCompleted,
-          authProvider: result.data.authProvider,
-          createdAt: result.data.createdAt,
-          lastLogin: result.data.lastLogin,
-        };
+
+        const user = await this.getCurrentUser();
+
+        if (!user) {
+          return { success: false, message: "Failed to fetch user data" };
+        }
+      
         this.user = user;
         console.log("User logged in:", this.user);
 
@@ -379,15 +374,7 @@ class AuthService {
   async updateProfileStatus(profileCompleted: boolean): Promise<void> {
     try {
       if (this.user) {
-        // Update local user state
         this.user.profileCompleted = profileCompleted;
-
-        // Optionally, you can also call backend to update the status
-        // await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/profile-status`, {
-        //   method: "PUT",
-        //   headers: this.getAuthHeaders(),
-        //   body: JSON.stringify({ profileCompleted: profileCompleted }),
-        // });
       }
     } catch (error) {
       console.error("Error updating profile status:", error);

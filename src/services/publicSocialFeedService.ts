@@ -137,6 +137,7 @@ export async function getAllOrganizations(): Promise<any[]> {
       imageUrl: org.imageUrl,
       isVerified: org.isVerified,
       institute: org.institute,
+      followerCount: org.followerCount || 0,
     }));
   } catch (error) {
     console.error("Error fetching organizations:", error);
