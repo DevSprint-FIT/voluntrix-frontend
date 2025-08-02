@@ -1,4 +1,5 @@
 // Service for workspace task data with backend integration
+import authService from "@/services/authService";
 
 export interface TaskStats {
   totalTasksDue: number;
@@ -13,9 +14,9 @@ export interface BackendTaskDTO {
   createdDate: string;
   updatedDate: string;
   dueDate: string | null;
-  taskStatus: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
-  taskDifficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXTREME';
-  taskCategory: 'DESIGN' | 'EDITORIAL' | 'LOGISTICS' | 'PROGRAMMING';
+  taskStatus: "TO_DO" | "IN_PROGRESS" | "DONE";
+  taskDifficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+  taskCategory: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   resourceUrl: string | null;
   taskSubmittedDate: string | null;
   assigneeId: number;
@@ -62,34 +63,32 @@ export interface TaskUpdateDTO {
   taskReviewedDate?: string;
 }
 
-export class WorkspaceTaskService {
-  private static readonly BASE_URL = 'http://localhost:8080/api/public/tasks';
-  private static readonly VOLUNTEER_ID = 1; // Hardcoded for now
-  private static readonly EVENT_ID = 1; // Hardcoded for now
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
 
+export const WorkspaceTaskService = {
   // Helper method to format date
-  private static formatDate(dateString: string | null): string {
-    if (!dateString) return 'No date';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+  formatDate(dateString: string | null): string {
+    if (!dateString) return "No date";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
-  }
+  },
 
   // Helper method to convert backend task to frontend task
-  private static convertToToDoTask(backendTask: BackendTaskDTO): ToDoTask {
+  convertToToDoTask(backendTask: BackendTaskDTO): ToDoTask {
     return {
       taskId: backendTask.taskId.toString(),
       description: backendTask.description,
       taskDifficulty: backendTask.taskDifficulty,
       dueDate: this.formatDate(backendTask.dueDate),
     };
-  }
+  },
 
-  private static convertToTaskInReview(
-    backendTask: BackendTaskDTO
-  ): TaskInReview {
+  convertToTaskInReview(backendTask: BackendTaskDTO): TaskInReview {
     return {
       taskId: backendTask.taskId.toString(),
       description: backendTask.description,
@@ -97,11 +96,9 @@ export class WorkspaceTaskService {
       taskSubmittedDate: this.formatDate(backendTask.taskSubmittedDate),
       resourceUrl: backendTask.resourceUrl || '',
     };
-  }
+  },
 
-  private static convertToCompletedTask(
-    backendTask: BackendTaskDTO
-  ): CompletedTask {
+  convertToCompletedTask(backendTask: BackendTaskDTO): CompletedTask {
     return {
       taskId: backendTask.taskId.toString(),
       description: backendTask.description,
@@ -109,17 +106,21 @@ export class WorkspaceTaskService {
       taskRewardPoints: backendTask.taskRewardPoints,
       resourceUrl: backendTask.resourceUrl || '',
     };
-  }
+  },
 
   // Get task stats from backend
-  static async getTaskStats(): Promise<TaskStats> {
+  async getTaskStats(eventId: number): Promise<TaskStats> {
     try {
       const response = await fetch(
-        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}/status-count`
+        `${getBaseUrl()}/api/tasks/assignee/event/${eventId}/status-count`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch task stats: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -130,78 +131,85 @@ export class WorkspaceTaskService {
         totalTasksCompleted: data.DONE || 0,
       };
     } catch (error) {
-      console.error('Error fetching task stats:', error);
-      // Return default values on error
-      return {
-        totalTasksDue: 0,
-        totalTasksPendingReview: 0,
-        totalTasksCompleted: 0,
-      };
+      console.error("Error fetching task stats:", error);
+      throw error;
     }
-  }
+  },
 
   // Get TO_DO tasks from backend
-  static async getToDoTasks(): Promise<ToDoTask[]> {
+  async getToDoTasks(eventId: number): Promise<ToDoTask[]> {
     try {
       const response = await fetch(
-        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=TO_DO`
+        `${getBaseUrl()}/api/tasks/assignee/event/${eventId}?taskStatus=TO_DO`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch TO_DO tasks: ${response.statusText}`);
       }
 
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToToDoTask(task));
     } catch (error) {
-      console.error('Error fetching TO_DO tasks:', error);
-      return [];
+      console.error("Error fetching TO_DO tasks:", error);
+      throw error;
     }
-  }
+  },
 
   // Get IN_PROGRESS tasks from backend
-  static async getTasksInReview(): Promise<TaskInReview[]> {
+  async getTasksInReview(eventId: number): Promise<TaskInReview[]> {
     try {
       const response = await fetch(
-        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=IN_PROGRESS`
+        `${getBaseUrl()}/api/tasks/assignee/event/${eventId}?taskStatus=IN_PROGRESS`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `Failed to fetch IN_PROGRESS tasks: ${response.statusText}`
+        );
       }
 
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToTaskInReview(task));
     } catch (error) {
-      console.error('Error fetching IN_PROGRESS tasks:', error);
-      return [];
+      console.error("Error fetching IN_PROGRESS tasks:", error);
+      throw error;
     }
-  }
+  },
 
   // Get DONE tasks from backend
-  static async getCompletedTasks(): Promise<CompletedTask[]> {
+  async getCompletedTasks(eventId: number): Promise<CompletedTask[]> {
     try {
       const response = await fetch(
-        `${this.BASE_URL}/assignee/${this.VOLUNTEER_ID}/event/${this.EVENT_ID}?taskStatus=DONE`
+        `${getBaseUrl()}/api/tasks/assignee/event/${eventId}?taskStatus=DONE`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch DONE tasks: ${response.statusText}`);
       }
 
       const data: BackendTaskDTO[] = await response.json();
       return data.map((task) => this.convertToCompletedTask(task));
     } catch (error) {
-      console.error('Error fetching DONE tasks:', error);
-      return [];
+      console.error("Error fetching DONE tasks:", error);
+      throw error;
+
     }
-  }
+  },
 
   // Submit a task with resource URL and change status to IN_PROGRESS
-  static async submitTask(
-    taskId: string,
-    resourceUrl: string
-  ): Promise<boolean> {
+  async submitTask(taskId: string, resourceUrl: string): Promise<boolean> {
     try {
       // Use local time for taskSubmittedDate
       const now = new Date();
@@ -221,16 +229,14 @@ export class WorkspaceTaskService {
         taskSubmittedDate: currentDateTime,
       };
 
-      const response = await fetch(`${this.BASE_URL}/${taskId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await fetch(`${getBaseUrl()}/api/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: authService.getAuthHeaders(),
         body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to submit task: ${response.statusText}`);
       }
 
       console.log(
@@ -241,8 +247,8 @@ export class WorkspaceTaskService {
 
       return true;
     } catch (error) {
-      console.error('Error submitting task:', error);
-      return false;
+      console.error("Error submitting task:", error);
+      throw error;
     }
-  }
-}
+  },
+};
