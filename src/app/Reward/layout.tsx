@@ -23,7 +23,7 @@ export default function RewardLayout({ children }: { children: React.ReactNode }
   return (
     <div className="mt-2 p-4">
       {/* Back Button Header */}
-      <div className="mb-6">
+      <div className="mb-4">
         <button
           onClick={handleBackClick}
           className="flex items-center gap-2 px-4  text-shark-600 hover:text-shark-800 hover:bg-shark-50 rounded-lg transition-colors"
