@@ -157,14 +157,17 @@ export default function EventCreation() {
       ? (rawCategories as { categoryId: number }[])
       : (Object.values(rawCategories) as { categoryId: number }[]);
 
-    let eventTime = eventData.eventTime;
+    let eventTime = eventData.eventTime ?? null;
     if (eventTime && eventTime.length === 5) {
       eventTime += ':00';
     }
 
+    const eventEndDate = eventData.eventEndDate ?? null;
+
     const payload = {
       ...eventData,
       eventTime,
+      eventEndDate,
       eventStatus: selectedOrg ? 'PENDING' : 'ACTIVE',
       organizationId: selectedOrg?.id ?? null,
       categories: categoryArray.map((cat) => ({

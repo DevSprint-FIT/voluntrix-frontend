@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import {
   VolunteerEventCounts,
   getVolunteerEventCounts,
 } from "@/services/volunteerEventStatsService";
+import authService from "@/services/authService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
 
 const tabs = [
   { name: "Active Events", href: "/Volunteer/events/active" },
@@ -21,35 +23,83 @@ export default function EventsLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [counts, setCounts] = useState<VolunteerEventCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const volunteerId = 1; // Replace with actual volunteer ID
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const getCounts = async () => {
+    const checkAuthAndFetchCounts = async () => {
       try {
-        const data = await getVolunteerEventCounts(volunteerId);
+        if (!authService.isAuthenticated()) {
+          router.replace("/auth/login");
+          return;
+        }
+
+        const currentUser = await authService.getCurrentUser();
+        if (!currentUser) {
+          router.replace("/auth/login");
+          return;
+        }
+
+        // Check if profile is completed
+        if (!currentUser.profileCompleted) {
+          router.replace("/auth/profile-form?type=volunteer");
+          return;
+        }
+
+        setIsAuthenticated(true);
+
+        // Fetch event counts
+        const data = await getVolunteerEventCounts();
         setCounts(data);
       } catch (error) {
         console.error("Failed to fetch event counts:", error);
+        // If authentication fails, redirect to login
+        if (error instanceof Error && error.message.includes("401")) {
+          router.replace("/auth/login");
+          return;
+        }
       } finally {
         setLoadingCounts(false);
       }
     };
 
-    getCounts();
-  }, [volunteerId]);
+    checkAuthAndFetchCounts();
+  }, [router]);
 
   const handlePageClick = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
+  // Show loading while checking authentication
+  if (!isAuthenticated && loadingCounts) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-secondary">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="p-4">
       {/* Title */}
-      <span className="text-shark-300">Volunteer / Events</span>
-      <h1 className="text-2xl font-primary font-bold mb-4">Events</h1>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <span className="text-shark-300">Volunteer / Events</span>
+          <h1 className="text-2xl font-primary font-bold">Events</h1>
+        </div>
+        <ProfileIndicator />
+      </div>
 
       {/* Event Status Cards */}
       <div className="flex gap-8 mb-8 justify-start">

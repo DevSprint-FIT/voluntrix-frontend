@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
 
 // Modal Component
 const NotificationModal = ({
@@ -227,10 +228,13 @@ const SettingsPage = () => {
   if (loading) {
     return (
       <div className="p-5 h-screen">
-        <span className="text-shark-300">Volunteer / Settings</span>
-        <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">
-          Settings
-        </h1>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <span className="text-shark-300">Volunteer / Settings</span>
+            <h1 className="font-secondary font-bold text-2xl mt-2">Settings</h1>
+          </div>
+          <ProfileIndicator />
+        </div>
         <div className="flex items-center justify-center h-full -mt-20">
           <div className="flex flex-col items-center space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-700"></div>
@@ -244,10 +248,13 @@ const SettingsPage = () => {
   if (error || !volunteer) {
     return (
       <div className="p-5">
-        <span className="text-shark-300">Volunteer / Settings</span>
-        <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">
-          Settings
-        </h1>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <span className="text-shark-300">Volunteer / Settings</span>
+            <h1 className="font-secondary font-bold text-2xl mt-2">Settings</h1>
+          </div>
+          <ProfileIndicator />
+        </div>
         <div className="text-center py-12">
           <p className="text-red-500 mb-4">
             {error || "Volunteer settings not found"}
@@ -265,8 +272,13 @@ const SettingsPage = () => {
 
   return (
     <div className="p-5">
-      <span className="text-shark-300">Volunteer / Settings</span>
-      <h1 className="font-secondary font-bold mb-6 text-2xl mt-2">Settings</h1>
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <span className="text-shark-300">Volunteer / Settings</span>
+          <h1 className="font-secondary font-bold text-2xl mt-2">Settings</h1>
+        </div>
+        <ProfileIndicator />
+      </div>
 
       {/* Email Section */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">

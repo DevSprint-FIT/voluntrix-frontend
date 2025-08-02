@@ -5,8 +5,10 @@ import EventCard from '@/components/UI/EventCard';
 import Image from 'next/image';
 import { EventType } from '@/types/EventType';
 import { fetchRecommendedEvents } from '@/services/eventService';
+import { fetchAllEvents } from '@/services/publicUserService';
 import EventCardSkeleton from '@/components/UI/EventCardSkeleton';
 import EventErrorDisplay from '@/components/UI/EventErrorDisplay';
+import authService from '@/services/authService';
 
 interface EventSectionProps {
   title: string;
@@ -24,7 +26,14 @@ export default function EventSection({ title, subTitle }: EventSectionProps) {
   useEffect(() => {
     const getRecommendedEvents = async () => {
       try {
-        const eventsData = await fetchRecommendedEvents();
+        let eventsData;
+
+        if (!authService.isAuthenticated()) {
+          eventsData = await fetchAllEvents();
+        } else {
+          eventsData = await fetchRecommendedEvents();
+        }
+
         setEvents(eventsData);
         setError(null);
       } catch (err) {

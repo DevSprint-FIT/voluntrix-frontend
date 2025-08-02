@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import {
   ClipboardList,
   Clock,
@@ -52,9 +52,13 @@ interface CompletedTask {
   resourceUrl: string;
 }
 
-const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const resolvedParams = React.use(params);
-  // Event ID - using 1 for now as specified
+const EventHostTasksPage = ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  // Unwrap the params Promise using React.use()
+  const resolvedParams = use(params);
   const eventId = Number(resolvedParams.id);
 
   // Modal states
@@ -82,75 +86,100 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
   const [tasksToBeCompleted, setTasksToBeCompleted] = useState<TaskDTO[]>([]);
   const [completedTasks, setCompletedTasks] = useState<TaskDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [tablesLoading, setTablesLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Load initial data
   useEffect(() => {
-    loadAllTaskData();
-  }, []);
+    const fetchTaskStats = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const stats = await hostWorkspaceTaskService.getTaskStatusCounts(
+          eventId
+        );
+        setTaskStats(stats);
+      } catch (error) {
+        console.error("Error fetching task stats:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Error fetching task statistics."
+        );
+        showResultModal(
+          "error",
+          "Loading Error",
+          "Failed to load task statistics. Please refresh the page."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchTableData = async () => {
+      try {
+        setTablesLoading(true);
+        setError(null);
+        const [pendingReview, toBeCompleted, completed] = await Promise.all([
+          hostWorkspaceTaskService.getTasksByEventAndStatus(
+            eventId,
+            "IN_PROGRESS"
+          ),
+          hostWorkspaceTaskService.getTasksByEventAndStatus(eventId, "TO_DO"),
+          hostWorkspaceTaskService.getTasksByEventAndStatus(eventId, "DONE"),
+        ]);
+        setTasksPendingReview(pendingReview);
+        setTasksToBeCompleted(toBeCompleted);
+        setCompletedTasks(completed);
+      } catch (error) {
+        console.error("Error fetching table data:", error);
+        setError(
+          error instanceof Error ? error.message : "Error fetching task data."
+        );
+        showResultModal(
+          "error",
+          "Loading Error",
+          "Failed to load task data. Please refresh the page."
+        );
+      } finally {
+        setTablesLoading(false);
+      }
+    };
+
+    fetchTaskStats();
+    fetchTableData();
+  }, [eventId]);
 
   const loadAllTaskData = async () => {
-    setIsLoading(true);
     try {
-      await Promise.all([
-        loadTaskStats(),
-        loadTasksPendingReview(),
-        loadTasksToBeCompleted(),
-        loadCompletedTasks(),
-      ]);
+      setTablesLoading(true);
+      setError(null);
+      const [stats, pendingReview, toBeCompleted, completed] =
+        await Promise.all([
+          hostWorkspaceTaskService.getTaskStatusCounts(eventId),
+          hostWorkspaceTaskService.getTasksByEventAndStatus(
+            eventId,
+            "IN_PROGRESS"
+          ),
+          hostWorkspaceTaskService.getTasksByEventAndStatus(eventId, "TO_DO"),
+          hostWorkspaceTaskService.getTasksByEventAndStatus(eventId, "DONE"),
+        ]);
+      setTaskStats(stats);
+      setTasksPendingReview(pendingReview);
+      setTasksToBeCompleted(toBeCompleted);
+      setCompletedTasks(completed);
     } catch (error) {
       console.error("Error loading task data:", error);
+      setError(
+        error instanceof Error ? error.message : "Error loading task data."
+      );
       showResultModal(
         "error",
         "Loading Error",
         "Failed to load task data. Please refresh the page."
       );
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadTaskStats = async () => {
-    try {
-      const stats = await hostWorkspaceTaskService.getTaskStatusCounts(eventId);
-      setTaskStats(stats);
-    } catch (error) {
-      console.error("Error loading task stats:", error);
-    }
-  };
-
-  const loadTasksPendingReview = async () => {
-    try {
-      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
-        eventId,
-        "IN_PROGRESS"
-      );
-      setTasksPendingReview(tasks);
-    } catch (error) {
-      console.error("Error loading tasks pending review:", error);
-    }
-  };
-
-  const loadTasksToBeCompleted = async () => {
-    try {
-      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
-        eventId,
-        "TO_DO"
-      );
-      setTasksToBeCompleted(tasks);
-    } catch (error) {
-      console.error("Error loading tasks to be completed:", error);
-    }
-  };
-
-  const loadCompletedTasks = async () => {
-    try {
-      const tasks = await hostWorkspaceTaskService.getTasksByEventAndStatus(
-        eventId,
-        "DONE"
-      );
-      setCompletedTasks(tasks);
-    } catch (error) {
-      console.error("Error loading completed tasks:", error);
+      setTablesLoading(false);
     }
   };
 
@@ -163,16 +192,28 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
     setIsResultModalOpen(true);
   };
 
+  // Format date to YYYY-MM-DD format (matching VolunteerWorkspace formatting)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    // Fix timezone offset issue to show the correct local date
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const TaskStatusCard = ({
     count,
     label,
     subtext,
     icon: Icon,
+    loading,
   }: {
-    count: number;
+    count?: number;
     label: string;
     subtext: string;
     icon: React.ElementType;
+    loading?: boolean;
   }) => {
     return (
       <div
@@ -188,7 +229,11 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
             {label}
           </h3>
           <div className="text-3xl font-bold text-verdant-600 min-h-[2.5rem]">
-            {count}
+            {!loading && count !== undefined ? (
+              count
+            ) : (
+              <span className="opacity-0">0</span>
+            )}
           </div>
           <p className="font-secondary text-sm text-shark-300">{subtext}</p>
         </div>
@@ -221,7 +266,7 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
         return "bg-verdant-200 text-verdant-900";
       case "LOGISTICS":
         return "bg-shark-100 text-shark-800";
-      case "PROGRAMMING":
+      case "PROGRAM":
         return "bg-shark-200 text-shark-900";
       default:
         return "bg-gray-100 text-gray-800";
@@ -583,18 +628,21 @@ const EventHostTasksPage = ({ params }: { params: Promise<{ id: string }> }) => 
             label="Total Tasks Pending Review"
             subtext="Tasks awaiting approval"
             icon={Eye}
+            loading={isLoading}
           />
           <TaskStatusCard
             count={taskStats.TO_DO}
             label="Total Tasks Due"
             subtext="Assigned pending tasks"
             icon={Clock}
+            loading={isLoading}
           />
           <TaskStatusCard
             count={taskStats.DONE}
             label="Total Tasks Completed"
             subtext="Successfully finished tasks"
             icon={CheckCircle}
+            loading={isLoading}
           />
         </div>
       </div>

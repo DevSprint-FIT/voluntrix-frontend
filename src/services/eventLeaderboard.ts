@@ -1,6 +1,7 @@
+import authService from "@/services/authService";
+
 export interface LeaderboardParticipant {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   eventRewardPoints: number;
   profilePictureUrl?: string;
 }
@@ -12,12 +13,7 @@ export interface EventDetails {
   eventLocation: string;
   eventStartDate: string;
   eventEndDate: string;
-  eventTime: {
-    hour: number;
-    minute: number;
-    second: number;
-    nano: number;
-  };
+  eventTime: string;
   eventImageUrl: string;
   volunteerCount: number;
   eventType: "ONLINE" | "ONSITE";
@@ -25,11 +21,13 @@ export interface EventDetails {
   eventStatus: "DRAFT" | "ACTIVE" | "COMPLETE" | "PENDING" | "DENIED";
   sponsorshipEnabled: boolean;
   donationEnabled: boolean;
+  sponsorshipProposalUrl?: string;
+  donationGoal: number;
+  donations: number;
   categories: Array<{
     categoryId: number;
     categoryName: string;
   }>;
-  eventHostId: number;
   organizationId: number;
   eventHostRewardPoints: number;
 }
@@ -43,7 +41,9 @@ export interface ProcessedLeaderboardEntry {
   isEventHost?: boolean;
 }
 
-const API_BASE_URL = "http://localhost:8080/api/public";
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+};
 
 export const eventLeaderboardService = {
   /**
@@ -54,7 +54,11 @@ export const eventLeaderboardService = {
   ): Promise<LeaderboardParticipant[]> {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/participations/event/${eventId}/leaderboard`
+        `${getBaseUrl()}/api/participations/event/${eventId}/leaderboard`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
       );
 
       if (!response.ok) {
@@ -73,7 +77,10 @@ export const eventLeaderboardService = {
    */
   async getEventDetails(eventId: number): Promise<EventDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
+      const response = await fetch(`${getBaseUrl()}/api/events/${eventId}`, {
+        method: "GET",
+        headers: authService.getAuthHeaders(),
+      });
 
       if (!response.ok) {
         throw new Error(
@@ -98,7 +105,7 @@ export const eventLeaderboardService = {
     const entries: ProcessedLeaderboardEntry[] = participants.map(
       (participant, index) => ({
         id: `volunteer-${index}`,
-        name: `${participant.firstName} ${participant.lastName}`,
+        name: participant.fullName,
         eventRewardPoints: participant.eventRewardPoints,
         profilePictureUrl: participant.profilePictureUrl,
         rank: 0, // Will be set based on points
