@@ -136,7 +136,7 @@ const TasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
     return (
       <div
         style={{ backgroundColor: "#FBFBFB" }}
-        className="rounded-xl p-6 min-w-[23rem] min-h-[8rem] flex-grow-0 flex-shrink-0 flex items-center gap-10"
+        className="rounded-xl p-6 min-w-0 w-full min-h-[8rem] flex items-center gap-4 md:gap-10"
       >
         <div className="bg-verdant-50 rounded-full p-3 flex-shrink-0">
           <Icon size={32} className="text-verdant-700" />
@@ -375,7 +375,7 @@ const TasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
@@ -414,7 +414,7 @@ const TasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
       {/* Task Stats Cards */}
       <div className="px-6 pt-0">
-        <div className="flex gap-8 mb-8 justify-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <TaskStatusCard
             count={taskStats.totalTasksDue}
             loading={isLoading}

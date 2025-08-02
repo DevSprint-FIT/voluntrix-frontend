@@ -145,7 +145,7 @@ const DocumentsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
@@ -160,10 +160,10 @@ const DocumentsPage = () => {
 
       {/* Document Statistics */}
       <div className="px-6 mb-8">
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             style={{ backgroundColor: "#FBFBFB" }}
-            className="rounded-xl p-6 min-w-[18rem] flex-grow-0 flex-shrink-0 flex items-center gap-6"
+            className="rounded-xl p-6 min-w-0 w-full flex items-center gap-4 md:gap-6"
           >
             <div className="bg-verdant-50 rounded-full p-3 flex-shrink-0">
               <FileText size={28} className="text-verdant-700" />
@@ -181,7 +181,7 @@ const DocumentsPage = () => {
 
           <div
             style={{ backgroundColor: "#FBFBFB" }}
-            className="rounded-xl p-6 min-w-[18rem] flex-grow-0 flex-shrink-0 flex items-center gap-6"
+            className="rounded-xl p-6 min-w-0 w-full flex items-center gap-4 md:gap-6"
           >
             <div className="bg-verdant-50 rounded-full p-3 flex-shrink-0">
               <Clock size={28} className="text-verdant-700" />
@@ -205,7 +205,7 @@ const DocumentsPage = () => {
 
           <div
             style={{ backgroundColor: "#FBFBFB" }}
-            className="rounded-xl p-6 min-w-[18rem] flex-grow-0 flex-shrink-0 flex items-center gap-6"
+            className="rounded-xl p-6 min-w-0 w-full flex items-center gap-4 md:gap-6"
           >
             <div className="bg-verdant-50 rounded-full p-3 flex-shrink-0">
               <Calendar size={28} className="text-verdant-700" />

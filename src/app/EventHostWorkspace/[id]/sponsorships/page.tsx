@@ -201,7 +201,7 @@ const SponsorshipsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
