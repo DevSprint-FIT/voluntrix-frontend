@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   BarChart,
   User,
@@ -19,8 +19,8 @@ import VolunteerToHostModal from "./VolunteerToHostModal";
 import {
   fetchVolunteer,
   VolunteerProfile,
-} from '@/services/volunteerProfileService';
-import { useRouter } from 'next/navigation';
+} from "@/services/volunteerProfileService";
+import { useRouter } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -31,7 +31,7 @@ interface MenuItem {
 
 const VolunteerSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
+  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [volunteer, setVolunteer] = useState<VolunteerProfile>();
   const pathname = usePathname();
@@ -50,24 +50,24 @@ const VolunteerSidebar = () => {
         const data = await fetchVolunteer();
         setVolunteer(data);
       } catch (error) {
-        console.error('Error fetching volunteer profile:', error);
+        console.error("Error fetching volunteer profile:", error);
       }
     };
     getVolunteerProfile();
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Dashboard', icon: BarChart, href: '/Volunteer/dashboard' },
-    { name: 'Profile', icon: User, href: '/Volunteer/profile' },
-    { name: 'Events', icon: Calendar, href: '/Volunteer/events/active' },
+    { name: "Dashboard", icon: BarChart, href: "/Volunteer/dashboard" },
+    { name: "Profile", icon: User, href: "/Volunteer/profile" },
+    { name: "Events", icon: Calendar, href: "/Volunteer/events/active" },
     {
-      name: 'Notifications',
+      name: "Notifications",
       icon: Bell,
       badge: notificationCount,
-      href: '/notifications',
+      href: "/notifications",
     },
-    { name: 'Social Feed', icon: Send, href: '/social-feed' },
-    { name: 'Settings', icon: Settings, href: '/Volunteer/settings' },
+    { name: "Social Feed", icon: Send, href: "/social-feed" },
+    { name: "Settings", icon: Settings, href: "/Volunteer/settings" },
   ];
 
   // Set active item based on current route
@@ -90,7 +90,7 @@ const VolunteerSidebar = () => {
             src="/images/logo.svg"
             alt="Logo"
             className="h-18 w-18 ml-[-10px]"
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
           />
         </div>
 
@@ -101,17 +101,17 @@ const VolunteerSidebar = () => {
               const isActive = selectedItem === item.name;
 
               return (
-                <Link key={item.name} href={item.href || '#'}>
+                <Link key={item.name} href={item.href || "#"}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? 'text-verdant-700 font-semibold' : ''
+                      isActive ? "text-verdant-700 font-semibold" : ""
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <item.icon
                         className={`h-5 w-5 ${
-                          isActive ? 'text-verdant-700' : ''
+                          isActive ? "text-verdant-700" : ""
                         }`}
                       />
                       <span className="font-secondary font-medium text-shark-950">
@@ -119,7 +119,7 @@ const VolunteerSidebar = () => {
                       </span>
                     </div>
 
-                    {typeof item.badge === 'number' && item.badge > 0 && (
+                    {typeof item.badge === "number" && item.badge > 0 && (
                       <span className="text-xs bg-verdant-100 text-shark-950 px-1.5 rounded-md">
                         {item.badge}
                       </span>
@@ -137,12 +137,12 @@ const VolunteerSidebar = () => {
         <Button
           onPress={() => {
             if (volunteer && volunteer.isEventHost) {
-              router.push('/event-host/dashboard');
+              router.push("/event-host/dashboard");
             } else {
               onOpen();
             }
           }}
-          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-8"
+          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-36"
         >
           Switch to Event Host
         </Button>
@@ -152,7 +152,7 @@ const VolunteerSidebar = () => {
       {/* Logout */}
       <div>
         <button
-          onClick={() => setSelectedItem('Logout')}
+          onClick={() => setSelectedItem("Logout")}
           className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
