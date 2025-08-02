@@ -37,11 +37,6 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       href: `/VolunteerWorkspace/${eventId}/leaderboard`,
     },
     {
-      name: 'Leaderboard',
-      icon: Trophy,
-      href: `/VolunteerWorkspace/${eventId}/leaderboard`,
-    },
-    {
       name: 'Notifications',
       icon: Bell,
       badge: notificationCount,
