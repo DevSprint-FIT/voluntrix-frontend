@@ -137,7 +137,7 @@ const VolunteerSidebar = () => {
         <Button
           onPress={() => {
             if (volunteer && volunteer.isEventHost) {
-              router.push('/event-host/events');
+              router.push('/event-host/dashboard');
             } else {
               onOpen();
             }

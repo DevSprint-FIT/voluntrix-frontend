@@ -110,13 +110,13 @@ export default function BasicInfoEC({
           <textarea
             value={data.eventDescription}
             onChange={(e) => onChange({ eventDescription: e.target.value })}
-            maxLength={250}
+            maxLength={500}
             placeholder="Describe your event"
             className="resize-none border-[2px] border-shark-300 text-shark-950 pl-2 pt-1 rounded-lg w-full placeholder:text-shark-300 h-[80px]"
           />
         </label>
         <div className="w-full text-right font-secondary font-normal text-shark-800 text-[11px]">
-          {data.eventDescription.length}/250
+          {data.eventDescription.length}/500
         </div>
       </div>
       <div className="flex gap-8 mt-2">

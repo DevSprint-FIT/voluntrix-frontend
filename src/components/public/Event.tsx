@@ -100,17 +100,19 @@ export default function Event({
                     {formatDate(event.eventStartDate)}
                   </p>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <Image
-                    src="/icons/clock.svg"
-                    width={32}
-                    height={32}
-                    alt="clock"
-                  />
-                  <p className="font-secondary text-shark-950 text-[16px] font-medium text-left">
-                    {event.eventTime && `${formatTime(event.eventTime)}`}
-                  </p>
-                </div>
+                {event.eventTime && (
+                  <div className="flex gap-2 items-center">
+                    <Image
+                      src="/icons/clock.svg"
+                      width={32}
+                      height={32}
+                      alt="clock"
+                    />
+                    <p className="font-secondary text-shark-950 text-[16px] font-medium text-left">
+                      {`${formatTime(event.eventTime)}`}
+                    </p>
+                  </div>
+                )}
                 <div className="flex gap-2 items-center">
                   <Image
                     src="/icons/location.svg"
@@ -124,14 +126,18 @@ export default function Event({
                 </div>
               </div>
               {(() => {
-                const sentences = event.eventDescription.match(
-                  /[^.!?]+[.!?]+/g
-                ) || [event.eventDescription];
-                const firstParagraph = sentences.slice(0, 2).join(' ');
-                const secondParagraph = sentences.slice(2).join(' ');
+                const description = event.eventDescription;
+                const splitIndex = description.indexOf('. ') + 1;
+
+                const firstParagraph =
+                  splitIndex > 0
+                    ? description.slice(0, splitIndex).trim()
+                    : description;
+                const secondParagraph =
+                  splitIndex > 0 ? description.slice(splitIndex).trim() : '';
 
                 return (
-                  <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-3">
                     <p className="text-shark-950 text-[16px] font-normal text-left text-wrap">
                       {firstParagraph}
                     </p>
