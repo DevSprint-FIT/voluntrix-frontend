@@ -44,7 +44,7 @@ const StatCard = ({
   <div className="bg-[#FBFBFB] rounded-lg p-6">
     <div className="flex items-start space-x-6">
       <div
-        className={`p-4 rounded-full ${bgColor} flex items-center justify-center`}
+        className={`p-4 rounded-full ${bgColor} flex items-center justify-center ml-10`}
       >
         <Icon size={32} className={color} />
       </div>
@@ -340,7 +340,7 @@ const VolunteerDashboard = () => {
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             <StatCard
               title="Current Level"
               value={`Level ${dashboardData.currentLevel}`}
