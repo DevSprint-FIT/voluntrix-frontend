@@ -324,14 +324,16 @@ const VolunteerDashboard = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-9 py-4">
-        <div>
-          <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
-            Event Host / Dashboard
-          </nav>
-          <h1 className="text-2xl font-bold text-gray-900 font-secondary">
-            Main Dashboard
-          </h1>
-          <div className="flex items-center space-x-4 mt-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
+              Event Host / Dashboard
+            </nav>
+            <h1 className="text-2xl font-bold text-gray-900 font-secondary">
+              Main Dashboard
+            </h1>
+          </div>
+          <div className="flex items-center space-x-4 mt-3">
             <ProfileIndicator />
           </div>
         </div>
