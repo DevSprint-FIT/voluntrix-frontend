@@ -19,6 +19,7 @@ import {
   Organization,
 } from "@/services/volunteerProfileService";
 import ProfileIndicator from "@/components/UI/ProfileIndicator";
+import { useRouter } from 'next/navigation';
 
 // Notification Modal Component
 const NotificationModal = ({
@@ -230,6 +231,8 @@ const VolunteerProfilePage = () => {
     useState<Organization | null>(null);
   const [isUnfollowing, setIsUnfollowing] = useState(false);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -427,10 +430,13 @@ const VolunteerProfilePage = () => {
 
                 <div className="flex items-center space-x-6 mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium font-secondary bg-[#ECFDF6] text-[#029972] px-3 py-1 rounded-full">
+                    <button
+                       onClick={() => router.push('/Reward/status')}
+                       className="text-sm font-medium font-secondary bg-[#ECFDF6] text-[#029972] px-3 py-1 rounded-full hover:bg-[#D1FAE5] transition-colors cursor-pointer"
+                     >
                       Level {profile.volunteerLevel} Volunteer
-                    </span>
-                  </div>
+                    </button>
+                 </div>
                   <div
                     className={`px-3 py-1 rounded-full text-sm font-medium font-secondary ${
                       profile.isAvailable

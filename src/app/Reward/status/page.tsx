@@ -10,17 +10,15 @@ export default function RewardStatus() {
     profilePictureUrl?: string;
   } | null>(null);
 
-  const username = "anne13";
-
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchVolunteerRewardStats(username);
+      const data = await fetchVolunteerRewardStats();
       if (data) {
         setRewardStats(data);
       }
     };
     fetchData();
-  }, [username]);
+  }, []);
 
   const isLoading = !rewardStats;
 
