@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   Upload,
@@ -25,6 +25,7 @@ interface EventDocument {
 }
 
 const DocumentsPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -98,6 +99,15 @@ const DocumentsPage = () => {
     },
   ];
 
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Filter documents based on search query and category
   const filteredDocuments = documentsData.filter((doc) => {
     const matchesSearch = doc.name
@@ -143,6 +153,17 @@ const DocumentsPage = () => {
       day: "numeric",
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-600 mx-auto mb-4"></div>
+          <p className="text-shark-600 font-secondary">Loading documents...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
