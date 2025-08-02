@@ -89,10 +89,10 @@ export default function VolunteerApplication({
       openSuccessModal();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      console.error('Submission error:', err);
       setErrorMessage(
         err.response?.data?.message || 'Something went wrong. Please try again.'
       );
+      console.error('Submission error:', errorMessage);
       onClose();
       openErrorModal();
     } finally {
@@ -240,7 +240,8 @@ export default function VolunteerApplication({
                 Submission Failed
               </div>
               <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
-                {errorMessage}
+                We couldn&apos;t submit your application. Please check your
+                details or try again later.
               </div>
             </ModalBody>
           </>
