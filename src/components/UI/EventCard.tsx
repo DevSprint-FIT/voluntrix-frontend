@@ -84,6 +84,8 @@ export default function EventCard({ event }: { event: EventType }) {
                 {!event.donationEnabled &&
                   (() => {
                     const description = event.eventDescription;
+                    if (!description) return null;
+
                     const splitIndex = description.indexOf('. ') + 1;
 
                     const preview =

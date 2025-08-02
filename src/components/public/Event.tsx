@@ -127,6 +127,7 @@ export default function Event({
               </div>
               {(() => {
                 const description = event.eventDescription;
+                if (!description) return null;
                 const splitIndex = description.indexOf('. ') + 1;
 
                 const firstParagraph =
