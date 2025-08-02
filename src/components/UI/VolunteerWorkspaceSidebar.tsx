@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -14,7 +14,10 @@ interface MenuItem {
 
 const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Tasks');
+  const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+  const pathname = usePathname();
+
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -24,9 +27,14 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
 
   const menuItems: MenuItem[] = [
     {
-      name: 'Tasks',
+      name: "Tasks",
       icon: ListTodo,
       href: `/VolunteerWorkspace/${eventId}/tasks`,
+    },
+    {
+      name: "Leaderboard",
+      icon: Trophy,
+      href: `/VolunteerWorkspace/${eventId}/leaderboard`,
     },
     {
       name: 'Leaderboard',
@@ -41,7 +49,16 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
     },
   ];
 
-  const router = useRouter();
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Tasks if no match found
+      setSelectedItem("Tasks");
+    }
+  }, [pathname, menuItems]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
@@ -51,8 +68,8 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
           <img
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
-            className="h-18 w-18 ml-[-10px]"
-            onClick={() => router.push('/')}
+            className="h-18 w-18 ml-[-10px] cursor-pointer"
+            onClick={() => router.push("/")}
           />
         </div>
 
@@ -101,7 +118,10 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       {/* Back Button */}
       <div>
         <button
-          onClick={() => setSelectedItem('Back')}
+          onClick={() => {
+            setSelectedItem("Back");
+            router.push("/Volunteer/events/active");
+          }}
           className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">

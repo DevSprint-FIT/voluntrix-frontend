@@ -97,6 +97,9 @@ export default function LoginPage() {
       if (result.success && result.nextStep) {
         console.log("Login successful, navigating to:", result.nextStep);
         
+        // Add delay to allow backend to process and show loading state
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
         // Navigate based on user state
         switch (result.nextStep) {
           case "role-selection":
@@ -107,18 +110,26 @@ export default function LoginPage() {
             break;
           case "dashboard":
           default:
-            router.push('/dashboard');
+            if (result.user && result.user.role) {
+              router.push(`/${result.user.role.slice(0, 1) + result.user.role.slice(1).toLowerCase()}/dashboard`);
+            } else {
+              setErrors({ general: "User information is missing. Please try again." });
+              setIsLoading(false);
+            }
             break;
         }
       } else {
         setErrors({ general: result.message });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Login failed:", error);
       setErrors({ general: "Something went wrong. Please try again." });
-    } finally {
       setIsLoading(false);
+      router.push('/auth/login');
     }
+    // Note: Don't set isLoading to false here for successful cases
+    // to maintain loading state during navigation
   };
 
   // Show loading while checking authentication status
@@ -138,6 +149,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center p-8 relative">
+      {/* Login Success Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-sm mx-4">
+            <div className="w-16 h-16 mx-auto mb-6 relative">
+              <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
+              Signing You In
+            </h3>
+            <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
+              Please wait while we verify your credentials and set up your dashboard...
+            </p>
+          </div>
+        </div>
+      )}
+
       <Link 
         href="/"
         className="absolute top-8 left-8 flex items-center space-x-2 px-4 py-2 border border-shark-300 rounded-[20px] text-shark-950 hover:text-shark-700 hover:border-shark-400 transition-colors font-primary bg-white/80 backdrop-blur-sm shadow-sm tracking-[0.025rem]"

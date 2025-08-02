@@ -12,7 +12,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,7 +23,8 @@ interface MenuItem {
 
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Tasks');
+  const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -66,6 +67,17 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       href: `/EventHostWorkspace/${eventId}/notifications`,
     },
   ];
+
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Tasks if no match found
+      setSelectedItem("Tasks");
+    }
+  }, [pathname]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">

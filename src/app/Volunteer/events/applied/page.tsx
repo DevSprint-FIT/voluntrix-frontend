@@ -9,6 +9,8 @@ import {
 } from "@/services/volunteerEventService";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@heroui/button";
+import { useRouter } from "next/navigation";
+import authService from "@/services/authService";
 
 // Modal Component
 interface ConfirmModalProps {
@@ -75,11 +77,11 @@ function ConfirmModal({
 export default function AppliedEventsPage() {
   const [events, setEvents] = useState<AppliedEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<AppliedEvent | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const volunteerId = 1; // Replace with actual volunteer ID
+  const router = useRouter();
 
   useEffect(() => {
     fetchEvents();
@@ -87,11 +89,40 @@ export default function AppliedEventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const data = await getVolunteerAppliedEvents(volunteerId);
+      // Check authentication
+      if (!authService.isAuthenticated()) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      const currentUser = await authService.getCurrentUser();
+      if (!currentUser) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      // Check if profile is completed
+      if (!currentUser.profileCompleted) {
+        router.replace("/auth/profile-form?type=volunteer");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const data = await getVolunteerAppliedEvents();
       setEvents(data);
     } catch (error) {
       console.error("Failed to load applied events", error);
-      // You might want to show a toast notification here
+      setError(
+        error instanceof Error ? error.message : "Failed to load applied events"
+      );
+
+      // If authentication fails, redirect to login
+      if (error instanceof Error && error.message.includes("401")) {
+        router.replace("/auth/login");
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -124,6 +155,10 @@ export default function AppliedEventsPage() {
     } catch (error) {
       console.error("Failed to cancel application", error);
       // You might want to show an error toast here
+      if (error instanceof Error && error.message.includes("401")) {
+        router.replace("/auth/login");
+        return;
+      }
     } finally {
       setIsDeleting(false);
     }
@@ -168,14 +203,38 @@ export default function AppliedEventsPage() {
     },
   ];
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Applied Events</h1>
-      {loading ? (
+  if (loading) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Applied Events</h1>
         <div className="flex justify-center items-center">
           <Loader2 className="h-8 w-8 text-verdant-600 animate-spin" />
         </div>
-      ) : events.length === 0 ? (
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Applied Events</h1>
+        <div className="text-center py-8">
+          <p className="text-red-500 mb-4">Error: {error}</p>
+          <button
+            onClick={fetchEvents}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Applied Events</h1>
+      {events.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           No applied events found.
         </div>

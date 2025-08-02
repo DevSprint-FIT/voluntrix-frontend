@@ -6,7 +6,9 @@ import 'react-calendar/dist/Calendar.css';
 import "@/app/styles/calendar.css"      
 import SponsorshipsChart from "@/components/UI/SponsorshipsChart"; 
 import CustomNavigation from "@/components/UI/CustomNavigation"; 
-
+import authService from "@/services/authService";
+import { useRouter } from "next/navigation";
+import { User } from "@/services/authService";
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
 
@@ -50,6 +52,10 @@ export default function SponsorDashboardPage() {
   const [sponsorshipsLoading, setSponsorshipsLoading] = useState(false);
   const [selectedYear, setSelectedYear] = useState(2025);
   const [sponsor, setSponsor] = useState<SponsorSettings | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const router = useRouter();
 
   // New state for actual sponsor event data
   const [allSponsorEventData, setAllSponsorEventData] = useState<SponsorEventData[]>([]);
@@ -63,6 +69,40 @@ export default function SponsorDashboardPage() {
 
   const username = "SPONSOR123"; 
   const sponsorId = 1; 
+
+  useEffect(() => {
+      const checkAuthAndLoadData = async () => {
+        try {
+          if (!authService.isAuthenticated()) {
+            router.replace('/auth/login');
+            return;
+          }
+  
+          const currentUser = await authService.getCurrentUser();
+          if (!currentUser) {
+            router.replace('/auth/login');
+            return;
+          }
+  
+          // Check if profile is completed
+          if (!currentUser.profileCompleted) {
+            console.log(currentUser);
+            router.replace('/auth/profile-form?type=sponsor');
+            return;
+          }
+  
+          setUser(currentUser);
+        } catch (error) {
+          console.error('Auth check error:', error);
+          router.replace('/auth/signup');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      checkAuthAndLoadData();
+    }, [router]);
+
 
   const onChangeHandler = (
     value: Date | [Date | null, Date | null] | null,

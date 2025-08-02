@@ -22,7 +22,7 @@ interface CreateTaskModalProps {
 export interface TaskFormData {
   description: string;
   difficulty: "EASY" | "MEDIUM" | "HARD" | "EXTREME";
-  category: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING";
+  category: "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM";
   assigneeId: number;
   dueDate: string;
 }
@@ -86,8 +86,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     "EXTREME",
   ];
   const categoryOptions: Array<
-    "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAMMING"
-  > = ["DESIGN", "EDITORIAL", "LOGISTICS", "PROGRAMMING"];
+    "DESIGN" | "EDITORIAL" | "LOGISTICS" | "PROGRAM"
+  > = ["DESIGN", "EDITORIAL", "LOGISTICS", "PROGRAM"];
 
   // Load available volunteers when modal opens
   useEffect(() => {

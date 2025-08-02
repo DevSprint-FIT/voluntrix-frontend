@@ -10,12 +10,15 @@ import {
   Award,
   CheckCircle,
   AlertCircle,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import {
   volunteerProfileService,
   VolunteerProfile,
   Organization,
 } from "@/services/volunteerProfileService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
 
 // Notification Modal Component
 const NotificationModal = ({
@@ -72,6 +75,68 @@ const NotificationModal = ({
   );
 };
 
+// Confirmation Modal Component
+const UnfollowConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  organizationName,
+  isUnfollowing,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  organizationName: string;
+  isUnfollowing: boolean;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center mb-4">
+          <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
+          <h2 className="text-lg font-semibold text-gray-900 font-secondary">
+            Confirm Unfollow
+          </h2>
+        </div>
+
+        <p className="text-gray-600 font-secondary mb-6">
+          Are you sure you want to unfollow{" "}
+          <span className="font-medium text-gray-900">
+            "{organizationName}"
+          </span>
+          ? You will no longer receive updates from this organization.
+        </p>
+
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            disabled={isUnfollowing}
+            className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md font-secondary transition-colors disabled:opacity-50"
+          >
+            No, Keep Following
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isUnfollowing}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center font-secondary transition-colors disabled:opacity-50"
+          >
+            {isUnfollowing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Unfollowing...
+              </>
+            ) : (
+              "Yes, Unfollow"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Modal Component
 const FollowedOrganizationsModal = ({
   isOpen,
@@ -82,7 +147,7 @@ const FollowedOrganizationsModal = ({
   isOpen: boolean;
   onClose: () => void;
   organizations: Organization[];
-  onUnfollow: (orgId: number) => void;
+  onUnfollow: (org: Organization) => void;
 }) => {
   if (!isOpen) return null;
 
@@ -129,7 +194,7 @@ const FollowedOrganizationsModal = ({
                     </div>
                   </div>
                   <button
-                    onClick={() => onUnfollow(org.id)}
+                    onClick={() => onUnfollow(org)}
                     className="px-4 py-2 text-sm font-medium font-secondary text-red-600 bg-red-50 hover:text-red-700 hover:bg-red-100 rounded-md transition-colors"
                   >
                     Unfollow
@@ -158,6 +223,12 @@ const VolunteerProfilePage = () => {
   const [modalType, setModalType] = useState<"success" | "error">("success");
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+
+  // Confirmation modal states
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] =
+    useState<Organization | null>(null);
+  const [isUnfollowing, setIsUnfollowing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -209,14 +280,28 @@ const VolunteerProfilePage = () => {
     fetchData();
   }, []);
 
-  const handleUnfollow = async (organizationId: number) => {
+  const handleUnfollowClick = (organization: Organization) => {
+    setSelectedOrganization(organization);
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmUnfollow = async () => {
+    if (!selectedOrganization) return;
+
+    setIsUnfollowing(true);
     try {
-      await volunteerProfileService.unfollowOrganization(organizationId);
+      await volunteerProfileService.unfollowOrganization(
+        selectedOrganization.id
+      );
 
       // Remove the organization from the local state
       setFollowedOrganizations((prev) =>
-        prev.filter((org) => org.id !== organizationId)
+        prev.filter((org) => org.id !== selectedOrganization.id)
       );
+
+      // Close confirmation modal
+      setConfirmModalOpen(false);
+      setSelectedOrganization(null);
 
       // Show success modal
       setModalType("success");
@@ -235,6 +320,15 @@ const VolunteerProfilePage = () => {
           : "Failed to unfollow organization. Please try again."
       );
       setModalOpen(true);
+    } finally {
+      setIsUnfollowing(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    if (!isUnfollowing) {
+      setConfirmModalOpen(false);
+      setSelectedOrganization(null);
     }
   };
 
@@ -277,13 +371,18 @@ const VolunteerProfilePage = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-6 py-4">
-        <div>
-          <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
-            Volunteer / Profile
-          </nav>
-          <h1 className="text-2xl font-bold font-secondary text-gray-900">
-            Profile
-          </h1>
+        <div className="flex justify-between items-start">
+          <div>
+            <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
+              Volunteer / Profile
+            </nav>
+            <h1 className="text-2xl font-bold font-secondary text-gray-900">
+              Profile
+            </h1>
+          </div>
+          <div className="mt-3">
+            <ProfileIndicator />
+          </div>
         </div>
       </div>
 
@@ -448,7 +547,16 @@ const VolunteerProfilePage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         organizations={followedOrganizations}
-        onUnfollow={handleUnfollow}
+        onUnfollow={handleUnfollowClick}
+      />
+
+      {/* Confirmation Modal */}
+      <UnfollowConfirmationModal
+        isOpen={confirmModalOpen}
+        onClose={handleModalClose}
+        onConfirm={handleConfirmUnfollow}
+        organizationName={selectedOrganization?.name || ""}
+        isUnfollowing={isUnfollowing}
       />
 
       {/* Notification Modal */}
