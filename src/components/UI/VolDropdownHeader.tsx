@@ -2,22 +2,22 @@
 
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
+import { ActiveEvent } from '@/services/volunteerEventService';
 
-interface EventDropdownHeaderProps {
-  events: EventType[];
+interface VolDropdownHeader {
+  events: ActiveEvent[];
 }
 
-export default function EventDropdownHeader({
+export default function VolDropdownHeader({
   events,
-}: EventDropdownHeaderProps) {
+}: VolDropdownHeader) {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
   const handleClick = (eventId: string) => {
-    router.push(`/EventHostWorkspace/${eventId}/tasks`);
+    router.push(`/VolunteerWorkspace/${eventId}/tasks`);
   };
 
   return (
@@ -44,21 +44,18 @@ export default function EventDropdownHeader({
             <div className="absolute top-full left-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg z-30">
               <div className="py-2 max-h-64 overflow-y-auto">
                 {events
-                  .filter((event) =>
-                    ['ACTIVE', 'COMPLETE'].includes(event.eventStatus)
-                  )
                   .map((event) => (
                     <button
                       key={event.eventId}
                       onClick={() => {
                         handleClick(String(event.eventId));
-                        setSelectedEvent(event.eventTitle);
+                        setSelectedEvent(event.eventName);
                         setIsDropdownOpen(false);
                       }}
                       className="w-full text-left text-shark-700 px-4 py-1 hover:bg-verdant-50 transition-colors"
                     >
                       <span className="font-secondary font-medium text-sm">
-                        {event.eventTitle}
+                        {event.eventName}
                       </span>
                     </button>
                   ))}
