@@ -9,8 +9,8 @@ import {
   Building2,
   Briefcase,
   Globe,
-  Linkedin,
 } from "lucide-react";
+import { FaLinkedin } from "react-icons/fa";
 import { sponsorService, SponsorProfile } from "@/services/sponsorService";
 
 const formatJoinedDate = (appliedAt: number[]): string => {
@@ -244,7 +244,7 @@ const SponsorProfilePage = () => {
                 )}
                 {profile.linkedinProfile && (
                   <div className="flex items-center space-x-3">
-                    <Linkedin size={16} className="text-gray-400" />
+                    <FaLinkedin size={16} className="text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-600 font-secondary">
                         LinkedIn
