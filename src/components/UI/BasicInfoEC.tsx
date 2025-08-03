@@ -148,7 +148,7 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-1 items-center">
             Event Visibility
             <Tooltip
               placement="bottom"

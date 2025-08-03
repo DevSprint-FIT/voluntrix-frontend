@@ -142,7 +142,7 @@ const VolunteerSidebar = () => {
               onOpen();
             }
           }}
-          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-36"
+          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-24"
         >
           Switch to Event Host
         </Button>
