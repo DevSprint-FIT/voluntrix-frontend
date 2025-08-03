@@ -316,7 +316,7 @@ export default function ChatListInterface({
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <div className="bg-black text-white p-4">
+      <div className="bg-white text-black p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <button
@@ -324,7 +324,7 @@ export default function ChatListInterface({
                 // onLogout();
                 setShowChat(false);
               }}
-              className="text-white hover:bg-green-700 p-1 rounded"
+              className="text-black hover:bg-shark-950 p-1 rounded"
             >
               <svg
                 className="w-6 h-6"
@@ -347,7 +347,7 @@ export default function ChatListInterface({
           </div>
           <button
             onClick={() => setShowAddChat(true)}
-            className="bg-green-700 hover:bg-green-800 p-2 rounded-full"
+            className="bg-white hover:bg-shark-800 p-2 rounded-full"
           >
             <svg
               className="w-6 h-6"
@@ -371,8 +371,8 @@ export default function ChatListInterface({
             onClick={() => setActiveTab('conversations')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === 'conversations'
-                ? 'bg-green-800 text-white'
-                : 'text-green-100 hover:text-white hover:bg-green-700'
+                ? 'bg-shark-950 text-white'
+                : 'text-shark-950 hover:text-white hover:bg-shark-950'
             }`}
           >
             Available Sponsors
@@ -381,8 +381,8 @@ export default function ChatListInterface({
             onClick={() => setActiveTab('sponsors')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === 'sponsors'
-                ? 'bg-green-800 text-white'
-                : 'text-green-100 hover:text-white hover:bg-green-700'
+                ? 'bg-shark-950 text-white'
+                : 'text-shark-950 hover:text-white hover:bg-shark-950'
             }`}
           >
             All Sponsors
@@ -415,7 +415,7 @@ export default function ChatListInterface({
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-shark-500"
           />
         </div>
       </div>
@@ -424,7 +424,7 @@ export default function ChatListInterface({
       <div className="flex-1 overflow-y-auto bg-white">
         {loading ? (
           <div className="p-8 text-center">
-            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-8 h-8 border-4 border-shark-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500 text-sm">
               {activeTab === 'conversations'
                 ? 'Loading conversations...'
@@ -453,10 +453,10 @@ export default function ChatListInterface({
                 ? 'Error Loading Conversations'
                 : 'Error Loading Sponsors'}
             </h3>
-            <p className="text-gray-500 text-sm mb-4">{error}</p>
+            <p className="text-shark-950 text-sm mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+              className="bg-shark-500 text-white px-4 py-2 rounded-lg hover:bg-shark-950 transition-colors"
             >
               Try Again
             </button>
@@ -488,7 +488,7 @@ export default function ChatListInterface({
               </p>
               <button
                 onClick={() => setShowAddChat(true)}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                className="bg-shark-500 text-white px-4 py-2 rounded-lg hover:bg-shark-600 transition-colors"
               >
                 Start New Chat
               </button>
@@ -503,13 +503,13 @@ export default function ChatListInterface({
                 {/* Avatar */}
                 <div className="relative">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-black font-bold text-lg"
                     style={{ backgroundColor: getAvatarColor(user.username) }}
                   >
                     {user.username[0].toUpperCase()}
                   </div>
                   {user.isOnline && (
-                    <div className="absolute -bottom-0 -right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                    <div className="absolute -bottom-0 -right-0 w-4 h-4 bg-shark-500 rounded-full border-2 border-white"></div>
                   )}
                 </div>
 
@@ -528,7 +528,7 @@ export default function ChatListInterface({
                       {user.lastMessage || 'No messages yet'}
                     </p>
                     {user.unreadCount && user.unreadCount > 0 && (
-                      <span className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      <span className="bg-shark-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                         {user.unreadCount}
                       </span>
                     )}
@@ -661,7 +661,7 @@ export default function ChatListInterface({
                 value={newChatUser}
                 onChange={(e) => setNewChatUser(e.target.value)}
                 placeholder="Username to chat with"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-shark-500"
                 onKeyPress={(e) => e.key === 'Enter' && handleStartNewChat()}
               />
             </div>
@@ -679,7 +679,7 @@ export default function ChatListInterface({
               <button
                 onClick={handleStartNewChat}
                 disabled={!newChatUser.trim()}
-                className="flex-1 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 px-4 bg-shark-900 text-white rounded-lg hover:bg-shark-950 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Start Chat
               </button>

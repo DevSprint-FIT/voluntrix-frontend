@@ -289,10 +289,10 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto border-x border-gray-200">
       {/* Header */}
-      <div className="bg-green-600 text-white p-4 flex items-center space-x-3 shadow-sm">
+      <div className="bg-shark-950 text-white p-4 flex items-center space-x-3 shadow-sm">
         <button
           onClick={onBack}
-          className="text-white hover:bg-green-700 p-1 rounded"
+          className="text-shark-950 hover:bg-green-700 p-1 rounded"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -300,7 +300,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
         </button>
         
         <div 
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-shark-950 font-bold"
           style={{ backgroundColor: getAvatarColor(otherUser) }}
         >
           {otherUser[0]?.toUpperCase()}
@@ -308,7 +308,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
         
         <div className="flex-1">
           <h2 className="text-lg font-semibold">{otherUser}</h2>
-          <p className="text-sm text-green-200">
+          <p className="text-sm text-shark-200">
             {isConnected && isRoomReady ? 'Online' : 'Connecting...'}
           </p>
         </div>
@@ -359,7 +359,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
               <div key={index} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
                   isOwnMessage 
-                    ? 'bg-green-500 text-white rounded-br-sm' 
+                    ? 'bg-shark-900 text-white rounded-br-sm' 
                     : 'bg-white text-gray-800 rounded-bl-sm shadow-sm'
                 }`}>
                   <p className="text-sm">{message.content}</p>
