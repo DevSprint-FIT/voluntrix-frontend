@@ -3,6 +3,7 @@ import { getAllOrganizations, getFollowedOrganizationIds, followOrganization } f
 import { PublicFeedOrganizationDetails } from "@/services/types";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@heroui/react";
+import Image from "next/image";
 
 // Modal Component
 const NotificationModal = ({
@@ -59,11 +60,7 @@ const NotificationModal = ({
   );
 };
 
-interface Props {
-  volunteerId?: number; 
-}
-
-export default function SuggestedOrganizations({ volunteerId }: Props) {
+export default function SuggestedOrganizations() {
   const [unfollowedOrgs, setUnfollowedOrgs] = useState<PublicFeedOrganizationDetails[]>([]);
 
   // Modal states
@@ -118,10 +115,12 @@ export default function SuggestedOrganizations({ volunteerId }: Props) {
           {unfollowedOrgs.map(org => (
             <li key={org.id} className="flex items-center justify-between">
               <div className="flex items-center gap-3 ">
-                <img
+                <Image
                   src={org.imageUrl || "/default-org.png"}
                   alt={org.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                    <span className="font-medium font-secondary">{org.name}</span>

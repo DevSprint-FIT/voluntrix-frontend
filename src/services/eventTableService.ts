@@ -59,6 +59,7 @@ const getCurrentOrganizationId = async (): Promise<number> => {
 };
 
 // Get all volunteers for host lookup
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllVolunteers = async (): Promise<Map<number, any>> => {
   const baseUrl = getBaseUrl();
   const response = await fetch(`${baseUrl}/api/public/volunteers/all`, {
@@ -72,6 +73,7 @@ const getAllVolunteers = async (): Promise<Map<number, any>> => {
 
   const volunteers = await response.json();
   const volunteerMap = new Map();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   volunteers.forEach((volunteer: any) => {
     volunteerMap.set(volunteer.volunteerId, volunteer);
   });

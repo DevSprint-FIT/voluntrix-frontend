@@ -2,6 +2,7 @@
 
 import { CheckCircle, MapPin, Calendar } from "lucide-react";
 import React from "react";
+import Image from "next/image";
 
 interface ProfileHeaderProps {
   data: {
@@ -34,12 +35,12 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderProps["data"] }> = ({ data })
       {/* Profile Image */}
       <div className="w-24 h-24 flex items-center justify-center overflow-hidden rounded-2xl bg-white">
         {data?.imageUrl ? (
-          <img
+          <Image
             src={data.imageUrl}
             alt="Profile Image"
             width={96}
             height={96}
-            className="object-cover w-full h-full"
+            className="object-cover"
           />
         ) : (
           <div className="text-2xl font-bold text-shark-400">

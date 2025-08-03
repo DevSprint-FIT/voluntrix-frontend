@@ -17,6 +17,7 @@ const getBaseUrl = () => {
 };
 
 // Helper function to get current user info based on user type - NOW EXPORTED
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getCurrentUserInfo(): Promise<{username: string, userType: string, profileImageUrl?: string, fullName?: string, rawData?: any}> {
   const baseUrl = getBaseUrl();
   

@@ -11,6 +11,7 @@ type TableProps<T> = {
   data: T[];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Table<T extends Record<string, any>>({
   columns,
   data,

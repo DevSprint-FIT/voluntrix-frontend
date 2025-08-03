@@ -72,6 +72,7 @@ export const updateOrganizationPhone = async (
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteOrganizationById = async (id: number): Promise<void> => {
   try {
     const response = await fetch(`${getBaseUrl()}/api/users/account`, {

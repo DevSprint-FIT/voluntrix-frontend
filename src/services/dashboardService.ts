@@ -129,6 +129,7 @@ export async function getDonationsStats(year: number): Promise<DonationData[]> {
     }
     
     // Transform the data to match the expected format
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formattedData: DonationData[] = data.map((item: any) => ({
       month: item.month || item.monthName || item.name || '',
       amount: item.amount || item.totalAmount || item.value || 0,
@@ -270,6 +271,7 @@ export async function getEventDataForOrganization(): Promise<{
     console.log("All invitations received:", allInvitations);
     
     // Filter only APPROVED events
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const approvedEvents = allInvitations.filter((invitation: any) => 
       invitation.applicationStatus === 'APPROVED'
     );
@@ -339,6 +341,7 @@ export async function getFollowersStatsByOrganizationId(orgId: number, year: num
   return getFollowersStats(year);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getInstituteDistributionByOrganizationId(organizationId: number): Promise<InstituteDistribution> {
   console.warn("getInstituteDistributionByOrganizationId is deprecated. Use getInstituteDistribution instead.");
   return getInstituteDistribution();

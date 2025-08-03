@@ -18,7 +18,6 @@ import {
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
 import ProfileIndicator from "@/components/UI/ProfileIndicator";
-import { User } from "@/services/authService";
 
 interface User {
   userId: number;
@@ -216,10 +215,12 @@ const VolunteerDashboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedYear, setSelectedYear] = useState("2025");
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();

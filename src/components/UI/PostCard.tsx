@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import ConfirmationModal from "./ConfirmationModal";
 import ShareModal from "./ShareModal";
-
+import Image from "next/image";
 import {
   getUserReaction,
   reactToPost,
@@ -48,7 +48,6 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({
   user,
-  username,
   institute,
   timeAgo,
   followers,
@@ -57,13 +56,11 @@ const PostCard: React.FC<PostCardProps> = ({
   mediaType,
   profileImageUrl,
   postId,
-  impressions,
   userId,
   userType,
   isPublicView = false,
   onDelete,
   onEdit,
-  onLike,
   handleShareClick,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -72,10 +69,12 @@ const PostCard: React.FC<PostCardProps> = ({
   const [likeCount, setLikeCount] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
   const [commentText, setCommentText] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [comments, setComments] = useState<any[]>([]);
   const [showComments, setShowComments] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
   const [openCommentMenuId, setOpenCommentMenuId] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [currentUserInfo, setCurrentUserInfo] = useState<any>(null);
 
   // Get current user info for comment ownership validation
@@ -93,6 +92,7 @@ const PostCard: React.FC<PostCardProps> = ({
   }, []);
 
   // Function to check if current user owns the comment
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const canDeleteComment = (comment: any): boolean => {
     if (!currentUserInfo) {
       return false;
@@ -141,6 +141,7 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onShare = (platform: string) => {
     handleShareClick(postId);
     setShowShareModal(false);
@@ -226,10 +227,12 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Post Header */}
       <div className="flex items-center gap-3 mb-2">
         {profileImageUrl ? (
-          <img
+          <Image
             src={profileImageUrl}
             alt="Organization"
-            className="w-10 h-10 rounded-full object-cover"
+            className="rounded-full object-cover"
+            width={40}
+            height={40} 
           />
         ) : (
           <div className="bg-gray-200 w-10 h-10 rounded-full" />
@@ -248,6 +251,7 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Post Content */}
       <p className="mb-2 text-sm">{content}</p>
       {mediaType === "IMAGE" && imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={imageUrl} alt="Post Media" className="w-full h-auto rounded-lg" />
       )}
       {mediaType === "VIDEO" && imageUrl && (
@@ -337,10 +341,12 @@ const PostCard: React.FC<PostCardProps> = ({
                 <div key={comment.id} className="flex flex-col">
                   <div className="flex items-start gap-3">
                     {comment.profileImageUrl ? (
-                      <img
+                      <Image
                         src={comment.profileImageUrl}
                         alt={`${comment.commenterName}'s profile`}
-                        className="w-8 h-8 rounded-full bg-shark-100 shrink-0 object-cover"
+                        className="rounded-full bg-shark-100 shrink-0 object-cover"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-shark-100 shrink-0" />

@@ -33,6 +33,7 @@ interface Event {
   eventStatus: 'PENDING' | 'ACTIVE' | 'COMPLETE' | 'DENIED';
   sponsorshipEnabled: boolean;
   donationEnabled: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   categories: any[];
   eventHostId: number;
   organizationId: number;
@@ -57,6 +58,7 @@ interface SponsorEventData {
 }
 
 class SponsorService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private volunteersCache: any[] | null = null;
   
   private async fetchWithErrorHandling<T>(url: string): Promise<T> {
@@ -247,12 +249,14 @@ class SponsorService {
   }
 
   // Get all volunteers (with caching)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getAllVolunteers(): Promise<any[]> {
     if (this.volunteersCache) {
       return this.volunteersCache;
     }
     
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.volunteersCache = await this.fetchWithErrorHandling<any[]>(
         `${API_BASE_URL}/volunteers`
       );
@@ -264,6 +268,7 @@ class SponsorService {
   }
 
   // Get volunteer details by ID
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getVolunteer(volunteerId: number): Promise<any> {
     try {
       // Get all volunteers (uses cache if available)

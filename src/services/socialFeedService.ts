@@ -1,4 +1,4 @@
-import { Post, Organization, ApiResponse, MediaType } from "./types";
+import { Post, Organization, ApiResponse } from "./types";
 import { arrayToDate, getTimeAgoFromDate } from "./utils";
 import authService from "./authService"; // Import the auth service
 
@@ -152,6 +152,7 @@ export async function updatePost(
   shares?: number
 ): Promise<Post | null> {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = { content };
 
     if (mediaUrl !== undefined && mediaUrl !== null) {

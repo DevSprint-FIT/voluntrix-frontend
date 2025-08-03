@@ -5,11 +5,9 @@ import { X } from "lucide-react";
 import { Button } from "@heroui/button";
 import { DatePicker } from "@heroui/date-picker";
 import { parseDate } from "@internationalized/date";
-import Toast from "@/components/UI/Toast";
 import Image from "next/image";
 import {
   hostWorkspaceTaskService,
-  TaskCreateDTO,
   VolunteerEventParticipationDTO,
 } from "@/services/hostWorkspaceTaskService";
 
@@ -95,6 +93,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     if (isOpen) {
       loadAvailableVolunteers();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, eventId]);
 
   // Filter volunteers when category changes
@@ -118,6 +117,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       setFilteredVolunteers([]);
       setFormData((prev) => ({ ...prev, assigneeId: 0 }));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.category, availableVolunteers]);
 
   const loadAvailableVolunteers = async () => {
@@ -147,7 +147,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       [field]: value,
     }));
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDateChange = (date: any) => {
     if (date) {
       // Create a date string in YYYY-MM-DD format directly to avoid timezone issues
@@ -260,6 +260,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           setSubmitStatus({ type: "idle", message: "" });
         }, 5000);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setSubmitStatus({
         type: "error",

@@ -101,6 +101,7 @@ export const getEventStatusCounts = async (): Promise<EventStatusCounts> => {
     };
 
     if (Array.isArray(allEvents)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       allEvents.forEach((event: any) => {
         // Skip events not associated with this organization
         if (!eventIds.includes(event.eventId)) {
@@ -134,6 +135,7 @@ export const getEventStatusCounts = async (): Promise<EventStatusCounts> => {
 };
 
 // Legacy function for backward compatibility
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getEventStatusCountsByOrgId = async (orgId: number): Promise<EventStatusCounts> => {
   console.warn("getEventStatusCountsByOrgId is deprecated. Use getEventStatusCounts instead.");
   return getEventStatusCounts();

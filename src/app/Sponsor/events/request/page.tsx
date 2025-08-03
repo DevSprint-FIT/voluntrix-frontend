@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
 import { Loader2 } from "lucide-react";
 import { sponsorService, SponsorEventData } from "@/services/sponsorService";
+import Image from "next/image";
 
 interface Volunteer {
   volunteerId: number;
@@ -161,10 +162,12 @@ export default function SponsorEventRequestsPage() {
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
           {volunteer.profilePictureUrl ? (
-            <img 
+            <Image
               src={volunteer.profilePictureUrl} 
               alt={`${volunteer.firstName} ${volunteer.lastName}`}
-              className="w-full h-full object-cover"
+              width={48}
+              height={48}
+              className="object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -262,7 +265,7 @@ export default function SponsorEventRequestsPage() {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No sponsorship requests found</h3>
-          <p className="text-gray-500">You haven't made any sponsorship requests yet.</p>
+          <p className="text-gray-500">You haven&apos;t made any sponsorship requests yet.</p>
         </div>
       ) : (
         <Table columns={columns} data={events} />

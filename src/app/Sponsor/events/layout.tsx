@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
-import { sponsorService, SponsorEventData } from "@/services/sponsorService";
+import { sponsorService } from "@/services/sponsorService";
+import Image from "next/image";
 
 const tabs = [
   { name: "Active Events", href: "/Sponsor/events/active" },
@@ -95,10 +96,12 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
-          <img
-            src={sponsor?.imageUrl} 
+          <Image
+            src={sponsor?.imageUrl || "/images/default-profile.jpg"} 
             alt="Sponsor Profile"
-            className="w-10 h-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="font-semibold font-secondary text-xl leading-tight">{sponsor?.name}</h2> 

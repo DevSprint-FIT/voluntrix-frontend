@@ -25,6 +25,7 @@ const VolunteerSidebar = () => {
     }, 500);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const menuItems: MenuItem[] = [
     { name: "Dashboard", icon: BarChart, href: `/event-host/dashboard` },
     { name: "Events", icon: Calendar, href: `/event-host/events` },

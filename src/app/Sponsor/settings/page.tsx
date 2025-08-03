@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import { Button } from "@heroui/button";
 import PhoneVerificationModal from "@/components/UI/PhoneVerification";
 import AccountDeletionModal from "@/components/UI/AccountDeletion";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
+import Image from "next/image";
 
 // Types for sponsor data
 interface SponsorSettings {
@@ -204,10 +206,12 @@ const SponsorSettingsPage = () => {
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
-          <img
-            src={sponsor?.imageUrl} 
+          <Image
+            src={sponsor?.imageUrl || "/images/default-profile.jpg"} 
             alt="Sponsor Profile"
-            className="w-10 h-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="font-semibold font-secondary text-xl leading-tight">{sponsor?.name}</h2> 

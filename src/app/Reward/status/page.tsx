@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchVolunteerRewardStats } from "@/services/rewardService";
+import Image from "next/image";
 
 export default function RewardStatus() {
   const [rewardStats, setRewardStats] = useState<{
@@ -53,10 +54,12 @@ export default function RewardStatus() {
               {isLoading ? (
                 <div className="w-full h-full bg-shark-50 animate-pulse" />
               ) : (
-                <img
-                  src={rewardStats.profilePictureUrl || "/default-profile.png"}
+                <Image
+                  src={rewardStats.profilePictureUrl || "/default-profile.png"} 
                   alt="Profile Picture"
-                  className="w-full h-full object-cover object-top rounded-full"
+                  width={192}
+                  height={192}
+                  className="object-cover object-top rounded-full"
                 />
               )}
             </div>

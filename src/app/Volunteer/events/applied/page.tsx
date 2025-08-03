@@ -42,7 +42,7 @@ function ConfirmModal({
 
         <p className="text-gray-600 mb-6">
           Are you sure you want to cancel your application for{" "}
-          <span className="font-medium text-gray-900">"{eventName}"</span>? This
+          <span className="font-medium text-gray-900">&quot;{eventName}&quot;</span>? This
           action cannot be undone.
         </p>
 
@@ -85,6 +85,7 @@ export default function AppliedEventsPage() {
 
   useEffect(() => {
     fetchEvents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvents = async () => {

@@ -21,6 +21,7 @@ import {
   VolunteerProfile,
 } from "@/services/volunteerProfileService";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface MenuItem {
   name: string;
@@ -79,6 +80,7 @@ const VolunteerSidebar = () => {
       // Default to Dashboard if no match found
       setSelectedItem("Dashboard");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   return (
@@ -86,10 +88,12 @@ const VolunteerSidebar = () => {
       {/* Logo */}
       <div>
         <div className="mb-10 mt-6 flex justify-center">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Logo"
-            className="h-18 w-18 ml-[-10px]"
+            width={72}
+            height={72}
+            className="ml-[-10px]"
             onClick={() => router.push("/")}
           />
         </div>

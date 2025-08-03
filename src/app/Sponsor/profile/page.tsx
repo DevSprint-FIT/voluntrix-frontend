@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { MapPin, Calendar, Mail, Phone, Building2, Briefcase, Globe } from "lucide-react";
-
+import Image from "next/image";
 
 interface SponsorProfile {
   id: number;
@@ -50,10 +50,6 @@ const SponsorProfilePage = () => {
   const [profile, setProfile] = useState<SponsorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Using hardcoded values for now
-  const sponsorId = 1;
-  const username = "john_doe_sponsor";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -129,10 +125,12 @@ const SponsorProfilePage = () => {
           {/* Right Side: Sponsor Info */}
           {profile && (
             <div className="flex items-center gap-3">
-              <img
+              <Image
                 src={profile.profilePictureUrl || "/api/placeholder/40/40"}
                 alt="Sponsor Profile"
-                className="w-10 h-10 rounded-full object-cover"
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
               />
               <div>
                 <h2 className="font-semibold font-secondary text-xl leading-tight">
@@ -152,10 +150,12 @@ const SponsorProfilePage = () => {
           {/* Main Profile Card */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
-              <img
+              <Image
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
                 alt={profile.firstName}
-                className="w-32 h-32 rounded-lg object-cover"
+                width={120}
+                height={120}
+                className="rounded-lg object-cover"
               />
 
               <div className="flex-1">

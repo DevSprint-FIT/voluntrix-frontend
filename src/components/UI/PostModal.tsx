@@ -3,6 +3,7 @@ import uploadImage from "@/utils/uploadImage";
 import { Image as ImageIcon, Pencil } from "lucide-react";
 import {Textarea} from "@heroui/react";
 import { Button } from "@heroui/button";
+import Image from "next/image";
 
 interface PostModalProps {
   onClose: () => void;
@@ -99,11 +100,13 @@ const PostModal: React.FC<PostModalProps> = ({
         ) : (
         <div className="flex items-center gap-3 mb-4">
            {organizationImageUrl && (
-             <img
+             <Image
                 src={organizationImageUrl}
                 alt={organizationName}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+                className="rounded-full object-cover"
+                width={40}
+                height={40}
+             />
            )}
           <div className="flex flex-col">
              <span className="font-semibold font-secondary ">{organizationName}</span>
@@ -136,6 +139,7 @@ const PostModal: React.FC<PostModalProps> = ({
             className="w-full max-w-md max-h-[28rem] rounded-lg object-contain mx-auto"
            />
          ) : previewImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={previewImage}
             alt="Preview"

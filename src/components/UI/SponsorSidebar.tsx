@@ -7,12 +7,12 @@ import {
   User,
   Calendar,
   Bell,
-  Send,
   Settings,
   LogOut,
   LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface MenuItem {
   name: string;
@@ -45,7 +45,7 @@ const SponsorSidebar = () => {
       {/* Logo */}
       <div>
         <div className="mb-8 flex justify-center">
-          <img src="/images/logo.svg" alt="Logo" className="h-18 w-18 mr-6" />
+          <Image src="/images/logo.svg" alt="Logo" width={72} height={72} className="mr-6" />
         </div>
 
         {/* Navigation */}

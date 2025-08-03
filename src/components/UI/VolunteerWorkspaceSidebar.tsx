@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 
 interface MenuItem {
   name: string;
@@ -25,6 +26,7 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
     }, 500);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const menuItems: MenuItem[] = [
     {
       name: "Tasks",
@@ -60,10 +62,12 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       {/* Logo */}
       <div>
         <div className="mb-24 mt-4 flex justify-center">
-          <img
+          <Image
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
-            className="h-18 w-18 ml-[-10px] cursor-pointer"
+            width={72}
+            height={72}
+            className="ml-[-10px] cursor-pointer"
             onClick={() => router.push("/")}
           />
         </div>

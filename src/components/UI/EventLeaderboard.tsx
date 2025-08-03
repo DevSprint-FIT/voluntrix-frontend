@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Trophy, Medal, Award, Star } from "lucide-react";
+import Image from "next/image";
 
 export interface LeaderboardEntry {
   id: string;
@@ -41,7 +42,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
     }
   };
 
-  const getRankBadgeColor = (rank: number) => {
+  const getRankBadgeColor = () => {
     return "bg-verdant-100 text-verdant-800 border-verdant-200";
   };
 
@@ -183,9 +184,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                             <div className="flex items-center justify-center space-x-2">
                               {getRankIcon(entry.rank)}
                               <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRankBadgeColor(
-                                  entry.rank
-                                )}`}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRankBadgeColor()}`}
                               >
                                 {entry.rank}
                               </span>
@@ -195,10 +194,12 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                             <div className="flex items-center space-x-6">
                               <div className="w-14 h-14 bg-verdant-100 rounded-full flex items-center justify-center overflow-hidden">
                                 {entry.profilePictureUrl ? (
-                                  <img
+                                  <Image
                                     src={entry.profilePictureUrl}
                                     alt={entry.name}
-                                    className="w-full h-full object-cover"
+                                    width={56}
+                                    height={56}
+                                    className="object-cover"
                                   />
                                 ) : (
                                   <span className="text-verdant-700 font-medium text-sm">

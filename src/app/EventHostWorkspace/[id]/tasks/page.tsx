@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useEffect, use } from "react";
@@ -22,35 +23,6 @@ import {
   TaskStatusCount,
   TaskCreateDTO,
 } from "@/services/hostWorkspaceTaskService";
-
-// Types for different task states
-interface TaskPendingReview {
-  taskId: number;
-  description: string;
-  assignee: string;
-  category: string;
-  difficulty: string;
-  resourceUrl: string;
-}
-
-interface TaskToBeCompleted {
-  taskId: number;
-  description: string;
-  assignee: string;
-  dueDate: string;
-  category: string;
-  difficulty: string;
-}
-
-interface CompletedTask {
-  taskId: number;
-  description: string;
-  assignee: string;
-  category: string;
-  difficulty: string;
-  rewardPoints: number;
-  resourceUrl: string;
-}
 
 const EventHostTasksPage = ({
   params,

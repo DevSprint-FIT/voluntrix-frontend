@@ -78,10 +78,10 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
   };
 
-  const handleChat = (id: string, type: 'request' | 'sponsorship') => {
-    console.log(`Opening chat for ${type}:`, id);
-    // TODO: Implement chat functionality
-  };
+  // const handleChat = (id: string, type: 'request' | 'sponsorship') => {
+  //   console.log(`Opening chat for ${type}:`, id);
+  //   // TODO: Implement chat functionality
+  // };
 
   const handleOpenSponsorChat = () => {
     console.log('Opening sponsor chat');

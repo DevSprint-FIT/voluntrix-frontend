@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,8 +12,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@/services/authService";
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
-
-
+import Image from "next/image";
 import { sponsorService, SponsorEventData } from "@/services/sponsorService";
 
 
@@ -309,10 +309,12 @@ export default function SponsorDashboardPage() {
         {/* Right Side: Sponsor Info */}
         {sponsor && (
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={sponsor.imageUrl} 
               alt="Sponsor Profile"
-              className="w-10 h-10 rounded-full object-cover"
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
             />
             <div>
               <h2 className="font-semibold font-secondary text-xl leading-tight">{sponsor.name}</h2> 
