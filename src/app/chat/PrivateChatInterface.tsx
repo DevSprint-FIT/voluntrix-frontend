@@ -296,7 +296,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
       <div className="bg-shark-950 text-white p-4 flex items-center space-x-3 shadow-sm">
         <button
           onClick={onBack}
-          className="text-shark-950 hover:bg-green-700 p-1 rounded"
+          className="text-shark-100 hover:bg-shark-700 p-1 rounded"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
