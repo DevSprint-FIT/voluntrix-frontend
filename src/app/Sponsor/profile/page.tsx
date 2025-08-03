@@ -1,48 +1,29 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Calendar, Mail, Phone, Building2, Briefcase, Globe } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Mail,
+  Phone,
+  Building2,
+  Briefcase,
+  Globe,
+} from "lucide-react";
+import { FaLinkedin } from "react-icons/fa";
+import { sponsorService, SponsorProfile } from "@/services/sponsorService";
 
+const formatJoinedDate = (appliedAt: number[]): string => {
+  if (!appliedAt || appliedAt.length < 3) return "Unknown";
 
-interface SponsorProfile {
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  website?: string;
-  profilePictureUrl?: string;
-  about: string;
-  institute: string;
-  company: string;
-  jobTitle: string;
-  joinedDate: string;
-}
+  // appliedAt format: [year, month, day, hour, minute, second, nanosecond]
+  const [year, month, day] = appliedAt;
+  const date = new Date(year, month - 1, day); // month is 0-indexed in JavaScript Date
 
-
-const mockSponsorProfile: SponsorProfile = {
-  id: 1,
-  username: "john_doe_sponsor",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@company.com",
-  phoneNumber: "+1 (555) 123-4567",
-  website: "https://www.techsolutions.com",
-    profilePictureUrl: "/images/default-profile.jpg",
-  about: "I'm passionate about supporting educational initiatives and community development projects. With over 10 years of experience in the corporate sector, I believe in giving back to society by sponsoring meaningful volunteer programs that create lasting impact in our communities.",
-  institute: "Stanford University",
-  company: "Tech Solutions Inc.",
-  jobTitle: "Senior Product Manager",
-  joinedDate: "2023-08-15T00:00:00Z"
-};
-
-
-const formatJoinedDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long' 
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 };
 
@@ -51,21 +32,18 @@ const SponsorProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Using hardcoded values for now
-  const sponsorId = 1;
-  const username = "john_doe_sponsor";
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        
-        setProfile(mockSponsorProfile);
+        const profileData = await sponsorService.getSponsorProfile();
+        if (profileData) {
+          setProfile(profileData);
+        } else {
+          setError("Failed to load profile data");
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -130,13 +108,13 @@ const SponsorProfilePage = () => {
           {profile && (
             <div className="flex items-center gap-3">
               <img
-                src={profile.profilePictureUrl || "/api/placeholder/40/40"}
+                src={profile.imageUrl || "/images/default-profile.jpg"}
                 alt="Sponsor Profile"
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
                 <h2 className="font-semibold font-secondary text-xl leading-tight">
-                  {profile.firstName} {profile.lastName}
+                  {profile.name}
                 </h2>
                 <p className="font-secondary font-semibold text-[#4F4F4F] text-xs leading-tight">
                   {profile.company}
@@ -153,18 +131,18 @@ const SponsorProfilePage = () => {
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
               <img
-                src={profile.profilePictureUrl || "/api/placeholder/120/120"}
-                alt={profile.firstName}
+                src={profile.imageUrl || "/images/default-profile.jpg"}
+                alt={profile.name}
                 className="w-32 h-32 rounded-lg object-cover"
               />
 
               <div className="flex-1">
                 <div className="flex flex-col mb-2">
                   <span className="text-gray-500 font-secondary mb-0">
-                    @{profile.username}
+                    @{profile.handle}
                   </span>
                   <h2 className="text-2xl font-bold font-secondary text-gray-900">
-                    {profile.firstName} {profile.lastName}
+                    {profile.name}
                   </h2>
                 </div>
 
@@ -182,19 +160,16 @@ const SponsorProfilePage = () => {
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center text-gray-600 font-secondary">
                     <MapPin size={16} className="mr-1" />
-                    <span>{profile.institute}</span>
+                    <span>{profile.address}</span>
                   </div>
                   <div className="flex items-center text-gray-600 font-secondary">
                     <Calendar size={16} className="mr-1" />
-                    <span>
-                      Joined {formatJoinedDate(profile.joinedDate)}
-                    </span>
+                    <span>Joined {formatJoinedDate(profile.appliedAt)}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-6 mb-4">
-                  <div className="flex items-center space-x-2">
-                  </div>
+                  <div className="flex items-center space-x-2"></div>
                 </div>
               </div>
             </div>
@@ -206,12 +181,13 @@ const SponsorProfilePage = () => {
               About
             </h3>
             <p className="text-gray-600 font-secondary leading-relaxed">
-              {profile.about}
+              {profile.sponsorshipNote}
             </p>
           </div>
 
-          {/* Contact Information - Half Width */}
+          {/* Contact Information and Web & Social Links - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Contact Information Card */}
             <div className="bg-[#FBFBFB] rounded-lg p-6">
               <h3 className="text-lg font-semibold font-secondary text-gray-900 mb-4">
                 Contact Information
@@ -235,10 +211,19 @@ const SponsorProfilePage = () => {
                       Phone
                     </p>
                     <p className="font-medium text-gray-900 font-secondary">
-                      {profile.phoneNumber}
+                      {profile.mobileNumber}
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Web and Social Links Card */}
+            <div className="bg-[#FBFBFB] rounded-lg p-6">
+              <h3 className="text-lg font-semibold font-secondary text-gray-900 mb-4">
+                Web and Social Links
+              </h3>
+              <div className="space-y-3">
                 {profile.website && (
                   <div className="flex items-center space-x-3">
                     <Globe size={16} className="text-gray-400" />
@@ -246,13 +231,31 @@ const SponsorProfilePage = () => {
                       <p className="text-sm text-gray-600 font-secondary">
                         Website
                       </p>
-                      <a 
+                      <a
                         href={profile.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-medium text-blue-600 font-secondary hover:text-blue-800 transition-colors"
                       >
                         {profile.website}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                {profile.linkedinProfile && (
+                  <div className="flex items-center space-x-3">
+                    <FaLinkedin size={16} className="text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 font-secondary">
+                        LinkedIn
+                      </p>
+                      <a
+                        href={profile.linkedinProfile}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-blue-600 font-secondary hover:text-blue-800 transition-colors"
+                      >
+                        {profile.linkedinProfile}
                       </a>
                     </div>
                   </div>
