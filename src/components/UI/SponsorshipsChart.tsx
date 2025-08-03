@@ -67,6 +67,7 @@ const SponsorshipsChart: React.FC<SponsorshipsChartProps> = ({
   const totalCount = data.reduce((sum, item) => sum + item.count, 0);
   const previousCount = data[data.length - 2]?.count || 0;
   const currentCount = data[data.length - 1]?.count || 0;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const percentageChange =
     previousCount > 0
       ? (((currentCount - previousCount) / previousCount) * 100).toFixed(0)

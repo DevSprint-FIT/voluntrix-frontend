@@ -35,6 +35,7 @@ export default function SponsorPendingSponsorshipsPage() {
     {
       header: "Event Name",
       accessor: "eventTitle",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       cell: (value, row) => (
         <div className="flex flex-col">
           <span className="font-bold">{value}</span>

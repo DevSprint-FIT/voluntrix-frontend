@@ -71,6 +71,7 @@ export default function SponsorEventsLayout({
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={sponsor?.imageUrl || "/images/default-profile.jpg"}
             alt="Sponsor Profile"
