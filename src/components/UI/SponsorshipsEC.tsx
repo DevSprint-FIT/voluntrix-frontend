@@ -154,7 +154,9 @@ export default function SponsorshipsEC({
 
               <Button
                 variant="shadow"
-                isDisabled={!tierName.trim() || !Number(tierAmount) || !tierBenefits}
+                isDisabled={
+                  !tierName.trim() || !Number(tierAmount) || !tierBenefits
+                }
                 className="bg-verdant-600 text-white px-6 py-2 rounded-lg h-9"
                 onPress={addTier}
               >
@@ -163,18 +165,21 @@ export default function SponsorshipsEC({
             </div>
           </label>
         </div>
-        <label className="font-secondary font-medium text-shark-950 text-[15px] flex flex-col mb-2">
+        <label className="font-secondary font-medium text-shark-950 text-[15px] flex flex-col">
           Benefits
           <textarea
             value={tierBenefits}
             onChange={(e) => setTierBenefits(e.target.value)}
-            maxLength={200}
+            maxLength={500}
             placeholder="Enter Sponsorship Benefits"
             className="resize-none border-[2px] border-shark-300 text-shark-950 pl-2 pt-1 rounded-lg w-[516px] placeholder:text-shark-300 h-[50px]"
           />
+          <div className="w-[516px] text-right font-secondary font-normal text-shark-800 text-[11px]">
+            {tierBenefits.length}/500
+          </div>
         </label>
         {tiers.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-3">
             <h4 className="font-secondary font-medium text-shark-950 text-[16px] mb-1">
               Sponsorship Tiers:
             </h4>
