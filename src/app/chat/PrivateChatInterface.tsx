@@ -287,7 +287,11 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto border-x border-gray-200">
+    <div 
+      className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto border-x border-gray-200 fixed inset-0 z-50"
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+    >
       {/* Header */}
       <div className="bg-shark-950 text-white p-4 flex items-center space-x-3 shadow-sm">
         <button
@@ -330,7 +334,18 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
       {/* Messages Area */}
       <div 
         ref={messageAreaRef}
-        className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"
+        className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 overscroll-contain"
+        onWheel={(e) => {
+          // Prevent parent scroll when reaching scroll boundaries
+          const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+          const isAtTop = scrollTop === 0;
+          const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+          
+          if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
+            e.preventDefault();
+          }
+          e.stopPropagation();
+        }}
       >
         {messages.length === 0 ? (
           <div className="text-center py-8">
@@ -364,7 +379,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
                 }`}>
                   <p className="text-sm">{message.content}</p>
                   <p className={`text-xs mt-1 ${
-                    isOwnMessage ? 'text-green-100' : 'text-gray-500'
+                    isOwnMessage ? 'text-shark-100' : 'text-gray-500'
                   }`}>
                     {formatTime(message.timestamp)}
                   </p>
@@ -391,7 +406,7 @@ export default function PrivateChatInterface({ initialUser, initialOtherUser, on
           <button
             type="submit"
             disabled={!isConnected || !isRoomReady || !messageInput.trim()}
-            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white p-2 rounded-full transition-colors"
+            className="bg-shark-500 hover:bg-shark-600 disabled:bg-gray-300 text-white p-2 rounded-full transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

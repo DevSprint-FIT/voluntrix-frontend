@@ -314,7 +314,11 @@ export default function ChatListInterface({
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div 
+      className="h-screen bg-gray-50 flex flex-col fixed inset-0 z-50"
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+    >
       {/* Header */}
       <div className="bg-white text-black p-4">
         <div className="flex items-center justify-between mb-4">
@@ -421,7 +425,20 @@ export default function ChatListInterface({
       </div>
 
       {/* Content List */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div 
+        className="flex-1 overflow-y-auto bg-white overscroll-contain"
+        onWheel={(e) => {
+          // Prevent parent scroll when reaching scroll boundaries
+          const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+          const isAtTop = scrollTop === 0;
+          const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+          
+          if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
+            e.preventDefault();
+          }
+          e.stopPropagation();
+        }}
+      >
         {loading ? (
           <div className="p-8 text-center">
             <div className="w-8 h-8 border-4 border-shark-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
