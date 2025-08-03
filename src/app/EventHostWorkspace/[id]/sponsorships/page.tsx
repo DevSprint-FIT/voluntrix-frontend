@@ -47,15 +47,33 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   // Action handlers
   const handleApprove = async (id: number) => {
-    console.log('Approved sponsorship request:', id);
-    const updateStatus = await updateSponsorshipRequestStatus(id, 'APPROVED');
-    console.log(updateStatus);
+    try {
+      console.log('Approving sponsorship request:', id);
+      const approvedItem = pendingRequests.find((req) => req.requestId === id);
+      if (!approvedItem) return;
+
+      await updateSponsorshipRequestStatus(id, 'APPROVED');
+
+      setPendingRequests((prev) => prev.filter((req) => req.requestId !== id));
+      setApprovedSponsors((prev) => [
+        ...prev,
+        { ...approvedItem, status: 'APPROVED' },
+      ]);
+    } catch (error) {
+      console.error('Error approving sponsorship request:', error);
+    }
   };
 
   const handleReject = async (id: number) => {
-    console.log('Rejected sponsorship request:', id);
-    const updateStatus = await updateSponsorshipRequestStatus(id, 'REJECTED');
-    console.log(updateStatus);
+    try {
+      console.log('Rejecting sponsorship request:', id);
+
+      setPendingRequests((prev) => prev.filter((req) => req.requestId !== id));
+
+      await updateSponsorshipRequestStatus(id, 'REJECTED');
+    } catch (error) {
+      console.error('Error rejecting sponsorship request:', error);
+    }
   };
 
   const handleChat = (id: string, type: 'request' | 'sponsorship') => {
