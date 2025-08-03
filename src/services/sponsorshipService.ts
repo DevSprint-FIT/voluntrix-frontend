@@ -38,3 +38,23 @@ export const fetchSponsorshipsByEvent = async (
     throw error;
   }
 };
+
+export const updateSponsorshipAvailability = async (
+  sponsorshipId: number,
+  isAvailable: boolean
+) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sponsorships/${sponsorshipId}/availability`,
+      isAvailable,
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
+
+    return response.data.data;
+  } catch (error) {
+    console.error('Error updating sponsorship availability:', error);
+    throw error;
+  }
+};

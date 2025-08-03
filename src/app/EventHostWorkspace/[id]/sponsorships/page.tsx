@@ -8,6 +8,7 @@ import {
   fetchSponReqWithNameByEvent,
   updateSponsorshipRequestStatus,
 } from '@/services/sponsorshipRequestService';
+import { updateSponsorshipAvailability } from '@/services/sponsorshipService';
 
 const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +54,7 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
       if (!approvedItem) return;
 
       await updateSponsorshipRequestStatus(id, 'APPROVED');
+      await updateSponsorshipAvailability(id, false);
 
       setPendingRequests((prev) => prev.filter((req) => req.requestId !== id));
       setApprovedSponsors((prev) => [
