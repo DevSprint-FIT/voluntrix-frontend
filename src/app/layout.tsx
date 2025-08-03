@@ -1,30 +1,31 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: "Voluntrix",
-  description: "Join, organize, and support volunteer events effortlessly.",
-  keywords: ["volunteering", "events", "community", "nonprofits"],
+  title: 'Voluntrix',
+  description: 'Join, organize, and support volunteer events effortlessly.',
+  keywords: ['volunteering', 'events', 'community', 'nonprofits'],
   openGraph: {
-    title: "Voluntrix",
-    description: "Empowering volunteers and organizations worldwide.",
-    // url: "https://voluntrix.com",
-    type: "website",
+    title: 'Voluntrix',
+    description: 'Empowering volunteers and organizations worldwide.',
+    url: 'https://voluntrix-preview.vercel.app/',
+    type: 'website',
   },
 };
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        {/* Layout UI */}
-        {/* Place children where you want to render a page or nested layout */}
-        <main>{children}</main>
+        <main>
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
-  )
+  );
 }

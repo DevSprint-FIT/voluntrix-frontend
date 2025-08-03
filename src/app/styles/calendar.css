@@ -1,0 +1,145 @@
+
+
+/* Basic calendar setup */
+.react-calendar {
+  background-color: #FBFBFB !important;
+  border: none !important;
+  font-family: inherit;
+  width: 100%;
+}
+
+/* Remove all default tile styling */
+.react-calendar__tile {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-weight: normal !important;
+  /* Ensure tiles have consistent dimensions */
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Prevent underline on dates */
+.react-calendar__tile abbr {
+  text-decoration: none;
+}
+
+/* Remove red color on weekends */
+.react-calendar__month-view__days__day--weekend {
+  color: inherit; /* Use default text color */
+}
+
+/* Remove underlines from all text */
+.react-calendar__tile abbr,
+.react-calendar__month-view__weekdays abbr {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+/* Remove default weekend styling */
+.react-calendar__month-view__days__day--weekend {
+  color: inherit !important;
+}
+
+/* Remove all default "today" styling */
+.react-calendar__tile--now {
+  background: none !important;
+  color: inherit !important;
+  font-weight: normal !important;
+}
+
+/* Set the calendar background color to #FBFBFB */
+.react-calendar {
+  background-color: #fbfbfb !important;
+  border: none;  
+  font-family: inherit;
+  cursor: default;
+}
+
+/* Style weekday headers */
+.react-calendar__month-view__weekdays abbr {
+  font-family: inherit;
+  cursor: default;
+}
+
+/* Style the month/year label */
+.react-calendar__navigation__label {
+  background-color: #ecfdf5 !important; /* verdant-50 */
+  color: #047857 !important; /* verdant-600 */
+  border-radius: 9999px !important; /* rounded-full */
+  padding: 6px 12px !important;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* Style for the year dropdown to show years from current to bottom */
+.year-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.year-dropdown option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.year-dropdown option:hover {
+  background-color: #f3f4f6;
+}
+
+/* PERFECT CIRCLE for event dates */
+.react-calendar__tile.highlight-event {
+  position: relative !important;
+}
+
+.react-calendar__tile.highlight-event::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  /* Use the same value for both width and height to ensure perfect circle */
+  width: 32px !important;
+  height: 32px !important;
+  background-color: #0cbc8b !important;
+  border-radius: 50% !important;
+  z-index: 1 !important;
+  /* Prevent any distortion */
+  flex-shrink: 0 !important;
+}
+
+.react-calendar__tile.highlight-event abbr {
+  position: relative !important;
+  z-index: 2 !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Ensure event highlight takes precedence over any other state */
+.react-calendar__tile.highlight-event:hover::before,
+.react-calendar__tile.highlight-event:focus::before,
+.react-calendar__tile.highlight-event:active::before {
+  background-color: #0cbc8b !important;
+  /* Maintain circle dimensions on hover/focus */
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.react-calendar__tile.highlight-event:hover abbr,
+.react-calendar__tile.highlight-event:focus abbr,
+.react-calendar__tile.highlight-event:active abbr {
+  color: white !important;
+}
