@@ -278,12 +278,15 @@ export default function Navbar() {
             >
               Events
             </Link>
+            {/* Social Feed - Only show to authenticated ORGANIZATION or VOLUNTEER users (NOT SPONSORS) */}
+            {isAuthenticated && user && (user.role === 'ORGANIZATION' || user.role === 'VOLUNTEER') && (
             <Link
               href="/PublicFeed"
               className="transition-all duration-300 ease-in-out hover:text-verdant-600"
             >
-              {isAuthenticated ? 'Event Feed' : 'Public Feed'}
+              Social Feed
             </Link>
+     )}
             <Link
               href="#"
               className="transition-all duration-300 ease-in-out hover:text-verdant-600"

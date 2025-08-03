@@ -37,7 +37,7 @@ const Sidebar = () => {
       badge: notificationCount,
       href: '/Organization/notifications',
     },
-    { name: 'Social Feed', icon: Send, href: '/Organization/feed' },
+    { name: 'My Feed', icon: Send, href: '/Organization/feed' },
     { name: 'Settings', icon: Settings, href: '/Organization/settings' },
   ];
 

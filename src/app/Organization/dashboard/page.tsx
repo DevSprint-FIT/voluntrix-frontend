@@ -18,18 +18,21 @@ import authService from "@/services/authService";
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
 
-import { getEventDataForOrganization, getFollowersStats, FollowersData, getInstituteDistribution } from "@/services/dashboardService";
+import { 
+  getEventDataForOrganization, 
+  getFollowersStats, 
+  FollowersData, 
+  getInstituteDistribution,
+  getDonationsStats,
+  getThisMonthDonations,
+  DonationData,
+  ThisMonthDonation
+} from "@/services/dashboardService";
 import { getOrganizationSettings, OrganizationSettings } from "@/services/organizationSettingsService";
 
 interface TileProps {
   date: Date;
   view: string;
-}
-
-interface DonationData {
-  month: string;
-  amount: number;
-  label: string;
 }
 
 interface FollowersChartData {
@@ -51,8 +54,12 @@ export default function DashboardPage() {
   const [followersDataLineGraph, setFollowersDataLineGraph] = useState<FollowersChartData[]>([]);
   const [followersLoading, setFollowersLoading] = useState(false);
   const [selectedYear, setSelectedYear] = useState(2025);
+  const [donationsSelectedYear, setDonationsSelectedYear] = useState(2025);
+  const [followersSelectedYear, setFollowersSelectedYear] = useState(2025);
   const [followersThisMonth, setFollowersThisMonth] = useState<number>(0);
   const [totalEventsHosted, setTotalEventsHosted] = useState<number>(0);
+  const [thisMonthDonations, setThisMonthDonations] = useState<ThisMonthDonation>({ amount: 0, currency: 'LKR' });
+  const [thisMonthDonationsLoading, setThisMonthDonationsLoading] = useState(false);
   const [organization, setOrganization] = useState<OrganizationSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,6 +133,8 @@ export default function DashboardPage() {
     setFollowersLoading(true);
     try {
       const data: FollowersData[] = await getFollowersStats(year);
+      
+      console.log("Raw followers data from API:", data);
 
       const formattedData: FollowersChartData[] = data.map(item => ({
         month: item.month,
@@ -134,9 +143,37 @@ export default function DashboardPage() {
       }));
       setFollowersDataLineGraph(formattedData);
 
-      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
-
-      const currentMonthData = data.find(d => d.month === currentMonth);
+      
+      const currentMonth = new Date().toLocaleString('default', { month: 'short' }).toUpperCase();
+      console.log("Current month (our format):", currentMonth);
+      console.log("Available months in data:", data.map(d => d.month));
+      
+      // Try multiple formats to match
+      const possibleFormats = [
+        new Date().toLocaleString('default', { month: 'short' }).toUpperCase(), // "AUG"
+        new Date().toLocaleString('default', { month: 'short' }), // "Aug"  
+        new Date().toLocaleString('default', { month: 'long' }), // "August"
+        new Date().toLocaleString('default', { month: 'long' }).toUpperCase(), // "AUGUST"
+        (new Date().getMonth() + 1).toString().padStart(2, '0'), // "08"
+        (new Date().getMonth() + 1).toString(), // "8"
+      ];
+      
+      console.log("Trying these formats:", possibleFormats);
+      
+      let currentMonthData = null;
+      let matchedFormat = null;
+      
+      for (const format of possibleFormats) {
+        currentMonthData = data.find(d => d.month === format);
+        if (currentMonthData) {
+          matchedFormat = format;
+          break;
+        }
+      }
+      
+      console.log("Matched format:", matchedFormat);
+      console.log("Found data for current month:", currentMonthData);
+      
       setFollowersThisMonth(currentMonthData ? currentMonthData.count : 0);
 
     } catch (error) {
@@ -151,48 +188,36 @@ export default function DashboardPage() {
   const fetchDonationsData = async (year: number) => {
     setDonationsLoading(true);
     try {
-      
-      setTimeout(() => {
-        
-        const yearData: Record<number, DonationData[]> = {
-          2023: [
-            { month: 'JAN', amount: 2800, label: 'Jan' },
-            { month: 'FEB', amount: 3200, label: 'Feb' },
-            { month: 'MAR', amount: 2900, label: 'Mar' },
-            { month: 'APR', amount: 3500, label: 'Apr' },
-            { month: 'MAY', amount: 4100, label: 'May' },
-            { month: 'JUN', amount: 3800, label: 'Jun' },
-          ],
-          2024: [
-            { month: 'JAN', amount: 3500, label: 'Jan' },
-            { month: 'FEB', amount: 4200, label: 'Feb' },
-            { month: 'MAR', amount: 3800, label: 'Mar' },
-            { month: 'APR', amount: 4600, label: 'Apr' },
-            { month: 'MAY', amount: 5200, label: 'May' },
-            { month: 'JUN', amount: 4800, label: 'Jun' },
-          ],
-          2025: [
-            { month: 'MAR', amount: 3200, label: 'MAR' },
-            { month: 'APR', amount: 2800, label: 'APR' },
-            { month: 'MAY', amount: 5000, label: 'MAY' },
-            { month: 'JUN', amount: 2400, label: 'JUN' },
-            { month: 'JUL', amount: 4800, label: 'JUL' },
-            { month: 'AUG', amount: 4600, label: 'AUG' },
-          ],
-        };
-        
-        setDonationsData(yearData[year] || []);
-        setDonationsLoading(false);
-      }, 1000);
+      const data = await getDonationsStats(year);
+      setDonationsData(data);
     } catch (error) {
       console.error("Error fetching donations data:", error);
+      setDonationsData([]);
+    } finally {
       setDonationsLoading(false);
+    }
+  };
+
+  const fetchThisMonthDonations = async () => {
+    setThisMonthDonationsLoading(true);
+    try {
+      const data = await getThisMonthDonations();
+      setThisMonthDonations(data);
+    } catch (error) {
+      console.error("Error fetching this month donations:", error);
+      setThisMonthDonations({ amount: 0, currency: 'LKR' });
+    } finally {
+      setThisMonthDonationsLoading(false);
     }
   };
 
   const fetchEventData = async () => {
     try {
       const { eventCount, eventDates } = await getEventDataForOrganization();
+      
+      console.log("Fetched event dates:", eventDates);
+      console.log("Event dates length:", eventDates.length);
+      console.log("Event dates formatted:", eventDates.map(date => date.toDateString()));
       
       setEventDates(eventDates);
       setTotalEventsHosted(eventCount); 
@@ -225,8 +250,9 @@ export default function DashboardPage() {
         await Promise.all([
           fetchEventData(),
           fetchInstituteDistribution(),
-          fetchDonationsData(selectedYear),
-          fetchFollowersData(selectedYear)
+          fetchDonationsData(donationsSelectedYear),
+          fetchFollowersData(followersSelectedYear),
+          fetchThisMonthDonations()
         ]);
 
       } catch (error) {
@@ -238,28 +264,33 @@ export default function DashboardPage() {
     };
 
     initializeDashboard();
-  }, [selectedYear]);
+  }, [donationsSelectedYear, followersSelectedYear]);
 
-  const handleYearChange = (year: number) => {
-    setSelectedYear(year);
+  const handleDonationsYearChange = (year: number) => {
+    setDonationsSelectedYear(year);
     fetchDonationsData(year); 
-    fetchFollowersData(year); 
   };
 
   const handleFollowersYearChange = (year: number) => {
-    setSelectedYear(year);
+    setFollowersSelectedYear(year);
     fetchFollowersData(year); 
   };
 
   const tileClassName = ({ date, view }: TileProps) => {
     if (view === 'month') {
-      return eventDates.some(ed =>
-        ed.getFullYear() === date.getFullYear() &&
-        ed.getMonth() === date.getMonth() &&
-        ed.getDate() === date.getDate()
-      ) ? "highlight-event" : undefined;
+      const hasEvent = eventDates.some(ed => {
+        return ed.toDateString() === date.toDateString();
+      });
+      
+      return hasEvent ? "highlight-event" : undefined;
     }
     return undefined;
+  };
+
+  // Format donation amount for display
+  const formatDonationAmount = (amount: number, currency: string = 'LKR') => {
+    if (thisMonthDonationsLoading) return "Loading...";
+    return `${currency} ${amount.toLocaleString()}`;
   };
 
   // Loading state
@@ -323,7 +354,11 @@ export default function DashboardPage() {
       {/* Stat Cards Grid */}
       <div className="flex flex-wrap gap-10 mb-8">
         <StatCard title="Total Events Hosted" value={totalEventsHosted} icon={<BarChart size={20} />} />
-        <StatCard title="This Month Donations" value="LKR 4,500" icon={<BarChart size={20} />} />
+        <StatCard 
+          title="This Month Donations" 
+          value={formatDonationAmount(thisMonthDonations.amount, thisMonthDonations.currency)} 
+          icon={<BarChart size={20} />} 
+        />
         <StatCard title="This Month Followers" value={followersThisMonth} icon={<BarChart size={20} />} />
         <StatCard title="Total Views" value={40} icon={<BarChart size={20} />} />
       </div>
@@ -367,7 +402,7 @@ export default function DashboardPage() {
         <DonationsChart
           data={donationsData.length > 0 ? donationsData : undefined}
           loading={donationsLoading}
-          onYearChange={handleYearChange}
+          onYearChange={handleDonationsYearChange}
         />
       </div>
 

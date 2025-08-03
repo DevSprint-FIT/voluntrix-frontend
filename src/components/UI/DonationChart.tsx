@@ -2,16 +2,6 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 
-
-const dummyData = [
-  { month: 'MAR', amount: 3200, label: 'MAR' },
-  { month: 'APR', amount: 2800, label: 'APR' },
-  { month: 'MAY', amount: 5000, label: 'MAY' },
-  { month: 'JUN', amount: 2400, label: 'JUN' },
-  { month: 'JUL', amount: 4800, label: 'JUL' },
-  { month: 'AUG', amount: 4600, label: 'AUG' },
-];
-
 interface DonationsChartProps {
   data?: Array<{
     month: string;
@@ -23,7 +13,7 @@ interface DonationsChartProps {
 }
 
 const DonationsChart: React.FC<DonationsChartProps> = ({ 
-  data = dummyData, 
+  data = [], 
   loading = false,
   onYearChange 
 }) => {
@@ -37,6 +27,29 @@ const DonationsChart: React.FC<DonationsChartProps> = ({
     setIsYearDropdownOpen(false);
     onYearChange?.(year);
   };
+
+  // Generate fallback data for recent months when no data is available
+  const generateFallbackData = () => {
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const currentDate = new Date();
+    const currentMonthIndex = currentDate.getMonth();
+    
+    // Get last 3 months including current month
+    const recentMonths = [];
+    for (let i = 2; i >= 0; i--) {
+      const monthIndex = (currentMonthIndex - i + 12) % 12;
+      recentMonths.push({
+        month: months[monthIndex],
+        amount: 0,
+        label: months[monthIndex]
+      });
+    }
+    
+    return recentMonths;
+  };
+
+  // Use actual data if available, otherwise use fallback data
+  const chartData = data && data.length > 0 ? data : generateFallbackData();
 
   // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -55,11 +68,12 @@ const DonationsChart: React.FC<DonationsChartProps> = ({
     return null;
   };
 
-  // Calculate total and percentage change
-  const currentAmount = data[data.length - 1]?.amount || 0;
-  const previousAmount = data[data.length - 2]?.amount || 0;
-  const percentageChange = previousAmount > 0 
-    ? ((currentAmount - previousAmount) / previousAmount * 100).toFixed(0)
+  // Calculate total amount (sum of all months) and percentage change
+  const totalAmount = chartData.reduce((sum, item) => sum + item.amount, 0);
+  const currentMonthAmount = chartData.length > 0 ? chartData[chartData.length - 1]?.amount || 0 : 0;
+  const previousMonthAmount = chartData.length > 1 ? chartData[chartData.length - 2]?.amount || 0 : 0;
+  const percentageChange = previousMonthAmount > 0 
+    ? ((currentMonthAmount - previousMonthAmount) / previousMonthAmount * 100).toFixed(0)
     : 0;
 
   if (loading) {
@@ -108,15 +122,21 @@ const DonationsChart: React.FC<DonationsChartProps> = ({
             )}
           </div>
           
-          {/* Amount on first line */}
+          {/* Amount on first line - Show total amount */}
           <div className="text-xl pl-4 font-bold text-gray-900 mb-1">
-            LKR {currentAmount.toLocaleString()}
+            LKR {totalAmount.toLocaleString()}
           </div>
           
           {/* Percentage on second line */}
           <div className="text-sm text-gray-500 mb-3 pl-4">
             Total Donations  
-            <span className="text-green-600 ml-1">+{percentageChange}%</span>
+            {data && data.length > 0 ? (
+              <span className="text-green-600 ml-1">
+                {previousMonthAmount > 0 ? `${Number(percentageChange) >= 0 ? '+' : ''}${percentageChange}%` : 'N/A'}
+              </span>
+            ) : (
+              <span className="text-gray-400 ml-1">No donations yet</span>
+            )}
           </div>
         </div>
       </div>
@@ -124,7 +144,7 @@ const DonationsChart: React.FC<DonationsChartProps> = ({
       {/* Chart positioned to the right */}
       <div className="h-32 ml-auto pt-0 pr-12 pb-6" style={{ width: '70%' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis 
               dataKey="month" 
               axisLine={false}
