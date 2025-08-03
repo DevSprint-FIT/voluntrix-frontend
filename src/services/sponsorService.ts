@@ -59,6 +59,22 @@ interface SponsorProfile {
   appliedAt: number[];
 }
 
+// Interface for the new sponsorship request table data
+interface SponsorRequestTableDTO {
+  requestId: number;
+  price: number;
+  type: string;
+  eventTitle: string;
+  eventId: number;
+  eventStartDate: number[];
+  paymentStatus: "FULLPAID" | "PARTIALPAID" | "UNPAID";
+  totalAmountPaid: number;
+}
+
+// Status enums
+type SponsorshipRequestStatus = "APPROVED" | "REJECTED" | "PENDING";
+type SponsorshipPaymentStatus = "FULLPAID" | "PARTIALPAID" | "UNPAID";
+
 // Combined interface for frontend use
 interface SponsorEventData {
   eventId: number;
@@ -77,6 +93,70 @@ interface SponsorEventData {
 }
 
 class SponsorService {
+  // Get sponsorship requests by status using the new API endpoint
+  async getSponsorshipRequestsByStatus(
+    status: SponsorshipRequestStatus
+  ): Promise<SponsorRequestTableDTO[]> {
+    try {
+      const response = await fetch(
+        `${getBaseUrl()}/api/sponsorship-requests/sponsor/status/${status}`,
+        {
+          method: "GET",
+          headers: authService.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.error(
+        `Error fetching sponsorship requests with status ${status}:`,
+        error
+      );
+      return [];
+    }
+  }
+
+  // Get counts for all sponsorship request statuses
+  async getSponsorshipRequestCounts(): Promise<{
+    approved: number;
+    pending: number;
+    rejected: number;
+  }> {
+    try {
+      const [approvedRequests, pendingRequests, rejectedRequests] =
+        await Promise.all([
+          this.getSponsorshipRequestsByStatus("APPROVED"),
+          this.getSponsorshipRequestsByStatus("PENDING"),
+          this.getSponsorshipRequestsByStatus("REJECTED"),
+        ]);
+
+      return {
+        approved: approvedRequests.length,
+        pending: pendingRequests.length,
+        rejected: rejectedRequests.length,
+      };
+    } catch (error) {
+      console.error("Error fetching sponsorship request counts:", error);
+      return { approved: 0, pending: 0, rejected: 0 };
+    }
+  }
+
+  // Helper method to format date array to readable date string
+  formatDateArray(dateArray: number[]): string {
+    if (!dateArray || dateArray.length < 3) return "N/A";
+    const [year, month, day] = dateArray;
+    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
   // Get sponsor profile information
   async getSponsorProfile(): Promise<SponsorProfile | null> {
     try {
@@ -329,4 +409,7 @@ export type {
   Sponsorship,
   Event,
   SponsorProfile,
+  SponsorRequestTableDTO,
+  SponsorshipRequestStatus,
+  SponsorshipPaymentStatus,
 };
