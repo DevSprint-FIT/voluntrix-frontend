@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -7,10 +7,10 @@ import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
 import { useRouter } from 'next/navigation';
 import EventDropdownHeader from '@/components/UI/EventDropdownHeader';
-import ProfileIndicator from "@/components/UI/ProfileIndicator";
+import ProfileIndicator from '@/components/UI/ProfileIndicator';
 
 export default function HostEvents() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
   const [events, setEvents] = useState<EventType[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export default function HostEvents() {
 
   const handleRowClick = (eventId: string, eventStatus: string) => {
     const status = eventStatus.toUpperCase();
-    if (status === "ACTIVE" || status === "COMPLETE") {
+    if (status === 'ACTIVE' || status === 'COMPLETE') {
       router.push(`/EventHostWorkspace/${eventId}/tasks`);
     }
   };
@@ -36,19 +36,19 @@ export default function HostEvents() {
       try {
         setLoading(true);
         const data = await fetchEventByHostId();
-        console.log("Fetched data:", JSON.stringify(data, null, 2));
+        console.log('Fetched data:', JSON.stringify(data, null, 2));
 
         setEvents(Array.isArray(data) ? data : []);
 
         const counts = {
-          active: data.filter((e) => e.eventStatus.toUpperCase() === "ACTIVE")
+          active: data.filter((e) => e.eventStatus.toUpperCase() === 'ACTIVE')
             .length,
-          pending: data.filter((e) => e.eventStatus.toUpperCase() === "PENDING")
+          pending: data.filter((e) => e.eventStatus.toUpperCase() === 'PENDING')
             .length,
           completed: data.filter(
-            (e) => e.eventStatus.toUpperCase() === "COMPLETE"
+            (e) => e.eventStatus.toUpperCase() === 'COMPLETE'
           ).length,
-          denied: data.filter((e) => e.eventStatus.toUpperCase() === "DENIED")
+          denied: data.filter((e) => e.eventStatus.toUpperCase() === 'DENIED')
             .length,
         };
 
@@ -57,7 +57,7 @@ export default function HostEvents() {
         setError(
           err instanceof Error
             ? err.message
-            : "Failed to fetch events. Please try again."
+            : 'Failed to fetch events. Please try again.'
         );
       } finally {
         setLoading(false);
@@ -69,39 +69,39 @@ export default function HostEvents() {
 
   const statsCards = [
     {
-      title: "Active Events",
+      title: 'Active Events',
       count: eventCounts.active.toString(),
-      subtitle: "Currently ongoing",
+      subtitle: 'Currently ongoing',
     },
     {
-      title: "Applied Events",
+      title: 'Applied Events',
       count: eventCounts.pending.toString(),
-      subtitle: "Pending Approvals",
+      subtitle: 'Pending Approvals',
     },
     {
-      title: "Completed Events",
+      title: 'Completed Events',
       count: eventCounts.completed.toString(),
-      subtitle: "Total completed",
+      subtitle: 'Total completed',
     },
   ];
 
   const filteredEvents = Array.isArray(events)
     ? events.filter((event) => {
         const status = event.eventStatus.toUpperCase();
-        if (activeTab === "all") return true;
-        if (activeTab === "active") return status === "ACTIVE";
-        if (activeTab === "applied") return status === "PENDING";
-        if (activeTab === "completed") return status === "COMPLETE";
+        if (activeTab === 'all') return true;
+        if (activeTab === 'active') return status === 'ACTIVE';
+        if (activeTab === 'applied') return status === 'PENDING';
+        if (activeTab === 'completed') return status === 'COMPLETE';
         return false;
       })
     : [];
 
   const tabs = [
-    { id: "all", label: "All Events", active: true },
-    { id: "active", label: "Active Events", active: false },
-    { id: "applied", label: "Applied Events", active: false },
-    { id: "completed", label: "Completed Events", active: false },
-    { id: "denied", label: "Denied Events", active: false },
+    { id: 'all', label: 'All Events', active: true },
+    { id: 'active', label: 'Active Events', active: false },
+    { id: 'applied', label: 'Applied Events', active: false },
+    { id: 'completed', label: 'Completed Events', active: false },
+    { id: 'denied', label: 'Denied Events', active: false },
   ];
 
   function formatDate(dateString: string) {
@@ -109,32 +109,32 @@ export default function HostEvents() {
     const day = date.getDate();
     const suffix =
       day % 10 === 1 && day !== 11
-        ? "st"
+        ? 'st'
         : day % 10 === 2 && day !== 12
-        ? "nd"
+        ? 'nd'
         : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
+        ? 'rd'
+        : 'th';
 
-    const month = date.toLocaleString("default", { month: "short" });
+    const month = date.toLocaleString('default', { month: 'short' });
     const year = date.getFullYear();
-    return `${day.toString().padStart(2, "0")}${suffix} ${month} ${year}`;
+    return `${day.toString().padStart(2, '0')}${suffix} ${month} ${year}`;
   }
 
   function getStatusStyles(status: string) {
     switch (status.toUpperCase()) {
-      case "DRAFT":
-        return "bg-gray-200 text-gray-800"; // Neutral, work-in-progress
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-700"; // Awaiting approval
-      case "ACTIVE":
-        return "bg-green-100 text-green-700"; // Ongoing event
-      case "COMPLETE":
-        return "bg-blue-100 text-blue-700"; // Successfully finished
-      case "DENIED":
-        return "bg-red-100 text-red-700"; // Rejected or not approved
+      case 'DRAFT':
+        return 'bg-gray-200 text-gray-800'; // Neutral, work-in-progress
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-700'; // Awaiting approval
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-700'; // Ongoing event
+      case 'COMPLETE':
+        return 'bg-blue-100 text-blue-700'; // Successfully finished
+      case 'DENIED':
+        return 'bg-red-100 text-red-700'; // Rejected or not approved
       default:
-        return "bg-gray-100 text-gray-700"; // Fallback
+        return 'bg-gray-100 text-gray-700'; // Fallback
     }
   }
 
@@ -178,12 +178,10 @@ export default function HostEvents() {
               Events
             </h1>
           </div>
-          <div className="flex items-center space-x-4 mt-3">
+          <div className="flex items-center space-x-12 mt-3">
+            <EventCreation />
             <ProfileIndicator />
           </div>
-        </div>
-        <div className="flex justify-end mt-8">
-          <EventCreation />
         </div>
       </div>
 
@@ -225,13 +223,13 @@ export default function HostEvents() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-2 px-1 border-b-2 font-medium text-md ${
                     activeTab === tab.id
-                      ? "border-verdant-500 text-verdant-600"
-                      : "border-transparent text-shark-500 hover:text-shark-700 hover:border-shark-300"
+                      ? 'border-verdant-500 text-verdant-600'
+                      : 'border-transparent text-shark-500 hover:text-shark-700 hover:border-shark-300'
                   }`}
                 >
                   {tab.label}
 
-                  {tab.id === "all" && (
+                  {tab.id === 'all' && (
                     <span className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-verdant-600 rounded-full">
                       {events.length}
                     </span>
@@ -268,7 +266,7 @@ export default function HostEvents() {
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center space-y-4">
-                        {activeTab === "all" && events.length === 0 ? (
+                        {activeTab === 'all' && events.length === 0 ? (
                           <>
                             <p className="text-shark-500 font-secondary text-lg">
                               Create your first event to get started.

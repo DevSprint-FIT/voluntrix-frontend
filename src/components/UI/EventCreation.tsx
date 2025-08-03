@@ -247,6 +247,7 @@ export default function EventCreation() {
         onPress={() => setWizardOpen(true)}
         className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
       >
+        <span className="text-3xl">+</span>
         Create Event
       </Button>
       <Modal
