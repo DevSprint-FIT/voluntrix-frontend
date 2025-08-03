@@ -9,6 +9,7 @@ import {
   updateSponsorshipRequestStatus,
 } from '@/services/sponsorshipRequestService';
 import { updateSponsorshipAvailability } from '@/services/sponsorshipService';
+import ChatController from '@/app/chat/ChatController';
 
 const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,8 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   const resolvedParams = React.use(params);
   const eventId = Number(resolvedParams.id);
+
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     // Simulate data loading with dummy data
@@ -78,14 +81,14 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
   };
 
-  const handleChat = (id: string, type: 'request' | 'sponsorship') => {
-    console.log(`Opening chat for ${type}:`, id);
-    // TODO: Implement chat functionality
-  };
+  // const handleChat = (id: string, type: 'request' | 'sponsorship') => {
+  //   console.log(`Opening chat for ${type}:`, id);
+  //   // TODO: Implement chat functionality
+  // };
 
   const handleOpenSponsorChat = () => {
     console.log('Opening sponsor chat');
-    // TODO: Implement sponsor chat functionality - to be integrated later
+    setShowChat((prev) => !prev);
   };
 
   // Table configurations
@@ -189,6 +192,13 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
               <MessageCircle size={20} />
               Chat with Sponsors
             </button>
+            <div
+              className={`fixed top-0 right-0 h-full shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+                showChat ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              <ChatController setShowChat={setShowChat} />
+            </div>
           </div>
         </div>
       </div>
