@@ -21,7 +21,7 @@ export default function RewardSummary() {
         setLoading(true);
         setError(null);
         
-        const data = await fetchVolunteerRewardStats(username);
+        const data = await fetchVolunteerRewardStats();
         
         if (data) {
           setVolunteerData({
