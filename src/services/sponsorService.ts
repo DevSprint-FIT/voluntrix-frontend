@@ -223,19 +223,16 @@ class SponsorService {
 
   private async fetchWithErrorHandling<T>(url: string): Promise<T> {
     try {
-      console.log(`Fetching: ${url}`); // Debug log
       const response = await fetch(url, {
         method: "GET",
         headers: authService.getAuthHeaders(),
       });
 
       if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}, url: ${url}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log(`Response for ${url}:`, result); // Debug log
       return result.data || result;
     } catch (error) {
       console.error(`Error fetching ${url}:`, error);
@@ -267,33 +264,20 @@ class SponsorService {
   // Get all sponsor event data by combining multiple API calls
   async getAllSponsorEventData(): Promise<SponsorEventData[]> {
     try {
-      console.log(`Fetching sponsorship requests for sponsor`);
-
       // Get all sponsorship requests for this sponsor
       const sponsorshipRequests = await this.getSponsorshipRequests();
-      console.log("Sponsorship requests:", sponsorshipRequests);
 
       if (!sponsorshipRequests || sponsorshipRequests.length === 0) {
-        console.log("No sponsorship requests found");
         return [];
       }
 
       const eventDataPromises = sponsorshipRequests.map(async (request) => {
         try {
-          console.log(
-            `Processing request ${request.requestId} for sponsorship ${request.sponsorshipId}`
-          );
-
           // Get sponsorship details
           const sponsorship = await this.getSponsorship(request.sponsorshipId);
-          console.log(
-            `Sponsorship details for ${request.sponsorshipId}:`,
-            sponsorship
-          );
 
           // Get event details
           const event = await this.getEvent(sponsorship.eventId);
-          console.log(`Event details for ${sponsorship.eventId}:`, event);
 
           // Combine all data
           return {
@@ -324,7 +308,6 @@ class SponsorService {
       const filteredResults = results.filter(
         (item) => item !== null
       ) as SponsorEventData[];
-      console.log("Final combined data:", filteredResults);
       return filteredResults;
     } catch (error) {
       console.error("Error fetching sponsor event data:", error);
@@ -355,13 +338,6 @@ class SponsorService {
     return allEventData.filter((event) => event.requestStatus === "REJECTED");
   }
 
-  // Utility method to check if event date has passed (for determining if payment is due)
-  isEventUpcoming(eventStartDate: string): boolean {
-    const eventDate = new Date(eventStartDate);
-    const now = new Date();
-    return eventDate > now;
-  }
-
   // Method to update sponsorship request status (for approve/reject actions)
   // Note: This would typically be used by event hosts, not sponsors
   async updateSponsorshipRequestStatus(
@@ -385,33 +361,6 @@ class SponsorService {
       return true;
     } catch (error) {
       console.error("Error updating sponsorship request status:", error);
-      return false;
-    }
-  }
-
-  // Method to process payment (placeholder for actual payment integration)
-  async processPayment(eventId: number, amount: number): Promise<boolean> {
-    try {
-      // This would integrate with your actual payment processing API
-      // For now, it's a placeholder that simulates payment processing
-
-      const response = await fetch(`${getBaseUrl()}/api/payments/process`, {
-        method: "POST",
-        headers: authService.getAuthHeaders(),
-        body: JSON.stringify({
-          eventId,
-          amount,
-          type: "SPONSORSHIP",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Payment failed! status: ${response.status}`);
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Error processing payment:", error);
       return false;
     }
   }
