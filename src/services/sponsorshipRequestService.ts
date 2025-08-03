@@ -58,3 +58,26 @@ export const fetchSponReqWithNameByEvent = async (id: number) => {
     throw error;
   }
 };
+
+export const updateSponsorshipRequestStatus = async (
+  requestId: number,
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+) => {
+  const id = String(requestId);
+
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sponsorship-requests/${id}/status/${status}`,
+      {},
+      {
+        headers: authService.getAuthHeadersAxios(),
+      }
+    );
+
+    console.log('Sponsorship request status updated:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error updating sponsorship request status:', error);
+    throw error;
+  }
+};
