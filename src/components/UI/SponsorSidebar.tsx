@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import {
   BarChart,
   User,
-  Calendar,
   Bell,
   Settings,
   LogOut,
   LucideIcon,
+  Handshake,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,7 +47,11 @@ const SponsorSidebar = () => {
   const menuItems: MenuItem[] = [
     { name: "Dashboard", icon: BarChart, href: "/Sponsor/dashboard" },
     { name: "Profile", icon: User, href: "/Sponsor/profile" },
-    { name: "Events", icon: Calendar, href: "/Sponsor/events/approved" },
+    {
+      name: "Sponsorships",
+      icon: Handshake,
+      href: "/Sponsor/sponsorships/approved",
+    },
     {
       name: "Notifications",
       icon: Bell,
