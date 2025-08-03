@@ -12,65 +12,65 @@
 }
 
 @font-face {
-  font-family: "UberMove";
-  src: url("./fonts/UberMoveMedium.otf") format("truetype");
+  font-family: 'UberMove';
+  src: url('./fonts/UberMoveMedium.otf') format('truetype');
   fontweight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "UberMove";
-  src: url("./fonts/UberMoveBold.otf") format("truetype");
+  font-family: 'UberMove';
+  src: url('./fonts/UberMoveBold.otf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "UberMoveText";
-  src: url("./fonts/UberMoveTextLight.otf") format("truetype");
+  font-family: 'UberMoveText';
+  src: url('./fonts/UberMoveTextLight.otf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "UberMoveText";
-  src: url("./fonts/UberMoveTextRegular.otf") format("truetype");
+  font-family: 'UberMoveText';
+  src: url('./fonts/UberMoveTextRegular.otf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "UberMoveText";
-  src: url("./fonts/UberMoveTextMedium.otf") format("truetype");
+  font-family: 'UberMoveText';
+  src: url('./fonts/UberMoveTextMedium.otf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "UberMoveText";
-  src: url("./fonts/UberMoveTextBold.otf") format("truetype");
+  font-family: 'UberMoveText';
+  src: url('./fonts/UberMoveTextBold.otf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type='date']::-webkit-calendar-picker-indicator {
   filter: invert(38%) sepia(7%) saturate(150%) hue-rotate(0deg) brightness(85%)
     contrast(90%);
 }
 
-input[type="date"]:focus {
+input[type='date']:focus {
   border-color: #4f4f4f;
   outline: none;
 }
 
-input[type="date"] {
+input[type='date'] {
   position: relative;
   color: var(--shark-600, #5d5d5d);
   font-size: 14px;
   padding-left: 24px;
 }
 
-input[type="date"]::-webkit-input-placeholder {
+input[type='date']::-webkit-input-placeholder {
   position: absolute;
   left: 22px;
   top: 50%;
@@ -78,14 +78,14 @@ input[type="date"]::-webkit-input-placeholder {
   color: var(--shark-600, #5d5d5d);
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type='date']::-webkit-calendar-picker-indicator {
   position: absolute;
   left: 6px;
   top: 50%;
   transform: translateY(-50%);
   width: 12px;
   height: 12px;
-  background: url("/icons/calendar.svg") no-repeat center;
+  background: url('/icons/calendar.svg') no-repeat center;
   background-size: contain;
 }
 
