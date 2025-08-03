@@ -234,15 +234,15 @@ const PublicFeedPage = () => {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="mt-20 flex justify-center items-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-verdant-600 mx-auto mb-4"></div>
-            <p>Loading Social Feed...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
+          <p className="text-shark-600 font-primary">Loading Social Feed...</p>
         </div>
-      </>
+      </div>
     );
   }
 

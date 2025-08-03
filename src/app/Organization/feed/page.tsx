@@ -180,8 +180,14 @@ export default function SocialFeed() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-shark-600 font-primary">Loading My Feed...</p>
+        </div>
       </div>
     );
   }
