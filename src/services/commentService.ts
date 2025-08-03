@@ -16,8 +16,8 @@ const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 };
 
-// Helper function to get current user info based on user type
-async function getCurrentUserInfo(): Promise<{username: string, userType: string, profileImageUrl?: string}> {
+// Helper function to get current user info based on user type - NOW EXPORTED
+export async function getCurrentUserInfo(): Promise<{username: string, userType: string, profileImageUrl?: string, fullName?: string, rawData?: any}> {
   const baseUrl = getBaseUrl();
   
   try {
@@ -28,11 +28,21 @@ async function getCurrentUserInfo(): Promise<{username: string, userType: string
 
     if (volunteerResponse.ok) {
       const volunteerData = await volunteerResponse.json();
-      const username = volunteerData.handle || volunteerData.username || `volunteer_${volunteerData.volunteerId}`;
+      console.log("Raw volunteer data:", volunteerData); // Debug log
+      
+      const username = volunteerData.username || `volunteer_${volunteerData.volunteerId}`;
+      
+      // Use the fullName field directly from the API response
+      const fullName = volunteerData.fullName || username;
+      
+      console.log("Volunteer data extracted:", { username, fullName, volunteerId: volunteerData.volunteerId }); // Debug log
+      
       return {
         username,
         userType: "VOLUNTEER",
-        profileImageUrl: volunteerData.profilePictureUrl || volunteerData.imageUrl || null
+        profileImageUrl: volunteerData.profilePictureUrl || volunteerData.imageUrl || null,
+        fullName,
+        rawData: volunteerData
       };
     }
   } catch {}
@@ -45,11 +55,17 @@ async function getCurrentUserInfo(): Promise<{username: string, userType: string
 
     if (orgResponse.ok) {
       const orgData = await orgResponse.json();
+      console.log("Raw organization data:", orgData); // Debug log
+      
       const username = orgData.data?.username || orgData.username || orgData.data?.name || orgData.name;
+      const fullName = orgData.data?.name || orgData.name || username;
+      
       return {
         username,
         userType: "ORGANIZATION",
-        profileImageUrl: orgData.profilePictureUrl || null
+        profileImageUrl: orgData.profilePictureUrl || null,
+        fullName,
+        rawData: orgData
       };
     }
   } catch {}
@@ -65,7 +81,8 @@ export async function addComment(
   const baseUrl = getBaseUrl();
 
   try {
-    const { username, userType, profileImageUrl } = await getCurrentUserInfo();
+    const { username, userType, profileImageUrl, fullName } = await getCurrentUserInfo();
+    console.log("Adding comment with user info:", { username, userType, fullName }); // Debug log
 
     const requestBody = {
       socialFeedId,
@@ -90,6 +107,7 @@ export async function addComment(
     }
     
     const result = await response.json();
+    console.log("Comment added, response:", result); // Debug log
     return result;
   } catch (error) {
     console.error("Error adding comment:", error);
@@ -111,7 +129,9 @@ export const getCommentsForPost = async (postId: number): Promise<Comment[]> => 
       throw new Error(`Failed to fetch comments: ${response.status} - ${errorText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log("Fetched comments:", result); // Debug log
+    return result;
   } catch (error) {
     console.error("Error fetching comments:", error);
     throw error;
@@ -136,3 +156,4 @@ export const deleteComment = async (commentId: number): Promise<void> => {
     throw error;
   }
 };
+

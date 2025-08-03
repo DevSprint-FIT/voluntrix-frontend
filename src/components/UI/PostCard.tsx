@@ -20,6 +20,7 @@ import {
   addComment,
   getCommentsForPost,
   deleteComment,
+  getCurrentUserInfo,
 } from "@/services/commentService";
 
 import { getTimeAgoFromDate } from "@/services/utils";
@@ -75,6 +76,39 @@ const PostCard: React.FC<PostCardProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
   const [openCommentMenuId, setOpenCommentMenuId] = useState<number | null>(null);
+  const [currentUserInfo, setCurrentUserInfo] = useState<any>(null);
+
+  // Get current user info for comment ownership validation
+  useEffect(() => {
+    const fetchCurrentUserInfo = async () => {
+      try {
+        const userInfo = await getCurrentUserInfo();
+        setCurrentUserInfo(userInfo);
+      } catch (error) {
+        console.error("Error fetching current user info:", error);
+      }
+    };
+
+    fetchCurrentUserInfo();
+  }, []);
+
+  // Function to check if current user owns the comment
+  const canDeleteComment = (comment: any): boolean => {
+    if (!currentUserInfo) {
+      return false;
+    }
+    
+    // Check if user types match first
+    if (comment.userType !== currentUserInfo.userType) {
+      return false;
+    }
+    
+    // For matching user types, check if either username or fullName matches the commenterName
+    const isUsernameMatch = comment.commenterName === currentUserInfo.username;
+    const isFullNameMatch = currentUserInfo.fullName && comment.commenterName === currentUserInfo.fullName;
+    
+    return isUsernameMatch || isFullNameMatch;
+  };
 
   const handleDeleteClick = () => {
     setShowMenu(false);
@@ -86,27 +120,26 @@ const PostCard: React.FC<PostCardProps> = ({
     setShowConfirmModal(false);
   };
 
- const toggleLike = async () => {
-  const newLikedState = !liked;
-  setLiked(newLikedState);
+  const toggleLike = async () => {
+    const newLikedState = !liked;
+    setLiked(newLikedState);
 
-  try {
-    if (newLikedState) {
-      await reactToPost({ socialFeedId: postId, userId, userType });
-    } else {
-      await removeReaction(postId, userId, userType);
+    try {
+      if (newLikedState) {
+        await reactToPost({ socialFeedId: postId, userId, userType });
+      } else {
+        await removeReaction(postId, userId, userType);
+      }
+
+      // Fetch updated reactions to get accurate count
+      const allReactions = await getReactionsForPost(postId);
+      const totalLikes = allReactions.filter((r) => r.reacted).length;
+      setLikeCount(totalLikes);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      setLiked(!newLikedState);
     }
-
-    // Fetch updated reactions to get accurate count
-    const allReactions = await getReactionsForPost(postId);
-    const totalLikes = allReactions.filter((r) => r.reacted).length;
-    setLikeCount(totalLikes);
-  } catch (error) {
-    console.error("Error toggling like:", error);
-    setLiked(!newLikedState);
-  }
-  
-};
+  };
 
   const onShare = (platform: string) => {
     handleShareClick(postId);
@@ -114,16 +147,14 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   const handleCommentSubmit = async () => {
-    if (!commentText.trim()) return; // Don't submit empty comments
+    if (!commentText.trim()) return;
     
     try {
-      // Using simplified addComment that relies on JWT token for user identity
       await addComment(postId, commentText);
       
       // Refresh comments after adding a new one
       const fetchedComments = await getCommentsForPost(postId);
       setComments(fetchedComments);
-      
       setCommentText("");
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -319,6 +350,7 @@ const PostCard: React.FC<PostCardProps> = ({
                         {comment.commenterName}
                       </p>
                       <p className="text-sm">{comment.content}</p>
+                      
                       <button
                         className="absolute top-1 right-1 p-1 hover:bg-gray-200 rounded-full"
                         onClick={() =>
@@ -330,17 +362,24 @@ const PostCard: React.FC<PostCardProps> = ({
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
+                      
                       {openCommentMenuId === comment.id && (
                         <div className="absolute -top-5 left-full ml-2 bg-white border rounded-md shadow-sm">
-                          <button
-                            className="block px-6 py-2 text-red-600 hover:text-red-500 w-full text-right rounded"
-                            onClick={() => {
-                              handleCommentDelete(comment.id);
-                              setOpenCommentMenuId(null);
-                            }}
-                          >
-                            Delete
-                          </button>
+                          {canDeleteComment(comment) ? (
+                            <button
+                              className="block px-6 py-2 text-red-600 hover:text-red-500 w-full text-right rounded"
+                              onClick={() => {
+                                handleCommentDelete(comment.id);
+                                setOpenCommentMenuId(null);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          ) : (
+                            <div className="px-6 py-2 text-gray-400 text-sm">
+                              No actions available
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

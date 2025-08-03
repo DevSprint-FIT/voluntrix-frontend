@@ -66,7 +66,7 @@ const VolunteerSidebar = () => {
       badge: notificationCount,
       href: "/notifications",
     },
-    { name: "Social Feed", icon: Send, href: "/social-feed" },
+    { name: "Social Feed", icon: Send, href: "/PublicFeed" },
     { name: "Settings", icon: Settings, href: "/Volunteer/settings" },
   ];
 
