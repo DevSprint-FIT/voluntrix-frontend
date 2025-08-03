@@ -177,6 +177,24 @@ class SponsorService {
     }
   }
 
+  // Get dashboard stats with dummy values for incomplete backend features
+  getDashboardStats() {
+    return {
+      totalEventsSponsored: 5,
+      totalSponsorships: 5,
+      totalEventsDonated: 2,
+      totalSponsorshipAmount: "LKR 250,000",
+    };
+  }
+
+  // Get dummy sponsored event dates for calendar highlighting
+  getSponsoredEventDates(): Date[] {
+    return [
+      new Date(2025, 6, 1), // July 1, 2025
+      new Date(2025, 8, 25), // September 25, 2025
+    ];
+  }
+
   // Update sponsor profile information
   async updateSponsorProfile(
     updateData: Partial<SponsorProfile>
