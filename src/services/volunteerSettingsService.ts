@@ -60,26 +60,26 @@ export const getVolunteerSettings = async (): Promise<VolunteerSettings> => {
   }
 };
 
-export const updateVolunteerEmail = async (
-  email: string
+export const updateVolunteerAbout = async (
+  about: string
 ): Promise<VolunteerSettings> => {
   try {
     const response = await fetch(`${getBaseUrl()}/api/volunteers/profile`, {
       method: "PATCH",
       headers: authService.getAuthHeaders(),
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ about }),
     });
 
     if (!response.ok) {
       throw new Error(
-        `Failed to update email: ${response.status} ${response.statusText}`
+        `Failed to update about: ${response.status} ${response.statusText}`
       );
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error updating volunteer email:", error);
+    console.error("Error updating volunteer about:", error);
     throw error;
   }
 };

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   getVolunteerSettings,
-  updateVolunteerEmail,
+  updateVolunteerAbout,
   updateVolunteerAvailability,
   VolunteerSettings,
 } from "@/services/volunteerSettingsService";
@@ -127,8 +127,8 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [editingEmail, setEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
+  const [editingAbout, setEditingAbout] = useState(false);
+  const [newAbout, setNewAbout] = useState("");
   const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
   // Modal states
@@ -146,7 +146,7 @@ const SettingsPage = () => {
         setError(null);
         const data = await getVolunteerSettings();
         setVolunteer(data);
-        setNewEmail(data.email);
+        setNewAbout(data.about || "");
       } catch (error) {
         console.error("Failed to fetch volunteer settings:", error);
         setError("Failed to load volunteer settings");
@@ -157,21 +157,21 @@ const SettingsPage = () => {
     loadVolunteer();
   }, []);
 
-  const handleSaveEmail = async () => {
+  const handleSaveAbout = async () => {
     if (!volunteer) return;
 
     try {
-      const updated = await updateVolunteerEmail(newEmail);
+      const updated = await updateVolunteerAbout(newAbout);
       setVolunteer(updated);
-      setEditingEmail(false);
+      setEditingAbout(false);
 
       // Show success modal
       setModalType("success");
-      setModalTitle("Email Updated");
-      setModalMessage("Your email address has been successfully updated.");
+      setModalTitle("About Updated");
+      setModalMessage("Your about section has been successfully updated.");
       setModalOpen(true);
     } catch (error) {
-      console.error("Failed to update email:", error);
+      console.error("Failed to update about:", error);
 
       // Show error modal
       setModalType("error");
@@ -179,7 +179,7 @@ const SettingsPage = () => {
       setModalMessage(
         error instanceof Error
           ? error.message
-          : "Failed to update email address. Please try again."
+          : "Failed to update about section. Please try again."
       );
       setModalOpen(true);
     }
@@ -280,38 +280,42 @@ const SettingsPage = () => {
         <ProfileIndicator />
       </div>
 
-      {/* Email Section */}
+      {/* About Section */}
       <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="font-secondary font-semibold text-2xl">
-              Your email address
+            <h2 className="font-secondary font-semibold text-2xl mb-2">
+              About You
             </h2>
             <div className="mb-4 text-shark-700">
-              {!editingEmail ? (
-                volunteer.email
+              {!editingAbout ? (
+                <div className="whitespace-pre-wrap">
+                  {volunteer.about || "No about information provided"}
+                </div>
               ) : (
                 <>
-                  <div className="mb-2">{volunteer.email}</div>
-                  <input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-2xl"
-                    placeholder="Enter new email"
+                  <div className="mb-2 whitespace-pre-wrap">
+                    {volunteer.about || "No about information provided"}
+                  </div>
+                  <textarea
+                    value={newAbout}
+                    onChange={(e) => setNewAbout(e.target.value)}
+                    className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-2xl resize-none"
+                    placeholder="Tell us about yourself..."
+                    rows={4}
                   />
                   <div className="flex gap-2 mt-4">
                     <Button
                       onPress={() => {
-                        setEditingEmail(false);
-                        setNewEmail(volunteer.email);
+                        setEditingAbout(false);
+                        setNewAbout(volunteer.about || "");
                       }}
                       className="rounded-full bg-shark-100 text-shark-900 font-primary tracking-wide text-base"
                     >
                       Cancel
                     </Button>
                     <Button
-                      onPress={handleSaveEmail}
+                      onPress={handleSaveAbout}
                       className="rounded-full bg-shark-950 text-shark-50 font-primary tracking-wide text-base"
                     >
                       Save
@@ -321,23 +325,14 @@ const SettingsPage = () => {
               )}
             </div>
 
-            {!editingEmail && (
+            {!editingAbout && (
               <Button
-                onPress={() => setEditingEmail(true)}
+                onPress={() => setEditingAbout(true)}
                 className="rounded-full bg-shark-950 text-shark-50 font-primary tracking-wide text-base"
               >
-                Change email
+                Change About
               </Button>
             )}
-          </div>
-
-          <div className="flex flex-col justify-start">
-            <div className="font-secondary text-shark-950 font-medium">
-              Your username
-            </div>
-            <div className="font-secondary text-shark-700">
-              {volunteer.username} (not editable)
-            </div>
           </div>
         </div>
       </div>

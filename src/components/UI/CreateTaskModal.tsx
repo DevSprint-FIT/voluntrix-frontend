@@ -6,6 +6,7 @@ import { Button } from "@heroui/button";
 import { DatePicker } from "@heroui/date-picker";
 import { parseDate } from "@internationalized/date";
 import Toast from "@/components/UI/Toast";
+import Image from "next/image";
 import {
   hostWorkspaceTaskService,
   TaskCreateDTO,
@@ -278,207 +279,226 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     <>
       {/* Main Modal */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
-        <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto relative">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-secondary text-shark-950">
-              Create New Task
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-              disabled={isSubmitting}
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Task Description */}
-            <div>
-              <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Task Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                placeholder="Description can be up to 500 characters"
-                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 resize-none font-secondary"
-                rows={4}
-                maxLength={500}
-                required
-              />
-              <div className="text-right text-xs text-shark-400 mt-1">
-                {formData.description.length}/500 characters
+        <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 shadow-2xl max-h-[90vh] overflow-hidden relative">
+          {/* Modal Header */}
+          <div className="p-6 pb-4 border-b border-shark-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 flex items-center justify-center bg-verdant-50 rounded-lg">
+                  <Image
+                    src="/icons/document.svg"
+                    alt="Create Task"
+                    width={20}
+                    height={20}
+                    className="text-verdant-600"
+                  />
+                </div>
+                <h2 className="text-2xl font-bold font-secondary text-shark-950">
+                  Create New Task
+                </h2>
               </div>
-            </div>
-
-            {/* Task Difficulty */}
-            <div>
-              <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Task Difficulty
-              </label>
-              <select
-                value={formData.difficulty}
-                onChange={(e) =>
-                  handleInputChange("difficulty", e.target.value)
-                }
-                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
-                required
-              >
-                <option value="">Select difficulty level</option>
-                {difficultyOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Task Category */}
-            <div>
-              <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Task Category
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => handleInputChange("category", e.target.value)}
-                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
-                required
-              >
-                <option value="">Select task category</option>
-                {categoryOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Assignee */}
-            <div>
-              <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Assignee
-              </label>
-              <select
-                value={formData.assigneeId}
-                onChange={(e) =>
-                  handleInputChange("assigneeId", parseInt(e.target.value))
-                }
-                className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary"
-                required
-                disabled={isLoadingVolunteers || !formData.category}
-              >
-                <option value={0}>
-                  {isLoadingVolunteers
-                    ? "Loading volunteers..."
-                    : !formData.category
-                    ? "Please select a category first"
-                    : "Select assignee"}
-                </option>
-                {filteredVolunteers.map((volunteer) => (
-                  <option
-                    key={volunteer.volunteerId}
-                    value={volunteer.volunteerId}
-                  >
-                    {volunteer.volunteerUsername}
-                  </option>
-                ))}
-              </select>
-              {formData.category &&
-                filteredVolunteers.length === 0 &&
-                !isLoadingVolunteers && (
-                  <p className="text-sm text-orange-600 mt-1 font-secondary">
-                    No volunteers available for {formData.category} category.
-                  </p>
-                )}
-            </div>
-
-            {/* Due Date */}
-            <div>
-              <label className="block text-sm font-medium text-shark-700 font-secondary mb-2">
-                Due Date
-              </label>
-              <DatePicker
-                value={formatDateForDatePicker(formData.dueDate)}
-                onChange={handleDateChange}
-                minValue={getTomorrowDate()}
-                className="w-full"
-                classNames={{
-                  base: "w-full",
-                  inputWrapper:
-                    "border-2 border-shark-200 hover:border-shark-300 group-data-[focus=true]:border-verdant-500 h-12 rounded-xl",
-                  input: "text-shark-700 font-secondary",
-                  selectorButton: "text-shark-500 hover:text-verdant-600",
-                }}
-                color="success"
-                variant="bordered"
-                isRequired
-                showMonthAndYearPickers
-              />
-            </div>
-
-            {/* Submit Buttons */}
-            <div className="flex gap-4 pt-4">
-              <Button
-                type="button"
-                onPress={onClose}
-                className="flex-1 rounded-full font-primary tracking-wide text-base bg-shark-200 text-shark-700 hover:bg-shark-300"
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
                 disabled={isSubmitting}
               >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className={`flex-1 rounded-full font-primary tracking-wide text-base ${
-                  submitStatus.type === "success"
-                    ? "bg-green-600 text-white hover:bg-green-700"
-                    : submitStatus.type === "error"
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "bg-verdant-600 text-white hover:bg-verdant-700"
-                }`}
-                disabled={isSubmitting || submitStatus.type === "success"}
-              >
-                <div className="flex items-center gap-2">
-                  {submitStatus.type === "submitting" && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  )}
-                  {submitStatus.type === "success" && (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  {submitStatus.type === "error" && (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  <span>
-                    {submitStatus.type !== "idle" && submitStatus.message
-                      ? submitStatus.message
-                      : "Create Task"}
-                  </span>
-                </div>
-              </Button>
+                <X size={24} />
+              </button>
             </div>
-          </form>
+          </div>
+
+          {/* Modal Content */}
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Task Description */}
+              <div>
+                <label className="block text-sm font-semibold text-shark-700 font-secondary mb-3">
+                  Task Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  placeholder="Describe the task in detail (up to 500 characters)"
+                  className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 resize-none font-secondary transition-colors hover:border-shark-300"
+                  rows={4}
+                  maxLength={500}
+                  required
+                />
+                <div className="text-right text-xs text-shark-500 mt-2 font-secondary">
+                  {formData.description.length}/500 characters
+                </div>
+              </div>
+
+              {/* Task Difficulty */}
+              <div>
+                <label className="block text-sm font-semibold text-shark-700 font-secondary mb-3">
+                  Task Difficulty
+                </label>
+                <select
+                  value={formData.difficulty}
+                  onChange={(e) =>
+                    handleInputChange("difficulty", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary transition-colors hover:border-shark-300"
+                  required
+                >
+                  <option value="">Select difficulty level</option>
+                  {difficultyOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Task Category */}
+              <div>
+                <label className="block text-sm font-semibold text-shark-700 font-secondary mb-3">
+                  Task Category
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary transition-colors hover:border-shark-300"
+                  required
+                >
+                  <option value="">Select task category</option>
+                  {categoryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Assignee */}
+              <div>
+                <label className="block text-sm font-semibold text-shark-700 font-secondary mb-3">
+                  Assignee
+                </label>
+                <select
+                  value={formData.assigneeId}
+                  onChange={(e) =>
+                    handleInputChange("assigneeId", parseInt(e.target.value))
+                  }
+                  className="w-full px-4 py-3 border-2 border-shark-200 rounded-xl focus:ring-0 focus:outline-none focus:border-verdant-500 font-secondary transition-colors hover:border-shark-300 disabled:bg-gray-50 disabled:text-gray-500"
+                  required
+                  disabled={isLoadingVolunteers || !formData.category}
+                >
+                  <option value={0}>
+                    {isLoadingVolunteers
+                      ? "Loading volunteers..."
+                      : !formData.category
+                      ? "Please select a category first"
+                      : "Select assignee"}
+                  </option>
+                  {filteredVolunteers.map((volunteer) => (
+                    <option
+                      key={volunteer.volunteerId}
+                      value={volunteer.volunteerId}
+                    >
+                      {volunteer.volunteerUsername}
+                    </option>
+                  ))}
+                </select>
+                {formData.category &&
+                  filteredVolunteers.length === 0 &&
+                  !isLoadingVolunteers && (
+                    <p className="text-sm text-orange-600 mt-2 font-secondary bg-orange-50 p-2 rounded-lg">
+                      No volunteers available for {formData.category} category.
+                    </p>
+                  )}
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="block text-sm font-semibold text-shark-700 font-secondary mb-3">
+                  Due Date
+                </label>
+                <DatePicker
+                  value={formatDateForDatePicker(formData.dueDate)}
+                  onChange={handleDateChange}
+                  minValue={getTomorrowDate()}
+                  className="w-full"
+                  classNames={{
+                    base: "w-full",
+                    inputWrapper:
+                      "border-2 border-shark-200 hover:border-shark-300 group-data-[focus=true]:border-verdant-500 h-12 rounded-xl transition-colors",
+                    input: "text-shark-700 font-secondary",
+                    selectorButton: "text-shark-500 hover:text-verdant-600",
+                  }}
+                  color="success"
+                  variant="bordered"
+                  isRequired
+                  showMonthAndYearPickers
+                />
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-4 pt-6 border-t border-shark-100">
+                <Button
+                  type="button"
+                  onPress={onClose}
+                  className="flex-1 rounded-full font-primary tracking-wide text-base bg-shark-200 text-shark-700 hover:bg-shark-300 transition-colors"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className={`flex-1 rounded-full font-primary tracking-wide text-base transition-all ${
+                    submitStatus.type === "success"
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : submitStatus.type === "error"
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-verdant-600 text-white hover:bg-verdant-700 shadow-lg hover:shadow-xl"
+                  }`}
+                  disabled={isSubmitting || submitStatus.type === "success"}
+                >
+                  <div className="flex items-center gap-2">
+                    {submitStatus.type === "submitting" && (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    )}
+                    {submitStatus.type === "success" && (
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {submitStatus.type === "error" && (
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    <span>
+                      {submitStatus.type !== "idle" && submitStatus.message
+                        ? submitStatus.message
+                        : "Create Task"}
+                    </span>
+                  </div>
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </>

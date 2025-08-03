@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { BarChart, Calendar, Bell, LogOut, LucideIcon } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@heroui/react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { BarChart, Calendar, Bell, LogOut, LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@heroui/react";
+import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 
 interface MenuItem {
   name: string;
@@ -16,7 +16,9 @@ interface MenuItem {
 
 const VolunteerSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
+  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const pathname = usePathname();
+
   useEffect(() => {
     setTimeout(() => {
       setNotificationCount(3);
@@ -24,48 +26,59 @@ const VolunteerSidebar = () => {
   }, []);
 
   const menuItems: MenuItem[] = [
-    { name: 'Dashboard', icon: BarChart, href: `/event-host/dashboard` },
-    { name: 'Events', icon: Calendar, href: `/event-host/events` },
+    { name: "Dashboard", icon: BarChart, href: `/event-host/dashboard` },
+    { name: "Events", icon: Calendar, href: `/event-host/events` },
     {
-      name: 'Notifications',
+      name: "Notifications",
       icon: Bell,
       badge: notificationCount,
       href: `/event-host/notifications`,
     },
   ];
 
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem("Dashboard");
+    }
+  }, [pathname, menuItems]);
+
   const router = useRouter();
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       <div>
-        <div className="mb-8 flex justify-center">
+        <div className="mb-24 mt-6 flex justify-center">
           <Image
             src="/images/logo.svg"
             alt="Logo"
             width={152}
             height={44}
             className="ml-[-10px] cursor-pointer"
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
           />
         </div>
         <nav>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-12">
             {menuItems.map((item) => {
               const isActive = selectedItem === item.name;
 
               return (
-                <Link key={item.name} href={item.href || '#'}>
+                <Link key={item.name} href={item.href || "#"}>
                   <div
                     onClick={() => setSelectedItem(item.name)}
-                    className={`w-full cursor-pointer text-left flex items-center justify-between px-2 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? 'text-verdant-700 font-semibold' : ''
+                    className={`w-full cursor-pointer text-left flex items-center justify-between px-4 py-2 rounded-md hover:bg-verdant-50 relative ${
+                      isActive ? "text-verdant-700 font-semibold" : ""
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <item.icon
                         className={`h-5 w-5 ${
-                          isActive ? 'text-verdant-700' : ''
+                          isActive ? "text-verdant-700" : ""
                         }`}
                       />
                       <span className="font-secondary font-medium text-shark-950">
@@ -73,7 +86,7 @@ const VolunteerSidebar = () => {
                       </span>
                     </div>
 
-                    {typeof item.badge === 'number' && item.badge > 0 && (
+                    {typeof item.badge === "number" && item.badge > 0 && (
                       <span className="text-xs bg-verdant-100 text-shark-950 px-1.5 rounded-md">
                         {item.badge}
                       </span>
@@ -91,15 +104,15 @@ const VolunteerSidebar = () => {
       </div>
       <div className="space-y-8">
         <Button
-          onPress={() => router.push('/Volunteer/dashboard')}
+          onPress={() => router.push("/Volunteer/dashboard")}
           className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-8"
         >
           Switch to Volunteer
         </Button>
 
         <button
-          onClick={() => setSelectedItem('Logout')}
-          className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-shark-50 group text-sm text-shark-950 w-full text-left"
+          onClick={() => setSelectedItem("Logout")}
+          className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-shark-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">
             <LogOut className="h-5 w-5" />
