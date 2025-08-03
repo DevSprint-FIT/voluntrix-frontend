@@ -4,11 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { HandCoins, MessageCircle, Check, X } from 'lucide-react';
 import Table, { Column } from '@/components/UI/Table';
 import { SponsorshipRequestType } from '@/types/SponsorshipRequestType';
-import { fetchSponReqWithNameByEvent } from '@/services/sponsorshipRequestService';
+import {
+  fetchSponReqWithNameByEvent,
+  updateSponsorshipRequestStatus,
+} from '@/services/sponsorshipRequestService';
 
 const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [sponsorshipRequests, setSponsorshipRequests] = useState<
+  const [pendingRequests, setPendingRequests] = useState<
+    SponsorshipRequestType[]
+  >([]);
+  const [approvedSponsors, setApprovedSponsors] = useState<
     SponsorshipRequestType[]
   >([]);
 
@@ -22,8 +28,13 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
         setIsLoading(true);
 
         const data = await fetchSponReqWithNameByEvent(eventId);
-        console.log('Fetched sponsorship requests:', data);
-        setSponsorshipRequests(data);
+        console.log('Fetched sponsorship data:', data);
+
+        const pending = data.filter((item) => item.status === 'PENDING');
+        const approved = data.filter((item) => item.status === 'APPROVED');
+
+        setPendingRequests(pending);
+        setApprovedSponsors(approved);
       } catch (error) {
         console.error('Error fetching sponsorship data:', error);
       } finally {
@@ -35,14 +46,16 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   }, [eventId]);
 
   // Action handlers
-  const handleApprove = (id: string) => {
+  const handleApprove = async (id: number) => {
     console.log('Approved sponsorship request:', id);
-    // TODO: Implement approval logic
+    const updateStatus = await updateSponsorshipRequestStatus(id, 'APPROVED');
+    console.log(updateStatus);
   };
 
-  const handleReject = (id: string) => {
+  const handleReject = async (id: number) => {
     console.log('Rejected sponsorship request:', id);
-    // TODO: Implement rejection logic
+    const updateStatus = await updateSponsorshipRequestStatus(id, 'REJECTED');
+    console.log(updateStatus);
   };
 
   const handleChat = (id: string, type: 'request' | 'sponsorship') => {
@@ -80,14 +93,14 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
       cell: (value, row) => (
         <div className="flex items-center gap-6">
           <button
-            onClick={() => handleApprove(value as string)}
+            onClick={() => handleApprove(row.requestId)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
             title="Approve"
           >
             <Check size={16} />
           </button>
           <button
-            onClick={() => handleReject(value as string)}
+            onClick={() => handleReject(row.requestId)}
             className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
             title="Reject"
           >
@@ -109,7 +122,7 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     },
     {
       header: 'Sponsorship Type',
-      accessor: 'sponsorshipType',
+      accessor: 'sponsorshipName',
       cell: (value) => (
         <span className="px-3 py-1 rounded-full text-xs font-medium">
           {value}
@@ -177,10 +190,7 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
               </div>
             </div>
           ) : (
-            <Table
-              columns={sponsorshipRequestColumns}
-              data={sponsorshipRequests}
-            />
+            <Table columns={sponsorshipRequestColumns} data={pendingRequests} />
           )}
         </div>
 
@@ -199,10 +209,7 @@ const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
               </div>
             </div>
           ) : (
-            <Table
-              columns={eventSponsorshipColumns}
-              data={sponsorshipRequests}
-            />
+            <Table columns={eventSponsorshipColumns} data={approvedSponsors} />
           )}
         </div>
       </div>
