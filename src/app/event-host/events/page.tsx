@@ -6,6 +6,7 @@ import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
 import { useRouter } from 'next/navigation';
+import EventDropdownHeader from '@/components/UI/EventDropdownHeader';
 
 export default function HostEvents() {
   const [activeTab, setActiveTab] = useState('all');
@@ -208,7 +209,7 @@ export default function HostEvents() {
 
         {/* Tabs */}
         <div className="mb-6">
-          <div>
+          <div className="flex items-center justify-between">
             <nav className="-mb-px flex space-x-8">
               {tabs.map((tab) => (
                 <button
@@ -230,6 +231,7 @@ export default function HostEvents() {
                 </button>
               ))}
             </nav>
+            <EventDropdownHeader events={events} />
           </div>
         </div>
 
