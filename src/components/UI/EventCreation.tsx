@@ -169,7 +169,7 @@ export default function EventCreation() {
       eventTime,
       eventEndDate,
       eventStatus: selectedOrg ? 'PENDING' : 'ACTIVE',
-      organizationId: selectedOrg?.id ?? null,
+      organizationId: selectedOrg?.organizationId ?? null,
       categories: categoryArray.map((cat) => ({
         categoryId: cat.categoryId,
       })),
@@ -185,7 +185,7 @@ export default function EventCreation() {
       console.log('Event created successfully:', createdEvent);
 
       const eventId = createdEvent?.eventId;
-      const organizationId = selectedOrg?.id;
+      const organizationId = selectedOrg?.organizationId;
 
       if (eventId && organizationId) {
         await createEventInvitation(eventId, organizationId);

@@ -45,9 +45,9 @@ export default function OrganizationEC({
               organizationId: number;
               organizationLogoUrl?: string;
             }) => ({
-              id: org.organizationId,
-              name: org.organizationName,
-              logoUrl: org.organizationLogoUrl,
+              organizationId: org.organizationId,
+              organizationName: org.organizationName,
+              organizationLogoUrl: org.organizationLogoUrl,
             })
           );
         setOrganizationTitles(validOrganizations);
@@ -65,7 +65,7 @@ export default function OrganizationEC({
     debounceRef.current = setTimeout(() => {
       if (query.trim()) {
         const filtered = organizationTitles.filter((org) =>
-          org.name.toLowerCase().includes(query.toLowerCase())
+          org.organizationName.toLowerCase().includes(query.toLowerCase())
         );
         setResults(filtered);
       } else {
@@ -142,7 +142,7 @@ export default function OrganizationEC({
           <div className="absolute top-[70px] left-0 w-[350px] max-h-[120px] bg-white border-[2px] border-shark-200 rounded-lg shadow-lg z-20 overflow-y-auto">
             {results.map((org) => (
               <div
-                key={org.id}
+                key={org.organizationId}
                 onClick={() => {
                   setSelectedOrg(org);
                   setQuery('');
@@ -150,7 +150,7 @@ export default function OrganizationEC({
                 }}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-shark-100 cursor-pointer"
               >
-                <span className="text-[14px] text-shark-950">{org.name}</span>
+                <span className="text-[14px] text-shark-950">{org.organizationName}</span>
               </div>
             ))}
           </div>
@@ -170,7 +170,7 @@ export default function OrganizationEC({
             height={24}
             alt="Organization logo"
           /> */}
-          <span className="text-[15px] text-shark-950">{selectedOrg.name}</span>
+          <span className="text-[15px] text-shark-950">{selectedOrg.organizationName}</span>
           <Image
             src="/icons/close.svg"
             width={12}
