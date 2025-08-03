@@ -35,6 +35,15 @@ const SponsorSidebar = () => {
 
   // Set active item based on current route
   useEffect(() => {
+    // Ensure pathname is not null
+    if (!pathname) return;
+
+    // Special handling for sponsorships routes
+    if (pathname.startsWith("/Sponsor/sponsorships")) {
+      setSelectedItem("Sponsorships");
+      return;
+    }
+
     const currentItem = menuItems.find((item) => item.href === pathname);
     if (currentItem) {
       setSelectedItem(currentItem.name);
