@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,11 +7,10 @@ import EventStatusCard from "@/components/UI/EventStatusCard";
 import { sponsorService, SponsorEventData } from "@/services/sponsorService";
 
 const tabs = [
-  { name: "Active Events", href: "/Sponsor/events/active" },
-  { name: "Event Requests", href: "/Sponsor/events/request" },
-  { name: "Completed Events", href: "/Sponsor/events/completed" },
+  { name: "Approved Sponsorships", href: "/Sponsor/events/active" },
+  { name: "Pending Sponsorships", href: "/Sponsor/events/request" },
+  { name: "Rejected Sponsorships", href: "/Sponsor/events/completed" },
 ];
-
 
 interface EventStatusCounts {
   active: number;
@@ -26,21 +25,23 @@ interface Sponsor {
   imageUrl: string;
 }
 
-export default function SponsorEventsLayout({ children }: { children: React.ReactNode }) {
+export default function SponsorEventsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const [counts, setCounts] = useState<EventStatusCounts | null>(null);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const [sponsor, setSponsor] = useState<Sponsor | null>(null);
 
-  
   const sponsorId = 1;
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoadingCounts(true);
-        
-        
+
         const mockSponsor: Sponsor = {
           id: "sponsor-123",
           name: "John Doe",
@@ -50,8 +51,8 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
         setSponsor(mockSponsor);
 
         // Fetch real event data
-        const eventData = await sponsorService.getAllSponsorEventData(sponsorId);
-        
+        const eventData = await sponsorService.getAllSponsorEventData();
+
         // Calculate real counts using the same logic as your service
         const activeEvents = sponsorService.getActiveEvents(eventData);
         const pendingRequests = sponsorService.getPendingRequests(eventData);
@@ -60,20 +61,19 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
         const realCounts: EventStatusCounts = {
           active: activeEvents.length,
           pending: pendingRequests.length,
-          completed: completedEvents.length
+          completed: completedEvents.length,
         };
 
         setCounts(realCounts);
-        console.log('Event counts loaded:', realCounts);
-        
+        console.log("Event counts loaded:", realCounts);
       } catch (error) {
-        console.error('Error loading event data:', error);
-        
+        console.error("Error loading event data:", error);
+
         // Fallback to show 0 counts if API fails
         setCounts({
           active: 0,
           pending: 0,
-          completed: 0
+          completed: 0,
         });
       } finally {
         setLoadingCounts(false);
@@ -96,36 +96,40 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
           <img
-            src={sponsor?.imageUrl} 
+            src={sponsor?.imageUrl}
             alt="Sponsor Profile"
             className="w-10 h-10 rounded-full object-cover"
           />
           <div>
-            <h2 className="font-semibold font-secondary text-xl leading-tight">{sponsor?.name}</h2> 
-            <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{sponsor?.company}</p>       
+            <h2 className="font-semibold font-secondary text-xl leading-tight">
+              {sponsor?.name}
+            </h2>
+            <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">
+              {sponsor?.company}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Event Status Cards */}
       <div className="flex gap-8 mb-8 justify-start">
-        <EventStatusCard 
+        <EventStatusCard
           count={counts?.active}
           loading={loadingCounts}
-          label="Active Events" 
-          subtext="Currently sponsoring" 
+          label="Approved Sponsorships"
+          subtext="Currently sponsoring"
         />
-        <EventStatusCard 
+        <EventStatusCard
           count={counts?.pending}
           loading={loadingCounts}
-          label="Event Requests" 
-          subtext="Pending sponsorship" 
+          label="Pending Sponsorships"
+          subtext="Pending sponsorships"
         />
-        <EventStatusCard 
+        <EventStatusCard
           count={counts?.completed}
           loading={loadingCounts}
-          label="Completed Events" 
-          subtext="Successfully sponsored" 
+          label="Rejected Sponsorships"
+          subtext="Unsuccessful sponsorships"
         />
       </div>
 
@@ -150,9 +154,7 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
       </div>
 
       {/* Main Content */}
-      <div className="py-8">
-        {children}
-      </div>
+      <div className="py-8">{children}</div>
     </div>
   );
 }
