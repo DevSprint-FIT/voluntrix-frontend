@@ -6,17 +6,7 @@ import { Button } from "@heroui/button";
 import PhoneVerificationModal from "@/components/UI/PhoneVerification";
 import AccountDeletionModal from "@/components/UI/AccountDeletion";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
-
-// Types for sponsor data
-interface SponsorSettings {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  imageUrl: string;
-  company: string;
-  contactNumber?: string;
-}
+import { sponsorService, SponsorProfile } from "@/services/sponsorService";
 
 // Modal Component
 const NotificationModal = ({
@@ -40,7 +30,7 @@ const NotificationModal = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             {type === "success" ? (
-              <CheckCircle className="text-verdant-600" size={24} />
+              <CheckCircle className="text-green-600" size={24} />
             ) : (
               <AlertCircle className="text-red-600" size={24} />
             )}
@@ -61,7 +51,7 @@ const NotificationModal = ({
             onPress={onClose}
             className={`rounded-full font-primary tracking-wide text-base ${
               type === "success"
-                ? "bg-verdant-600 text-white"
+                ? "bg-green-600 text-white"
                 : "bg-red-600 text-white"
             }`}
           >
@@ -74,15 +64,13 @@ const NotificationModal = ({
 };
 
 const SponsorSettingsPage = () => {
-  const [sponsor, setSponsor] = useState<SponsorSettings | null>(null);
+  const [sponsor, setSponsor] = useState<SponsorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [editingEmail, setEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
-  const [editingContactNumber, setEditingContactNumber] = useState(false);
-  const [newContactNumber, setNewContactNumber] = useState("");
+  const [editingMobileNumber, setEditingMobileNumber] = useState(false);
+  const [newMobileNumber, setNewMobileNumber] = useState("");
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
@@ -91,31 +79,22 @@ const SponsorSettingsPage = () => {
   const [modalMessage, setModalMessage] = useState("");
 
   const router = useRouter();
-  const username = "SPONSOR123"; 
 
-  
   useEffect(() => {
     const loadSponsor = async () => {
       try {
-       
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        
-        const mockSponsorData: SponsorSettings = {
-          id: "sponsor-123",
-          name: "John Doe",
-          email: "john.doe@techcorp.com",
-          username: "SPONSOR123",
-          imageUrl:"/images/default-profile.jpg",
-          company: "TechCorp Solutions",
-          contactNumber: "+1 (555) 123-4567"
-        };
-
-        setSponsor(mockSponsorData);
-        setNewEmail(mockSponsorData.email);
-        setNewContactNumber(mockSponsorData.contactNumber || "");
+        const sponsorData = await sponsorService.getSponsorProfile();
+        if (sponsorData) {
+          setSponsor(sponsorData);
+          setNewMobileNumber(sponsorData.mobileNumber || "");
+        }
       } catch (error) {
         console.error("Failed to fetch sponsor", error);
+        // Show error modal
+        setModalType("error");
+        setModalTitle("Error");
+        setModalMessage("Failed to load sponsor data. Please try again.");
+        setModalOpen(true);
       } finally {
         setLoading(false);
       }
@@ -123,62 +102,38 @@ const SponsorSettingsPage = () => {
     loadSponsor();
   }, []);
 
-  const handleSaveEmail = async () => {
-    if (!sponsor) return;
-
-    console.log("Starting email update...");
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const updatedSponsor = { ...sponsor, email: newEmail };
-      setSponsor(updatedSponsor);
-      setEditingEmail(false);
-
-      // Show success modal
-      setModalType("success");
-      setModalTitle("Email Updated");
-      setModalMessage("Your email address has been successfully updated.");
-      setModalOpen(true);
-      
-      console.log("Success modal should show now");
-    } catch (error) {
-      console.error("Failed to update email:", error);
-
-      // Show error modal
-      setModalType("error");
-      setModalTitle("Update Failed");
-      setModalMessage(
-        error instanceof Error
-          ? error.message
-          : "Failed to update email address. Please try again."
-      );
-      setModalOpen(true);
-      
-      console.log("Error modal should show now");
-    }
+  const validateMobileNumber = (mobileNumber: string): boolean => {
+    const mobileRegex = /^\d{10}$/;
+    return mobileRegex.test(mobileNumber);
   };
 
-  const handleSaveContactNumber = async () => {
+  const handleSaveMobileNumber = async () => {
     if (!sponsor) return;
 
-    console.log("Starting contact number update...");
-    
+    // Validate mobile number
+    if (!validateMobileNumber(newMobileNumber)) {
+      setModalType("error");
+      setModalTitle("Invalid Mobile Number");
+      setModalMessage("Mobile number must be exactly 10 digits.");
+      setModalOpen(true);
+      return;
+    }
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const updatedSponsor = { ...sponsor, contactNumber: newContactNumber };
+      const updatedSponsor = await sponsorService.updateSponsorProfile({
+        mobileNumber: newMobileNumber,
+      });
+
       setSponsor(updatedSponsor);
-      setEditingContactNumber(false);
+      setEditingMobileNumber(false);
 
       // Show success modal
       setModalType("success");
-      setModalTitle("Contact Number Updated");
-      setModalMessage("Your contact number has been successfully updated.");
+      setModalTitle("Mobile Number Updated");
+      setModalMessage("Your mobile number has been successfully updated.");
       setModalOpen(true);
-      
     } catch (error) {
-      console.error("Failed to update contact number:", error);
+      console.error("Failed to update mobile number:", error);
 
       // Show error modal
       setModalType("error");
@@ -186,7 +141,7 @@ const SponsorSettingsPage = () => {
       setModalMessage(
         error instanceof Error
           ? error.message
-          : "Failed to update contact number. Please try again."
+          : "Failed to update mobile number. Please try again."
       );
       setModalOpen(true);
     }
@@ -194,130 +149,163 @@ const SponsorSettingsPage = () => {
 
   return (
     <div className="p-5">
-      {/* Title with Sponsor Info */}
-      <div className="flex justify-between items-center mb-4 px-4">
-        {/* Left Side: Title */}
-        <div>
-          <p className="text-shark-300">Sponsor / Settings</p>
-          <h1 className="text-2xl font-primary font-bold">Settings</h1>
+      {loading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-shark-950"></div>
         </div>
+      ) : (
+        <>
+          {/* Title with Sponsor Info */}
+          <div className="flex justify-between items-center mb-4 px-4">
+            {/* Left Side: Title */}
+            <div>
+              <p className="text-shark-300">Sponsor / Settings</p>
+              <h1 className="text-2xl font-primary font-bold">Settings</h1>
+            </div>
 
-        {/* Right Side: Sponsor Info */}
-        <div className="flex items-center gap-3">
-          <img
-            src={sponsor?.imageUrl} 
-            alt="Sponsor Profile"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <h2 className="font-semibold font-secondary text-xl leading-tight">{sponsor?.name}</h2> 
-            <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">{sponsor?.company}</p>       
+            {/* Right Side: Sponsor Info */}
+            <div className="flex items-center gap-3">
+              <img
+                src={sponsor?.imageUrl || "/images/default-profile.jpg"}
+                alt="Sponsor Profile"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <h2 className="font-semibold font-secondary text-xl leading-tight">
+                  {sponsor?.name}
+                </h2>
+                <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">
+                  {sponsor?.company}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Email Section */}
-      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="font-secondary font-semibold text-xl">Your email address</h2>
+          {/* Mobile Number Section */}
+          <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="font-secondary font-semibold text-xl">
+                  Your Phone Number
+                </h2>
 
+                <div className="mb-4 text-shark-700">
+                  {!editingMobileNumber ? (
+                    sponsor?.mobileNumber || (
+                      <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
+                    )
+                  ) : (
+                    <>
+                      <div className="mb-2">{sponsor?.mobileNumber}</div>
+                      <input
+                        type="tel"
+                        value={newMobileNumber}
+                        onChange={(e) => setNewMobileNumber(e.target.value)}
+                        className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-full"
+                        placeholder="Enter new mobile number (10 digits)"
+                        maxLength={10}
+                      />
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          onPress={() => {
+                            setEditingMobileNumber(false);
+                            setNewMobileNumber(sponsor?.mobileNumber || "");
+                          }}
+                          className="!rounded-full bg-shark-100 text-shark-900 font-primary"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onPress={handleSaveMobileNumber}
+                          className="!rounded-full bg-shark-950 text-shark-50 font-primary"
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {!editingMobileNumber && (
+                  <Button
+                    onPress={() => setEditingMobileNumber(true)}
+                    className="!rounded-full bg-shark-950 text-shark-50 font-primary"
+                  >
+                    Change Your Phone Number
+                  </Button>
+                )}
+              </div>
+
+              {/* Username */}
+              <div className="flex flex-col justify-start">
+                <div className="font-secondary text-shark-950 font-medium">
+                  Your username
+                </div>
+                <div className="font-secondary text-shark-700">
+                  {sponsor ? (
+                    `${sponsor.handle} (not editable)`
+                  ) : (
+                    <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Danger Zone Section */}
+          <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
+            <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">
+              Danger Zone
+            </h2>
             <div className="mb-4 text-shark-700">
-              {!editingEmail ? (
-                sponsor?.email || (
-                  <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
-                )
-              ) : (
-                <>
-                  <div className="mb-2">{sponsor?.email}</div>
-                  <input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-full"
-                    placeholder="Enter new email"
-                  />
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      onPress={() => setEditingEmail(false)}
-                      className="!rounded-full bg-shark-100 text-shark-900 font-primary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onPress={handleSaveEmail}
-                      className="!rounded-full bg-shark-950 text-shark-50 font-primary"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </>
-              )}
+              Permanently delete your account and all data.
             </div>
-
-            {!editingEmail && (
-              <Button
-                onPress={() => setEditingEmail(true)}
-                className="!rounded-full bg-shark-950 text-shark-50 font-primary"
-              >
-                Change email
-              </Button>
-            )}
+            <Button
+              onPress={() => setOpen(true)}
+              className="!rounded-full bg-red-600 text-shark-50 font-primary"
+            >
+              Delete Account
+            </Button>
           </div>
 
-          {/* Username */}
-          <div className="flex flex-col justify-start">
-            <div className="font-secondary text-shark-950 font-medium">Your username</div>
-            <div className="font-secondary text-shark-700">
-              {sponsor ? (
-                `${sponsor.username} (not editable)`
-              ) : (
-                <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+          {/* Modals */}
+          <PhoneVerificationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+          <AccountDeletionModal
+            isOpen={open}
+            onClose={() => setOpen(false)}
+            onConfirm={async () => {
+              if (!sponsor) return;
 
-      {/* Danger Zone Section */}
-      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
-        <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">Danger Zone</h2>
-        <div className="mb-4 text-shark-700">Permanently delete your account and all data.</div>
-        <Button
-          onPress={() => setOpen(true)}
-          className="!rounded-full bg-red-600 text-shark-50 font-primary"
-        >
-          Delete Account
-        </Button>
-      </div>
+              try {
+                // TODO: Implement actual account deletion API call
+                // await sponsorService.deleteAccount();
+                await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      {/* Modals */}
-      <PhoneVerificationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <AccountDeletionModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={async () => {
-          if(!sponsor) return;
+                setOpen(false);
+                router.push("/");
+              } catch (error) {
+                console.error("Failed to delete account", error);
+                setModalType("error");
+                setModalTitle("Deletion Failed");
+                setModalMessage("Failed to delete account. Please try again.");
+                setModalOpen(true);
+              }
+            }}
+          />
 
-          try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            setOpen(false);
-            router.push("/");
-          } catch (error) {
-             console.error("Failed to delete account", error);
-          }
-        }}
-      />
-
-      {/* Notification Modal */}
-      <NotificationModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        type={modalType}
-        title={modalTitle}
-        message={modalMessage}
-      />
+          {/* Notification Modal */}
+          <NotificationModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            type={modalType}
+            title={modalTitle}
+            message={modalMessage}
+          />
+        </>
+      )}
     </div>
   );
 };
