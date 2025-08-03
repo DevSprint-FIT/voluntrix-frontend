@@ -89,7 +89,7 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
           <Image
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
-            width={72}
+            width={152}
             height={72}
             className="ml-[-10px]"
             onClick={() => router.push('/')}
