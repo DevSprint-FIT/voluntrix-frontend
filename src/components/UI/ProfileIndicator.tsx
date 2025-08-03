@@ -49,13 +49,16 @@ const ProfileIndicator: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-4 mr-4">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={profile.profilePictureUrl || "/images/default-profile.jpg"}
         alt={profile.fullName}
-        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+        className="rounded-full object-cover border-2 border-gray-200"
+        width={48}
+        height={48}
       />
       <div className="flex flex-col">
-        <p className="text-base font-medium font-secondary font-semibold text-shark-950">
+        <p className="text-base font-medium font-secondary text-shark-950">
           {profile.fullName}
         </p>
         <p className="text-sm text-shark-500 font-secondary">

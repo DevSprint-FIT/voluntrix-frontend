@@ -78,6 +78,7 @@ export default function SocialFeed() {
         const existingPost = posts.find(post => post.id === editingPost.postId);
         if (!existingPost) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const updatedPost = await updatePost(
           editingPost.postId,
           content, 
@@ -211,10 +212,13 @@ export default function SocialFeed() {
 
         {/* Right Side */}
         <div className="flex items-center space-x-2 pr-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={organization?.imageUrl} 
+            src={organization?.imageUrl || "/images/default-profile.jpg"} 
             alt="Institute Logo"
-            className="w-10 h-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 
@@ -230,10 +234,13 @@ export default function SocialFeed() {
           <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
               {organization?.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={organization.imageUrl}
-                  className="w-10 h-10 rounded-full object-cover"
-                  alt="Organization"
+                  src={organization?.imageUrl || "/images/default-profile.jpg"} 
+                  alt="Institute Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
                 />
               ) : (
                 <div className="w-10 h-10 bg-shark-300 rounded-full" />

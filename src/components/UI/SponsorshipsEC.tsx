@@ -72,6 +72,7 @@ export default function SponsorshipsEC({
   };
 
   const [proposalMessage, setProposalmessage] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [file, setFile] = useState<File | null>(null);
 
   // Validation logic

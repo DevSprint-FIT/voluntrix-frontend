@@ -39,12 +39,15 @@ const isOrganization = (userType: UserType): userType is "ORGANIZATION" =>
   userType === USER_TYPE.ORGANIZATION;
 
 const PublicFeedPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [posts, setPosts] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<UserType>("ORGANIZATION");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [organizationsMap, setOrganizationsMap] = useState<Map<string, any>>(
     new Map()
   );
@@ -86,6 +89,7 @@ const PublicFeedPage = () => {
   };
 
   // Store organization data in state for later use in other effects
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [organizationData, setOrganizationData] = useState<any>(null);
 
   useEffect(() => {

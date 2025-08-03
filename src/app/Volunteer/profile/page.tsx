@@ -7,7 +7,6 @@ import {
   Mail,
   Phone,
   X,
-  Award,
   CheckCircle,
   AlertCircle,
   AlertTriangle,
@@ -105,7 +104,7 @@ const UnfollowConfirmationModal = ({
         <p className="text-gray-600 font-secondary mb-6">
           Are you sure you want to unfollow{" "}
           <span className="font-medium text-gray-900">
-            "{organizationName}"
+            &quot;{organizationName}&quot;
           </span>
           ? You will no longer receive updates from this organization.
         </p>
@@ -180,10 +179,13 @@ const FollowedOrganizationsModal = ({
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover"
                     />
                     <div>
                       <h3 className="font-medium font-secondary text-gray-900">
@@ -394,10 +396,13 @@ const VolunteerProfilePage = () => {
           {/* Main Profile Card */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
                 alt={profile.fullName}
-                className="w-32 h-32 rounded-lg object-cover"
+                className="rounded-lg object-cover"
+                width={128}
+                height={128}
               />
 
               <div className="flex-1">
@@ -518,11 +523,14 @@ const VolunteerProfilePage = () => {
               <div className="flex space-x-2">
                 {followedOrganizations.slice(0, 3).map((org) => (
                   <div key={org.id} className="flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="rounded-full object-cover"
                       title={org.name}
+                      width={40}
+                      height={40}
                     />
                   </div>
                 ))}

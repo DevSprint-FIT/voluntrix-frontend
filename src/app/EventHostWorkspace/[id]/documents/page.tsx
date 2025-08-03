@@ -29,8 +29,6 @@ const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] =
-    useState<EventDocument | null>(null);
 
   // Mock data for documents
   const documentsData: EventDocument[] = [

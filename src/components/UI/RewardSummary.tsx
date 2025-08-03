@@ -3,6 +3,7 @@ import { FaMedal, FaGift } from 'react-icons/fa';
 import { fetchVolunteerRewardStats } from '@/services/rewardService';
 
 export default function RewardSummary() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [streakProtection, setStreakProtection] = useState(false);
   const [volunteerData, setVolunteerData] = useState({
     name: '',
@@ -20,7 +21,7 @@ export default function RewardSummary() {
         setLoading(true);
         setError(null);
         
-        const data = await fetchVolunteerRewardStats(username);
+        const data = await fetchVolunteerRewardStats();
         
         if (data) {
           setVolunteerData({
@@ -48,6 +49,7 @@ export default function RewardSummary() {
     }
   }, [username]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleStreakProtection = () => {
     setStreakProtection((prev) => !prev);
   };

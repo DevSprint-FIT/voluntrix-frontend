@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   User,
@@ -9,10 +9,10 @@ import {
   LogOut,
   LucideIcon,
   Handshake,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,9 +23,26 @@ interface MenuItem {
 
 const SponsorSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const router = useRouter();
   const pathname = usePathname();
+
+  const menuItems: MenuItem[] = [
+    { name: 'Dashboard', icon: BarChart, href: '/Sponsor/dashboard' },
+    { name: 'Profile', icon: User, href: '/Sponsor/profile' },
+    {
+      name: 'Sponsorships',
+      icon: Handshake,
+      href: '/Sponsor/sponsorships/approved',
+    },
+    {
+      name: 'Notifications',
+      icon: Bell,
+      badge: notificationCount,
+      href: '/Sponsor/notifications',
+    },
+    { name: 'Settings', icon: Settings, href: '/Sponsor/settings' },
+  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -39,8 +56,8 @@ const SponsorSidebar = () => {
     if (!pathname) return;
 
     // Special handling for sponsorships routes
-    if (pathname.startsWith("/Sponsor/sponsorships")) {
-      setSelectedItem("Sponsorships");
+    if (pathname.startsWith('/Sponsor/sponsorships')) {
+      setSelectedItem('Sponsorships');
       return;
     }
 
@@ -49,37 +66,22 @@ const SponsorSidebar = () => {
       setSelectedItem(currentItem.name);
     } else {
       // Default to Dashboard if no match found
-      setSelectedItem("Dashboard");
+      setSelectedItem('Dashboard');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  const menuItems: MenuItem[] = [
-    { name: "Dashboard", icon: BarChart, href: "/Sponsor/dashboard" },
-    { name: "Profile", icon: User, href: "/Sponsor/profile" },
-    {
-      name: "Sponsorships",
-      icon: Handshake,
-      href: "/Sponsor/sponsorships/approved",
-    },
-    {
-      name: "Notifications",
-      icon: Bell,
-      badge: notificationCount,
-      href: "/Sponsor/notifications",
-    },
-    { name: "Settings", icon: Settings, href: "/Sponsor/settings" },
-  ];
 
   return (
     <div className="h-screen w-60 bg-[#f8fefc] border-r  py-6 flex flex-col justify-between fixed">
       {/* Logo */}
       <div>
         <div className="mb-8 mt-7 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/logo.svg"
             alt="Logo"
             className="h-18 w-18 mr-6"
-            onClick={() => router.push("/")}
+            onClick={() => router.push('/')}
           />
         </div>
 
@@ -90,16 +92,16 @@ const SponsorSidebar = () => {
               const isActive = selectedItem === item.name;
 
               return (
-                <Link key={item.name} href={item.href || "#"}>
+                <Link key={item.name} href={item.href || '#'}>
                   <div
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 relative ${
-                      isActive ? "text-verdant-700 font-semibold" : ""
+                      isActive ? 'text-verdant-700 font-semibold' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <item.icon
                         className={`h-5 w-5 ${
-                          isActive ? "text-verdant-700" : ""
+                          isActive ? 'text-verdant-700' : ''
                         }`}
                       />
                       <span className="font-secondary font-medium text-shark-950">
@@ -107,7 +109,7 @@ const SponsorSidebar = () => {
                       </span>
                     </div>
 
-                    {typeof item.badge === "number" && item.badge > 0 && (
+                    {typeof item.badge === 'number' && item.badge > 0 && (
                       <span className="text-xs bg-verdant-100 text-shark-950  px-1 mr-4 rounded-md">
                         {item.badge}
                       </span>
@@ -127,7 +129,7 @@ const SponsorSidebar = () => {
       {/* Logout */}
       <div>
         <button
-          onClick={() => setSelectedItem("Logout")}
+          onClick={() => setSelectedItem('Logout')}
           className="flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
           <div className="flex items-center space-x-2">

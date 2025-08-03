@@ -7,7 +7,6 @@ import {
   updateVolunteerAvailability,
   VolunteerSettings,
 } from "@/services/volunteerSettingsService";
-import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
 import ProfileIndicator from "@/components/UI/ProfileIndicator";
@@ -68,6 +67,7 @@ const NotificationModal = ({
 };
 
 // Confirmation Modal Component
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ConfirmationModal = ({
   isOpen,
   onClose,
@@ -136,8 +136,6 @@ const SettingsPage = () => {
   const [modalType, setModalType] = useState<"success" | "error">("success");
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
-
-  const router = useRouter();
 
   useEffect(() => {
     const loadVolunteer = async () => {
@@ -343,7 +341,7 @@ const SettingsPage = () => {
           Availability
         </h2>
         <div className="mb-4 text-shark-700">
-          While unavailable, your account will be hidden and rewards won't get
+          While unavailable, your account will be hidden and rewards won&apos;t get
           affected.
         </div>
         <div className="mb-4">

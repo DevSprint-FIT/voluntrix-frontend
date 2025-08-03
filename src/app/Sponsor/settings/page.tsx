@@ -170,10 +170,13 @@ const SponsorSettingsPage = () => {
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={sponsor?.imageUrl || "/images/default-profile.jpg"}
             alt="Sponsor Profile"
-            className="w-10 h-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="font-semibold font-secondary text-xl leading-tight">

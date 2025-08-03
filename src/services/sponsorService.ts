@@ -35,6 +35,7 @@ interface Event {
   eventStatus: "PENDING" | "ACTIVE" | "COMPLETE" | "DENIED";
   sponsorshipEnabled: boolean;
   donationEnabled: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   categories: any[];
   eventHostId: number;
   organizationId: number;

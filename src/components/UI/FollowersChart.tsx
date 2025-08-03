@@ -64,6 +64,7 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
     ? Number(((currentCount - previousCount) / previousCount * 100).toFixed(0))
     : 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (

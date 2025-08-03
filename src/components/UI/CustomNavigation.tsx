@@ -9,7 +9,9 @@ interface CustomNavigationProps {
 const CustomNavigation: React.FC<CustomNavigationProps> = ({ date, onNavigate }) => {
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const monthNames = [

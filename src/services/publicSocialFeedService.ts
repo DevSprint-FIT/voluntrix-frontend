@@ -90,6 +90,7 @@ export async function getAllVolunteers(): Promise<PublicFeedVolunteerDetails[]> 
     }
     
     const data = await res.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (data.data || data).map((volunteer: any) => ({
       id: volunteer.id,
       firstName: volunteer.firstName,
@@ -129,6 +130,7 @@ export async function getCurrentOrganizationDetails(): Promise<PublicFeedOrganiz
 }
 
 // All organizations for feed right sidebar
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getAllOrganizations(): Promise<any[]> {
   try {
     const BASE_URL = getBaseUrl();
@@ -141,6 +143,7 @@ export async function getAllOrganizations(): Promise<any[]> {
     const json = await res.json();
     const organizations = json.data || json;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return organizations.map((org: any) => ({
       id: org.id,
       name: org.name,

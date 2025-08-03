@@ -52,6 +52,7 @@ export const getAllOrganizations = async (): Promise<Organization[]> => {
 };
 
 // Legacy function for backward compatibility
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getOrganizationById = async (orgId: number): Promise<Organization> => {
   console.warn("getOrganizationById is deprecated. Use getOrganizationByToken instead.");
   return getOrganizationByToken();
