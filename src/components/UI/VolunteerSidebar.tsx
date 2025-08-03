@@ -91,7 +91,7 @@ const VolunteerSidebar = () => {
           <Image
             src="/images/logo.svg"
             alt="Logo"
-            width={72}
+            width={152}
             height={72}
             className="ml-[-10px]"
             onClick={() => router.push("/")}

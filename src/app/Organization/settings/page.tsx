@@ -12,7 +12,6 @@ import { Button } from "@heroui/button";
 import PhoneVerificationModal from "@/components/UI/PhoneVerification";
 import AccountDeletionModal from "@/components/UI/AccountDeletion";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
-import Image from "next/image";
 
 // Modal Component
 const NotificationModal = ({
@@ -204,7 +203,8 @@ const SettingsPage = () => {
 
         {/* Right Side: Organization Info */}
         <div className="flex items-center gap-3">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={organization?.imageUrl || "/images/default-profile.jpg"} 
             alt="Organization Logo"
             width={40}

@@ -70,7 +70,7 @@ const Sidebar = () => {
           <Image
             src="/images/logo.svg"
             alt="Logo"
-            width={72}
+            width={152}
             height={72}
             className="mr-6"
             onClick={() => router.push('/')}

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { MapPin, Calendar, Mail, Phone, Building2, Briefcase, Globe } from "lucide-react";
-import Image from "next/image";
 
 interface SponsorProfile {
   id: number;
@@ -125,7 +124,8 @@ const SponsorProfilePage = () => {
           {/* Right Side: Sponsor Info */}
           {profile && (
             <div className="flex items-center gap-3">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={profile.profilePictureUrl || "/api/placeholder/40/40"}
                 alt="Sponsor Profile"
                 width={40}
@@ -150,7 +150,8 @@ const SponsorProfilePage = () => {
           {/* Main Profile Card */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
                 alt={profile.firstName}
                 width={120}

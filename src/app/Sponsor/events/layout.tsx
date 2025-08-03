@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import { sponsorService } from "@/services/sponsorService";
-import Image from "next/image";
 
 const tabs = [
   { name: "Active Events", href: "/Sponsor/events/active" },
@@ -96,7 +95,8 @@ export default function SponsorEventsLayout({ children }: { children: React.Reac
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={sponsor?.imageUrl || "/images/default-profile.jpg"} 
             alt="Sponsor Profile"
             width={40}

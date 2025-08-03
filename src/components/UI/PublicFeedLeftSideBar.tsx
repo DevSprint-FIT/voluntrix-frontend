@@ -1,6 +1,5 @@
 import React from "react";
 import { BadgeCheck } from "lucide-react";
-import Image from "next/image";
 
 interface ProfileCardProps {
   profileImageUrl?: string; 
@@ -14,7 +13,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profileImageUrl, name, instit
   return (
     <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 w-full max-w-sm text-center  ml-10 mt-1">
       <div className="flex flex-col items-center space-y-4">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={profileImageUrl || "/images/default-profile.jpg"}
           alt="Profile"
           className="rounded-full object-cover border-shark-200"

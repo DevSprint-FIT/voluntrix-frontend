@@ -5,7 +5,6 @@ import {
   volunteerProfileService,
   VolunteerProfile,
 } from "@/services/volunteerProfileService";
-import Image from "next/image";
 
 const ProfileIndicator: React.FC = () => {
   const [profile, setProfile] = useState<VolunteerProfile | null>(null);
@@ -50,7 +49,8 @@ const ProfileIndicator: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-4 mr-4">
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={profile.profilePictureUrl || "/images/default-profile.jpg"}
         alt={profile.fullName}
         className="rounded-full object-cover border-2 border-gray-200"

@@ -3,7 +3,6 @@ import { getAllOrganizations, getFollowedOrganizationIds, followOrganization } f
 import { PublicFeedOrganizationDetails } from "@/services/types";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@heroui/react";
-import Image from "next/image";
 
 // Modal Component
 const NotificationModal = ({
@@ -115,7 +114,8 @@ export default function SuggestedOrganizations() {
           {unfollowedOrgs.map(org => (
             <li key={org.id} className="flex items-center justify-between">
               <div className="flex items-center gap-3 ">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={org.imageUrl || "/default-org.png"}
                   alt={org.name}
                   width={40}

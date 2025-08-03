@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 import EventStatusCard from "@/components/UI/EventStatusCard";
 import { EventStatusCounts, getEventStatusCounts } from "@/services/eventStatsService";
 import { getOrganizationByToken, Organization } from "@/services/organizationService";
-import Image from "next/image";
 
 export default function EventsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -59,7 +58,8 @@ export default function EventsLayout({ children }: { children: React.ReactNode }
 
         {/* Right Side: Organization Info */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={organization?.imageUrl || "/images/default-profile.jpg"} 
             alt="Organization Logo" 
             width={40}

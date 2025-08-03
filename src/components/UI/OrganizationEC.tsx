@@ -164,12 +164,13 @@ export default function OrganizationEC({
 
       {selectedOrg && (
         <div className="flex items-center gap-2 bg-shark-50 px-3 py-2 rounded-[20px] w-fit">
-          {/* <Image
-            src={selectedOrg.logoUrl ?? '/icons/default-logo.svg'}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={selectedOrg.organizationLogoUrl ?? '/icons/default-logo.svg'}
             width={24}
             height={24}
             alt="Organization logo"
-          /> */}
+          />
           <span className="text-[15px] text-shark-950">{selectedOrg.organizationName}</span>
           <Image
             src="/icons/close.svg"

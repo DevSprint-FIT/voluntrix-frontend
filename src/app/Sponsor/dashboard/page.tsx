@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { User } from "@/services/authService";
 import StatCard from "@/components/UI/StatCard";
 import { BarChart } from "lucide-react";
-import Image from "next/image";
 import { sponsorService, SponsorEventData } from "@/services/sponsorService";
 
 
@@ -309,7 +308,8 @@ export default function SponsorDashboardPage() {
         {/* Right Side: Sponsor Info */}
         {sponsor && (
           <div className="flex items-center gap-3">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={sponsor.imageUrl} 
               alt="Sponsor Profile"
               width={40}

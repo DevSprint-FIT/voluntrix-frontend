@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import ConfirmationModal from "./ConfirmationModal";
 import ShareModal from "./ShareModal";
-import Image from "next/image";
 import {
   getUserReaction,
   reactToPost,
@@ -177,7 +176,7 @@ const PostCard: React.FC<PostCardProps> = ({
       const totalLikes = allReactions.filter((r) => r.reacted).length;
       setLikeCount(totalLikes);
 
-      const userReaction = await getUserReaction(postId, userId, userType);
+      const userReaction = await getUserReaction(postId);
       if (userReaction) {
         setLiked(userReaction.reacted);
       }
@@ -227,7 +226,8 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Post Header */}
       <div className="flex items-center gap-3 mb-2">
         {profileImageUrl ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={profileImageUrl}
             alt="Organization"
             className="rounded-full object-cover"
@@ -341,7 +341,8 @@ const PostCard: React.FC<PostCardProps> = ({
                 <div key={comment.id} className="flex flex-col">
                   <div className="flex items-start gap-3">
                     {comment.profileImageUrl ? (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={comment.profileImageUrl}
                         alt={`${comment.commenterName}'s profile`}
                         className="rounded-full bg-shark-100 shrink-0 object-cover"

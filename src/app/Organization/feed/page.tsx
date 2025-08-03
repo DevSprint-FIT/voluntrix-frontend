@@ -14,7 +14,6 @@ import {
 } from "@/services/socialFeedService";
 import { Post, Organization } from "@/services/types";
 import { calculateMetrics, calculateTotalMediaSize } from "@/services/utils";
-import Image from "next/image";
 
 export default function SocialFeed() {
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -213,7 +212,8 @@ export default function SocialFeed() {
 
         {/* Right Side */}
         <div className="flex items-center space-x-2 pr-4">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={organization?.imageUrl || "/images/default-profile.jpg"} 
             alt="Institute Logo"
             width={40}
@@ -234,7 +234,8 @@ export default function SocialFeed() {
           <div className="bg-[#FBFBFB] p-6 rounded-xl mb-4">
             <div className="flex items-center gap-3">
               {organization?.imageUrl ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={organization?.imageUrl || "/images/default-profile.jpg"} 
                   alt="Institute Logo"
                   width={40}

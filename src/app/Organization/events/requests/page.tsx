@@ -14,7 +14,6 @@ import {
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import ConfirmationModal from "@/components/UI/ConfirmationModal";
-import Image from "next/image";
 
 export default function EventRequestsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -152,7 +151,8 @@ export default function EventRequestsPage() {
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
             {eventHost.profilePictureUrl ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={eventHost.profilePictureUrl}
               alt={eventHost.fullName}
               width={48}

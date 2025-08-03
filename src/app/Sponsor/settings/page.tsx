@@ -7,7 +7,6 @@ import { Button } from "@heroui/button";
 import PhoneVerificationModal from "@/components/UI/PhoneVerification";
 import AccountDeletionModal from "@/components/UI/AccountDeletion";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
-import Image from "next/image";
 
 // Types for sponsor data
 interface SponsorSettings {
@@ -206,7 +205,8 @@ const SponsorSettingsPage = () => {
 
         {/* Right Side: Sponsor Info */}
         <div className="flex items-center gap-3">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={sponsor?.imageUrl || "/images/default-profile.jpg"} 
             alt="Sponsor Profile"
             width={40}

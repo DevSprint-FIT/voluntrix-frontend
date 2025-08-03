@@ -1,5 +1,5 @@
 export type OrganizationTitles = {
-  id: number;
-  name: string;
-  logoUrl?: string;
+  organizationId: number;
+  organizationName: string;
+  organizationLogoUrl?: string;
 };

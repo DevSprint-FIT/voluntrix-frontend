@@ -45,7 +45,7 @@ const SponsorSidebar = () => {
       {/* Logo */}
       <div>
         <div className="mb-8 flex justify-center">
-          <Image src="/images/logo.svg" alt="Logo" width={72} height={72} className="mr-6" />
+          <Image src="/images/logo.svg" alt="Logo" width={152} height={72} className="mr-6" />
         </div>
 
         {/* Navigation */}

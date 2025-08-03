@@ -19,7 +19,6 @@ import {
 } from "@/services/volunteerProfileService";
 import ProfileIndicator from "@/components/UI/ProfileIndicator";
 import { useRouter } from 'next/navigation';
-import Image from "next/image";
 
 // Notification Modal Component
 const NotificationModal = ({
@@ -180,7 +179,8 @@ const FollowedOrganizationsModal = ({
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
                       width={40}
@@ -396,7 +396,8 @@ const VolunteerProfilePage = () => {
           {/* Main Profile Card */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
                 alt={profile.fullName}
                 className="rounded-lg object-cover"
@@ -522,7 +523,8 @@ const VolunteerProfilePage = () => {
               <div className="flex space-x-2">
                 {followedOrganizations.slice(0, 3).map((org) => (
                   <div key={org.id} className="flex-shrink-0">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
                       className="rounded-full object-cover"

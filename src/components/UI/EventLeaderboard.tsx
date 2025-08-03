@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Trophy, Medal, Award, Star } from "lucide-react";
-import Image from "next/image";
 
 export interface LeaderboardEntry {
   id: string;
@@ -194,7 +193,8 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                             <div className="flex items-center space-x-6">
                               <div className="w-14 h-14 bg-verdant-100 rounded-full flex items-center justify-center overflow-hidden">
                                 {entry.profilePictureUrl ? (
-                                  <Image
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
                                     src={entry.profilePictureUrl}
                                     alt={entry.name}
                                     width={56}
