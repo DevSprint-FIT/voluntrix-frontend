@@ -96,3 +96,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Chat overlay styles - prevent body scroll when chat is active */
+.chat-overlay-active {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Improved scroll containment for chat interfaces */
+.chat-container {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
