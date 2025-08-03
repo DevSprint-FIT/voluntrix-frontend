@@ -147,165 +147,168 @@ const SponsorSettingsPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-secondary">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5">
-      {loading ? (
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-shark-950"></div>
+      {/* Title with Sponsor Info */}
+      <div className="flex justify-between items-center mb-4 px-4">
+        {/* Left Side: Title */}
+        <div>
+          <p className="text-shark-300">Sponsor / Settings</p>
+          <h1 className="text-2xl font-primary font-bold">Settings</h1>
         </div>
-      ) : (
-        <>
-          {/* Title with Sponsor Info */}
-          <div className="flex justify-between items-center mb-4 px-4">
-            {/* Left Side: Title */}
-            <div>
-              <p className="text-shark-300">Sponsor / Settings</p>
-              <h1 className="text-2xl font-primary font-bold">Settings</h1>
-            </div>
 
-            {/* Right Side: Sponsor Info */}
-            <div className="flex items-center gap-3">
-              <img
-                src={sponsor?.imageUrl || "/images/default-profile.jpg"}
-                alt="Sponsor Profile"
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <h2 className="font-semibold font-secondary text-xl leading-tight">
-                  {sponsor?.name}
-                </h2>
-                <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">
-                  {sponsor?.company}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Number Section */}
-          <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="font-secondary font-semibold text-xl">
-                  Your Phone Number
-                </h2>
-
-                <div className="mb-4 text-shark-700">
-                  {!editingMobileNumber ? (
-                    sponsor?.mobileNumber || (
-                      <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
-                    )
-                  ) : (
-                    <>
-                      <div className="mb-2">{sponsor?.mobileNumber}</div>
-                      <input
-                        type="tel"
-                        value={newMobileNumber}
-                        onChange={(e) => setNewMobileNumber(e.target.value)}
-                        className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-full"
-                        placeholder="Enter new mobile number (10 digits)"
-                        maxLength={10}
-                      />
-                      <div className="flex gap-2 mt-4">
-                        <Button
-                          onPress={() => {
-                            setEditingMobileNumber(false);
-                            setNewMobileNumber(sponsor?.mobileNumber || "");
-                          }}
-                          className="!rounded-full bg-shark-100 text-shark-900 font-primary"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onPress={handleSaveMobileNumber}
-                          className="!rounded-full bg-shark-950 text-shark-50 font-primary"
-                        >
-                          Save
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {!editingMobileNumber && (
-                  <Button
-                    onPress={() => setEditingMobileNumber(true)}
-                    className="!rounded-full bg-shark-950 text-shark-50 font-primary"
-                  >
-                    Change Your Phone Number
-                  </Button>
-                )}
-              </div>
-
-              {/* Username */}
-              <div className="flex flex-col justify-start">
-                <div className="font-secondary text-shark-950 font-medium">
-                  Your username
-                </div>
-                <div className="font-secondary text-shark-700">
-                  {sponsor ? (
-                    `${sponsor.handle} (not editable)`
-                  ) : (
-                    <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Danger Zone Section */}
-          <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
-            <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">
-              Danger Zone
+        {/* Right Side: Sponsor Info */}
+        <div className="flex items-center gap-3">
+          <img
+            src={sponsor?.imageUrl || "/images/default-profile.jpg"}
+            alt="Sponsor Profile"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <h2 className="font-semibold font-secondary text-xl leading-tight">
+              {sponsor?.name}
             </h2>
+            <p className="font-secondary font-semibold text-shark-600 text-xs leading-tight">
+              {sponsor?.company}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Number Section */}
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 mb-6 pr-20 pl-10">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="font-secondary font-semibold text-xl">
+              Your Phone Number
+            </h2>
+
             <div className="mb-4 text-shark-700">
-              Permanently delete your account and all data.
+              {!editingMobileNumber ? (
+                sponsor?.mobileNumber || (
+                  <div className="h-4 w-32 bg-shark-100 rounded animate-pulse"></div>
+                )
+              ) : (
+                <>
+                  <div className="mb-2">{sponsor?.mobileNumber}</div>
+                  <input
+                    type="tel"
+                    value={newMobileNumber}
+                    onChange={(e) => setNewMobileNumber(e.target.value)}
+                    className="border border-shark-200 px-3 py-2 w-full max-w-md text-shark-950 rounded-full"
+                    placeholder="Enter new mobile number (10 digits)"
+                    maxLength={10}
+                  />
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      onPress={() => {
+                        setEditingMobileNumber(false);
+                        setNewMobileNumber(sponsor?.mobileNumber || "");
+                      }}
+                      className="!rounded-full bg-shark-100 text-shark-900 font-primary"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onPress={handleSaveMobileNumber}
+                      className="!rounded-full bg-shark-950 text-shark-50 font-primary"
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
-            <Button
-              onPress={() => setOpen(true)}
-              className="!rounded-full bg-red-600 text-shark-50 font-primary"
-            >
-              Delete Account
-            </Button>
+
+            {!editingMobileNumber && (
+              <Button
+                onPress={() => setEditingMobileNumber(true)}
+                className="!rounded-full bg-shark-950 text-shark-50 font-primary"
+              >
+                Change Your Phone Number
+              </Button>
+            )}
           </div>
 
-          {/* Modals */}
-          <PhoneVerificationModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-          <AccountDeletionModal
-            isOpen={open}
-            onClose={() => setOpen(false)}
-            onConfirm={async () => {
-              if (!sponsor) return;
+          {/* Username */}
+          <div className="flex flex-col justify-start">
+            <div className="font-secondary text-shark-950 font-medium">
+              Your username
+            </div>
+            <div className="font-secondary text-shark-700">
+              {sponsor ? (
+                `${sponsor.handle} (not editable)`
+              ) : (
+                <div className="h-4 w-24 bg-shark-100 rounded animate-pulse" />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-              try {
-                // TODO: Implement actual account deletion API call
-                // await sponsorService.deleteAccount();
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+      {/* Danger Zone Section */}
+      <div className="bg-[#FBFBFB] shadow-sm rounded-2xl p-6 pl-10">
+        <h2 className="font-secondary font-semibold text-xl text-red-600 mb-2">
+          Danger Zone
+        </h2>
+        <div className="mb-4 text-shark-700">
+          Permanently delete your account and all data.
+        </div>
+        <Button
+          onPress={() => setOpen(true)}
+          className="!rounded-full bg-red-600 text-shark-50 font-primary"
+        >
+          Delete Account
+        </Button>
+      </div>
 
-                setOpen(false);
-                router.push("/");
-              } catch (error) {
-                console.error("Failed to delete account", error);
-                setModalType("error");
-                setModalTitle("Deletion Failed");
-                setModalMessage("Failed to delete account. Please try again.");
-                setModalOpen(true);
-              }
-            }}
-          />
+      {/* Modals */}
+      <PhoneVerificationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+      <AccountDeletionModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={async () => {
+          if (!sponsor) return;
 
-          {/* Notification Modal */}
-          <NotificationModal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            type={modalType}
-            title={modalTitle}
-            message={modalMessage}
-          />
-        </>
-      )}
+          try {
+            // TODO: Implement actual account deletion API call
+            // await sponsorService.deleteAccount();
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            setOpen(false);
+            router.push("/");
+          } catch (error) {
+            console.error("Failed to delete account", error);
+            setModalType("error");
+            setModalTitle("Deletion Failed");
+            setModalMessage("Failed to delete account. Please try again.");
+            setModalOpen(true);
+          }
+        }}
+      />
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+      />
     </div>
   );
 };

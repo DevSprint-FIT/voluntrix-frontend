@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Table, { Column } from "@/components/UI/Table";
-import { Loader2 } from "lucide-react";
 import {
   sponsorService,
   SponsorRequestTableDTO,
@@ -72,14 +71,23 @@ export default function SponsorRejectedSponsorshipsPage() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#029972] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-secondary">
+            Loading sponsorships...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Rejected Sponsorships</h1>
-      {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <Loader2 className="h-8 w-8 text-verdant-600 animate-spin" />
-        </div>
-      ) : sponsorships.length === 0 ? (
+      {sponsorships.length === 0 ? (
         <div className="text-center text-gray-500 py-8">
           No rejected sponsorships found
         </div>
