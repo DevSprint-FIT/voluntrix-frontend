@@ -37,7 +37,7 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-[#029972] mb-6">
+        <h2 className="text-2xl font-bold text-center text-verdant-700 mb-6">
           Chat Login
         </h2>
 
@@ -57,7 +57,7 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#25d366] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-verdant-800 focus:border-transparent"
               placeholder="Enter your username"
               required
             />
@@ -72,7 +72,7 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#25d366] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-verdant-800 focus:border-transparent"
               placeholder="Enter your password"
               required
             />
@@ -80,9 +80,9 @@ export default function ChatLogin({ onLogin }: ChatLoginProps) {
 
           <button
             type="submit"
-            className="w-full bg-[#029972] text-white py-2 px-4 rounded-md hover:bg-[#0a6e55] transition-colors"
+            className="w-full bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800 transition-colors"
           >
-            Login
+            Continue
           </button>
         </form>
       </div>

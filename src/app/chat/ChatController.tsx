@@ -114,7 +114,7 @@ export default function ChatController({
               <h2 className="text-2xl font-bold text-black mb-2">
                 Get Started
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-shark-600">
                 Enter your username to continue
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function ChatController({
                   id="username"
                   value={usernameInput}
                   onChange={(e) => setUsernameInput(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-shark-600 focus:border-transparent transition-all"
                   placeholder="Enter your username"
                   required
                 />
@@ -146,7 +146,7 @@ export default function ChatController({
 
               <button
                 type="submit"
-                className="w-full py-3 px-4 rounded-lg transition-all bg-green-500 text-white hover:bg-green-600 font-medium hover:shadow-lg transform hover:scale-105"
+                className="w-full py-3 px-4 rounded-lg transition-all bg-shark-600 text-white hover:bg-shark-800 font-medium hover:shadow-lg transform hover:scale-105"
               >
                 Continue
               </button>

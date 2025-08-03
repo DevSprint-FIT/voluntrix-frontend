@@ -328,7 +328,7 @@ export default function ChatListInterface({
                 // onLogout();
                 setShowChat(false);
               }}
-              className="text-black hover:bg-shark-950 p-1 rounded"
+              className="text-black hover:bg-shark-100 p-1 rounded"
             >
               <svg
                 className="w-6 h-6"
