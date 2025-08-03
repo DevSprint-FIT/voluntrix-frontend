@@ -97,6 +97,32 @@ class SponsorService {
     }
   }
 
+  // Update sponsor profile information
+  async updateSponsorProfile(
+    updateData: Partial<SponsorProfile>
+  ): Promise<SponsorProfile> {
+    try {
+      const response = await fetch(`${getBaseUrl()}/api/sponsors/profile`, {
+        method: "PATCH",
+        headers: authService.getAuthHeaders(),
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error("Error updating sponsor profile:", error);
+      throw error;
+    }
+  }
+
   private async fetchWithErrorHandling<T>(url: string): Promise<T> {
     try {
       console.log(`Fetching: ${url}`); // Debug log
