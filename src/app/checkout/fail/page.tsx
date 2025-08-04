@@ -12,7 +12,7 @@ export default function FailPage() {
   useEffect(() => {
     // Auto redirect to sponsorship dashboard after 15 seconds
     const timer = setTimeout(() => {
-      router.push('/Sponsor/sponsorship');
+      router.push('Sponsor/sponsorships/approved');
     }, 10000);
 
     return () => clearTimeout(timer);
@@ -77,7 +77,7 @@ export default function FailPage() {
             
             <Button
               as={Link}
-              href="/Sponsor/sponsorship"
+              href="Sponsor/sponsorships/approved"
               variant="bordered"
               className="w-full border-verdant-600 text-verdant-600 hover:bg-verdant-50 font-primary font-medium py-3"
               size="lg"

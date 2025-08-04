@@ -12,7 +12,7 @@ export default function SuccessPage() {
   useEffect(() => {
     // Auto redirect to sponsorship dashboard after 10 seconds
     const timer = setTimeout(() => {
-      router.push('/Sponsor/sponsorship');
+      router.push('/Sponsor/sponsorships/approved');
     }, 10000);
 
     return () => clearTimeout(timer);
@@ -57,7 +57,7 @@ export default function SuccessPage() {
           <div className="space-y-3">
             <Button
               as={Link}
-              href="/Sponsor/sponsorship"
+              href="/Sponsor/sponsorships/approved"
               className="w-full bg-verdant-600 hover:bg-verdant-700 text-white font-primary font-medium py-3"
               size="lg"
               endContent={<ArrowRight className="w-4 h-4" />}
