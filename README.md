@@ -4,6 +4,8 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-white)  
 ![Next.js](https://img.shields.io/badge/Next.js-15.1.6-white)  
 
+![Home Page Screenshot](./public/images/home-page.png)
+
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Tech Stack](#tech-stack)
