@@ -99,7 +99,9 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
 
 export interface SponsorshipPaymentDetails {
   orderId: string;
+  eventId: number;
   eventTitle: string;
+  sponsorId: number;
   price: number;
   type: string;
   benefits: string;

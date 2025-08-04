@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,8 +8,15 @@ import { Shield, Award, Calendar } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import authService from "@/services/authService";
 import { User } from "@/services/authService";
-import { getSponsorshipPaymentDetails, SponsorshipPaymentDetails } from "@/services/paymentService";
+import { getSponsorshipPaymentDetails, SponsorshipPaymentDetails, startPayment, PaymentDetails, checkPaymentStatus } from "@/services/paymentService";
 import Navbar from "@/components/UI/Navbar";
+
+// Declare PayHere global interface
+declare global {
+  interface Window {
+    payhere: any;
+  }
+}
 
 interface SponsorshipFormData {
   currency: string;
@@ -103,6 +111,57 @@ export default function SponsorshipPage() {
     checkAuthAndRole();
   }, [router]);
 
+  // Setup PayHere event handlers
+  useEffect(() => {
+    // Load PayHere script if not already loaded
+    if (typeof window !== "undefined" && !window.payhere) {
+      const script = document.createElement('script');
+      script.src = 'https://www.payhere.lk/lib/payhere.js';
+      script.async = true;
+      script.onload = () => {
+        console.log('PayHere script loaded successfully');
+        setupPayHereHandlers();
+      };
+      document.body.appendChild(script);
+    } else if (window.payhere) {
+      setupPayHereHandlers();
+    }
+
+    function setupPayHereHandlers() {
+      if (window.payhere) {
+        window.payhere.onCompleted = function (orderId: string) {
+          let attempts = 0;
+          const interval = setInterval(async () => {
+            try {
+              const status = await checkPaymentStatus(orderId);
+              if(status === "SUCCESS") {
+                clearInterval(interval);
+                window.location.href = "/checkout/success";
+              } else if (status === "FAILED" || attempts > 10) {
+                clearInterval(interval);
+                window.location.href = "/checkout/fail";
+              }
+              attempts++;
+            } catch (error) {
+              clearInterval(interval);
+              console.log(error);
+              window.location.href = "/checkout/fail";
+            }
+          }, 1000);
+        };
+    
+        window.payhere.onDismissed = function () {
+          window.location.href = "/checkout/fail";
+        };
+    
+        window.payhere.onError = function (error: any) {
+          console.error("PayHere error occurred:", error);
+          window.location.href = "/checkout/fail";
+        };
+      }
+    }
+  }, []);
+
   const handleInputChange = (field: keyof SponsorshipFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -129,29 +188,92 @@ export default function SponsorshipPage() {
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "You must accept the terms and conditions to proceed";
     }
+
+    // Validate user authentication
+    if (!user) {
+      newErrors.user = "User authentication required. Please log in again.";
+    }
+
+    // Validate sponsorship package data
+    if (!sponsorshipPackage) {
+      newErrors.package = "Sponsorship package data not available. Please refresh the page.";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !sponsorshipPackage || !user) return;
     
     setIsLoading(true);
     try {
-      // Here you'll integrate with your payment processing
-      console.log("Sponsorship form data:", formData);
-      console.log("Order ID:", orderId);
+      console.log("Starting sponsorship payment process...");
+      console.log("Form data:", formData);
+      console.log("User:", user);
       console.log("Package:", sponsorshipPackage);
       
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create payment details object
+      const paymentDetails: PaymentDetails = {
+        orderId: orderId,
+        amount: formData.amount,
+        currency: formData.currency,
+        firstName: user.fullName ? user.fullName.split(' ')[0] : null,
+        lastName: user.fullName ? user.fullName.split(' ').slice(1).join(' ') : null,
+        email: user.email,
+        phone: null, // You might want to add phone field to the form
+        address: null, // You might want to add address fields to the form
+        city: null,
+        country: null,
+        userType: "SPONSOR",
+        volunteerId: null,
+        sponsorId: sponsorshipPackage.sponsorId, // Use sponsorId from API response
+        eventId: sponsorshipPackage.eventId, // Use eventId from API response
+        isAnnonymous: false,
+        transactionType: "SPONSORSHIP"
+      };
+
+      console.log("Payment details:", paymentDetails);
+
+      // Start payment process
+      const { hash, merchantId } = await startPayment(paymentDetails);
       
-      // Navigate to payment processing page
-      // router.push('/payment-processing');
+      console.log("Payment response:", { hash, merchantId });
+      
+      // Prepare PayHere payment object
+      const payment = {
+        sandbox: true,
+        merchant_id: merchantId,
+        return_url: process.env.NEXT_PUBLIC_PAYHERE_RETURN_URL,
+        cancel_url: process.env.NEXT_PUBLIC_PAYHERE_FAIL_URL,
+        notify_url: process.env.NEXT_PUBLIC_PAYHERE_NOTIFY_URL,
+        order_id: paymentDetails.orderId,
+        items: `${sponsorshipPackage.type} Sponsorship`,
+        amount: paymentDetails.amount,
+        currency: paymentDetails.currency,
+        first_name: paymentDetails.firstName,
+        last_name: paymentDetails.lastName,
+        email: paymentDetails.email,
+        phone: paymentDetails.phone,
+        address: paymentDetails.address,
+        city: paymentDetails.city,
+        country: paymentDetails.country,
+        hash: hash,
+      };
+
+      console.log("PayHere payment object:", payment);
+      
+      // Check if PayHere is available
+      if (typeof window !== "undefined" && window.payhere) {
+        console.log("Starting PayHere payment...");
+        window.payhere.startPayment(payment);
+      } else {
+        throw new Error("PayHere is not available. Please refresh the page and try again.");
+      }
       
     } catch (error) {
-      console.error("Sponsorship submission failed:", error);
+      console.error("Payment initiation failed:", error);
+      alert(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -496,7 +618,7 @@ export default function SponsorshipPage() {
                   className="w-full bg-verdant-600 hover:bg-verdant-700 text-white font-primary font-medium py-6 text-base tracking-[0.025rem] disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
-                  {isLoading ? "Processing..." : "Proceed to Payment"}
+                  {isLoading ? "Initializing Payment..." : "Pay with PayHere"}
                 </Button>
 
                 {/* Security Note */}
