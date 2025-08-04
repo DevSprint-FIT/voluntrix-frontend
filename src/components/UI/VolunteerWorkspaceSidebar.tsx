@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ListTodo, Trophy, Bell, ArrowLeft, LucideIcon } from "lucide-react";
+import { ListTodo, Trophy, ArrowLeft, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
@@ -14,6 +14,7 @@ interface MenuItem {
 }
 
 const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
   const pathname = usePathname();
@@ -38,12 +39,12 @@ const VolunteerWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       icon: Trophy,
       href: `/VolunteerWorkspace/${eventId}/leaderboard`,
     },
-    {
-      name: "Notifications",
-      icon: Bell,
-      badge: notificationCount,
-      href: `/VolunteerWorkspace/${eventId}/notifications`,
-    },
+    // {
+    //   name: "Notifications",
+    //   icon: Bell,
+    //   badge: notificationCount,
+    //   href: `/VolunteerWorkspace/${eventId}/notifications`,
+    // },
   ];
 
   // Set active item based on current route

@@ -169,7 +169,8 @@ export default function OrganizationEC({
             src={selectedOrg.organizationLogoUrl ?? '/icons/default-logo.svg'}
             width={24}
             height={24}
-            alt="Organization logo rounded-full"
+            alt="Organization logo"
+            className="rounded-full"
           />
           <span className="text-[15px] text-shark-950">{selectedOrg.organizationName}</span>
           <Image

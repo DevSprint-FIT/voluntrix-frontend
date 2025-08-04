@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BarChart, Calendar, Bell, LogOut, LucideIcon } from "lucide-react";
+import { BarChart, Calendar, LogOut, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import Image from "next/image";
@@ -15,6 +15,7 @@ interface MenuItem {
 }
 
 const VolunteerSidebar = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
   const pathname = usePathname();
@@ -29,12 +30,12 @@ const VolunteerSidebar = () => {
   const menuItems: MenuItem[] = [
     { name: "Dashboard", icon: BarChart, href: `/event-host/dashboard` },
     { name: "Events", icon: Calendar, href: `/event-host/events` },
-    {
-      name: "Notifications",
-      icon: Bell,
-      badge: notificationCount,
-      href: `/event-host/notifications`,
-    },
+    // {
+    //   name: "Notifications",
+    //   icon: Bell,
+    //   badge: notificationCount,
+    //   href: `/event-host/notifications`,
+    // },
   ];
 
   // Set active item based on current route

@@ -5,7 +5,6 @@ import {
   BarChart,
   User,
   Calendar,
-  Bell,
   Send,
   Settings,
   LogOut,
@@ -24,6 +23,7 @@ interface MenuItem {
 }
 
 const Sidebar = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const pathname = usePathname();
@@ -32,12 +32,12 @@ const Sidebar = () => {
     { name: 'Dashboard', icon: BarChart, href: '/Organization/dashboard' },
     { name: 'Profile', icon: User, href: '/Organization/profile' },
     { name: 'Events', icon: Calendar, href: '/Organization/events/active' },
-    {
-      name: 'Notifications',
-      icon: Bell,
-      badge: notificationCount,
-      href: '/Organization/notifications',
-    },
+    // {
+    //   name: 'Notifications',
+    //   icon: Bell,
+    //   badge: notificationCount,
+    //   href: '/Organization/notifications',
+    // },
     { name: 'My Feed', icon: Send, href: '/Organization/feed' },
     { name: 'Settings', icon: Settings, href: '/Organization/settings' },
   ];

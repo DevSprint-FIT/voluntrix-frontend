@@ -5,7 +5,6 @@ import {
   BarChart,
   User,
   Calendar,
-  Bell,
   Send,
   Settings,
   LogOut,
@@ -31,6 +30,7 @@ interface MenuItem {
 }
 
 const VolunteerSidebar = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -61,12 +61,12 @@ const VolunteerSidebar = () => {
     { name: 'Dashboard', icon: BarChart, href: '/Volunteer/dashboard' },
     { name: 'Profile', icon: User, href: '/Volunteer/profile' },
     { name: 'Events', icon: Calendar, href: '/Volunteer/events/active' },
-    {
-      name: 'Notifications',
-      icon: Bell,
-      badge: notificationCount,
-      href: '/notifications',
-    },
+    // {
+    //   name: 'Notifications',
+    //   icon: Bell,
+    //   badge: notificationCount,
+    //   href: '/notifications',
+    // },
     { name: 'Social Feed', icon: Send, href: '/PublicFeed' },
     { name: 'Settings', icon: Settings, href: '/Volunteer/settings' },
   ];

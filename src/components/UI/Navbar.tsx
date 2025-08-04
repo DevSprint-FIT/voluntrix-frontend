@@ -15,7 +15,6 @@ import {
   DropdownItem,
 } from '@heroui/dropdown';
 import { Avatar } from '@heroui/avatar';
-import { Bell } from 'lucide-react';
 import AuthService from '@/services/authService';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -298,9 +297,9 @@ export default function Navbar() {
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-4">
               {/* Notification Bell */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+              {/* <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
                 <Bell size={20} className="text-shark-950" />
-              </button>
+              </button> */}
 
               {/* User Profile Dropdown */}
               <Dropdown placement="bottom-end">

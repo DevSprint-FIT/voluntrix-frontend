@@ -5,7 +5,6 @@ import Image from 'next/image';
 import {
   ListTodo,
   Trophy,
-  Bell,
   ArrowLeft,
   LucideIcon,
   FileText,
@@ -23,6 +22,7 @@ interface MenuItem {
 }
 
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<string>("Tasks");
   const pathname = usePathname();
@@ -61,12 +61,12 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
       icon: FileText,
       href: `/EventHostWorkspace/${eventId}/documents`,
     },
-    {
-      name: 'Notifications',
-      icon: Bell,
-      badge: notificationCount,
-      href: `/EventHostWorkspace/${eventId}/notifications`,
-    },
+    // {
+    //   name: 'Notifications',
+    //   icon: Bell,
+    //   badge: notificationCount,
+    //   href: `/EventHostWorkspace/${eventId}/notifications`,
+    // },
   ];
 
   // Set active item based on current route
