@@ -1,10 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import authService from "@/services/authService";
 
-export default function AuthSuccessPage() {
+// Loading component for suspense fallback
+function AuthSuccessLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 flex items-center justify-center">
+      <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-md mx-4">
+        <div className="w-16 h-16 mx-auto mb-6 relative">
+          <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <h2 className="text-xl font-semibold text-shark-900 mb-3 font-secondary">
+          Loading...
+        </h2>
+        <p className="text-shark-600 font-primary text-sm">
+          Please wait while we process your authentication...
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Main component that uses searchParams
+function AuthSuccessContent() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string>("");
@@ -126,5 +147,14 @@ export default function AuthSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+// Main page component wrapped with Suspense
+export default function AuthSuccessPage() {
+  return (
+    <Suspense fallback={<AuthSuccessLoading />}>
+      <AuthSuccessContent />
+    </Suspense>
   );
 }
