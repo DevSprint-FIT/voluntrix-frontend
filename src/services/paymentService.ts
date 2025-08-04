@@ -184,3 +184,38 @@ export async function getSponsorshipPaymentDetails(requestId: number): Promise<S
     throw error;
   }
 }
+
+export async function generatePaymentID(type: string): Promise<string> {
+  try {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/generate-order-id/${type}`;
+    console.log("Generate order ID API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Generate order ID error response:", errorText);
+      throw new Error(`Failed to generate order ID. Status: ${response.status}, Response: ${errorText}`);
+    }
+
+    const responseText = await response.text();
+    console.log("Generate order ID raw response:", responseText);
+
+    try {
+      const data = JSON.parse(responseText);
+      return data.orderId;
+    } catch (parseError) {
+      console.error("JSON parse error in generateOrderId:", parseError);
+      console.error("Response was not valid JSON:", responseText);
+      throw new Error("Server returned invalid JSON response for order ID generation");
+    }
+  } catch (error) {
+    console.error("Error in generateOrderId:", error);
+    throw error;
+  }
+}
