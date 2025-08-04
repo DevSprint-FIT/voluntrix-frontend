@@ -4,6 +4,8 @@ import { Button, Progress, useDisclosure } from '@heroui/react';
 import Image from 'next/image';
 import { EventType } from '@/types/EventType';
 import DonationModal from '@/components/UI/DonationModal';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Event({
   event,
@@ -38,6 +40,17 @@ export default function Event({
     onOpenChange: onDonationModalChange,
   } = useDisclosure();
 
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const router = useRouter();
+
+  const handleClick = () => {
+    setIsLoggingIn(true);
+    // Add delay to show loading state
+    setTimeout(() => {
+      router.push('/auth/login');
+    }, 500);
+  };
+
   return (
     <div className="w-full flex items-start justify-center mb-[88px]">
       <div className="w-[1200px] flex flex-col items-center justify-start">
@@ -59,16 +72,6 @@ export default function Event({
                   <p className="w-[513px] font-secondary text-shark-950 font-medium text-4xl text-left text-wrap">
                     {event.eventTitle}
                   </p>
-                  {/* <button onClick={handleSave}>
-                    <Image
-                      src={
-                        isSaved ? '/icons/tick-circle.svg' : '/icons/save.svg'
-                      }
-                      width={32}
-                      height={32}
-                      alt="save"
-                    />
-                  </button> */}
                 </div>
                 {event.organizationId !== null && (
                   <div className="flex gap-2 items-center">
@@ -151,11 +154,28 @@ export default function Event({
                 );
               })()}
               <Button
+                onPress={handleClick}
                 variant="shadow"
                 className="bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
               >
                 Volunteer Now
               </Button>
+              {isLoggingIn && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center">
+                  <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-sm mx-4">
+                    <div className="w-16 h-16 mx-auto mb-6 relative">
+                      <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+                      <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <h3 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
+                      Redirecting to Login
+                    </h3>
+                    <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
+                      Please wait while we redirect you to the login page...
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -186,7 +206,7 @@ export default function Event({
                 variant="ghost"
                 color="default"
                 className="w-[272px] h-[79px] flex items-center justify-center gap-3 rounded-[20px] border border-shark-600 bg-white"
-                // onPress={() => {}} // want to open login modal
+                onPress={handleClick}
               >
                 <Image
                   src={'/icons/document.svg'}
@@ -201,6 +221,7 @@ export default function Event({
                 </div>
               </Button>
               <Button
+                onPress={handleClick}
                 variant="shadow"
                 className="w-[160px] bg-shark-950 text-white text-sm font-primary px-4 py-2 rounded-[20px] tracking-[1px]"
               >
