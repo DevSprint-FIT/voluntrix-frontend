@@ -11,6 +11,7 @@ export interface User {
   authProvider: string;
   createdAt: string;
   lastLogin: string;
+  imageURL: string | null;
 }
 
 interface SignupData {
@@ -63,6 +64,7 @@ interface UserProfileResponse {
     authProvider: string;
     createdAt: string;
     lastLogin: string;
+    imageURL: string | null;
   };
 }
 
@@ -145,6 +147,7 @@ class AuthService {
     const refreshToken = this.getRefreshToken();
     const headers: HeadersInit = {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
     };
 
     if (token) {
@@ -212,6 +215,7 @@ class AuthService {
           authProvider: result.data.authProvider,
           createdAt: result.data.createdAt,
           lastLogin: result.data.lastLogin,
+          imageURL: "/images/user.png",
         };
         this.user = user;
       }
@@ -362,6 +366,7 @@ class AuthService {
         authProvider: result.data.authProvider,
         createdAt: result.data.createdAt,
         lastLogin: result.data.lastLogin,
+        imageURL: result.data.imageURL,
       };
       return this.user;
     } catch (error) {
