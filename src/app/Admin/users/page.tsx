@@ -4,59 +4,19 @@ import { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/react";
 import { Search, Eye, Edit, Trash2 } from "lucide-react";
 
-// Dummy user data
-const dummyUsers = [
-  { 
-    id: 1, 
-    name: "Sarah Johnson", 
-    email: "sarah@email.com", 
-    role: "VOLUNTEER", 
-    status: "active", 
-    joinDate: "2025-01-15",
-    lastActive: "2025-08-04",
-    eventsParticipated: 12
-  },
-  { 
-    id: 2, 
-    name: "Green Earth Foundation", 
-    email: "contact@greenearth.org", 
-    role: "ORGANIZATION", 
-    status: "active", 
-    joinDate: "2024-11-20",
-    lastActive: "2025-08-03",
-    eventsHosted: 8
-  },
-  { 
-    id: 3, 
-    name: "Tech Corp Ltd", 
-    email: "sponsor@techcorp.com", 
-    role: "SPONSOR", 
-    status: "pending", 
-    joinDate: "2025-08-01",
-    lastActive: "2025-08-04",
-    sponsorships: 3
-  },
-  { 
-    id: 4, 
-    name: "John Doe", 
-    email: "john@email.com", 
-    role: "VOLUNTEER", 
-    status: "active", 
-    joinDate: "2025-03-10",
-    lastActive: "2025-08-02",
-    eventsParticipated: 5
-  },
-  { 
-    id: 5, 
-    name: "Help Foundation", 
-    email: "info@helpfoundation.org", 
-    role: "ORGANIZATION", 
-    status: "inactive", 
-    joinDate: "2024-09-05",
-    lastActive: "2025-07-15",
-    eventsHosted: 15
-  },
-];
+// No dummy data - indicating backend implementation needed
+const dummyUsers: Array<{
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  joinDate: string;
+  lastActive: string;
+  eventsParticipated?: number;
+  eventsHosted?: number;
+  sponsorships?: number;
+}> = [];
 
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,16 +51,12 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold text-shark-900 font-secondary">User Management</h1>
-          <p className="text-shark-600 font-primary">Manage all users on the platform</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-shark-900 font-secondary">User Management</h1>
+        <p className="text-shark-600 font-primary">Manage all users on the platform</p>
       </div>
-
-      <div className="px-6 py-8">
         {/* Filters */}
         <Card className="mb-6">
           <CardBody>
@@ -217,7 +173,6 @@ export default function AdminUsersPage() {
             </div>
           </CardBody>
         </Card>
-      </div>
     </div>
   );
 }

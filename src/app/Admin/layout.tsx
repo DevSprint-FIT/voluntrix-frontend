@@ -1,5 +1,6 @@
-import { Metadata } from 'next';
 import AdminSidebar from '@/components/UI/AdminSidebar';
+import React from 'react';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Voluntrix',
@@ -12,11 +13,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="admin-layout flex min-h-screen bg-gray-50">
+    <div className="flex">
       <AdminSidebar />
-      <main className="flex-1 ml-64">
-        {children}
-      </main>
+      <div className="flex-1 p-6 ml-60">{children}</div>
     </div>
   );
 }

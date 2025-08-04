@@ -1,33 +1,52 @@
-"use client";
+'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2, 
-  Calendar, 
+import { useState, useEffect } from 'react';
+import {
+  BarChart,
+  Users,
+  Building2,
+  Calendar,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight
+  LucideIcon,
 } from 'lucide-react';
-import authService from '@/services/authService';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import authService from '@/services/authService';
 
-const adminNavItems = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/organizations', label: 'Organizations', icon: Building2 },
-  { href: '/admin/events', label: 'Events', icon: Calendar },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
-];
+interface MenuItem {
+  name: string;
+  icon: LucideIcon;
+  href?: string;
+  badge?: number;
+}
 
-export default function AdminSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const AdminSidebar = () => {
+  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const pathname = usePathname();
   const router = useRouter();
+
+  const menuItems: MenuItem[] = [
+    { name: 'Dashboard', icon: BarChart, href: '/Admin/dashboard' },
+    { name: 'Users', icon: Users, href: '/Admin/users' },
+    { name: 'Organizations', icon: Building2, href: '/Admin/organizations' },
+    { name: 'Events', icon: Calendar, href: '/Admin/events' },
+    { name: 'Settings', icon: Settings, href: '/Admin/settings' },
+  ];
+
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem('Dashboard');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
@@ -39,64 +58,78 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-white shadow-lg transition-all duration-300 z-40 ${
-      isCollapsed ? 'w-16' : 'w-64'
-    }`}>
-      {/* Header */}
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-shark-900 font-secondary">Admin Panel</h2>
-          )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-          </button>
+    <div className="h-screen w-60 bg-[#f8fefc] border-r  py-6 flex flex-col justify-between fixed">
+      {/* Logo */}
+      <div>
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/images/logo.svg"
+            alt="Logo"
+            width={152}
+            height={72}
+            className="mr-6 cursor-pointer"
+            onClick={() => router.push('/')}
+          />
         </div>
+
+        {/* Navigation */}
+        <nav>
+          <div className="flex flex-col space-y-4">
+            {menuItems.map((item) => {
+              const isActive = selectedItem === item.name;
+
+              return (
+                <Link key={item.name} href={item.href || '#'}>
+                  <div
+                    onClick={() => setSelectedItem(item.name)}
+                    className={`w-full cursor-pointer text-left flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 relative ${
+                      isActive ? 'text-verdant-700 font-semibold' : ''
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <item.icon
+                        className={`h-5 w-5 ${
+                          isActive ? 'text-verdant-700' : ''
+                        }`}
+                      />
+                      <span className="font-secondary font-medium text-shark-950">
+                        {item.name}
+                      </span>
+                    </div>
+
+                    {typeof item.badge === 'number' && item.badge > 0 && (
+                      <span className="text-xs bg-verdant-100 text-shark-950  px-1 mr-4 rounded-md">
+                        {item.badge}
+                      </span>
+                    )}
+
+                    {isActive && (
+                      <span className="absolute right-0 top-0 h-full w-1 bg-verdant-700 rounded-full " />
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </div>
 
-      {/* Navigation */}
-      <nav className="p-4">
-        <ul className="space-y-2">
-          {adminNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                    isActive 
-                      ? 'bg-verdant-100 text-verdant-700' 
-                      : 'text-shark-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon size={20} />
-                  {!isCollapsed && (
-                    <span className="font-primary font-medium">{item.label}</span>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
       {/* Logout */}
-      <div className="absolute bottom-4 left-4 right-4">
+      <div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          className="flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 group text-sm text-shark-950 w-full text-left"
         >
-          <LogOut size={20} />
-          {!isCollapsed && (
-            <span className="font-primary font-medium">Logout</span>
-          )}
+          <div className="flex items-center space-x-2">
+            <LogOut className="h-5 w-5" />
+            <span className="font-secondary font-medium text-shark-950">
+              Logout
+            </span>
+          </div>
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default AdminSidebar;
