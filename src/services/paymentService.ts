@@ -29,6 +29,8 @@ export async function startPayment(details: PaymentDetails) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+
       },
       body: JSON.stringify(details),
     });
@@ -122,6 +124,7 @@ export async function getSponsorshipPaymentDetails(requestId: number): Promise<S
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
         "Authorization": `Bearer ${authService.getToken()}`,
       },
     });

@@ -111,54 +111,47 @@ export default function SponsorshipPage() {
     checkAuthAndRole();
   }, [router]);
 
-  // Setup PayHere event handlers
+  // Setup PayHere event handlers - Match checkout page exactly
   useEffect(() => {
-    // Load PayHere script if not already loaded
-    if (typeof window !== "undefined" && !window.payhere) {
-      const script = document.createElement('script');
-      script.src = 'https://www.payhere.lk/lib/payhere.js';
-      script.async = true;
-      script.onload = () => {
-        console.log('PayHere script loaded successfully');
-        setupPayHereHandlers();
-      };
-      document.body.appendChild(script);
-    } else if (window.payhere) {
-      setupPayHereHandlers();
-    }
-
-    function setupPayHereHandlers() {
-      if (window.payhere) {
-        window.payhere.onCompleted = function (orderId: string) {
-          let attempts = 0;
-          const interval = setInterval(async () => {
-            try {
-              const status = await checkPaymentStatus(orderId);
-              if(status === "SUCCESS") {
-                clearInterval(interval);
-                window.location.href = "/checkout/success";
-              } else if (status === "FAILED" || attempts > 10) {
-                clearInterval(interval);
-                window.location.href = "/checkout/fail";
-              }
-              attempts++;
-            } catch (error) {
+    if (typeof window !== "undefined" && window.payhere) {
+      console.log("Setting up PayHere event handlers for sponsorship page...");
+      
+      window.payhere.onCompleted = function (orderId: string) {
+        console.log("PayHere onCompleted triggered for order:", orderId);
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          try {
+            const status = await checkPaymentStatus(orderId);
+            console.log(`Payment status check attempt ${attempts + 1}: ${status}`);
+            if(status === "SUCCESS") {
               clearInterval(interval);
-              console.log(error);
+              window.location.href = "/checkout/success";
+            } else if (status === "FAILED" || attempts > 10) {
+              clearInterval(interval);
               window.location.href = "/checkout/fail";
             }
-          }, 1000);
-        };
-    
-        window.payhere.onDismissed = function () {
-          window.location.href = "/checkout/fail";
-        };
-    
-        window.payhere.onError = function (error: any) {
-          console.error("PayHere error occurred:", error);
-          window.location.href = "/checkout/fail";
-        };
-      }
+            attempts++;
+          } catch (error) {
+            console.error("Error checking payment status:", error);
+            clearInterval(interval);
+            window.location.href = "/checkout/fail";
+          }
+        }, 1000);
+      };
+  
+      window.payhere.onDismissed = function () {
+        console.log("PayHere onDismissed triggered");
+        window.location.href = "/checkout/fail";
+      };
+  
+      window.payhere.onError = function (error: any) {
+        console.error("PayHere onError triggered:", error);
+        window.location.href = "/checkout/fail";
+      };
+      
+      console.log("PayHere event handlers setup completed for sponsorship page");
+    } else {
+      console.log("PayHere not available during useEffect setup");
     }
   }, []);
 
@@ -216,29 +209,30 @@ export default function SponsorshipPage() {
       // Create payment details object
       const paymentDetails: PaymentDetails = {
         orderId: orderId,
-        amount: formData.amount,
+        amount: parseFloat(formData.amount).toFixed(2), // Ensure decimal format like "100.00"
         currency: formData.currency,
         firstName: user.fullName ? user.fullName.split(' ')[0] : null,
         lastName: user.fullName ? user.fullName.split(' ').slice(1).join(' ') : null,
         email: user.email,
-        phone: null, // You might want to add phone field to the form
-        address: null, // You might want to add address fields to the form
+        phone: null,
+        address: null,
         city: null,
         country: null,
         userType: "SPONSOR",
         volunteerId: null,
-        sponsorId: sponsorshipPackage.sponsorId, // Use sponsorId from API response
-        eventId: sponsorshipPackage.eventId, // Use eventId from API response
+        sponsorId: sponsorshipPackage.sponsorId,
+        eventId: sponsorshipPackage.eventId,
         isAnnonymous: false,
         transactionType: "SPONSORSHIP"
       };
 
-      console.log("Payment details:", paymentDetails);
+      console.log("Payment details being sent:", paymentDetails);
 
       // Start payment process
+      console.log("Calling startPayment API...");
       const { hash, merchantId } = await startPayment(paymentDetails);
       
-      console.log("Payment response:", { hash, merchantId });
+      console.log("Payment API response:", { hash, merchantId });
       
       // Prepare PayHere payment object
       const payment = {
@@ -248,7 +242,7 @@ export default function SponsorshipPage() {
         cancel_url: process.env.NEXT_PUBLIC_PAYHERE_FAIL_URL,
         notify_url: process.env.NEXT_PUBLIC_PAYHERE_NOTIFY_URL,
         order_id: paymentDetails.orderId,
-        items: `${sponsorshipPackage.type} Sponsorship`,
+        items: paymentDetails.transactionType,
         amount: paymentDetails.amount,
         currency: paymentDetails.currency,
         first_name: paymentDetails.firstName,
@@ -263,12 +257,22 @@ export default function SponsorshipPage() {
 
       console.log("PayHere payment object:", payment);
       
-      // Check if PayHere is available
+      // Ensure PayHere is available before calling it
       if (typeof window !== "undefined" && window.payhere) {
-        console.log("Starting PayHere payment...");
-        window.payhere.startPayment(payment);
+        console.log("PayHere is available, starting payment...");
+        console.log("PayHere object details:", window.payhere);
+        
+        try {
+          console.log("About to call window.payhere.startPayment...");
+          window.payhere.startPayment(payment);
+          console.log("window.payhere.startPayment called successfully");
+        } catch (error) {
+          console.error("Error calling payhere.startPayment:", error);
+          alert(`PayHere Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
       } else {
-        throw new Error("PayHere is not available. Please refresh the page and try again.");
+        console.error("PayHere is not available");
+        throw new Error("PayHere payment system is not available. Please refresh the page and try again.");
       }
       
     } catch (error) {

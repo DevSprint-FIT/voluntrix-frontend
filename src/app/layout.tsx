@@ -30,6 +30,7 @@ export default function RootLayout({
         <Script 
           src="https://www.payhere.lk/lib/payhere.js" 
           strategy="beforeInteractive"
+          id="payhere-script"
         />
       </head>
       <body suppressHydrationWarning>
