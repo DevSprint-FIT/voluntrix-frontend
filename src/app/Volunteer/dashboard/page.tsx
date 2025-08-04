@@ -17,7 +17,20 @@ import {
 } from "@/services/volunteerDashboardService";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
-import { User } from "@/services/authService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
+
+interface User {
+  userId: number;
+  email: string;
+  fullName: string;
+  handle: string;
+  role: string;
+  emailVerified: boolean;
+  profileCompleted: boolean;
+  authProvider: string;
+  createdAt: string;
+  lastLogin: string;
+}
 
 const StatCard = ({
   title,
@@ -202,10 +215,12 @@ const VolunteerDashboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedYear, setSelectedYear] = useState("2025");
   const [totalContributionsFromChart, setTotalContributionsFromChart] =
     useState(0);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -308,13 +323,18 @@ const VolunteerDashboard = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-9 py-4">
-        <div>
-          <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
-            Volunteer / Dashboard
-          </nav>
-          <h1 className="text-2xl font-bold text-gray-900 font-secondary">
-            Main Dashboard
-          </h1>
+        <div className="flex justify-between items-start">
+          <div>
+            <nav className="text-[#B0B0B0] mb-2 mt-3 font-secondary">
+              Volunteer / Dashboard
+            </nav>
+            <h1 className="text-2xl font-bold text-gray-900 font-secondary">
+              Main Dashboard
+            </h1>
+          </div>
+          <div className="mt-3">
+            <ProfileIndicator />
+          </div>
         </div>
       </div>
 
@@ -345,7 +365,7 @@ const VolunteerDashboard = () => {
             />
             <StatCard
               title="Total Profile Views"
-              value="250"
+              value="5"
               icon={Eye}
               color="text-[#029972]"
               bgColor="bg-[#ECFDF6]"

@@ -6,6 +6,8 @@ import EventCreation from '@/components/UI/EventCreation';
 import { EventType } from '@/types/EventType';
 import { fetchEventByHostId } from '@/services/eventService';
 import { useRouter } from 'next/navigation';
+import EventDropdownHeader from '@/components/UI/EventDropdownHeader';
+import ProfileIndicator from '@/components/UI/ProfileIndicator';
 
 export default function HostEvents() {
   const [activeTab, setActiveTab] = useState('all');
@@ -22,8 +24,11 @@ export default function HostEvents() {
 
   const router = useRouter();
 
-  const handleRowClick = (eventId: string) => {
-    router.push(`/EventHostWorkspace/${eventId}/tasks`);
+  const handleRowClick = (eventId: string, eventStatus: string) => {
+    const status = eventStatus.toUpperCase();
+    if (status === 'ACTIVE' || status === 'COMPLETE') {
+      router.push(`/EventHostWorkspace/${eventId}/tasks`);
+    }
   };
 
   useEffect(() => {
@@ -43,9 +48,8 @@ export default function HostEvents() {
           completed: data.filter(
             (e) => e.eventStatus.toUpperCase() === 'COMPLETE'
           ).length,
-          denied: data.filter(
-            (e) => e.eventStatus.toUpperCase() === 'DENIED'
-          ).length,
+          denied: data.filter((e) => e.eventStatus.toUpperCase() === 'DENIED')
+            .length,
         };
 
         setEventCounts(counts);
@@ -165,14 +169,19 @@ export default function HostEvents() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-9 py-4">
-        <nav className="text-shark-300 mb-2 mt-3 font-secondary">
-          Event Host / Events
-        </nav>
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 font-secondary">
-            Events
-          </h1>
-          <EventCreation />
+        <div className="flex items-start justify-between">
+          <div>
+            <nav className="text-shark-300 mb-2 mt-3 font-secondary">
+              Event Host / Events
+            </nav>
+            <h1 className="text-2xl font-bold text-gray-900 font-secondary">
+              Events
+            </h1>
+          </div>
+          <div className="flex items-center space-x-12 mt-3">
+            <EventCreation />
+            <ProfileIndicator />
+          </div>
         </div>
       </div>
 
@@ -206,7 +215,7 @@ export default function HostEvents() {
 
         {/* Tabs */}
         <div className="mb-6">
-          <div>
+          <div className="flex items-center justify-between">
             <nav className="-mb-px flex space-x-8">
               {tabs.map((tab) => (
                 <button
@@ -228,6 +237,7 @@ export default function HostEvents() {
                 </button>
               ))}
             </nav>
+            <EventDropdownHeader events={events} />
           </div>
         </div>
 
@@ -276,7 +286,9 @@ export default function HostEvents() {
                     <tr
                       key={event.eventId}
                       className="hover:bg-shark-50 space-y-4 cursor-pointer"
-                      onClick={() => handleRowClick(String(event.eventId))}
+                      onClick={() =>
+                        handleRowClick(String(event.eventId), event.eventStatus)
+                      }
                     >
                       <td className="px-6 py-4 whitespace-nowrap rounded-l-lg">
                         <div className="text-md font-primary font-medium text-shark-900">

@@ -203,10 +203,13 @@ const SettingsPage = () => {
 
         {/* Right Side: Organization Info */}
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={organization?.imageUrl} 
+            src={organization?.imageUrl || "/images/default-profile.jpg"} 
             alt="Organization Logo"
-            className="w-10 h-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="font-semibold font-secondary text-xl leading-tight">{organization?.name}</h2> 

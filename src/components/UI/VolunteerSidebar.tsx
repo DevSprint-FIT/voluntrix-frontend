@@ -12,13 +12,16 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button, useDisclosure } from '@heroui/react';
 import VolunteerToHostModal from './VolunteerToHostModal';
+
 import {
   fetchVolunteer,
   VolunteerProfile,
 } from '@/services/volunteerProfileService';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface MenuItem {
   name: string;
@@ -32,6 +35,7 @@ const VolunteerSidebar = () => {
   const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [volunteer, setVolunteer] = useState<VolunteerProfile>();
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -63,19 +67,45 @@ const VolunteerSidebar = () => {
       badge: notificationCount,
       href: '/notifications',
     },
-    { name: 'Social Feed', icon: Send, href: '/social-feed' },
+    { name: 'Social Feed', icon: Send, href: '/PublicFeed' },
     { name: 'Settings', icon: Settings, href: '/Volunteer/settings' },
   ];
+
+  useEffect(() => {
+    // Ensure pathname is not null
+    if (!pathname) return;
+
+    // Special handling for events routes
+    if (
+      pathname.startsWith('/Volunteer/events/active') ||
+      pathname.startsWith('/Volunteer/events/applied') ||
+      pathname.startsWith('/Volunteer/events/completed')
+    ) {
+      setSelectedItem('Events');
+      return;
+    }
+
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem('Dashboard');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       {/* Logo */}
       <div>
-        <div className="mb-8 flex justify-center">
-          <img
+        <div className="mb-10 mt-6 flex justify-center">
+          <Image
             src="/images/logo.svg"
             alt="Logo"
-            className="h-18 w-18 ml-[-10px]"
+            width={152}
+            height={72}
+            className="ml-[-10px]"
             onClick={() => router.push('/')}
           />
         </div>
@@ -123,12 +153,12 @@ const VolunteerSidebar = () => {
         <Button
           onPress={() => {
             if (volunteer && volunteer.isEventHost) {
-              router.push('/event-host/events');
+              router.push('/event-host/dashboard');
             } else {
               onOpen();
             }
           }}
-          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-8"
+          className="rounded-full bg-shark-950 text-shark-50 font-primary text-base tracking-wide mt-24"
         >
           Switch to Event Host
         </Button>

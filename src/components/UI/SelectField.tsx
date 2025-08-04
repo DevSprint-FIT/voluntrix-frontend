@@ -23,7 +23,7 @@ export default function SelectField({
       }}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      value={value}
+      selectedKeys={[value]}
       size={'sm'}
     >
       {options.length > 0 ? (
@@ -31,7 +31,6 @@ export default function SelectField({
           <SelectItem
             className="font-medium text-shark-600"
             key={option.key}
-            value={option.label}
           >
             {option.label}
           </SelectItem>

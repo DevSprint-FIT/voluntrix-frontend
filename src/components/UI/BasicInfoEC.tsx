@@ -84,7 +84,7 @@ export default function BasicInfoEC({
     <div className="flex flex-col">
       <div className="flex justify-between">
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Event Title
+          Event Title *
           <input
             type="text"
             className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[350px] placeholder:text-shark-300"
@@ -94,7 +94,7 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Event Location
+          Event Location *
           <input
             type="text"
             className="border-[2px] border-shark-300 text-shark-950 pl-2 py-1 rounded-lg w-[350px] placeholder:text-shark-300"
@@ -106,22 +106,22 @@ export default function BasicInfoEC({
       </div>
       <div className="flex flex-col mt-2">
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          Event Description
+          Event Description *
           <textarea
             value={data.eventDescription}
             onChange={(e) => onChange({ eventDescription: e.target.value })}
-            maxLength={250}
+            maxLength={500}
             placeholder="Describe your event"
             className="resize-none border-[2px] border-shark-300 text-shark-950 pl-2 pt-1 rounded-lg w-full placeholder:text-shark-300 h-[80px]"
           />
         </label>
         <div className="w-full text-right font-secondary font-normal text-shark-800 text-[11px]">
-          {data.eventDescription.length}/250
+          {data.eventDescription.length}/500
         </div>
       </div>
       <div className="flex gap-8 mt-2">
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          Start Date
+          Start Date *
           <input
             type="date"
             className="w-[141px] h-8 border-2 border-shark-300 rounded-lg text-shark-300"
@@ -130,7 +130,7 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-          End Date
+          End Date 
           <input
             type="date"
             className="w-[141px] h-8 border-2 border-shark-300 rounded-lg text-shark-300"
@@ -148,7 +148,7 @@ export default function BasicInfoEC({
           />
         </label>
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-1 items-center">
             Event Visibility
             <Tooltip
               placement="bottom"
@@ -188,7 +188,7 @@ export default function BasicInfoEC({
           </Select>
         </label>
         <label className="font-secondary font-medium text-shark-950 text-[15px]">
-          Event Type
+          Event Type *
           <Select
             placeholder="Select type"
             variant="bordered"
@@ -221,7 +221,7 @@ export default function BasicInfoEC({
         </div>
       )}
       <div className="mt-3 font-secondary font-medium text-shark-950 text-[15px]">
-        Event Category
+        Event Category *
       </div>
       <div className="text-[15px] font-secondary text-shark-950 font-normal flex gap-5">
         {categories.map((category) => (
@@ -241,18 +241,18 @@ export default function BasicInfoEC({
         ))}
       </div>
       <label className="mt-3 flex flex-col font-secondary font-medium text-shark-950 text-[15px]">
-        Upload Event Image (Maximum image size is 100 MB)
+        Upload Event Image (Maximum image size is 10 MB) *
         <input
           type="file"
           accept="image/*"
           onChange={async (e) => {
             const file = e.target.files?.[0];
-            const maxSize = 100 * 1024 * 1024;
+            const maxSize = 10 * 1024 * 1024;
 
             if (file) {
               if (file.size > maxSize) {
                 setImageMessage(
-                  'File size exceeds 100 MB. Please upload a smaller image.'
+                  'File size exceeds 10 MB. Please upload a smaller image.'
                 );
               } else {
                 setImageMessage('Uploading...');

@@ -1,34 +1,29 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { HandCoins, MessageCircle, Check, X } from "lucide-react";
-import Table, { Column } from "@/components/UI/Table";
+import React, { useState, useEffect } from 'react';
+import { HandCoins, MessageCircle, Check, X } from 'lucide-react';
+import Table, { Column } from '@/components/UI/Table';
+import { SponsorshipRequestType } from '@/types/SponsorshipRequestType';
+import {
+  fetchSponReqWithNameByEvent,
+  updateSponsorshipRequestStatus,
+} from '@/services/sponsorshipRequestService';
+import { updateSponsorshipAvailability } from '@/services/sponsorshipService';
+import ChatController from '@/app/chat/ChatController';
 
-// Types for sponsorship data
-interface SponsorshipRequest {
-  id: string;
-  name: string;
-  jobTitle: string;
-  company: string;
-  sponsorshipType: string;
-}
-
-interface EventSponsorship {
-  id: string;
-  name: string;
-  jobTitle: string;
-  company: string;
-  sponsorshipType: "Platinum" | "Gold" | "Silver" | "Bronze";
-}
-
-const SponsorshipsPage = () => {
+const SponsorshipsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [sponsorshipRequests, setSponsorshipRequests] = useState<
-    SponsorshipRequest[]
+  const [pendingRequests, setPendingRequests] = useState<
+    SponsorshipRequestType[]
   >([]);
-  const [eventSponsorships, setEventSponsorships] = useState<
-    EventSponsorship[]
+  const [approvedSponsors, setApprovedSponsors] = useState<
+    SponsorshipRequestType[]
   >([]);
+
+  const resolvedParams = React.use(params);
+  const eventId = Number(resolvedParams.id);
+
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     // Simulate data loading with dummy data
@@ -36,132 +31,99 @@ const SponsorshipsPage = () => {
       try {
         setIsLoading(true);
 
-        // Dummy data for Sponsorship Requests
-        const dummyRequests: SponsorshipRequest[] = [
-          {
-            id: "1",
-            name: "John Smith",
-            jobTitle: "Marketing Director",
-            company: "TechCorp Solutions",
-            sponsorshipType: "Gold",
-          },
-          {
-            id: "2",
-            name: "Sarah Johnson",
-            jobTitle: "CEO",
-            company: "Green Energy Ltd",
-            sponsorshipType: "Platinum",
-          },
-        ];
+        const data = await fetchSponReqWithNameByEvent(eventId);
+        console.log('Fetched sponsorship data:', data);
 
-        // Dummy data for Event Sponsorships
-        const dummySponsorships: EventSponsorship[] = [
-          {
-            id: "1",
-            name: "Michael Brown",
-            jobTitle: "VP of Operations",
-            company: "Global Industries",
-            sponsorshipType: "Platinum",
-          },
-          {
-            id: "2",
-            name: "Emily Davis",
-            jobTitle: "Regional Manager",
-            company: "Local Business Hub",
-            sponsorshipType: "Silver",
-          },
-        ];
+        const pending = data.filter((item) => item.status === 'PENDING');
+        const approved = data.filter((item) => item.status === 'APPROVED');
 
-        setSponsorshipRequests(dummyRequests);
-        setEventSponsorships(dummySponsorships);
+        setPendingRequests(pending);
+        setApprovedSponsors(approved);
       } catch (error) {
-        console.error("Error fetching sponsorship data:", error);
+        console.error('Error fetching sponsorship data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [eventId]);
 
-  // Helper function to get sponsorship type badge color
-  const getSponsorshipBadgeColor = (type: string) => {
-    switch (type.toLowerCase()) {
-      case "platinum":
-        return "bg-gray-100 text-gray-800 border border-gray-300";
-      case "gold":
-        return "bg-yellow-100 text-yellow-800 border border-yellow-300";
-      case "silver":
-        return "bg-gray-50 text-gray-700 border border-gray-200";
-      case "bronze":
-        return "bg-orange-100 text-orange-800 border border-orange-300";
-      default:
-        return "bg-blue-100 text-blue-800 border border-blue-300";
+  // Action handlers
+  const handleApprove = async (id: number) => {
+    try {
+      console.log('Approving sponsorship request:', id);
+      const approvedItem = pendingRequests.find((req) => req.requestId === id);
+      if (!approvedItem) return;
+
+      await updateSponsorshipRequestStatus(id, 'APPROVED');
+      await updateSponsorshipAvailability(id, false);
+
+      setPendingRequests((prev) => prev.filter((req) => req.requestId !== id));
+      setApprovedSponsors((prev) => [
+        ...prev,
+        { ...approvedItem, status: 'APPROVED' },
+      ]);
+    } catch (error) {
+      console.error('Error approving sponsorship request:', error);
     }
   };
 
-  // Action handlers
-  const handleApprove = (id: string) => {
-    console.log("Approved sponsorship request:", id);
-    // TODO: Implement approval logic
+  const handleReject = async (id: number) => {
+    try {
+      console.log('Rejecting sponsorship request:', id);
+
+      setPendingRequests((prev) => prev.filter((req) => req.requestId !== id));
+
+      await updateSponsorshipRequestStatus(id, 'REJECTED');
+    } catch (error) {
+      console.error('Error rejecting sponsorship request:', error);
+    }
   };
 
-  const handleReject = (id: string) => {
-    console.log("Rejected sponsorship request:", id);
-    // TODO: Implement rejection logic
-  };
-
-  const handleChat = (id: string, type: "request" | "sponsorship") => {
-    console.log(`Opening chat for ${type}:`, id);
-    // TODO: Implement chat functionality
-  };
+  // const handleChat = (id: string, type: 'request' | 'sponsorship') => {
+  //   console.log(`Opening chat for ${type}:`, id);
+  //   // TODO: Implement chat functionality
+  // };
 
   const handleOpenSponsorChat = () => {
-    console.log("Opening sponsor chat");
-    // TODO: Implement sponsor chat functionality - to be integrated later
+    console.log('Opening sponsor chat');
+    setShowChat((prev) => !prev);
   };
 
   // Table configurations
-  const sponsorshipRequestColumns: Column<SponsorshipRequest>[] = [
+  const sponsorshipRequestColumns: Column<SponsorshipRequestType>[] = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Company',
+      accessor: 'company',
     },
     {
-      header: "Job Title",
-      accessor: "jobTitle",
+      header: 'Job Title',
+      accessor: 'jobTitle',
     },
     {
-      header: "Company",
-      accessor: "company",
-    },
-    {
-      header: "Sponsorship Type",
-      accessor: "sponsorshipType",
+      header: 'Sponsorship Type',
+      accessor: 'sponsorshipName',
       cell: (value) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getSponsorshipBadgeColor(
-            value as string
-          )}`}
-        >
+        <span className="px-3 py-1 rounded-full text-xs font-medium">
           {value}
         </span>
       ),
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'requestId',
       cell: (value, row) => (
         <div className="flex items-center gap-6">
           <button
-            onClick={() => handleApprove(value as string)}
+            onClick={() => handleApprove(row.requestId)}
             className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
             title="Approve"
           >
             <Check size={16} />
           </button>
           <button
-            onClick={() => handleReject(value as string)}
+            onClick={() => handleReject(row.requestId)}
             className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
             title="Reject"
           >
@@ -172,36 +134,41 @@ const SponsorshipsPage = () => {
     },
   ];
 
-  const eventSponsorshipColumns: Column<EventSponsorship>[] = [
+  const eventSponsorshipColumns: Column<SponsorshipRequestType>[] = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Company',
+      accessor: 'company',
     },
     {
-      header: "Job Title",
-      accessor: "jobTitle",
+      header: 'Job Title',
+      accessor: 'jobTitle',
     },
     {
-      header: "Company",
-      accessor: "company",
-    },
-    {
-      header: "Sponsorship Type",
-      accessor: "sponsorshipType",
+      header: 'Sponsorship Type',
+      accessor: 'sponsorshipName',
       cell: (value) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getSponsorshipBadgeColor(
-            value as string
-          )}`}
-        >
+        <span className="px-3 py-1 rounded-full text-xs font-medium">
           {value}
         </span>
       ),
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-600 mx-auto mb-4"></div>
+          <p className="text-shark-600 font-secondary">
+            Loading sponsorships...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
@@ -225,6 +192,13 @@ const SponsorshipsPage = () => {
               <MessageCircle size={20} />
               Chat with Sponsors
             </button>
+            <div
+              className={`fixed top-0 right-0 h-full shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+                showChat ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              <ChatController setShowChat={setShowChat} />
+            </div>
           </div>
         </div>
       </div>
@@ -246,10 +220,7 @@ const SponsorshipsPage = () => {
               </div>
             </div>
           ) : (
-            <Table
-              columns={sponsorshipRequestColumns}
-              data={sponsorshipRequests}
-            />
+            <Table columns={sponsorshipRequestColumns} data={pendingRequests} />
           )}
         </div>
 
@@ -268,7 +239,7 @@ const SponsorshipsPage = () => {
               </div>
             </div>
           ) : (
-            <Table columns={eventSponsorshipColumns} data={eventSponsorships} />
+            <Table columns={eventSponsorshipColumns} data={approvedSponsors} />
           )}
         </div>
       </div>

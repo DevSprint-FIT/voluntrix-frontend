@@ -23,6 +23,7 @@ const PhoneVerificationModal = ({ isOpen, onClose }: Props) => {
     try {
       await sendVerificationCode(fullPhone, captchaToken!);
       alert(`Code sent to ${fullPhone}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       alert("Failed to send verification code.");
     }

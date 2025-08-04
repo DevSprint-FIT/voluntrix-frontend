@@ -157,16 +157,19 @@ export default function EventCreation() {
       ? (rawCategories as { categoryId: number }[])
       : (Object.values(rawCategories) as { categoryId: number }[]);
 
-    let eventTime = eventData.eventTime;
+    let eventTime = eventData.eventTime ?? null;
     if (eventTime && eventTime.length === 5) {
       eventTime += ':00';
     }
 
+    const eventEndDate = eventData.eventEndDate ?? null;
+
     const payload = {
       ...eventData,
       eventTime,
+      eventEndDate,
       eventStatus: selectedOrg ? 'PENDING' : 'ACTIVE',
-      organizationId: selectedOrg?.id ?? null,
+      organizationId: selectedOrg?.organizationId ?? null,
       categories: categoryArray.map((cat) => ({
         categoryId: cat.categoryId,
       })),
@@ -182,7 +185,7 @@ export default function EventCreation() {
       console.log('Event created successfully:', createdEvent);
 
       const eventId = createdEvent?.eventId;
-      const organizationId = selectedOrg?.id;
+      const organizationId = selectedOrg?.organizationId;
 
       if (eventId && organizationId) {
         await createEventInvitation(eventId, organizationId);
@@ -244,6 +247,7 @@ export default function EventCreation() {
         onPress={() => setWizardOpen(true)}
         className="bg-verdant-700 text-white text-[15px] font-primary px-6 py-2 rounded-[20px] tracking-[1px]"
       >
+        <span className="text-3xl">+</span>
         Create Event
       </Button>
       <Modal

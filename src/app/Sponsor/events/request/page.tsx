@@ -15,11 +15,12 @@ interface Volunteer {
 
 export default function SponsorEventRequestsPage() {
   const [events, setEvents] = useState<SponsorEventData[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [volunteers, setVolunteers] = useState<Map<number, Volunteer>>(new Map());
   const [loading, setLoading] = useState(true);
 
   
-  const SPONSOR_ID = 1;
+  // const SPONSOR_ID = 1;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +28,7 @@ export default function SponsorEventRequestsPage() {
         setLoading(true);
         
         // Get ALL sponsor event data (not just pending ones)
-        const allEventData = await sponsorService.getAllSponsorEventData(SPONSOR_ID);
+        const allEventData = await sponsorService.getAllSponsorEventData();
         console.log('All event data:', allEventData);
         
         // Show ALL sponsorship requests (PENDING, APPROVED, REJECTED)
@@ -35,7 +36,7 @@ export default function SponsorEventRequestsPage() {
         setEvents(allEventData);
 
         // Fetch volunteer details for each event host in parallel
-        const volunteerMap = new Map<number, Volunteer>();
+        // const volunteerMap = new Map<number, Volunteer>();
         
         // Get all unique host IDs
         const hostIds = new Set<number>();
@@ -49,17 +50,17 @@ export default function SponsorEventRequestsPage() {
         }
 
         // Fetch volunteers for all unique host IDs
-        const volunteerPromises = Array.from(hostIds).map(async (hostId) => {
-          try {
-            const volunteer = await sponsorService.getVolunteer(hostId);
-            volunteerMap.set(hostId, volunteer);
-          } catch (error) {
-            console.error(`Error fetching volunteer for host ${hostId}:`, error);
-          }
-        });
+        // const volunteerPromises = Array.from(hostIds).map(async (hostId) => {
+        //   try {
+        //     const volunteer = await sponsorService.getVolunteer(hostId);
+        //     volunteerMap.set(hostId, volunteer);
+        //   } catch (error) {
+        //     console.error(`Error fetching volunteer for host ${hostId}:`, error);
+        //   }
+        // });
 
-        await Promise.all(volunteerPromises);
-        setVolunteers(volunteerMap);
+        // await Promise.all(volunteerPromises);
+        // setVolunteers(volunteerMap);
         
       } catch (error) {
         console.error("Error fetching event requests:", error);
@@ -121,8 +122,8 @@ export default function SponsorEventRequestsPage() {
             setVolunteer(cachedVolunteer);
           } else {
             // Fetch volunteer details
-            const volunteerData = await sponsorService.getVolunteer(eventDetails.eventHostId);
-            setVolunteer(volunteerData);
+            // const volunteerData = await sponsorService.getVolunteer(eventDetails.eventHostId);
+            // setVolunteer(volunteerData);
           }
         } catch (error) {
           console.error(`Error fetching volunteer info for event ${eventId}:`, error);
@@ -161,10 +162,13 @@ export default function SponsorEventRequestsPage() {
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
           {volunteer.profilePictureUrl ? (
-            <img 
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={volunteer.profilePictureUrl} 
               alt={`${volunteer.firstName} ${volunteer.lastName}`}
-              className="w-full h-full object-cover"
+              width={48}
+              height={48}
+              className="object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -262,7 +266,7 @@ export default function SponsorEventRequestsPage() {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No sponsorship requests found</h3>
-          <p className="text-gray-500">You haven't made any sponsorship requests yet.</p>
+          <p className="text-gray-500">You haven&apos;t made any sponsorship requests yet.</p>
         </div>
       ) : (
         <Table columns={columns} data={events} />

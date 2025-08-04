@@ -150,19 +150,22 @@ export default function EventRequestsPage() {
     return (
       <div className="flex items-center space-x-2">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-          {eventHost.profilePictureUrl ? (
-            <img 
-              src={eventHost.profilePictureUrl} 
+            {eventHost.profilePictureUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={eventHost.profilePictureUrl}
               alt={eventHost.fullName}
-              className="w-full h-full object-cover"
+              width={48}
+              height={48}
+              className="object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
               }}
             />
-          ) : (
+            ) : (
             <User className="h-6 w-6 text-gray-500" />
-          )}
+            )}
           {eventHost.profilePictureUrl && (
             <User className="h-6 w-6 text-gray-500 hidden" />
           )}

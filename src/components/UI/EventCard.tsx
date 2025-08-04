@@ -5,14 +5,9 @@ import { Progress } from '@heroui/progress';
 import { Button } from '@heroui/button';
 import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
+import authService from '@/services/authService';
 
 export default function EventCard({ event }: { event: EventType }) {
-  // const [isSaved, setIsSaved] = useState(false);
-
-  // const handleSave = () => {
-  //   setIsSaved((prevState) => !prevState);
-  // };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -36,7 +31,10 @@ export default function EventCard({ event }: { event: EventType }) {
   const router = useRouter();
 
   const handleNavigate = () => {
-    router.push(`/events/${event.eventId}`);
+    const path = authService.isAuthenticated()
+      ? `/events/${event.eventId}`
+      : `/public/events/${event.eventId}`;
+    router.push(path);
   };
   return (
     <div className="w-[310px] h-[460px] group rounded-[10px] bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 font-secondary overflow-hidden">
@@ -85,10 +83,15 @@ export default function EventCard({ event }: { event: EventType }) {
                 )}
                 {!event.donationEnabled &&
                   (() => {
-                    const sentences = event.eventDescription.match(
-                      /[^.!?]+[.!?]+/g
-                    ) || [event.eventDescription];
-                    const preview = sentences.slice(0, 2).join(' ');
+                    const description = event.eventDescription;
+                    if (!description) return null;
+
+                    const splitIndex = description.indexOf('. ') + 1;
+
+                    const preview =
+                      splitIndex > 0
+                        ? description.slice(0, splitIndex).trim()
+                        : description;
 
                     return (
                       <p className="text-shark-900 text-[13px] font-normal text-left text-wrap">

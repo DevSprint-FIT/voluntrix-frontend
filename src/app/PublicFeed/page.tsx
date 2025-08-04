@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import PostCard from "@/components/UI/PostCard";
-import { 
-  getAllPublicPosts, 
-  getCurrentOrganizationDetails, 
+import {
+  getAllPublicPosts,
+  getCurrentOrganizationDetails,
   getCurrentVolunteerDetails,
-  getAllOrganizations
+  getAllOrganizations,
 } from "@/services/publicSocialFeedService";
 import { reactToPost, removeReaction } from "@/services/reactionService";
 import ProfileCard from "@/components/UI/PublicFeedLeftSideBar";
@@ -25,7 +25,7 @@ interface ProfileCardProps {
   isVerified?: boolean;
 }
 
-export type UserType = "VOLUNTEER" | "ORGANIZATION"; 
+export type UserType = "VOLUNTEER" | "ORGANIZATION";
 
 const USER_TYPE = {
   ORGANIZATION: "ORGANIZATION" as const,
@@ -33,16 +33,24 @@ const USER_TYPE = {
 };
 
 // Type guard for userType
-const isVolunteer = (userType: UserType): userType is "VOLUNTEER" => userType === USER_TYPE.VOLUNTEER;
-const isOrganization = (userType: UserType): userType is "ORGANIZATION" => userType === USER_TYPE.ORGANIZATION;
+const isVolunteer = (userType: UserType): userType is "VOLUNTEER" =>
+  userType === USER_TYPE.VOLUNTEER;
+const isOrganization = (userType: UserType): userType is "ORGANIZATION" =>
+  userType === USER_TYPE.ORGANIZATION;
 
 const PublicFeedPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [posts, setPosts] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userType, setUserType] = useState<UserType>("ORGANIZATION"); 
+  const [userType, setUserType] = useState<UserType>("ORGANIZATION");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [organizationsMap, setOrganizationsMap] = useState<Map<string, any>>(
+    new Map()
+  );
   const [metrics, setMetrics] = useState({
     totalPosts: 0,
     postGrowth: "0%",
@@ -81,6 +89,7 @@ const PublicFeedPage = () => {
   };
 
   // Store organization data in state for later use in other effects
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [organizationData, setOrganizationData] = useState<any>(null);
 
   useEffect(() => {
@@ -88,12 +97,25 @@ const PublicFeedPage = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Get public posts
         const postResponse = await getAllPublicPosts();
-        console.log("Sample post structure:", postResponse.length > 0 ? JSON.stringify(postResponse[0], null, 2) : "No posts");
+        console.log(
+          "Sample post structure:",
+          postResponse.length > 0
+            ? JSON.stringify(postResponse[0], null, 2)
+            : "No posts"
+        );
         setPosts(postResponse);
-        
+
+        // Fetch all organizations to get follower counts
+        const allOrgs = await getAllOrganizations();
+        const orgMap = new Map();
+        allOrgs.forEach((org) => {
+          orgMap.set(org.name, org);
+        });
+        setOrganizationsMap(orgMap);
+
         // First try as organization (based on JWT token)
         const orgData = await getCurrentOrganizationDetails();
         let detectedUserType: UserType = USER_TYPE.ORGANIZATION;
@@ -103,10 +125,10 @@ const PublicFeedPage = () => {
         if (orgData) {
           profileId = orgData.id;
           setUserType(USER_TYPE.ORGANIZATION);
-          
+
           // Save organization data for later use
           setOrganizationData(orgData);
-          
+
           setProfile({
             name: orgData.name,
             institute: orgData.institute,
@@ -121,29 +143,30 @@ const PublicFeedPage = () => {
             profileId = volunteerData.id;
             detectedUserType = USER_TYPE.VOLUNTEER;
             setUserType(USER_TYPE.VOLUNTEER);
-            
+
             setProfile({
               name: `${volunteerData.firstName} ${volunteerData.lastName}`,
               institute: volunteerData.institute,
               about: volunteerData.about,
-              profileImageUrl: volunteerData.imageUrl,  
+              profileImageUrl: volunteerData.imageUrl,
               isVerified: undefined,
             });
           }
         }
-        
+
         // If no profile data found for either type
         if (profileId === 0) {
-          setError("No user profile found. Please ensure you are properly authenticated.");
+          setError(
+            "No user profile found. Please ensure you are properly authenticated."
+          );
           setLoading(false);
           return;
         }
 
         // Set the detected user ID
         setUserId(profileId);
-        
-        console.log(`Detected user type: ${detectedUserType}`);
 
+        console.log(`Detected user type: ${detectedUserType}`);
       } catch (error) {
         console.error("Error loading data:", error);
         setError("Failed to load profile data");
@@ -154,20 +177,25 @@ const PublicFeedPage = () => {
 
     fetchData();
   }, []);
-  
+
   // Calculate metrics whenever posts or organization data changes
   useEffect(() => {
     if (organizationData && posts.length > 0 && isOrganization(userType)) {
-      console.log("Recalculating metrics for organization:", organizationData.name);
-      console.log("Total posts available:", posts.length);
-      
-      // Filter posts that belong to this organization by matching the name
-      const orgPosts = posts.filter(post => 
-        post.organizationName === organizationData.name
+      console.log(
+        "Recalculating metrics for organization:",
+        organizationData.name
       );
-      
-      console.log(`Found ${orgPosts.length} posts for ${organizationData.name}`);
-      
+      console.log("Total posts available:", posts.length);
+
+      // Filter posts that belong to this organization by matching the name
+      const orgPosts = posts.filter(
+        (post) => post.organizationName === organizationData.name
+      );
+
+      console.log(
+        `Found ${orgPosts.length} posts for ${organizationData.name}`
+      );
+
       // Calculate metrics from filtered posts
       if (orgPosts.length > 0) {
         const calculatedMetrics = calculateMetrics(orgPosts);
@@ -182,22 +210,22 @@ const PublicFeedPage = () => {
       console.warn("User ID not available for like action");
       return;
     }
-    
+
     try {
       if (liked) {
         await removeReaction(postId, userId, userType);
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.id === postId 
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
               ? { ...post, likes: Math.max((post.likes || 0) - 1, 0) }
               : post
           )
         );
       } else {
         await reactToPost({ socialFeedId: postId, userId, userType: userType });
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.id === postId 
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
               ? { ...post, likes: (post.likes || 0) + 1 }
               : post
           )
@@ -210,15 +238,15 @@ const PublicFeedPage = () => {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="mt-20 flex justify-center items-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-verdant-600 mx-auto mb-4"></div>
-            <p>Loading profile...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
+          <p className="text-shark-600 font-primary">Loading Social Feed...</p>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -229,8 +257,8 @@ const PublicFeedPage = () => {
         <div className="mt-20 flex justify-center items-center min-h-[400px]">
           <div className="text-center">
             <p className="text-red-500 text-lg mb-4">{error}</p>
-            <button 
-              onClick={() => window.history.back()} 
+            <button
+              onClick={() => window.history.back()}
               className="px-4 py-2 bg-verdant-600 text-white rounded-lg hover:bg-verdant-700"
             >
               Go Back
@@ -257,7 +285,6 @@ const PublicFeedPage = () => {
     <>
       <Navbar />
       <div className="mt-20 flex flex-col md:flex-row max-w-full mx-auto p-6 gap-6">
-        
         {/* Left Sidebar – Dynamic Profile */}
         <aside className="hidden md:block md:w-1/5 -ml-4 mr-16 sticky top-24 self-start">
           {profile && <ProfileCard {...profile} />}
@@ -281,7 +308,10 @@ const PublicFeedPage = () => {
                 profileImageUrl={post.organizationImageUrl}
                 user={post.organizationName}
                 institute={(post?.institute ?? "").toUpperCase()}
-                followers={post.followers ?? 0}
+                followers={
+                  organizationsMap.get(post.organizationName)?.followerCount ??
+                  0
+                }
                 impressions={post.impressions}
                 timeAgo={post.timeAgo}
                 isPublicView={true}
@@ -336,7 +366,6 @@ const PublicFeedPage = () => {
             <SuggestedOrganizations />
           </aside>
         )}
-
       </div>
     </>
   );

@@ -9,6 +9,7 @@ import ContactInformation from "@/components/UI/ContactInformation";
 import SocialLinks from "@/components/UI/SocialLinks";
 
 const Page = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [organizationData, setOrganizationData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

@@ -28,12 +28,43 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
     onYearChange?.(year);
   };
 
-  const currentCount = data[data.length - 1]?.count || 0;
-  const previousCount = data[data.length - 2]?.count || 0;
+  // Generate placeholder data when no followers exist
+  const generateEmptyStateData = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const emptyData = [];
+    
+    // Show current month and 2 previous months with 0 followers
+    for (let i = 2; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const year = currentMonth - i < 0 ? currentYear - 1 : currentYear;
+      
+      emptyData.push({
+        month: months[monthIndex],
+        count: 0,
+        label: `${months[monthIndex]} ${year}`
+      });
+    }
+    
+    return emptyData;
+  };
+
+  // Use provided data or generate empty state data
+  const chartData = data && data.length > 0 ? data : generateEmptyStateData();
+
+   // Calculate total followers for the year by summing all monthly counts
+  const totalFollowersForYear = chartData.reduce((sum, item) => sum + item.count, 0);
+
+  const currentCount = chartData[chartData.length - 1]?.count || 0;
+  const previousCount = chartData[chartData.length - 2]?.count || 0;
   const percentageChange = previousCount > 0 
     ? Number(((currentCount - previousCount) / previousCount * 100).toFixed(0))
     : 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -94,7 +125,7 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
           </div>
 
           <div className="text-xl pl-4 font-bold text-gray-900 mb-1">
-            {currentCount.toLocaleString()}
+            {totalFollowersForYear.toLocaleString()}
           </div>
           <div className="text-sm text-gray-500 mb-3 pl-4">
             Total Followers
@@ -108,7 +139,7 @@ const FollowersChart: React.FC<FollowersChartProps> = ({
       {/* Chart positioned to the right */}
       <div className="h-32 ml-auto pt-0 pr-12 pb-6" style={{ width: '70%' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis 
               dataKey="month" 
               axisLine={false}

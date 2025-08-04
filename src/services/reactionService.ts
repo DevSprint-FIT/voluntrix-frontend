@@ -48,8 +48,6 @@ export async function getReactionsForPost(socialFeedId: number): Promise<Reactio
 // Get user's reaction for a specific post
 export async function getUserReaction(
   socialFeedId: number,
-  userId: number,
-  userType: string
 ): Promise<ReactionStatusDTO | null> {
   try {
     const response = await fetch(`${BASE_URL}/${socialFeedId}/my-reaction`, {

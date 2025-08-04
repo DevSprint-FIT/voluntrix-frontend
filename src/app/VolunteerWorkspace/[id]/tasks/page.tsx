@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import {
   ClipboardList,
   Clock,
@@ -19,7 +19,7 @@ import Table, { Column } from "@/components/UI/Table";
 import TaskSubmissionModal from "@/components/UI/TaskSubmissionModal";
 import Toast from "@/components/UI/Toast";
 
-const TasksPage = () => {
+const TasksPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [taskStats, setTaskStats] = useState<TaskStats>({
     totalTasksDue: 0,
     totalTasksPendingReview: 0,
@@ -30,6 +30,11 @@ const TasksPage = () => {
   const [tasksInReview, setTasksInReview] = useState<TaskInReview[]>([]);
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
   const [tablesLoading, setTablesLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Unwrap the params Promise using React.use()
+  const resolvedParams = use(params);
+  const eventId = Number(resolvedParams.id);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,10 +77,16 @@ const TasksPage = () => {
     const fetchTaskStats = async () => {
       try {
         setIsLoading(true);
-        const stats = await WorkspaceTaskService.getTaskStats();
+        setError(null);
+        const stats = await WorkspaceTaskService.getTaskStats(eventId);
         setTaskStats(stats);
       } catch (error) {
         console.error("Error fetching task stats:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Error fetching task statistics."
+        );
         showToast("Error fetching task statistics.", "error");
       } finally {
         setIsLoading(false);
@@ -85,16 +96,20 @@ const TasksPage = () => {
     const fetchTableData = async () => {
       try {
         setTablesLoading(true);
+        setError(null);
         const [toDo, inReview, completed] = await Promise.all([
-          WorkspaceTaskService.getToDoTasks(),
-          WorkspaceTaskService.getTasksInReview(),
-          WorkspaceTaskService.getCompletedTasks(),
+          WorkspaceTaskService.getToDoTasks(eventId),
+          WorkspaceTaskService.getTasksInReview(eventId),
+          WorkspaceTaskService.getCompletedTasks(eventId),
         ]);
         setToDoTasks(toDo);
         setTasksInReview(inReview);
         setCompletedTasks(completed);
       } catch (error) {
         console.error("Error fetching table data:", error);
+        setError(
+          error instanceof Error ? error.message : "Error fetching task data."
+        );
         showToast("Error fetching task data.", "error");
       } finally {
         setTablesLoading(false);
@@ -103,7 +118,7 @@ const TasksPage = () => {
 
     fetchTaskStats();
     fetchTableData();
-  }, []);
+  }, [eventId]);
 
   const TaskStatusCard = ({
     count,
@@ -121,7 +136,7 @@ const TasksPage = () => {
     return (
       <div
         style={{ backgroundColor: "#FBFBFB" }}
-        className="rounded-xl p-6 min-w-[23rem] min-h-[8rem] flex-grow-0 flex-shrink-0 flex items-center gap-10"
+        className="rounded-xl p-6 min-w-0 w-full min-h-[8rem] flex items-center gap-4 md:gap-10"
       >
         <div className="bg-verdant-50 rounded-full p-3 flex-shrink-0">
           <Icon size={32} className="text-verdant-700" />
@@ -205,13 +220,14 @@ const TasksPage = () => {
     try {
       setTablesLoading(true);
       setIsLoading(true);
+      setError(null);
 
       // Fetch all data in parallel
       const [stats, toDo, inReview, completed] = await Promise.all([
-        WorkspaceTaskService.getTaskStats(),
-        WorkspaceTaskService.getToDoTasks(),
-        WorkspaceTaskService.getTasksInReview(),
-        WorkspaceTaskService.getCompletedTasks(),
+        WorkspaceTaskService.getTaskStats(eventId),
+        WorkspaceTaskService.getToDoTasks(eventId),
+        WorkspaceTaskService.getTasksInReview(eventId),
+        WorkspaceTaskService.getCompletedTasks(eventId),
       ]);
 
       setTaskStats(stats);
@@ -220,6 +236,11 @@ const TasksPage = () => {
       setCompletedTasks(completed);
     } catch (error) {
       console.error("Error refreshing data:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Error refreshing data. Please refresh the page."
+      );
       showToast("Error refreshing data. Please refresh the page.", "error");
     } finally {
       setTablesLoading(false);
@@ -353,8 +374,19 @@ const TasksPage = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verdant-600 mx-auto mb-4"></div>
+          <p className="text-shark-600 font-secondary">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <div className="bg-white mb-6 mt-2">
         <div className="px-6 py-8">
@@ -370,9 +402,30 @@ const TasksPage = () => {
         </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="px-6 mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <div className="w-5 h-5 text-red-400">⚠</div>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Error loading tasks
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Task Stats Cards */}
       <div className="px-6 pt-0">
-        <div className="flex gap-8 mb-8 justify-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <TaskStatusCard
             count={taskStats.totalTasksDue}
             loading={isLoading}
@@ -411,6 +464,10 @@ const TasksPage = () => {
             <div className="flex justify-center items-center h-32">
               <div className="text-shark-600">Loading tasks...</div>
             </div>
+          ) : error ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-red-600">Failed to load tasks</div>
+            </div>
           ) : (
             <Table columns={toDoTaskColumns} data={toDoTasks} />
           )}
@@ -428,6 +485,10 @@ const TasksPage = () => {
             <div className="flex justify-center items-center h-32">
               <div className="text-shark-600">Loading tasks...</div>
             </div>
+          ) : error ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-red-600">Failed to load tasks</div>
+            </div>
           ) : (
             <Table columns={tasksInReviewColumns} data={tasksInReview} />
           )}
@@ -444,6 +505,10 @@ const TasksPage = () => {
           {tablesLoading ? (
             <div className="flex justify-center items-center h-32">
               <div className="text-shark-600">Loading tasks...</div>
+            </div>
+          ) : error ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-red-600">Failed to load tasks</div>
             </div>
           ) : (
             <Table columns={completedTaskColumns} data={completedTasks} />

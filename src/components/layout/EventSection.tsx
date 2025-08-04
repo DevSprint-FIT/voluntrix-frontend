@@ -8,6 +8,7 @@ import { EventType } from '@/types/EventType';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchLatestEvents } from '@/services/eventService';
+import authService from '@/services/authService';
 
 export default function EventSection() {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -34,7 +35,8 @@ export default function EventSection() {
   }, []);
 
   const handleNavigate = () => {
-    router.push('/events');
+    const path = authService.isAuthenticated() ? '/events' : '/public/events';
+    router.push(path);
   };
 
   return (

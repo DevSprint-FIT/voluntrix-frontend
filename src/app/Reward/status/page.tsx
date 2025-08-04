@@ -10,17 +10,15 @@ export default function RewardStatus() {
     profilePictureUrl?: string;
   } | null>(null);
 
-  const username = "anne13";
-
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchVolunteerRewardStats(username);
+      const data = await fetchVolunteerRewardStats();
       if (data) {
         setRewardStats(data);
       }
     };
     fetchData();
-  }, [username]);
+  }, []);
 
   const isLoading = !rewardStats;
 
@@ -55,10 +53,13 @@ export default function RewardStatus() {
               {isLoading ? (
                 <div className="w-full h-full bg-shark-50 animate-pulse" />
               ) : (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={rewardStats.profilePictureUrl || "/default-profile.png"}
                   alt="Profile Picture"
-                  className="w-full h-full object-cover object-top rounded-full"
+                  width={192}
+                  height={192}
+                  className="object-cover object-top rounded-full"
                 />
               )}
             </div>

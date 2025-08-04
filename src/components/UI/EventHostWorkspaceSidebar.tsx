@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   ListTodo,
   Trophy,
@@ -12,7 +13,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,7 +24,8 @@ interface MenuItem {
 
 const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Tasks');
+  const [selectedItem, setSelectedItem] = useState<string>("Tasks");
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -67,15 +69,29 @@ const EventHostWorkspaceSidebar = ({ eventId }: { eventId: string }) => {
     },
   ];
 
+  // Set active item based on current route
+  useEffect(() => {
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Tasks if no match found
+      setSelectedItem("Tasks");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
     <div className="fixed top-0 left-0 h-screen w-60 bg-[#f8fefc] border-r px-4 py-6 flex flex-col justify-between z-10">
       {/* Logo */}
       <div>
-        <div className="mb-16 mt-4 flex justify-center">
-          <img
+        <div className="mb-16 mt-4 w-18 flex justify-center">
+          <Image
             src="/images/workspaceLogo.svg"
             alt="Workspace Logo"
-            className="h-18 w-18 ml-[-10px]"
+            width={152}
+            height={72}
+            className="ml-[-10px]"
             onClick={() => router.push('/')}
           />
         </div>

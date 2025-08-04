@@ -14,6 +14,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface MenuItem {
   name: string;
@@ -37,7 +38,7 @@ const Sidebar = () => {
       badge: notificationCount,
       href: '/Organization/notifications',
     },
-    { name: 'Social Feed', icon: Send, href: '/Organization/feed' },
+    { name: 'My Feed', icon: Send, href: '/Organization/feed' },
     { name: 'Settings', icon: Settings, href: '/Organization/settings' },
   ];
 
@@ -50,6 +51,7 @@ const Sidebar = () => {
       // Default to Dashboard if no match found
       setSelectedItem('Dashboard');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   useEffect(() => {
@@ -65,10 +67,12 @@ const Sidebar = () => {
       {/* Logo */}
       <div>
         <div className="mb-8 flex justify-center">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Logo"
-            className="h-18 w-18 mr-6"
+            width={152}
+            height={72}
+            className="mr-6"
             onClick={() => router.push('/')}
           />
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, X, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
 interface TaskActionResultModalProps {
   isOpen: boolean;

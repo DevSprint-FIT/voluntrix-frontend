@@ -9,6 +9,11 @@ import {
   fetchFilteredEvents,
   fetchSearchedEvents,
 } from '@/services/eventService';
+import {
+  fetchPublicFilteredEvents,
+  fetchPublicSearchedEvents,
+} from '@/services/publicUserService';
+import authService from '@/services/authService';
 
 export default function HeroSection() {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -48,7 +53,12 @@ export default function HeroSection() {
           params.categoryIds = filters.categories.map((c) => c.id).join(',');
         }
 
-        const events = await fetchFilteredEvents(params);
+        let events;
+        if (authService.isAuthenticated()) {
+          events = await fetchFilteredEvents(params);
+        } else {
+          events = await fetchPublicFilteredEvents(params);
+        }
 
         setEvents(events);
       } catch (err: unknown) {
@@ -74,7 +84,13 @@ export default function HeroSection() {
         setLoading(true);
         setError(null);
 
-        const events = await fetchSearchedEvents(searchText);
+        let events;
+        if (authService.isAuthenticated()) {
+          events = await fetchSearchedEvents(searchText);
+        } else {
+          events = await fetchPublicSearchedEvents(searchText);
+        }
+
         setEvents(events);
       } catch (err: unknown) {
         if (err instanceof Error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { DatePicker } from "@heroui/date-picker";
 import { parseDate } from "@internationalized/date";
 
@@ -62,6 +62,7 @@ const TaskRejectionModal: React.FC<TaskRejectionModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDateChange = (date: any) => {
     if (date) {
       // Create a date string in YYYY-MM-DD format directly to avoid timezone issues

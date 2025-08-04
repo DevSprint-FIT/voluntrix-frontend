@@ -6,6 +6,7 @@ const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const uploadImage = async (file: File): Promise<any> => {
   try {
     console.log("Starting image upload process...");
@@ -61,6 +62,7 @@ const uploadImage = async (file: File): Promise<any> => {
           expire,
           signature,
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (err: any, result: any) => {
           if (err) {
             console.error("ImageKit upload failed:", err);

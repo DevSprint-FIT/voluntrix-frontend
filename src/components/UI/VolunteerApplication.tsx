@@ -13,8 +13,8 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import Link from 'next/link';
 import { createEventApplication } from '@/services/eventApplicationService';
+import { AxiosError } from 'axios';
 
 interface VolunteerApplicationProps {
   isFormOpen: boolean;
@@ -88,11 +88,11 @@ export default function VolunteerApplication({
       onClose();
       openSuccessModal();
     } catch (error) {
-      console.error('Submission error:', error);
+      const err = error as AxiosError<{ message: string }>;
       setErrorMessage(
-        error?.response?.data?.message ||
-          'Something went wrong. Please try again.'
+        err.response?.data?.message || 'Something went wrong. Please try again.'
       );
+      console.error('Submission error:', errorMessage);
       onClose();
       openErrorModal();
     } finally {
@@ -153,11 +153,11 @@ export default function VolunteerApplication({
                       className="rounded-[5px] border-[2px] border-shark-800 h-[110px] w-full p-2 resize-none"
                     />
                   </div>
-                  <div className="flex gap-2 items-start">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => setIsAgree((prev) => !prev)}
-                    >
+                  <div
+                    className="flex gap-2 items-start cursor-pointer"
+                    onClick={() => setIsAgree((prev) => !prev)}
+                  >
+                    <div>
                       {!isAgree ? (
                         <Image
                           src={'/icons/tick-box.svg'}
@@ -178,10 +178,8 @@ export default function VolunteerApplication({
                       I agree to follow the event guidelines, commit to my
                       responsibilities, represent the event professionally, and
                       accept the{' '}
-                      <Link href={'#'} className="underline">
-                        Terms & Conditions
-                      </Link>{' '}
-                      of volunteering.
+                      <span className="underline">Terms & Conditions</span> of
+                      volunteering.
                     </div>
                   </div>
                 </div>
@@ -242,7 +240,8 @@ export default function VolunteerApplication({
                 Submission Failed
               </div>
               <div className="mt-2 text-center font-normal font-secondary text-shark-800 text-sm">
-                {errorMessage}
+                We couldn&apos;t submit your application. Please check your
+                details or try again later.
               </div>
             </ModalBody>
           </>

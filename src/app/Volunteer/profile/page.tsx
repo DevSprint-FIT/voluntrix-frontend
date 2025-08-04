@@ -7,15 +7,18 @@ import {
   Mail,
   Phone,
   X,
-  Award,
   CheckCircle,
   AlertCircle,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import {
   volunteerProfileService,
   VolunteerProfile,
   Organization,
 } from "@/services/volunteerProfileService";
+import ProfileIndicator from "@/components/UI/ProfileIndicator";
+import { useRouter } from 'next/navigation';
 
 // Notification Modal Component
 const NotificationModal = ({
@@ -72,6 +75,68 @@ const NotificationModal = ({
   );
 };
 
+// Confirmation Modal Component
+const UnfollowConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  organizationName,
+  isUnfollowing,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  organizationName: string;
+  isUnfollowing: boolean;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center mb-4">
+          <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
+          <h2 className="text-lg font-semibold text-gray-900 font-secondary">
+            Confirm Unfollow
+          </h2>
+        </div>
+
+        <p className="text-gray-600 font-secondary mb-6">
+          Are you sure you want to unfollow{" "}
+          <span className="font-medium text-gray-900">
+            &quot;{organizationName}&quot;
+          </span>
+          ? You will no longer receive updates from this organization.
+        </p>
+
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            disabled={isUnfollowing}
+            className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md font-secondary transition-colors disabled:opacity-50"
+          >
+            No, Keep Following
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isUnfollowing}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center font-secondary transition-colors disabled:opacity-50"
+          >
+            {isUnfollowing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Unfollowing...
+              </>
+            ) : (
+              "Yes, Unfollow"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Modal Component
 const FollowedOrganizationsModal = ({
   isOpen,
@@ -82,7 +147,7 @@ const FollowedOrganizationsModal = ({
   isOpen: boolean;
   onClose: () => void;
   organizations: Organization[];
-  onUnfollow: (orgId: number) => void;
+  onUnfollow: (org: Organization) => void;
 }) => {
   if (!isOpen) return null;
 
@@ -114,10 +179,13 @@ const FollowedOrganizationsModal = ({
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover"
                     />
                     <div>
                       <h3 className="font-medium font-secondary text-gray-900">
@@ -129,7 +197,7 @@ const FollowedOrganizationsModal = ({
                     </div>
                   </div>
                   <button
-                    onClick={() => onUnfollow(org.id)}
+                    onClick={() => onUnfollow(org)}
                     className="px-4 py-2 text-sm font-medium font-secondary text-red-600 bg-red-50 hover:text-red-700 hover:bg-red-100 rounded-md transition-colors"
                   >
                     Unfollow
@@ -158,6 +226,14 @@ const VolunteerProfilePage = () => {
   const [modalType, setModalType] = useState<"success" | "error">("success");
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+
+  // Confirmation modal states
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] =
+    useState<Organization | null>(null);
+  const [isUnfollowing, setIsUnfollowing] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -209,14 +285,28 @@ const VolunteerProfilePage = () => {
     fetchData();
   }, []);
 
-  const handleUnfollow = async (organizationId: number) => {
+  const handleUnfollowClick = (organization: Organization) => {
+    setSelectedOrganization(organization);
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmUnfollow = async () => {
+    if (!selectedOrganization) return;
+
+    setIsUnfollowing(true);
     try {
-      await volunteerProfileService.unfollowOrganization(organizationId);
+      await volunteerProfileService.unfollowOrganization(
+        selectedOrganization.id
+      );
 
       // Remove the organization from the local state
       setFollowedOrganizations((prev) =>
-        prev.filter((org) => org.id !== organizationId)
+        prev.filter((org) => org.id !== selectedOrganization.id)
       );
+
+      // Close confirmation modal
+      setConfirmModalOpen(false);
+      setSelectedOrganization(null);
 
       // Show success modal
       setModalType("success");
@@ -235,6 +325,15 @@ const VolunteerProfilePage = () => {
           : "Failed to unfollow organization. Please try again."
       );
       setModalOpen(true);
+    } finally {
+      setIsUnfollowing(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    if (!isUnfollowing) {
+      setConfirmModalOpen(false);
+      setSelectedOrganization(null);
     }
   };
 
@@ -277,13 +376,18 @@ const VolunteerProfilePage = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white px-6 py-4">
-        <div>
-          <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
-            Volunteer / Profile
-          </nav>
-          <h1 className="text-2xl font-bold font-secondary text-gray-900">
-            Profile
-          </h1>
+        <div className="flex justify-between items-start">
+          <div>
+            <nav className="text-[#B0B0B0] font-secondary mb-2 mt-3">
+              Volunteer / Profile
+            </nav>
+            <h1 className="text-2xl font-bold font-secondary text-gray-900">
+              Profile
+            </h1>
+          </div>
+          <div className="mt-3">
+            <ProfileIndicator />
+          </div>
         </div>
       </div>
 
@@ -292,10 +396,13 @@ const VolunteerProfilePage = () => {
           {/* Main Profile Card */}
           <div className="bg-[#FBFBFB] rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile.profilePictureUrl || "/api/placeholder/120/120"}
                 alt={profile.fullName}
-                className="w-32 h-32 rounded-lg object-cover"
+                className="rounded-lg object-cover"
+                width={128}
+                height={128}
               />
 
               <div className="flex-1">
@@ -328,10 +435,13 @@ const VolunteerProfilePage = () => {
 
                 <div className="flex items-center space-x-6 mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium font-secondary bg-[#ECFDF6] text-[#029972] px-3 py-1 rounded-full">
+                    <button
+                       onClick={() => router.push('/Reward/status')}
+                       className="text-sm font-medium font-secondary bg-[#ECFDF6] text-[#029972] px-3 py-1 rounded-full hover:bg-[#D1FAE5] transition-colors cursor-pointer"
+                     >
                       Level {profile.volunteerLevel} Volunteer
-                    </span>
-                  </div>
+                    </button>
+                 </div>
                   <div
                     className={`px-3 py-1 rounded-full text-sm font-medium font-secondary ${
                       profile.isAvailable
@@ -413,11 +523,14 @@ const VolunteerProfilePage = () => {
               <div className="flex space-x-2">
                 {followedOrganizations.slice(0, 3).map((org) => (
                   <div key={org.id} className="flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={org.imageUrl || "/api/placeholder/40/40"}
                       alt={org.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="rounded-full object-cover"
                       title={org.name}
+                      width={40}
+                      height={40}
                     />
                   </div>
                 ))}
@@ -448,7 +561,16 @@ const VolunteerProfilePage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         organizations={followedOrganizations}
-        onUnfollow={handleUnfollow}
+        onUnfollow={handleUnfollowClick}
+      />
+
+      {/* Confirmation Modal */}
+      <UnfollowConfirmationModal
+        isOpen={confirmModalOpen}
+        onClose={handleModalClose}
+        onConfirm={handleConfirmUnfollow}
+        organizationName={selectedOrganization?.name || ""}
+        isUnfollowing={isUnfollowing}
       />
 
       {/* Notification Modal */}
