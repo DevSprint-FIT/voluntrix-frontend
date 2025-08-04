@@ -1,34 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Input,
-  Divider,
-  Checkbox,
-} from '@heroui/react';
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  AlertCircle,
-  CheckCircle,
-  LogIn,
-} from 'lucide-react';
-import Image from 'next/image';
-import authService, { User } from '@/services/authService';
+import { useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Divider, Checkbox } from "@heroui/react";
+import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, LogIn } from "lucide-react";
+import Image from "next/image";
+import authService, { User } from "@/services/authService";
 
 interface LoginModalProps {
   isOpen: boolean;
-  onChange: (open: boolean) => void;
-  onLoginSuccess?: (user: User) => void;
   onClose: () => void;
+  onLoginSuccess?: (user: User) => void;
   title?: string;
   subtitle?: string;
 }
@@ -45,17 +26,16 @@ interface LoginErrors {
   general?: string;
 }
 
-export default function LoginModal({
-  isOpen,
-  onChange,
+export default function LoginModal({ 
+  isOpen, 
+  onClose, 
   onLoginSuccess,
-  onClose,
-  title = 'Welcome Back',
-  subtitle = 'Sign in to your account to continue',
+  title = "Welcome Back",
+  subtitle = "Sign in to your account to continue"
 }: LoginModalProps) {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     rememberMe: false,
   });
 
@@ -64,18 +44,15 @@ export default function LoginModal({
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  const handleInputChange = (
-    field: keyof LoginFormData,
-    value: string | boolean
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof LoginFormData, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
     // Clear errors when user starts typing
     if (errors[field as keyof LoginErrors]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
+      setErrors(prev => ({ ...prev, [field]: "" }));
     }
     // Clear general error when any field changes
     if (errors.general) {
-      setErrors((prev) => ({ ...prev, general: '' }));
+      setErrors(prev => ({ ...prev, general: "" }));
     }
   };
 
@@ -84,16 +61,16 @@ export default function LoginModal({
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -107,19 +84,16 @@ export default function LoginModal({
     setErrors({});
 
     try {
-      console.log('Attempting login with email:', formData.email);
-
+      console.log("Attempting login with email:", formData.email);
+      
       // Call auth service login
-      const result = await authService.login({
-        email: formData.email,
-        password: formData.password,
-      });
+      const result = await authService.login({email: formData.email, password: formData.password});
 
-      console.log('Login successful:', result);
-
+      console.log("Login successful:", result);
+      
       // Show success state briefly
       setLoginSuccess(true);
-
+      
       // Call success callback if provided with the user data
       if (onLoginSuccess && result.user) {
         onLoginSuccess(result.user);
@@ -129,72 +103,65 @@ export default function LoginModal({
       setTimeout(() => {
         handleClose();
       }, 1000);
+
     } catch (error) {
-      console.error('Login failed:', error);
-
+      console.error("Login failed:", error);
+      
       // Handle different error types
-      let errorMessage = 'Login failed. Please try again.';
-
+      let errorMessage = "Login failed. Please try again.";
+      
       if (error instanceof Error) {
-        if (
-          error.message.includes('401') ||
-          error.message.includes('Invalid')
-        ) {
-          errorMessage =
-            'Invalid email or password. Please check your credentials.';
-        } else if (error.message.includes('404')) {
-          errorMessage = 'Account not found. Please check your email address.';
-        } else if (
-          error.message.includes('network') ||
-          error.message.includes('fetch')
-        ) {
-          errorMessage =
-            'Network error. Please check your connection and try again.';
+        if (error.message.includes("401") || error.message.includes("Invalid")) {
+          errorMessage = "Invalid email or password. Please check your credentials.";
+        } else if (error.message.includes("404")) {
+          errorMessage = "Account not found. Please check your email address.";
+        } else if (error.message.includes("network") || error.message.includes("fetch")) {
+          errorMessage = "Network error. Please check your connection and try again.";
         } else {
           errorMessage = error.message;
         }
       }
-
+      
       setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
   };
 
-  //   const handleGoogleLogin = async () => {
-  //     try {
-  //       console.log("Attempting Google login...");
-
-  //       // Call auth service Google login
-  //     //   const result = await authService.loginWithGoogle();
-
-  //       console.log("Google login initiated:", result);
-
-  //       // Note: Google login typically redirects, so we might not reach here
-  //       if (onLoginSuccess) {
-  //         onLoginSuccess(result);
-  //       }
-
-  //     } catch (error) {
-  //       console.error("Google login failed:", error);
-  //       setErrors({
-  //         general: "Google login failed. Please try again or use email/password."
-  //       });
-  //     }
-  //   };
+//   const handleGoogleLogin = async () => {
+//     try {
+//       console.log("Attempting Google login...");
+      
+//       // Call auth service Google login
+//     //   const result = await authService.loginWithGoogle();
+      
+//       console.log("Google login initiated:", result);
+      
+//       // Note: Google login typically redirects, so we might not reach here
+//       if (onLoginSuccess) {
+//         onLoginSuccess(result);
+//       }
+      
+//     } catch (error) {
+//       console.error("Google login failed:", error);
+//       setErrors({ 
+//         general: "Google login failed. Please try again or use email/password." 
+//       });
+//     }
+//   };
 
   const handleClose = () => {
     // Reset form and states
     setFormData({
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       rememberMe: false,
     });
     setErrors({});
     setIsPasswordVisible(false);
     setIsLoading(false);
     setLoginSuccess(false);
-
+    
     onClose();
   };
 
@@ -205,9 +172,8 @@ export default function LoginModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onOpenChange={onChange}
+    <Modal 
+      isOpen={isOpen} 
       onClose={handleClose}
       placement="center"
       backdrop="blur"
@@ -215,19 +181,19 @@ export default function LoginModal({
       closeButton={!isLoading}
       isDismissable={!isLoading}
       classNames={{
-        base: 'bg-white/95 backdrop-blur-md',
-        header: 'border-b border-shark-200',
-        body: 'py-6',
-        footer: 'border-t border-shark-200',
+        base: "bg-white/95 backdrop-blur-md",
+        header: "border-b border-shark-200",
+        body: "py-6",
+        footer: "border-t border-shark-200",
       }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1 text-center">
           <h3 className="text-2xl font-bold text-shark-900 font-secondary">
-            {loginSuccess ? 'Welcome!' : title}
+            {loginSuccess ? "Welcome!" : title}
           </h3>
           <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
-            {loginSuccess ? 'Login successful! Redirecting...' : subtitle}
+            {loginSuccess ? "Login successful! Redirecting..." : subtitle}
           </p>
         </ModalHeader>
 
@@ -247,9 +213,7 @@ export default function LoginModal({
               {errors.general && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start space-x-2">
                   <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-red-700 text-sm font-primary">
-                    {errors.general}
-                  </p>
+                  <p className="text-red-700 text-sm font-primary">{errors.general}</p>
                 </div>
               )}
 
@@ -259,25 +223,25 @@ export default function LoginModal({
                 label="Email Address"
                 placeholder="Enter your email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={(e) => handleInputChange("email", e.target.value)}
                 isInvalid={!!errors.email}
                 errorMessage={errors.email}
                 startContent={<Mail className="w-4 h-4 text-shark-400" />}
                 classNames={{
-                  input: 'font-primary text-shark-900 tracking-[0.02rem]',
-                  label: 'font-secondary text-shark-500 text-sm font-normal',
-                  errorMessage: 'font-primary text-xs',
+                  input: "font-primary text-shark-900 tracking-[0.02rem]",
+                  label: "font-secondary text-shark-500 text-sm font-normal",
+                  errorMessage: "font-primary text-xs",
                 }}
                 disabled={isLoading}
               />
 
               {/* Password Input */}
               <Input
-                type={isPasswordVisible ? 'text' : 'password'}
+                type={isPasswordVisible ? "text" : "password"}
                 label="Password"
                 placeholder="Enter your password"
                 value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
+                onChange={(e) => handleInputChange("password", e.target.value)}
                 isInvalid={!!errors.password}
                 errorMessage={errors.password}
                 startContent={<Lock className="w-4 h-4 text-shark-400" />}
@@ -296,9 +260,9 @@ export default function LoginModal({
                   </button>
                 }
                 classNames={{
-                  input: 'font-primary text-shark-900 tracking-[0.02rem]',
-                  label: 'font-secondary text-shark-500 text-sm font-normal',
-                  errorMessage: 'font-primary text-xs',
+                  input: "font-primary text-shark-900 tracking-[0.02rem]",
+                  label: "font-secondary text-shark-500 text-sm font-normal",
+                  errorMessage: "font-primary text-xs",
                 }}
                 disabled={isLoading}
               />
@@ -307,21 +271,18 @@ export default function LoginModal({
               <div className="flex items-center justify-between">
                 <Checkbox
                   isSelected={formData.rememberMe}
-                  onValueChange={(checked) =>
-                    handleInputChange('rememberMe', checked)
-                  }
+                  onValueChange={(checked) => handleInputChange("rememberMe", checked)}
                   size="sm"
                   classNames={{
-                    wrapper:
-                      'data-[selected=true]:bg-verdant-600 data-[selected=true]:border-verdant-600',
-                    icon: 'text-white',
-                    label: 'text-shark-600 font-primary text-sm',
+                    wrapper: "data-[selected=true]:bg-verdant-600 data-[selected=true]:border-verdant-600",
+                    icon: "text-white",
+                    label: "text-shark-600 font-primary text-sm",
                   }}
                   disabled={isLoading}
                 >
                   Remember me
                 </Checkbox>
-
+                
                 <button
                   type="button"
                   className="text-verdant-600 hover:text-verdant-700 text-sm font-medium font-primary"
@@ -340,15 +301,13 @@ export default function LoginModal({
                 startContent={!isLoading ? <LogIn className="w-4 h-4" /> : null}
                 disabled={!formData.email || !formData.password}
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
 
               {/* Divider */}
               <div className="flex items-center my-6">
                 <Divider className="flex-1" />
-                <span className="px-4 text-shark-500 text-sm font-primary">
-                  or
-                </span>
+                <span className="px-4 text-shark-500 text-sm font-primary">or</span>
                 <Divider className="flex-1" />
               </div>
 
@@ -377,7 +336,7 @@ export default function LoginModal({
         {!loginSuccess && (
           <ModalFooter className="justify-center">
             <p className="text-shark-500 text-sm font-primary">
-              Don&apos;t have an account?{' '}
+              Don&apos;t have an account?{" "}
               <button
                 type="button"
                 className="text-verdant-600 hover:text-verdant-700 font-medium"

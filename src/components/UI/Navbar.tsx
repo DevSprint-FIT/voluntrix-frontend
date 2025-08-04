@@ -1,36 +1,19 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Button } from '@heroui/button';
-import authService from '@/services/authService';
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/dropdown';
-import { Avatar } from '@heroui/avatar';
-import AuthService from '@/services/authService';
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Button } from "@heroui/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Avatar } from "@heroui/avatar";
+import AuthService from "@/services/authService";
+import { User } from "@/services/authService";
+
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface User {
-  userId: number;
-  email: string;
-  fullName: string;
-  handle: string;
-  role: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  authProvider: string;
-  createdAt: string;
-  lastLogin: string;
-}
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -55,7 +38,7 @@ export default function Navbar() {
   const [eventPath, setEventPath] = useState('/public/events');
 
   useEffect(() => {
-    if (authService.isAuthenticated()) {
+    if (AuthService.isAuthenticated()) {
       setEventPath('/events');
     }
   }, []);
@@ -242,9 +225,8 @@ export default function Navbar() {
           isScrolled ? 'shadow-md bg-white py-2' : 'bg-transparent py-6'
         }`}
       >
-        <div
-          className={`w-[1250px] mx-auto flex items-center justify-between transition-all duration-300 ease-in-out`}
-        >
+        <div className="w-[1250px] mx-auto flex items-center justify-between">
+          {/* Logo */}
           <div
             className={`transition-all duration-300 ease-in-out ${
               isScrolled ? 'scale-90' : 'scale-100'
@@ -260,6 +242,7 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Navigation Links */}
           <div
             className={`flex space-x-16 text-shark-950 text-[1rem] font-primary tracking-wider font-medium transition-all duration-300 ease-in-out ${
               isScrolled ? 'text-[0.95rem]' : 'text-[1.05rem]'
@@ -279,13 +262,13 @@ export default function Navbar() {
             </Link>
             {/* Social Feed - Only show to authenticated ORGANIZATION or VOLUNTEER users (NOT SPONSORS) */}
             {isAuthenticated && user && (user.role === 'ORGANIZATION' || user.role === 'VOLUNTEER') && (
-            <Link
-              href="/PublicFeed"
-              className="transition-all duration-300 ease-in-out hover:text-verdant-600"
-            >
-              Social Feed
-            </Link>
-     )}
+              <Link
+                href="/PublicFeed"
+                className="transition-all duration-300 ease-in-out hover:text-verdant-600"
+              >
+                Social Feed
+              </Link>
+            )}
             <Link
               href="#"
               className="transition-all duration-300 ease-in-out hover:text-verdant-600"
@@ -293,6 +276,7 @@ export default function Navbar() {
               Volunteers
             </Link>
           </div>
+
           {/* Conditional rendering based on authentication status */}
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-4">
@@ -306,7 +290,7 @@ export default function Navbar() {
                 <DropdownTrigger>
                   <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity duration-200">
                     <Avatar
-                      src={`/icons/user.png`} // You can customize this path
+                      src={user.imageURL || "/icons/user.png"}
                       alt={user.fullName}
                       size="sm"
                       className="w-8 h-8"

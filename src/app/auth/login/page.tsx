@@ -81,7 +81,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/google`;
   };
 
   const handleSubmit = async () => {

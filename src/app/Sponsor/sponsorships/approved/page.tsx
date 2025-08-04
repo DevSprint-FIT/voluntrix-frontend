@@ -35,7 +35,7 @@ export default function SponsorApprovedSponsorshipsPage() {
   }, []);
 
   const handlePayNow = (sponsorship: SponsorRequestTableDTO) => {
-    router.push(`/sponsorship?id=${sponsorship.requestId}`);
+    router.push(`/sponsorship?requestId=${sponsorship.requestId}`);
   };
 
   const getPaymentStatusBadge = (status: SponsorshipPaymentStatus) => {
