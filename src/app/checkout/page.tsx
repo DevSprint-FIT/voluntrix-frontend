@@ -12,22 +12,22 @@ declare global {
 }
 
 const dummyData : PaymentDetails = {
-  "orderId": "ORD999021",
-  "amount": "100.00",
+  "orderId": "ORD999045",
+  "amount": "100",
   "currency": "LKR",
-  "firstName": "Samantha",
-  "lastName": "Green",
+  "firstName": null,
+  "lastName": null,
   "email": "samantha@gmail.com",
-  "phone": "1234567890",
-  "address": "Another St",
-  "city": "City",
-  "country": "Country",
-  "userType": "VOLUNTEER",
-  "volunteerId": 1,
-  "sponsorId": null,
+  "phone": null,
+  "address": null,
+  "city": null,
+  "country": null,
+  "userType": "SPONSOR",
+  "volunteerId": null,
+  "sponsorId": 1,
   "eventId": 1,
   "isAnnonymous": false,
-  "transactionType": "DONATION"
+  "transactionType": "SPONSORSHIP"
 }
 
 
@@ -68,8 +68,13 @@ export default function PaymentPage() {
   const handlePayment = async () => {
     const paymentDetails: PaymentDetails = dummyData;
 
+    console.log("Starting payment with details:", paymentDetails);
+    console.log("API Base URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
+
     try {
       const { hash, merchantId } = await startPayment(paymentDetails);
+      
+      console.log("Payment response:", { hash, merchantId });
       
       const payment = {
         sandbox: true,
@@ -91,10 +96,11 @@ export default function PaymentPage() {
         hash: hash,
       };
 
+      console.log("PayHere payment object:", payment);
       window.payhere.startPayment(payment);
     } catch (error) {
       console.error("Payment failed:", error);
-      alert(error);
+      alert(`Payment failed: ${error}`);
     }
   };
 

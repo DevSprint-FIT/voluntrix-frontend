@@ -21,10 +21,7 @@ export default function FailPage() {
   const commonIssues = [
     "Insufficient funds in your account",
     "Your bank declined the transaction",
-    "Network connectivity issues",
-    
-    "Incorrect payment details",
-    "Payment method temporarily unavailable"
+    "Network connectivity issues"
   ];
 
   return (
@@ -42,19 +39,19 @@ export default function FailPage() {
           </h1>
 
           {/* Description */}
-          <p className="text-base text-shark-600 mb-4 font-primary">
+          <p className="text-base text-shark-600 mb-4 font-primary leading-relaxed">
             We couldn&apos;t process your sponsorship payment at this time.
           </p>
 
           {/* Common Issues */}
-          <div className="bg-red-50 rounded-lg p-3 mb-4 text-left">
-            <div className="flex items-center mb-2">
+          <div className="bg-red-50 rounded-lg p-4 mb-4 text-left">
+            <div className="flex items-center mb-3">
               <AlertCircle className="w-4 h-4 text-red-600 mr-2" />
               <span className="text-shark-700 font-medium font-secondary text-sm">Common Issues:</span>
             </div>
-            <ul className="text-xs text-shark-600 space-y-1 font-primary">
+            <ul className="text-sm text-shark-600 space-y-2 font-primary">
               {commonIssues.map((issue, index) => (
-                <li key={index} className="flex items-start">
+                <li key={index} className="flex items-start leading-relaxed">
                   <span className="text-red-500 mr-2 mt-1">•</span>
                   {issue}
                 </li>
@@ -63,8 +60,8 @@ export default function FailPage() {
           </div>
 
           {/* Additional Info */}
-          <p className="text-xs text-shark-500 mb-6 font-primary">
-            Don&apos;t worry! You can try again or use a different payment method. Your sponsorship details are saved.
+          <p className="text-sm text-shark-500 mb-6 font-primary leading-relaxed">
+            Don&apos;t worry! You can try again or contact support. Your sponsorship details are saved.
           </p>
 
           {/* Action Buttons */}
@@ -88,31 +85,21 @@ export default function FailPage() {
             >
               View My Sponsorships
             </Button>
-
-            <Button
-              as={Link}
-              href="/Sponsor/dashboard"
-              variant="light"
-              className="w-full text-shark-600 hover:bg-shark-50 font-primary font-medium py-3"
-              size="lg"
-            >
-              Back to Dashboard
-            </Button>
           </div>
 
           {/* Support Info */}
           <div className="mt-4 pt-3 border-t border-shark-200">
-            <p className="text-xs text-shark-500 font-primary">
+            <p className="text-sm text-shark-500 font-primary leading-relaxed">
               Need help?{" "}
               <Link href="/support" className="text-verdant-600 hover:text-verdant-700 underline font-medium">
-                Contact our support team
+                Contact Support
               </Link>
             </p>
           </div>
 
           {/* Auto redirect notice */}
           <p className="text-xs text-shark-400 mt-3 font-primary">
-            You will be automatically redirected to your sponsorships in 10 seconds
+            Auto-redirecting to sponsorships in 10 seconds
           </p>
         </CardBody>
       </Card>

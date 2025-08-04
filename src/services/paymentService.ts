@@ -70,6 +70,9 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
 
     const response = await fetch(apiUrl, {
       method: "GET",
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
     });
 
     console.log("Status check response status:", response.status);
@@ -77,6 +80,13 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Status check error response:", errorText);
+      
+      // If the endpoint doesn't exist or returns 404, assume payment is still pending
+      if (response.status === 404) {
+        console.log("Payment status endpoint not found, returning PENDING");
+        return "PENDING";
+      }
+      
       throw new Error(`Failed to fetch payment status. Status: ${response.status}, Response: ${errorText}`);
     }
 
@@ -86,15 +96,33 @@ export async function checkPaymentStatus(orderId: string): Promise<string> {
     try {
       const data = JSON.parse(responseText);
       const { status } = data;
-      return status;
+      console.log("Parsed payment status:", status);
+      
+      // Normalize status values based on backend responses
+      const normalizedStatus = status?.toUpperCase();
+      if (normalizedStatus === 'SUCCESS') {
+        return "SUCCESS";
+      } else if (normalizedStatus === 'EXPIRED') {
+        return "FAILED";
+      } else if (normalizedStatus === 'PENDING') {
+        return "PENDING";
+      } else {
+        // For any unknown status, assume pending to allow retries
+        console.log(`Unknown payment status: ${status}, treating as PENDING`);
+        return "PENDING";
+      }
     } catch (parseError) {
       console.error("JSON parse error in status check:", parseError);
       console.error("Response was not valid JSON:", responseText);
-      throw new Error("Server returned invalid JSON response for status check");
+      
+      // If we can't parse the response, assume pending for now
+      return "PENDING";
     }
   } catch (error) {
     console.error("Error in checkPaymentStatus:", error);
-    throw error;
+    
+    // Instead of throwing error, return PENDING to allow retries
+    return "PENDING";
   }
 }
 

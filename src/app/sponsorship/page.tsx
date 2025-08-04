@@ -119,14 +119,21 @@ export default function SponsorshipPage() {
       window.payhere.onCompleted = function (orderId: string) {
         console.log("PayHere onCompleted triggered for order:", orderId);
         let attempts = 0;
+        const maxAttempts = 10;
+        
         const interval = setInterval(async () => {
           try {
+            console.log(`Payment status check attempt ${attempts + 1}/${maxAttempts}`);
             const status = await checkPaymentStatus(orderId);
-            console.log(`Payment status check attempt ${attempts + 1}: ${status}`);
+            console.log(`Payment status for ${orderId}: ${status}`);
+            
             if(status === "SUCCESS") {
               clearInterval(interval);
               window.location.href = "/checkout/success";
-            } else if (status === "FAILED" || attempts > 10) {
+            } else if (status === "FAILED") {
+              clearInterval(interval);
+              window.location.href = "/checkout/fail";
+            } else if (attempts >= maxAttempts) {
               clearInterval(interval);
               window.location.href = "/checkout/fail";
             }
@@ -136,7 +143,7 @@ export default function SponsorshipPage() {
             clearInterval(interval);
             window.location.href = "/checkout/fail";
           }
-        }, 1000);
+        }, 2000); // Increased interval to 2 seconds to be less aggressive
       };
   
       window.payhere.onDismissed = function () {
