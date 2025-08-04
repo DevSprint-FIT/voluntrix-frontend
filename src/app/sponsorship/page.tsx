@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardBody, Button, Input, Select, SelectItem, Checkbox } from "@heroui/react";
 import { Shield, Award, Calendar } from "lucide-react";
@@ -31,7 +31,33 @@ const currencies = [
   { key: "EUR", label: "EUR - Euro", symbol: "€" },
 ];
 
-export default function SponsorshipPage() {
+// Loading component for suspense fallback
+function SponsorshipPageLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-verdant-50 via-white to-verdant-100 relative">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-6 py-12 pt-32">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-6 relative">
+              <div className="absolute inset-0 border-4 border-verdant-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-verdant-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-shark-900 mb-2 font-secondary">
+              Loading Sponsorship Page
+            </h3>
+            <p className="text-shark-600 font-primary text-sm tracking-[0.025rem]">
+              Please wait while we load your sponsorship details...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main sponsorship content component
+function SponsorshipPageContent() {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -643,5 +669,14 @@ export default function SponsorshipPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component wrapped with Suspense
+export default function SponsorshipPage() {
+  return (
+    <Suspense fallback={<SponsorshipPageLoading />}>
+      <SponsorshipPageContent />
+    </Suspense>
   );
 }
