@@ -39,7 +39,7 @@ export default function Navbar() {
   const [eventPath, setEventPath] = useState('/public/events');
 
   useEffect(() => {
-    if (authService.isAuthenticated()) {
+    if (AuthService.isAuthenticated()) {
       setEventPath('/events');
     }
   }, []);
@@ -226,87 +226,8 @@ export default function Navbar() {
           isScrolled ? 'shadow-md bg-white py-2' : 'bg-transparent py-6'
         }`}
       >
-        <div
-          className={`w-[1250px] mx-auto flex items-center justify-between transition-all duration-300 ease-in-out`}
-        >
-          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">
-            Features
-          </Link>
-          <Link href="/events" className="transition-all duration-300 ease-in-out hover:text-verdant-600">
-            Events
-          </Link>
-          <Link href="/PublicFeed" className="transition-all duration-300 ease-in-out hover:text-verdant-600">
-            {isAuthenticated ? "Event Feed" : "Social Feed"}
-          </Link>
-          <Link href="#" className="transition-all duration-300 ease-in-out hover:text-verdant-600">
-            Volunteers
-          </Link>
-        </div>
-
-        {/* Conditional rendering based on authentication status */}
-        {isAuthenticated && user ? (
-          <div className="flex items-center space-x-4">
-            {/* Notification Bell */}
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-              <Bell size={20} className="text-shark-950" />
-            </button>
-
-            {/* User Profile Dropdown */}
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity duration-200">
-                  <Avatar
-                    src={user.imageURL || "/images/user.png"} // You can customize this path
-                    alt={user.fullName}
-                    size="sm"
-                    className="w-8 h-8"
-                    fallback={user.fullName.charAt(0).toUpperCase()}
-                  />
-                  <span className="text-shark-950 font-primary font-medium text-sm">
-                    {user.fullName}
-                  </span>
-                  <svg
-                    className="w-4 h-4 text-shark-950 transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="User Actions"
-                onAction={(key) => handleDropdownAction(key as string)}
-                className="min-w-[180px]"
-              >
-                <DropdownItem key="profile" className="font-primary">
-                  Profile
-                </DropdownItem>
-                <DropdownItem key="dashboard" className="font-primary">
-                  Dashboard
-                </DropdownItem>
-                <DropdownItem key="settings" className="font-primary">
-                  Settings
-                </DropdownItem>
-                <DropdownItem key="help" className="font-primary">
-                  Help & Support
-                </DropdownItem>
-                <DropdownItem
-                  key="logout"
-                  className="text-danger font-primary"
-                  color="danger"
-                >
-                  Logout
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            
+        <div className="w-[1250px] mx-auto flex items-center justify-between">
+          {/* Logo */}
           <div
             className={`transition-all duration-300 ease-in-out ${
               isScrolled ? 'scale-90' : 'scale-100'
@@ -322,6 +243,7 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Navigation Links */}
           <div
             className={`flex space-x-16 text-shark-950 text-[1rem] font-primary tracking-wider font-medium transition-all duration-300 ease-in-out ${
               isScrolled ? 'text-[0.95rem]' : 'text-[1.05rem]'
@@ -341,13 +263,13 @@ export default function Navbar() {
             </Link>
             {/* Social Feed - Only show to authenticated ORGANIZATION or VOLUNTEER users (NOT SPONSORS) */}
             {isAuthenticated && user && (user.role === 'ORGANIZATION' || user.role === 'VOLUNTEER') && (
-            <Link
-              href="/PublicFeed"
-              className="transition-all duration-300 ease-in-out hover:text-verdant-600"
-            >
-              Social Feed
-            </Link>
-     )}
+              <Link
+                href="/PublicFeed"
+                className="transition-all duration-300 ease-in-out hover:text-verdant-600"
+              >
+                Social Feed
+              </Link>
+            )}
             <Link
               href="#"
               className="transition-all duration-300 ease-in-out hover:text-verdant-600"
@@ -355,6 +277,7 @@ export default function Navbar() {
               Volunteers
             </Link>
           </div>
+
           {/* Conditional rendering based on authentication status */}
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-4">
@@ -368,7 +291,7 @@ export default function Navbar() {
                 <DropdownTrigger>
                   <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity duration-200">
                     <Avatar
-                      src={`/icons/user.png`} // You can customize this path
+                      src={user.imageURL || "/icons/user.png"}
                       alt={user.fullName}
                       size="sm"
                       className="w-8 h-8"
