@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Home,
   BarChart,
   User,
-  Calendar,
   Bell,
   Settings,
   LogOut,
   LucideIcon,
+  Handshake,
 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface MenuItem {
   name: string;
@@ -23,7 +23,26 @@ interface MenuItem {
 
 const SponsorSidebar = () => {
   const [notificationCount, setNotificationCount] = useState<number>(0);
-  const [selectedItem, setSelectedItem] = useState<string>('Home');
+  const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const menuItems: MenuItem[] = [
+    { name: 'Dashboard', icon: BarChart, href: '/Sponsor/dashboard' },
+    { name: 'Profile', icon: User, href: '/Sponsor/profile' },
+    {
+      name: 'Sponsorships',
+      icon: Handshake,
+      href: '/Sponsor/sponsorships/approved',
+    },
+    {
+      name: 'Notifications',
+      icon: Bell,
+      badge: notificationCount,
+      href: '/Sponsor/notifications',
+    },
+    { name: 'Settings', icon: Settings, href: '/Sponsor/settings' },
+  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -31,21 +50,39 @@ const SponsorSidebar = () => {
     }, 500);
   }, []);
 
-  const menuItems: MenuItem[] = [
-    { name: 'Home', icon: Home, href: '/' },
-    { name: 'Dashboard', icon: BarChart, href: '/Sponsor/dashboard' },
-    { name: 'Profile', icon: User, href: '/Sponsor/profile' },
-    { name: 'Events', icon: Calendar, href: '/Sponsor/events/active' },
-    { name: 'Notifications', icon: Bell, badge: notificationCount, href: '/Organization/notifications' },
-    { name: 'Settings', icon: Settings, href: '/Sponsor/settings' },
-  ];
+  // Set active item based on current route
+  useEffect(() => {
+    // Ensure pathname is not null
+    if (!pathname) return;
+
+    // Special handling for sponsorships routes
+    if (pathname.startsWith('/Sponsor/sponsorships')) {
+      setSelectedItem('Sponsorships');
+      return;
+    }
+
+    const currentItem = menuItems.find((item) => item.href === pathname);
+    if (currentItem) {
+      setSelectedItem(currentItem.name);
+    } else {
+      // Default to Dashboard if no match found
+      setSelectedItem('Dashboard');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <div className="h-screen w-60 bg-[#f8fefc] border-r  py-6 flex flex-col justify-between fixed">
       {/* Logo */}
       <div>
-        <div className="mb-8 flex justify-center">
-          <Image src="/images/logo.svg" alt="Logo" width={152} height={72} className="mr-6" />
+        <div className="mb-8 mt-7 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo.svg"
+            alt="Logo"
+            className="h-18 w-18 mr-6"
+            onClick={() => router.push('/')}
+          />
         </div>
 
         {/* Navigation */}
@@ -57,14 +94,19 @@ const SponsorSidebar = () => {
               return (
                 <Link key={item.name} href={item.href || '#'}>
                   <div
-                    onClick={() => setSelectedItem(item.name)}
                     className={`w-full cursor-pointer text-left flex items-center justify-between px-6 py-2 rounded-md hover:bg-verdant-50 relative ${
                       isActive ? 'text-verdant-700 font-semibold' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-2">
-                      <item.icon className={`h-5 w-5 ${isActive ? 'text-verdant-700' : ''}`} />
-                      <span className="font-secondary font-medium text-shark-950">{item.name}</span>
+                      <item.icon
+                        className={`h-5 w-5 ${
+                          isActive ? 'text-verdant-700' : ''
+                        }`}
+                      />
+                      <span className="font-secondary font-medium text-shark-950">
+                        {item.name}
+                      </span>
                     </div>
 
                     {typeof item.badge === 'number' && item.badge > 0 && (
@@ -73,7 +115,7 @@ const SponsorSidebar = () => {
                       </span>
                     )}
 
-                  {isActive && (
+                    {isActive && (
                       <span className="absolute right-0 top-0 h-full w-1 bg-verdant-700 rounded-full " />
                     )}
                   </div>
@@ -92,7 +134,9 @@ const SponsorSidebar = () => {
         >
           <div className="flex items-center space-x-2">
             <LogOut className="h-5 w-5" />
-            <span className="font-secondary font-medium text-shark-950">Logout</span>
+            <span className="font-secondary font-medium text-shark-950">
+              Logout
+            </span>
           </div>
         </button>
       </div>
