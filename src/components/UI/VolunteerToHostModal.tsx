@@ -32,7 +32,7 @@ export default function VolunteerToHostModal({
     try {
       await promoteToEventHost();
       console.log('Volunteer upgraded to Event Host');
-      router.push('/event-host/events');
+      router.push('/event-host/dashboard');
     } catch (error) {
       console.error('Error making volunteer an event host:', error);
     } finally {
