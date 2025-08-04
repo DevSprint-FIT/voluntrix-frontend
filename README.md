@@ -47,7 +47,7 @@ Features include:
 
 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/voluntrix-frontend.git
+https://github.com/DevSprint-FIT/voluntrix-frontend.git
 cd voluntrix-frontend
 ```
 
